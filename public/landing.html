@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iterum Foods - Professional Culinary & Restaurant Solutions</title>
+    <meta name="description" content="Nordic-inspired professional tools for culinary innovation and restaurant success. Built by chefs, designed for excellence.">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://iterumfoods.xyz">
+    <meta property="og:title" content="Iterum Foods - Culinary & Restaurant Solutions">
+    <meta property="og:description" content="Professional tools for culinary innovation">
+    
+    <!-- Nordic Branding Kit -->
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MC8Q3SZ47K"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-MC8Q3SZ47K');
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Custom adjustments for landing page */
+        .hero-height {
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .stats-bar {
+            background: linear-gradient(135deg, var(--nordic-forest) 0%, var(--nordic-pine) 100%);
+        }
+        
+        .investor-section {
+            background: var(--nordic-charcoal);
+            position: relative;
+        }
+        
+        .investor-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1' fill='rgba(255,255,255,0.05)'/%3E%3C/svg%3E");
+            opacity: 0.4;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: var(--space-3) 0;
+            display: flex;
+            align-items: start;
+            gap: var(--space-3);
+            font-size: var(--text-base);
+            color: var(--nordic-slate);
+        }
+        
+        .feature-list li i {
+            color: var(--nordic-forest);
+            margin-top: 4px;
+        }
+        
+        .cta-section {
+            background: var(--gradient-hero);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+        }
+        
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo-main {
+            font-family: var(--font-accent);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--nordic-forest);
+            letter-spacing: 0.5px;
+            line-height: 1;
+        }
+        
+        .logo-tagline {
+            font-size: 0.65rem;
+            color: var(--nordic-slate);
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+        
+        .trust-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-5);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: var(--text-sm);
+            font-weight: 600;
+        }
+        
+        .section-title {
+            font-family: var(--font-accent);
+            text-align: center;
+            margin-bottom: var(--space-7);
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            font-size: var(--text-xl);
+            color: var(--nordic-slate);
+            margin-top: var(--space-3);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nordic-nav" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: var(--space-5) 0;">
+        <div class="nordic-container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <!-- Logo -->
+                <div class="logo-container">
+                    <span class="logo-icon">🌿</span>
+                    <div class="logo-text">
+                        <div class="logo-main">ITERUM FOODS</div>
+                        <div class="logo-tagline">Culinary Excellence</div>
+                    </div>
+                </div>
+                
+                <!-- Desktop Nav -->
+                <div style="display: none; gap: var(--space-2);" class="desktop-nav">
+                    <a href="#products" class="nordic-nav-link">Products</a>
+                    <a href="#pricing" class="nordic-nav-link">Pricing</a>
+                    <a href="#investors" class="nordic-nav-link">Investors</a>
+                    <a href="#about" class="nordic-nav-link">About</a>
+                    <a href="#contact" class="nordic-nav-link">Contact</a>
+                </div>
+                
+                <!-- CTA -->
+                <div style="display: flex; gap: var(--space-3); align-items: center;">
+                    <a href="#client-portal" onclick="openClientPortal(event)" class="nordic-nav-link" style="display: none;">
+                        Client Login
+                    </a>
+                    <button onclick="scrollToProducts()" class="nordic-btn nordic-btn-primary" style="font-size: var(--text-sm);">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="nordic-hero hero-height nordic-texture-linen" style="padding-top: 100px;">
+        <div class="nordic-container">
+            <div class="nordic-hero-content" style="text-align: center; max-width: 900px; margin: 0 auto;">
+                <!-- Trust Badge -->
+                <div style="margin-bottom: var(--space-6);">
+                    <div class="trust-badge nordic-animate-fade">
+                        <i class="fas fa-users"></i>
+                        Trusted by 10,000+ culinary professionals worldwide
+                    </div>
+                </div>
+                
+                <!-- Hero Headline -->
+                <h1 style="color: white; margin-bottom: var(--space-5); text-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                    Transform Your<br/>
+                    <span style="color: var(--nordic-leaf);">Culinary Vision</span>
+                </h1>
+                
+                <!-- Hero Subheadline -->
+                <p style="color: rgba(255,255,255,0.9); font-size: var(--text-2xl); line-height: var(--leading-relaxed); margin-bottom: var(--space-7); font-weight: 400;">
+                    Professional tools for culinary professionals and restaurant entrepreneurs. 
+                    <span style="display: block; margin-top: var(--space-3); font-family: var(--font-accent); font-style: italic;">
+                        Built by chefs who understand excellence.
+                    </span>
+                </p>
+                
+                <!-- CTA Buttons -->
+                <div style="display: flex; flex-wrap: wrap; gap: var(--space-4); justify-content: center; margin-bottom: var(--space-8);">
+                    <button onclick="scrollToProducts()" class="nordic-btn nordic-btn-primary" style="font-size: var(--text-lg); padding: var(--space-5) var(--space-7);">
+                        <i class="fas fa-rocket"></i>
+                        Explore Our Tools
+                    </button>
+                    <button onclick="scrollToInvestors()" class="nordic-btn nordic-btn-secondary" style="font-size: var(--text-lg); padding: var(--space-5) var(--space-7); background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); color: white; border-color: rgba(255,255,255,0.3);">
+                        <i class="fas fa-chart-line"></i>
+                        For Investors
+                    </button>
+                </div>
+                
+                <!-- Trust Elements -->
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-6); color: rgba(255,255,255,0.8); font-size: var(--text-sm);">
+                    <div style="display: flex; align-items: center; gap: var(--space-2);">
+                        <i class="fas fa-check-circle" style="color: var(--nordic-leaf);"></i>
+                        <span style="font-weight: 600;">No Credit Card</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-2);">
+                        <i class="fas fa-shield-alt" style="color: var(--nordic-leaf);"></i>
+                        <span style="font-weight: 600;">Secure & Private</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-2);">
+                        <i class="fas fa-star" style="color: var(--nordic-leaf);"></i>
+                        <span style="font-weight: 600;">98% Satisfaction</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="stats-bar" style="padding: var(--space-7) 0;">
+        <div class="nordic-container">
+            <div class="nordic-grid nordic-grid-4">
+                <div class="nordic-stat">
+                    <div class="nordic-stat-number" style="color: white;">10K+</div>
+                    <div class="nordic-stat-label" style="color: rgba(255,255,255,0.8);">Professional Chefs</div>
+                </div>
+                <div class="nordic-stat">
+                    <div class="nordic-stat-number" style="color: white;">500+</div>
+                    <div class="nordic-stat-label" style="color: rgba(255,255,255,0.8);">Restaurants Planned</div>
+                </div>
+                <div class="nordic-stat">
+                    <div class="nordic-stat-number" style="color: white;">$2.1M</div>
+                    <div class="nordic-stat-label" style="color: rgba(255,255,255,0.8);">Average Funding</div>
+                </div>
+                <div class="nordic-stat">
+                    <div class="nordic-stat-number" style="color: white;">98%</div>
+                    <div class="nordic-stat-label" style="color: rgba(255,255,255,0.8);">Success Rate</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="nordic-section college-ruled paper-grain">
+        <div class="nordic-container">
+            <div class="section-title">
+                <h2>Our Product Suite</h2>
+                <p class="section-subtitle">
+                    Comprehensive tools designed by professionals, for professionals. 
+                    Everything you need to excel in the culinary industry.
+                </p>
+                <!-- Handwritten note accent -->
+                <div style="margin-top: var(--space-6); text-align: center;">
+                    <span class="sticky-note" style="display: inline-block; max-width: 500px;">
+                        "Every tool built from real kitchen experience" - Chef's Promise
+                    </span>
+                </div>
+            </div>
+
+            <div class="nordic-grid nordic-grid-3" style="margin-top: var(--space-8);">
+                <!-- Restaurant Business Planner -->
+                <div class="nordic-product-card">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-5);">
+                        <div class="nordic-icon-lg">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <span class="nordic-badge nordic-badge-success">Live</span>
+                    </div>
+                    <h3 style="margin-bottom: var(--space-3); font-size: var(--text-2xl);">Restaurant Business Planner</h3>
+                    <p style="color: var(--nordic-slate); margin-bottom: var(--space-5); line-height: var(--leading-relaxed);">
+                        Complete business planning platform with financial projections, equipment planning, and market insights.
+                    </p>
+                    <ul style="list-style: none; padding: 0; margin-bottom: var(--space-6);">
+                        <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-3);"><span class="notebook-check">✓</span> Business plan templates</li>
+                        <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-3);"><span class="notebook-check">✓</span> Financial modeling</li>
+                        <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-3);"><span class="notebook-check">✓</span> Equipment sourcing</li>
+                        <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-3);"><span class="notebook-check">✓</span> Opening timeline</li>
+                    </ul>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div class="nordic-price" style="font-size: var(--text-4xl);">$10</div>
+                            <div style="font-size: var(--text-sm); color: var(--nordic-stone);">per month</div>
+                        </div>
+                        <a href="https://iterum-culinary-app.web.app" target="_blank" class="nordic-btn nordic-btn-primary">
+                            Launch App
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Culinary R&D App -->
+                <div class="nordic-product-card">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-5);">
+                        <div class="nordic-icon-lg" style="background: linear-gradient(145deg, #E8F5E9, #C8E6C9); color: #2E7D32;">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <span class="nordic-badge nordic-badge-success">Live</span>
+                    </div>
+                    <h3 style="margin-bottom: var(--space-3); font-size: var(--text-2xl);">Culinary R&D App</h3>
+                    <p style="color: var(--nordic-slate); margin-bottom: var(--space-5); line-height: var(--leading-relaxed);">
+                        Professional recipe development and research platform. Your digital chef's notebook.
+                    </p>
+                    <ul style="list-style: none; padding: 0; margin-bottom: var(--space-6);">
+                        <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-3);"><span class="notebook-check">✓</span> Recipe development</li>
+                        <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-3);"><span class="notebook-check">✓</span> Menu planning</li>
+                        <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-3);"><span class="notebook-check">✓</span> Cost analysis</li>
+                        <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-3);"><span class="notebook-check">✓</span> Ingredient database</li>
+                    </ul>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div class="nordic-price" style="font-size: var(--text-4xl);">Free</div>
+                            <div style="font-size: var(--text-sm); color: var(--nordic-stone);">forever</div>
+                        </div>
+                        <a href="https://iterumfoods.xyz" target="_blank" class="nordic-btn nordic-btn-secondary">
+                            Launch App
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Payroll App -->
+                <div class="nordic-product-card">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-5);">
+                        <div class="nordic-icon-lg" style="background: linear-gradient(145deg, #FFF8E1, #FFE0B2); color: #E65100;">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <span class="nordic-badge nordic-badge-success">Live</span>
+                    </div>
+                    <h3 style="margin-bottom: var(--space-3); font-size: var(--text-2xl);">Payroll Management</h3>
+                    <p style="color: var(--nordic-slate); margin-bottom: var(--space-5); line-height: var(--leading-relaxed);">
+                        Simple payroll processing for restaurants with tax calculations and employee tracking.
+                    </p>
+                    <ul style="list-style: none; padding: 0; margin-bottom: var(--space-6);">
+                        <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-3);"><span class="notebook-check">✓</span> Payroll processing</li>
+                        <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-3);"><span class="notebook-check">✓</span> Tax calculations</li>
+                        <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-3);"><span class="notebook-check">✓</span> Employee management</li>
+                        <li style="padding: var(--space-2) 0; display: flex; align-items: center; gap: var(--space-3);"><span class="notebook-check">✓</span> Export reports</li>
+                    </ul>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div class="nordic-price" style="font-size: var(--text-4xl);">Free</div>
+                            <div style="font-size: var(--text-sm); color: var(--nordic-stone);">desktop app</div>
+                        </div>
+                        <button onclick="contactSales()" class="nordic-btn nordic-btn-secondary">
+                            Download
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Skills Platform -->
+                <div class="nordic-product-card" style="opacity: 0.85;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-5);">
+                        <div class="nordic-icon-lg" style="background: linear-gradient(145deg, #F3E5F5, #E1BEE7); color: #6A1B9A;">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <span class="nordic-badge nordic-badge-warning">Q2 2025</span>
+                    </div>
+                    <h3 style="margin-bottom: var(--space-3); font-size: var(--text-2xl);">Skills Platform</h3>
+                    <p style="color: var(--nordic-slate); margin-bottom: var(--space-5); line-height: var(--leading-relaxed);">
+                        Professional development and training platform for culinary teams.
+                    </p>
+                    <ul class="feature-list" style="margin-bottom: var(--space-6);">
+                        <li><i class="fas fa-check-circle"></i> Skill tracking</li>
+                        <li><i class="fas fa-check-circle"></i> Training modules</li>
+                        <li><i class="fas fa-check-circle"></i> Certification management</li>
+                    </ul>
+                    <div style="text-align: center;">
+                        <button class="nordic-btn nordic-btn-ghost" style="width: 100%;">
+                            Join Waitlist
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CRM Platform -->
+                <div class="nordic-product-card">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-5);">
+                        <div class="nordic-icon-lg" style="background: linear-gradient(145deg, #E8EAF6, #C5CAE9); color: #283593;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <span class="nordic-badge nordic-badge-success">Live</span>
+                    </div>
+                    <h3 style="margin-bottom: var(--space-3); font-size: var(--text-2xl);">Client & Lead Management</h3>
+                    <p style="color: var(--nordic-slate); margin-bottom: var(--space-5); line-height: var(--leading-relaxed);">
+                        Manage your culinary consulting clients and restaurant leads in one place.
+                    </p>
+                    <ul class="feature-list" style="margin-bottom: var(--space-6);">
+                        <li><i class="fas fa-check-circle"></i> Contact management</li>
+                        <li><i class="fas fa-check-circle"></i> Lead tracking</li>
+                        <li><i class="fas fa-check-circle"></i> Email campaigns</li>
+                    </ul>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div class="nordic-price" style="font-size: var(--text-4xl);">$20</div>
+                            <div style="font-size: var(--text-sm); color: var(--nordic-stone);">per month</div>
+                        </div>
+                        <button onclick="openCRM()" class="nordic-btn nordic-btn-primary">
+                            Access CRM
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recipe Marketplace -->
+                <div class="nordic-product-card" style="opacity: 0.85;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: var(--space-5);">
+                        <div class="nordic-icon-lg" style="background: linear-gradient(145deg, #FFEBEE, #FFCDD2); color: #C62828;">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <span class="nordic-badge nordic-badge-warning">Q3 2025</span>
+                    </div>
+                    <h3 style="margin-bottom: var(--space-3); font-size: var(--text-2xl);">Recipe Marketplace</h3>
+                    <p style="color: var(--nordic-slate); margin-bottom: var(--space-5); line-height: var(--leading-relaxed);">
+                        Buy, sell, and share professional recipes. Monetize your culinary creations.
+                    </p>
+                    <ul class="feature-list" style="margin-bottom: var(--space-6);">
+                        <li><i class="fas fa-check-circle"></i> Recipe marketplace</li>
+                        <li><i class="fas fa-check-circle"></i> Licensing & royalties</li>
+                        <li><i class="fas fa-check-circle"></i> Community ratings</li>
+                    </ul>
+                    <div style="text-align: center;">
+                        <button class="nordic-btn nordic-btn-ghost" style="width: 100%;">
+                            Notify Me
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="nordic-section" style="background: white;">
+        <div class="nordic-container">
+            <div class="section-title">
+                <h2>Simple, Honest Pricing</h2>
+                <p class="section-subtitle">
+                    Choose the plan that fits your needs. Upgrade or downgrade anytime.
+                </p>
+            </div>
+
+            <div class="nordic-grid nordic-grid-3" style="margin-top: var(--space-9);">
+                <!-- Starter -->
+                <div class="nordic-pricing-card">
+                    <div style="text-align: center; margin-bottom: var(--space-6);">
+                        <h3 style="font-size: var(--text-2xl); margin-bottom: var(--space-4); font-family: var(--font-primary);">Starter</h3>
+                        <div class="nordic-price">$0</div>
+                        <p style="color: var(--nordic-stone); margin-top: var(--space-2);">For individual chefs</p>
+                    </div>
+                    <ul class="feature-list" style="margin-bottom: var(--space-6);">
+                        <li><i class="fas fa-check"></i> Culinary R&D App (full)</li>
+                        <li><i class="fas fa-check"></i> Payroll App (basic)</li>
+                        <li><i class="fas fa-check"></i> Recipe tools</li>
+                        <li><i class="fas fa-check"></i> Email support</li>
+                    </ul>
+                    <button onclick="signUp('starter')" class="nordic-btn nordic-btn-ghost" style="width: 100%;">
+                        Start Free
+                    </button>
+                </div>
+
+                <!-- Professional (Featured) -->
+                <div class="nordic-pricing-card featured">
+                    <div style="position: absolute; top: -16px; left: 50%; transform: translateX(-50%);">
+                        <span class="nordic-badge nordic-badge-success" style="padding: var(--space-3) var(--space-5); font-size: var(--text-sm);">
+                            MOST POPULAR
+                        </span>
+                    </div>
+                    <div style="text-align: center; margin-bottom: var(--space-6); margin-top: var(--space-3);">
+                        <h3 style="font-size: var(--text-2xl); margin-bottom: var(--space-4); font-family: var(--font-primary);">Professional</h3>
+                        <div class="nordic-price" style="color: var(--nordic-forest);">$29</div>
+                        <p style="color: var(--nordic-stone); margin-top: var(--space-2);">For entrepreneurs</p>
+                    </div>
+                    <ul class="feature-list" style="margin-bottom: var(--space-6);">
+                        <li><i class="fas fa-check"></i> Everything in Starter</li>
+                        <li><i class="fas fa-check"></i> Business Planner (full)</li>
+                        <li><i class="fas fa-check"></i> CRM & Lead Management</li>
+                        <li><i class="fas fa-check"></i> Priority support</li>
+                        <li><i class="fas fa-check"></i> Export to PDF/Excel</li>
+                        <li><i class="fas fa-check"></i> Team collaboration (5 users)</li>
+                    </ul>
+                    <button onclick="signUp('professional')" class="nordic-btn nordic-btn-primary" style="width: 100%;">
+                        Start 14-Day Trial
+                    </button>
+                </div>
+
+                <!-- Enterprise -->
+                <div class="nordic-pricing-card">
+                    <div style="text-align: center; margin-bottom: var(--space-6);">
+                        <h3 style="font-size: var(--text-2xl); margin-bottom: var(--space-4); font-family: var(--font-primary);">Enterprise</h3>
+                        <div class="nordic-price" style="font-size: var(--text-5xl);">Custom</div>
+                        <p style="color: var(--nordic-stone); margin-top: var(--space-2);">For teams</p>
+                    </div>
+                    <ul class="feature-list" style="margin-bottom: var(--space-6);">
+                        <li><i class="fas fa-check"></i> Everything in Professional</li>
+                        <li><i class="fas fa-check"></i> Unlimited team members</li>
+                        <li><i class="fas fa-check"></i> White-label options</li>
+                        <li><i class="fas fa-check"></i> API access</li>
+                        <li><i class="fas fa-check"></i> Dedicated support</li>
+                        <li><i class="fas fa-check"></i> Custom training</li>
+                    </ul>
+                    <button onclick="contactSales()" class="nordic-btn nordic-btn-ghost" style="width: 100%;">
+                        Contact Sales
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Investor Section -->
+    <section id="investors" class="investor-section nordic-section" style="color: white;">
+        <div class="nordic-container" style="position: relative; z-index: 1;">
+            <div style="text-align: center; margin-bottom: var(--space-9);">
+                <div class="trust-badge" style="margin-bottom: var(--space-5); background: rgba(212, 165, 116, 0.2); border-color: rgba(212, 165, 116, 0.3);">
+                    <i class="fas fa-chart-line"></i>
+                    Investment Opportunity
+                </div>
+                <h2 style="color: white; margin-bottom: var(--space-5);">
+                    Building the Future of<br/>Culinary Technology
+                </h2>
+                <p style="font-size: var(--text-xl); color: rgba(255,255,255,0.8); max-width: 700px; margin: 0 auto;">
+                    Revolutionizing how culinary professionals work. Join us in transforming a $863B industry.
+                </p>
+            </div>
+
+            <div class="nordic-grid nordic-grid-2" style="gap: var(--space-8); margin-bottom: var(--space-9);">
+                <!-- Market Opportunity -->
+                <div>
+                    <h3 style="color: white; margin-bottom: var(--space-6); font-size: var(--text-3xl);">Market Opportunity</h3>
+                    <div style="display: flex; flex-direction: column; gap: var(--space-5);">
+                        <div style="background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); padding: var(--space-6); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-3);">
+                                <span style="font-weight: 600;">Global Restaurant Industry</span>
+                                <span style="font-family: var(--font-accent); font-size: var(--text-2xl); font-weight: 700; color: var(--nordic-amber);">$863B</span>
+                            </div>
+                            <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                <div style="height: 100%; width: 90%; background: linear-gradient(90deg, var(--nordic-amber), var(--nordic-copper)); border-radius: 4px;"></div>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); padding: var(--space-6); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-3);">
+                                <span style="font-weight: 600;">Culinary Software Market</span>
+                                <span style="font-family: var(--font-accent); font-size: var(--text-2xl); font-weight: 700; color: var(--nordic-leaf);">$12.5B</span>
+                            </div>
+                            <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                                <div style="height: 100%; width: 75%; background: linear-gradient(90deg, var(--nordic-leaf), var(--nordic-sage)); border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Traction Metrics -->
+                <div>
+                    <h3 style="color: white; margin-bottom: var(--space-6); font-size: var(--text-3xl);">Traction & Growth</h3>
+                    <div class="nordic-grid nordic-grid-2">
+                        <div style="background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); padding: var(--space-6); border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+                            <div style="font-family: var(--font-accent); font-size: var(--text-4xl); font-weight: 700; color: var(--nordic-leaf); margin-bottom: var(--space-2);">10K+</div>
+                            <div style="font-size: var(--text-sm); opacity: 0.8; margin-bottom: var(--space-2);">Active Users</div>
+                            <div style="font-size: var(--text-xs); color: var(--nordic-amber);">+250% YoY</div>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); padding: var(--space-6); border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+                            <div style="font-family: var(--font-accent); font-size: var(--text-4xl); font-weight: 700; color: var(--nordic-amber); margin-bottom: var(--space-2);">500+</div>
+                            <div style="font-size: var(--text-sm); opacity: 0.8; margin-bottom: var(--space-2);">Paying Customers</div>
+                            <div style="font-size: var(--text-xs); color: var(--nordic-amber);">+180% YoY</div>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); padding: var(--space-6); border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+                            <div style="font-family: var(--font-accent); font-size: var(--text-4xl); font-weight: 700; color: var(--nordic-copper); margin-bottom: var(--space-2);">$150K</div>
+                            <div style="font-size: var(--text-sm); opacity: 0.8; margin-bottom: var(--space-2);">Annual Revenue</div>
+                            <div style="font-size: var(--text-xs); color: var(--nordic-amber);">+320% YoY</div>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); padding: var(--space-6); border-radius: 16px; text-align: center; border: 1px solid rgba(255,255,255,0.1);">
+                            <div style="font-family: var(--font-accent); font-size: var(--text-4xl); font-weight: 700; color: var(--nordic-leaf); margin-bottom: var(--space-2);">98%</div>
+                            <div style="font-size: var(--text-sm); opacity: 0.8; margin-bottom: var(--space-2);">Retention Rate</div>
+                            <div style="font-size: var(--text-xs); color: var(--nordic-amber);">Industry Leading</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investment CTA -->
+            <div style="text-align: center;">
+                <h3 style="color: white; margin-bottom: var(--space-6); font-size: var(--text-3xl);">Interested in Learning More?</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: var(--space-4); justify-content: center;">
+                    <button onclick="downloadPitchDeck()" class="nordic-btn nordic-btn-primary" style="font-size: var(--text-lg); padding: var(--space-5) var(--space-7);">
+                        <i class="fas fa-file-pdf"></i>
+                        Download Pitch Deck
+                    </button>
+                    <button onclick="scheduleInvestorCall()" class="nordic-btn nordic-btn-secondary" style="font-size: var(--text-lg); padding: var(--space-5) var(--space-7); background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); color: white; border-color: rgba(255,255,255,0.3);">
+                        <i class="fas fa-calendar"></i>
+                        Schedule Call
+                    </button>
+                </div>
+                <p style="color: rgba(255,255,255,0.6); margin-top: var(--space-5); font-size: var(--text-sm);">
+                    <i class="fas fa-lock" style="margin-right: var(--space-2);"></i>
+                    All materials are confidential and require NDA
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="nordic-section nordic-texture-paper">
+        <div class="nordic-container">
+            <div class="nordic-grid nordic-grid-2" style="gap: var(--space-9); align-items: center;">
+                <div>
+                    <h2 style="margin-bottom: var(--space-6);">
+                        Built by Chefs,<br/>
+                        <span style="color: var(--nordic-forest);">For Chefs</span>
+                    </h2>
+                    <p style="font-size: var(--text-xl); color: var(--nordic-slate); margin-bottom: var(--space-6); line-height: var(--leading-relaxed);">
+                        We're not just software developers—we're culinary professionals who've worked in real kitchens, 
+                        opened actual restaurants, and faced the challenges you face every day.
+                    </p>
+                    <p style="font-size: var(--text-lg); color: var(--nordic-slate); margin-bottom: var(--space-7); line-height: var(--leading-relaxed);">
+                        Iterum Foods was born from the desire to create tools that truly understand the restaurant industry. 
+                        Built with honesty, designed with purpose.
+                    </p>
+                    <div style="display: flex; flex-direction: column; gap: var(--space-5);">
+                        <div style="display: flex; gap: var(--space-4);">
+                            <div class="nordic-icon" style="flex-shrink: 0;">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h4 style="font-size: var(--text-lg); margin-bottom: var(--space-2); font-family: var(--font-primary);">Real Kitchen Experience</h4>
+                                <p style="color: var(--nordic-slate);">50+ years combined experience in professional kitchens</p>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: var(--space-4);">
+                            <div class="nordic-icon" style="flex-shrink: 0;">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h4 style="font-size: var(--text-lg); margin-bottom: var(--space-2); font-family: var(--font-primary);">Restaurant Operators</h4>
+                                <p style="color: var(--nordic-slate);">We've opened, operated, and sold successful restaurants</p>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: var(--space-4);">
+                            <div class="nordic-icon" style="flex-shrink: 0;">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h4 style="font-size: var(--text-lg); margin-bottom: var(--space-2); font-family: var(--font-primary);">Industry Focused</h4>
+                                <p style="color: var(--nordic-slate);">Every feature designed specifically for culinary professionals</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nordic-card" style="padding: var(--space-8); background: linear-gradient(145deg, white, var(--nordic-birch));">
+                    <h3 style="margin-bottom: var(--space-6); font-size: var(--text-3xl); text-align: center;">Our Mission</h3>
+                    <div class="nordic-testimonial" style="border: none; background: rgba(139, 157, 131, 0.08);">
+                        <p class="nordic-testimonial-quote" style="font-size: var(--text-xl); margin-bottom: 0;">
+                            To empower every culinary professional with tools, insights, and support needed 
+                            to turn their passion into sustainable, profitable businesses.
+                        </p>
+                    </div>
+                    
+                    <div class="nordic-divider" style="margin: var(--space-6) 0;"></div>
+                    
+                    <div class="nordic-grid nordic-grid-2" style="gap: var(--space-6);">
+                        <div style="text-align: center;">
+                            <div style="font-family: var(--font-accent); font-size: var(--text-4xl); font-weight: 700; color: var(--nordic-forest); margin-bottom: var(--space-2);">10K+</div>
+                            <div style="font-size: var(--text-sm); color: var(--nordic-slate);">Professional Chefs</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-family: var(--font-accent); font-size: var(--text-4xl); font-weight: 700; color: var(--nordic-forest); margin-bottom: var(--space-2);">500+</div>
+                            <div style="font-size: var(--text-sm); color: var(--nordic-slate);">Restaurants</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-family: var(--font-accent); font-size: var(--text-4xl); font-weight: 700; color: var(--nordic-forest); margin-bottom: var(--space-2);">50+</div>
+                            <div style="font-size: var(--text-sm); color: var(--nordic-slate);">Countries</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-family: var(--font-accent); font-size: var(--text-4xl); font-weight: 700; color: var(--nordic-forest); margin-bottom: var(--space-2);">98%</div>
+                            <div style="font-size: var(--text-sm); color: var(--nordic-slate);">Satisfaction</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="nordic-section" style="background: white;">
+        <div class="nordic-container-narrow">
+            <div class="section-title">
+                <h2>Get in Touch</h2>
+                <p class="section-subtitle">
+                    Have questions? We're here to help.
+                </p>
+            </div>
+
+            <div class="nordic-grid nordic-grid-2" style="margin-top: var(--space-9); gap: var(--space-8);">
+                <!-- Contact Info -->
+                <div style="display: flex; flex-direction: column; gap: var(--space-6);">
+                    <div style="display: flex; gap: var(--space-4);">
+                        <div class="nordic-icon" style="flex-shrink: 0; background: linear-gradient(145deg, #E8F5E9, #C8E6C9);">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <h4 style="font-size: var(--text-lg); margin-bottom: var(--space-2); font-family: var(--font-primary);">Email Us</h4>
+                            <a href="mailto:hello@iterumfoods.xyz" style="color: var(--nordic-forest); text-decoration: none; font-weight: 600;">hello@iterumfoods.xyz</a>
+                            <p style="font-size: var(--text-sm); color: var(--nordic-stone); margin-top: var(--space-1);">Response within 24 hours</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: var(--space-4);">
+                        <div class="nordic-icon" style="flex-shrink: 0; background: linear-gradient(145deg, #E1F5FE, #B3E5FC);">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div>
+                            <h4 style="font-size: var(--text-lg); margin-bottom: var(--space-2); font-family: var(--font-primary);">Call Us</h4>
+                            <a href="tel:+16179135927" style="color: var(--nordic-forest); text-decoration: none; font-weight: 600;">617-913-5927</a>
+                            <p style="font-size: var(--text-sm); color: var(--nordic-stone); margin-top: var(--space-1);">Mon-Fri, 9am-6pm EST</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: var(--space-4);">
+                        <div class="nordic-icon" style="flex-shrink: 0; background: linear-gradient(145deg, #F3E5F5, #E1BEE7);">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <h4 style="font-size: var(--text-lg); margin-bottom: var(--space-2); font-family: var(--font-primary);">Visit Us</h4>
+                            <p style="color: var(--nordic-slate); font-weight: 600;">Boston, MA</p>
+                            <p style="font-size: var(--text-sm); color: var(--nordic-stone); margin-top: var(--space-1);">Headquarters</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="nordic-card nordic-shadow-lg">
+                    <h3 style="margin-bottom: var(--space-6); font-size: var(--text-2xl); font-family: var(--font-primary);">Quick Actions</h3>
+                    <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+                        <button onclick="openClientPortal(event)" class="nordic-btn nordic-btn-primary" style="width: 100%;">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Client Portal Login
+                        </button>
+                        <button onclick="openCRM()" class="nordic-btn nordic-btn-secondary" style="width: 100%;">
+                            <i class="fas fa-users"></i>
+                            Access CRM
+                        </button>
+                        <button onclick="scheduleDemo()" class="nordic-btn nordic-btn-secondary" style="width: 100%;">
+                            <i class="fas fa-calendar"></i>
+                            Schedule Demo
+                        </button>
+                        <button onclick="contactSupport()" class="nordic-btn nordic-btn-ghost" style="width: 100%;">
+                            <i class="fas fa-headset"></i>
+                            Contact Support
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="nordic-footer" style="padding: var(--space-9) 0 var(--space-7) 0;">
+        <div class="nordic-container">
+            <div class="nordic-grid nordic-grid-4" style="gap: var(--space-8); margin-bottom: var(--space-8);">
+                <!-- Brand -->
+                <div style="grid-column: span 2;">
+                    <div class="logo-container" style="margin-bottom: var(--space-5);">
+                        <span class="logo-icon" style="font-size: 2.5rem;">🌿</span>
+                        <div class="logo-text">
+                            <div class="logo-main" style="color: var(--nordic-leaf);">ITERUM FOODS</div>
+                            <div class="logo-tagline" style="color: var(--nordic-sand);">Culinary Excellence</div>
+                        </div>
+                    </div>
+                    <p style="color: var(--nordic-stone); line-height: var(--leading-relaxed); margin-bottom: var(--space-5);">
+                        The complete platform for culinary professionals and restaurant entrepreneurs. 
+                        From recipe development to business planning.
+                    </p>
+                    <div style="display: flex; gap: var(--space-3);">
+                        <a href="#" class="nordic-icon" style="background: rgba(255,255,255,0.05); color: var(--nordic-sand); border-color: rgba(255,255,255,0.1);">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="nordic-icon" style="background: rgba(255,255,255,0.05); color: var(--nordic-sand); border-color: rgba(255,255,255,0.1);">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="nordic-icon" style="background: rgba(255,255,255,0.05); color: var(--nordic-sand); border-color: rgba(255,255,255,0.1);">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="nordic-icon" style="background: rgba(255,255,255,0.05); color: var(--nordic-sand); border-color: rgba(255,255,255,0.1);">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Products -->
+                <div>
+                    <h4 style="color: white; margin-bottom: var(--space-4); font-size: var(--text-lg); font-family: var(--font-primary);">Products</h4>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: var(--space-3);">
+                        <li><a href="https://iterum-culinary-app.web.app" target="_blank" class="nordic-footer-link">Restaurant Planner</a></li>
+                        <li><a href="https://iterumfoods.xyz" target="_blank" class="nordic-footer-link">Culinary R&D App</a></li>
+                        <li><a href="#products" class="nordic-footer-link">Payroll App</a></li>
+                        <li><a href="#products" class="nordic-footer-link">CRM Platform</a></li>
+                        <li><a href="#products" class="nordic-footer-link">Skills Platform</a></li>
+                    </ul>
+                </div>
+
+                <!-- Company -->
+                <div>
+                    <h4 style="color: white; margin-bottom: var(--space-4); font-size: var(--text-lg); font-family: var(--font-primary);">Company</h4>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: var(--space-3);">
+                        <li><a href="#about" class="nordic-footer-link">About Us</a></li>
+                        <li><a href="#investors" class="nordic-footer-link">For Investors</a></li>
+                        <li><a href="#contact" class="nordic-footer-link">Contact</a></li>
+                        <li><a href="#" class="nordic-footer-link">Careers</a></li>
+                        <li><a href="#" class="nordic-footer-link">Blog</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="nordic-divider" style="background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);"></div>
+            
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-4);">
+                <p style="color: var(--nordic-stone); font-size: var(--text-sm);">
+                    © 2025 Iterum Foods. All rights reserved.
+                </p>
+                <div style="display: flex; gap: var(--space-6); font-size: var(--text-sm);">
+                    <a href="#" class="nordic-footer-link">Privacy Policy</a>
+                    <a href="#" class="nordic-footer-link">Terms of Service</a>
+                    <a href="#" class="nordic-footer-link">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const navHeight = 80;
+                    const targetPosition = target.offsetTop - navHeight;
+                    window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Show desktop nav on larger screens
+        window.addEventListener('resize', function() {
+            const desktopNav = document.querySelector('.desktop-nav');
+            if (window.innerWidth >= 768) {
+                desktopNav.style.display = 'flex';
+            } else {
+                desktopNav.style.display = 'none';
+            }
+        });
+        window.dispatchEvent(new Event('resize'));
+
+        // Scroll functions
+        function scrollToProducts() {
+            document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+            gtag('event', 'click', { event_category: 'Navigation', event_label: 'Products' });
+        }
+
+        function scrollToInvestors() {
+            document.getElementById('investors').scrollIntoView({ behavior: 'smooth' });
+            gtag('event', 'click', { event_category: 'Navigation', event_label: 'Investors' });
+        }
+
+        // Sign up functions
+        function signUp(plan) {
+            gtag('event', 'click', { event_category: 'Pricing', event_label: 'Sign Up - ' + plan });
+            if (plan === 'professional') {
+                window.open('https://iterum-culinary-app.web.app', '_blank');
+            } else {
+                window.open('https://iterum-culinary-app.web.app', '_blank');
+            }
+        }
+
+        function contactSales() {
+            gtag('event', 'click', { event_category: 'Contact', event_label: 'Enterprise Sales' });
+            window.location.href = 'mailto:hello@iterumfoods.xyz?subject=Enterprise Inquiry';
+        }
+
+        // Client Portal
+        function openClientPortal(event) {
+            event.preventDefault();
+            gtag('event', 'click', { event_category: 'Portal', event_label: 'Client Portal' });
+            window.open('https://iterumfoods.xyz/contact_management.html', '_blank');
+        }
+
+        // CRM Access
+        function openCRM() {
+            gtag('event', 'click', { event_category: 'Product', event_label: 'CRM Access' });
+            window.open('https://iterumfoods.xyz/contact_management.html', '_blank');
+        }
+
+        // Investor functions
+        function downloadPitchDeck() {
+            gtag('event', 'click', { event_category: 'Investor', event_label: 'Download Pitch Deck' });
+            alert('Pitch deck download requires NDA. Please contact hello@iterumfoods.xyz');
+        }
+
+        function scheduleInvestorCall() {
+            gtag('event', 'click', { event_category: 'Investor', event_label: 'Schedule Call' });
+            window.location.href = 'mailto:hello@iterumfoods.xyz?subject=Investor Call Request';
+        }
+
+        // Other functions
+        function scheduleDemo() {
+            gtag('event', 'click', { event_category: 'Contact', event_label: 'Schedule Demo' });
+            window.location.href = 'mailto:hello@iterumfoods.xyz?subject=Demo Request';
+        }
+
+        function contactSupport() {
+            gtag('event', 'click', { event_category: 'Contact', event_label: 'Support' });
+            window.location.href = 'mailto:hello@iterumfoods.xyz?subject=Support Request';
+        }
+
+        // Track page load
+        window.addEventListener('load', function() {
+            gtag('event', 'page_view', {
+                page_title: 'Iterum Foods - Home',
+                page_location: window.location.href
+            });
+        });
+
+        console.log('🌿 Iterum Foods - Nordic Design - Loaded');
+    </script>
+</body>
+</html>
+
