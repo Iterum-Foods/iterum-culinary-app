@@ -325,7 +325,7 @@ class CloudDataSync {
         };
         
         // Try to send via fetch with keepalive
-        fetch(`https://firestore.googleapis.com/v1/projects/iterum-culinary-app/databases/(default)/documents:commit`, {
+        fetch(`https://firestore.googleapis.com/v1/projects/iterum-culinary-app2/databases/(default)/documents:commit`, {
             method: 'POST',
             keepalive: true,
             headers: { 'Content-Type': 'application/json' },

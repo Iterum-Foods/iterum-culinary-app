@@ -3,7 +3,9 @@
  * Additional dark elements for better contrast
  */
 
-/* Dark Navigation Bar */
+/* Dark Navigation Bar - DISABLED: Using light theme for header across all pages */
+/* The header now uses the light theme from header-universal.css */
+/* 
 .unified-nav-header {
     background: linear-gradient(135deg, #0F0E0C 0%, #1A1512 100%) !important;
     border-bottom: 2px solid rgba(139, 78, 50, 0.5) !important;
@@ -31,8 +33,10 @@
     font-weight: 900 !important;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
 }
+*/
 
-/* Dropdown Menus - Darker */
+/* Dropdown Menus - DISABLED: Using light theme for header dropdowns */
+/*
 .nav-dropdown-content {
     background: linear-gradient(135deg, #2A2420 0%, #1F1D1A 100%) !important;
     border: 2px solid #4A3D2F !important;
@@ -48,6 +52,7 @@
     background: rgba(91, 122, 95, 0.3) !important;
     color: #FFFFFF !important;
 }
+*/
 
 /* Sidebar & Secondary Navigation */
 .sidebar, .secondary-nav {

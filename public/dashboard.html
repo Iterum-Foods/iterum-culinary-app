@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iterum Operations & Food Safety Dashboard</title>
+  
+  <!-- Auth check -->
+  <script>
+    (function () {
+      const sessionActive = localStorage.getItem('session_active');
+      const currentUser = localStorage.getItem('current_user');
+      if (!sessionActive || !currentUser) {
+        console.log('🔒 No active session - redirecting to sign-in page');
+        window.location.href = '/signin.html';
+      }
+    })();
+  </script>
+  
+  <!-- Firebase Config -->
+  <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/auth-manager.js"></script>
+  <script src="assets/js/auth-api-helper.js"></script>
+  <script src="assets/js/auth-diagnostics.js"></script>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMDJzL+S8QZl+YgIq+3/pI7g8v+KxI8U/Gk3y6+qXq+b4iYgVd/v/w/q9y+A4k=" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- ITERUM BRAND KIT - MUST LOAD FIRST -->
+  <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+  <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
+  <link rel="stylesheet" href="assets/css/header-universal.css">
+  
+  <!-- Additional Scripts -->
+  <script src="assets/js/user-data-manager.js" defer></script>
+  <script src="assets/js/cloud-data-sync.js" defer></script>
+  <script src="assets/js/sync-status-indicator.js" defer></script>
+  <script src="assets/js/unified-nav-header.js" defer></script>
+  <script src="assets/js/unified-project-selector.js" defer></script>
+  <script src="assets/js/header-user-display.js" defer></script>
+  <script src="assets/js/project-management-system.js" defer></script>
+  
+  <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
+  
+  <style>
+    /**
+     * ITERUM BRAND KIT - Heritage Warmth (Terracotta & Olive)
+     * Notebook-style dashboard with warm earth tones
+     */
+    :root {
+      /* Background Layers */
+      --brand-bg-primary: #fffbeb; /* Creamy Beige */
+      --brand-bg-secondary: #fef3c7; /* Light Yellow/Butter */
+      --brand-bg-tertiary: #fde68a; /* Warm Yellow */
+
+      /* Text Colors */
+      --brand-text-primary: #78350f; /* Dark Brown */
+      --brand-text-secondary: #92400e; /* Medium Brown */
+      --brand-text-muted: #b45309; /* Rust/Muted */
+
+      /* Accent Colors */
+      --brand-primary-accent: #d97706; /* Terracotta/Rust Orange */
+      --brand-secondary-accent: #4d7c0f; /* Olive Green */
+
+      /* UI Elements */
+      --brand-card-bg: #ffffff;
+      --brand-border-light: #fcd34d; /* Yellow/Gold border */
+
+      /* Spacing & Radius */
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+
+      /* Custom Notebook Styling */
+      --notebook-line-color: rgba(217, 119, 6, 0.15); /* Faint Rust line */
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--brand-bg-secondary);
+      color: var(--brand-text-primary);
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    .card-style {
+      background-color: var(--brand-card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--brand-border-light);
+      padding: 1.25rem;
+    }
+
+    /* Main Content Grid lines (Notebook ruled paper effect) */
+    .main-content-area {
+      background-color: var(--brand-bg-secondary);
+      background-image: linear-gradient(to bottom, var(--notebook-line-color) 1px, transparent 1px);
+      background-size: 100% 28px;
+      padding-top: 28px;
+      padding-right: 0.75rem;
+      padding-bottom: 3rem;
+      overflow-y: auto;
+      height: 100vh;
+    }
+
+    .chart-container {
+      position: relative;
+      width: 100%;
+      height: 280px;
+      max-height: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .op-link {
+    display: flex;
+    align-items: center;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      background-color: var(--brand-bg-primary);
+      border: 1px solid var(--brand-border-light);
+      transition: background-color 0.2s;
+      text-decoration: none;
+      color: var(--brand-text-primary);
+    }
+
+    .op-link:hover {
+      background-color: var(--brand-bg-tertiary);
+    }
+
+    /* Task and Idea Styling */
+    .task-item, .idea-item {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--brand-border-light);
+    display: flex;
+    align-items: center;
+      gap: 0.5rem;
+    }
+
+    .task-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--brand-primary-accent);
+    }
+
+    .task-text.done {
+      text-decoration: line-through;
+      color: var(--brand-text-muted);
+    }
+
+    textarea, input[type="text"], input[type="date"] {
+    width: 100%;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--brand-border-light);
+      background: var(--brand-card-bg);
+      color: var(--brand-text-primary);
+      padding: 0.625rem;
+    font-family: inherit;
+      font-size: 0.875rem;
+    }
+
+    textarea:focus, input:focus {
+      outline: none;
+      border-color: var(--brand-primary-accent);
+      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+      transition: all 0.2s;
+  }
+
+    .btn-primary {
+      background-color: var(--brand-primary-accent);
+    color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #b45309;
+    }
+
+    .btn-secondary {
+      background-color: var(--brand-secondary-accent);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background-color: #365314;
+    }
+
+    .btn-ghost {
+      background-color: transparent;
+      color: var(--brand-text-secondary);
+      border: 1px solid var(--brand-border-light);
+    }
+
+    .btn-ghost:hover {
+      background-color: var(--brand-bg-primary);
+    }
+  </style>
+</head>
+  <body class="flex h-screen text-primary bg-secondary" style="padding-top: 0;">
+
+  <!-- LEFT SIDEBAR (Notebook Spine) -->
+  <aside class="w-56 flex-shrink-0 border-r p-4 hidden md:block bg-primary border-brand" style="background-color: var(--brand-bg-primary); border-color: var(--brand-border-light);">
+    <div class="h-full flex flex-col">
+      <!-- Logo/Title -->
+      <div class="mb-8 flex items-center">
+        <span class="text-2xl font-extrabold" style="color: var(--brand-primary-accent);">Iterum</span>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex-grow space-y-1">
+        <div class="text-xs uppercase font-semibold mb-3 px-2" style="color: var(--brand-text-muted);">Main</div>
+        
+        <!-- Dashboard Link (Active) -->
+        <a href="dashboard.html" class="flex items-center px-3 py-2.5 rounded-md text-white font-semibold text-sm" style="background-color: var(--brand-primary-accent);">
+          <i class="fa-solid fa-gauge-high" style="width: 18px; font-size: 0.9rem;"></i>
+          <span class="ml-2.5">Dashboard</span>
+        </a>
+        
+        <!-- Projects Link -->
+        <a href="project-hub.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+          <i class="fa-solid fa-folder-tree" style="width: 18px; font-size: 0.9rem;"></i>
+          <span class="ml-2.5">Projects</span>
+        </a>
+        
+        <!-- Menu Builder Link -->
+        <a href="menu-builder.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+          <i class="fa-solid fa-utensils" style="width: 18px; font-size: 0.9rem;"></i>
+          <span class="ml-2.5">Menu Builder</span>
+        </a>
+        
+        <!-- Recipe Library Link -->
+        <a href="recipe-library.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+          <i class="fa-solid fa-book-open" style="width: 18px; font-size: 0.9rem;"></i>
+          <span class="ml-2.5">Recipe Index</span>
+        </a>
+        
+        <!-- Ingredients Link -->
+        <a href="ingredients.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+          <i class="fa-solid fa-carrot" style="width: 18px; font-size: 0.9rem;"></i>
+          <span class="ml-2.5">Ingredients</span>
+        </a>
+        
+        <!-- Recipe Developer Link -->
+        <a href="recipe-developer.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+          <i class="fa-solid fa-flask" style="width: 18px; font-size: 0.9rem;"></i>
+          <span class="ml-2.5">Recipe Developer</span>
+        </a>
+        
+        <!-- Calendar Link -->
+        <a href="calendar.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+          <i class="fa-solid fa-calendar-days" style="width: 18px; font-size: 0.9rem;"></i>
+          <span class="ml-2.5">Calendar</span>
+        </a>
+        
+        <!-- Kitchen Management Link -->
+        <a href="kitchen-management.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+          <i class="fa-solid fa-kitchen-set" style="width: 18px; font-size: 0.9rem;"></i>
+          <span class="ml-2.5">Kitchen</span>
+        </a>
+        
+        <!-- Inventory Link -->
+        <a href="inventory.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+          <i class="fa-solid fa-boxes-stacked" style="width: 18px; font-size: 0.9rem;"></i>
+          <span class="ml-2.5">Inventory</span>
+        </a>
+        
+        <!-- Vendors Link -->
+        <a href="vendor-management.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+          <i class="fa-solid fa-store" style="width: 18px; font-size: 0.9rem;"></i>
+          <span class="ml-2.5">Vendors</span>
+        </a>
+        
+        <div class="text-xs uppercase font-semibold mt-5 mb-2 pt-4 px-2 border-t" style="border-color: var(--brand-border-light); color: var(--brand-text-muted);">Tools</div>
+        
+        <!-- Recipe Photo Studio Link -->
+        <a href="recipe-photo-studio.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+          <i class="fa-solid fa-camera" style="width: 18px; font-size: 0.9rem;"></i>
+          <span class="ml-2.5">Photo Studio</span>
+        </a>
+        
+        <!-- Recipe Scaling Tool Link -->
+        <a href="recipe-scaling-tool.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+          <i class="fa-solid fa-calculator" style="width: 18px; font-size: 0.9rem;"></i>
+          <span class="ml-2.5">Recipe Scaling</span>
+        </a>
+        
+        <div class="text-xs uppercase font-semibold mt-5 mb-2 pt-4 px-2 border-t" style="border-color: var(--brand-border-light); color: var(--brand-text-muted);">Project</div>
+        <div id="sidebar-project-chip" class="text-xs font-semibold px-2" style="color: var(--brand-text-secondary);">Master Project</div>
+      </nav>
+
+      <!-- User Profile -->
+      <div class="mt-auto pt-4 border-t" style="border-color: var(--brand-border-light);">
+        <div class="flex items-center">
+          <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-white text-sm" style="background-color: var(--brand-secondary-accent);" id="user-avatar">C</div>
+          <div class="ml-2.5 flex-1 min-w-0">
+            <div class="text-sm font-semibold truncate" id="user-name" style="color: var(--brand-text-primary);">Chef</div>
+            <div class="text-xs truncate" style="color: var(--brand-text-muted);" id="user-email">Loading...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT AREA (Notebook Page) -->
+  <section class="flex-grow main-content-area min-h-full">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      
+      <!-- Header -->
+      <header class="mb-6 flex justify-between items-start sticky top-0 z-10 pb-4" style="background-color: var(--brand-bg-secondary);">
+        <div class="flex-1">
+          <h1 class="text-2xl font-bold mb-2" style="color: var(--brand-text-primary);">Daily Ops Board</h1>
+          <div class="flex items-center gap-3 flex-wrap">
+            <div id="header-project-chip" class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background-color: var(--brand-bg-primary); color: var(--brand-text-secondary);">Project: Master Project</div>
+            <div class="date-picker">
+              <label for="dashboard-date" class="text-xs block mb-1" style="color: var(--brand-text-muted);">Working date</label>
+              <input type="date" id="dashboard-date" class="text-sm py-1 px-2" style="margin-top: 0;">
+            </div>
+          </div>
+        </div>
+        <button onclick="window.location.href='recipe-developer.html'" class="py-2 px-4 rounded-md text-sm shadow-md text-white hover:opacity-90 transition-opacity whitespace-nowrap ml-4" style="background-color: var(--brand-primary-accent);">
+          <i class="fa-solid fa-plus mr-2"></i>New Experiment
+        </button>
+      </header>
+
+      <!-- Grid Layout for Cards: 2 equal columns with better spacing -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+        <!-- COLUMN 1: R&D, IDEAS, AND PERFORMANCE (Left Column) -->
+        <div class="space-y-5">
+          
+          <!-- Card 1.1: Idea Pad (Recipe Ideas - Existing Feature) -->
+          <div class="card-style">
+            <h2 class="text-lg font-bold mb-3 flex items-center" style="color: var(--brand-text-primary);">
+              <i class="fa-solid fa-lightbulb mr-2.5" style="color: var(--brand-secondary-accent); font-size: 1rem;"></i>Culinary Idea Pad
+            </h2>
+            <p class="text-xs mb-3" style="color: var(--brand-text-muted); line-height: 1.5;">
+              Sketch out concepts for new dishes or menu themes.
+            </p>
+            
+            <!-- Idea Form -->
+            <form id="idea-form" class="space-y-2.5 mb-3">
+              <input type="text" id="idea-title" placeholder="Idea title" class="w-full text-sm">
+              <textarea id="idea-notes" class="w-full h-28 resize-none text-sm" placeholder="Concept: Deconstructed Beet Wellington. Components: Smoked beet puree, puff pastry shard, foie gras mousse, reduced port wine jus. Theme: Late Autumn Menu."></textarea>
+              <div class="flex gap-2">
+                <button type="submit" class="btn-secondary flex-1">
+                  <i class="fa-solid fa-floppy-disk mr-2"></i>Save Idea
+                </button>
+                <button type="button" id="clear-ideas" class="btn-ghost">
+                  Clear All
+                </button>
+              </div>
+            </form>
+            
+            <!-- Idea List -->
+            <div id="idea-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
+            <div id="idea-status" class="text-xs mt-2" style="color: var(--brand-text-muted);">No ideas yet</div>
+          </div>
+
+          <!-- Card 1.2: R&D Success Rate (Doughnut Chart) -->
+          <div class="card-style">
+            <h2 class="text-lg font-bold mb-3" style="color: var(--brand-text-primary);">R&D Success Rate (Q3)</h2>
+            <p class="text-xs mb-3" style="color: var(--brand-text-muted); line-height: 1.5;">
+              Percentage of experiments reaching Final/Approved status.
+            </p>
+            <div class="chart-container">
+              <canvas id="successRateChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Card 1.3: Daily Tasks (Existing Feature) -->
+          <div class="card-style">
+            <h2 class="text-lg font-bold mb-3" style="color: var(--brand-text-primary);">Daily Tasks</h2>
+            <p class="text-xs mb-3" style="color: var(--brand-text-muted); line-height: 1.5;">
+              Capture the must-do items for today and check them off as you go.
+            </p>
+            
+            <!-- Task Form -->
+            <form id="task-form" class="flex gap-2 mb-3">
+              <input type="text" id="task-input" placeholder="Add a task and press Enter" class="flex-1 text-sm">
+              <button type="submit" class="btn-primary text-sm px-3">Add</button>
+            </form>
+            
+            <!-- Task List -->
+            <ul id="task-list" class="space-y-1 max-h-56 overflow-y-auto"></ul>
+            <div id="task-status" class="text-xs mt-2" style="color: var(--brand-text-muted);">Nothing queued</div>
+            
+            <!-- Task Actions -->
+            <div class="flex gap-2 mt-3">
+              <button id="clear-completed" class="btn-ghost flex-1 text-xs py-1.5">Clear Completed</button>
+              <button id="reset-tasks" class="btn-ghost flex-1 text-xs py-1.5">Reset List</button>
+            </div>
+          </div>
+        
+        <!-- COLUMN 2: DAILY OPERATIONS, LOGGING, AND EXECUTION (Right Column) -->
+        <div class="space-y-5">
+          
+          <!-- Card 2.1: Dynamic Temperature Log -->
+          <div class="card-style">
+            <div class="flex justify-between items-center mb-3">
+              <h2 class="text-lg font-bold flex items-center" style="color: var(--brand-text-primary);">
+                <i class="fa-solid fa-thermometer-three-quarters mr-2.5" style="color: var(--brand-primary-accent); font-size: 1rem;"></i>Critical Temperature Log
+              </h2>
+              <button onclick="tempLogManager.addUnit()" class="text-xs py-1 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
+                <i class="fa-solid fa-plus mr-1"></i> Add Unit
+              </button>
+            </div>
+            <p class="text-xs mb-3" style="color: var(--brand-text-muted); line-height: 1.5;">
+              Refrigeration units from your Equipment List. Target ≤ 5°C (≤ 41°F).
+            </p>
+            <ul id="refrigeration-unit-list" class="space-y-1">
+              <li class="text-center p-4" style="color: var(--brand-text-muted);">Loading Units...</li>
+            </ul>
+          </div>
+          
+          <!-- Card 2.2: Dynamic Sanitizer Check Log -->
+          <div class="card-style">
+            <div class="flex justify-between items-center mb-3">
+              <h2 class="text-lg font-bold flex items-center" style="color: var(--brand-text-primary);">
+                <i class="fa-solid fa-vial-circle-check mr-2.5" style="color: var(--brand-primary-accent); font-size: 1rem;"></i>Sanitizer Check Log
+              </h2>
+              <button onclick="sanitizerLogManager.addLocation()" class="text-xs py-1 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
+                <i class="fa-solid fa-plus mr-1"></i> Add Location
+              </button>
+            </div>
+            <p class="text-xs mb-3" style="color: var(--brand-text-muted); line-height: 1.5;">
+              All required check points. Target typically 150-200 PPM (varies by agent).
+            </p>
+            <ul id="sanitizer-location-list" class="space-y-1">
+              <li class="text-center p-4" style="color: var(--brand-text-muted);">Loading Locations...</li>
+            </ul>
+          </div>
+          
+          <!-- Card 2.3: Today's Operations Focus & Checklists -->
+          <div class="card-style">
+            <h2 class="text-lg font-bold mb-3 flex items-center" style="color: var(--brand-text-primary);">
+              <i class="fa-solid fa-bullseye mr-2.5" style="color: var(--brand-primary-accent); font-size: 1rem;"></i>Daily Operational Focus
+            </h2>
+            
+            <p class="font-semibold mt-3 mb-2 text-sm" style="color: var(--brand-text-secondary);">Operational Checklists:</p>
+            <div class="space-y-2">
+              <a href="#opening-checklist" class="op-link justify-between py-2">
+                <span class="font-medium text-sm">
+                  <i class="fa-solid fa-door-open text-center mr-2" style="color: var(--brand-secondary-accent); width: 16px;"></i>Opening Checklist
+                </span>
+                <span class="text-xs px-2 py-0.5 rounded-full" style="background-color: var(--brand-bg-tertiary); color: var(--brand-text-secondary);">Due 10:00 AM</span>
+              </a>
+              <a href="#closing-checklist" class="op-link justify-between py-2">
+                <span class="font-medium text-sm">
+                  <i class="fa-solid fa-door-closed text-center mr-2" style="color: var(--brand-secondary-accent); width: 16px;"></i>Closing Checklist
+                </span>
+                <span class="text-xs px-2 py-0.5 rounded-full text-white" style="background-color: var(--brand-primary-accent);">Due 11:30 PM</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Card 2.4: Notes (Existing Feature) -->
+          <div class="card-style">
+            <h2 class="text-lg font-bold mb-3" style="color: var(--brand-text-primary);">Notes</h2>
+            <p class="text-xs mb-3" style="color: var(--brand-text-muted); line-height: 1.5;">
+              Kitchen pulse, service feedback, or anything the team should remember.
+            </p>
+            <textarea id="notes-content" class="w-full h-32 resize-none mb-3 text-sm" placeholder="Document today's takeaways, issues to escalate, or wins worth sharing."></textarea>
+            <div class="flex gap-2">
+              <button id="save-notes" class="btn-primary flex-1 text-sm py-2">Save Notes</button>
+              <button id="clear-notes" class="btn-ghost text-sm py-2 px-3">Clear</button>
+            </div>
+            <div id="notes-status" class="text-xs mt-2" style="color: var(--brand-text-muted);">No saved notes yet</div>
+          </div>
+
+          <!-- Card 2.5: Quick Stats -->
+          <div class="card-style">
+            <h2 class="text-lg font-bold mb-3" style="color: var(--brand-text-primary);">Quick Stats</h2>
+            <div class="grid grid-cols-3 gap-3">
+              <div class="text-center">
+                <div class="text-xl font-bold" style="color: var(--brand-primary-accent);" id="quick-stat-tasks">0</div>
+                <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Open Tasks</div>
+              </div>
+              <div class="text-center">
+                <div class="text-xl font-bold" style="color: var(--brand-secondary-accent);" id="quick-stat-ideas">0</div>
+                <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Ideas Queued</div>
+              </div>
+              <div class="text-center">
+                <div class="text-xl font-bold" style="color: var(--brand-primary-accent);" id="quick-stat-notes">0</div>
+                <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Days Logged</div>
+              </div>
+            </div>
+          </div>
+
+    </div>
+      </div>
+  </section>
+
+  <!-- Load existing Dashboard functionality -->
+  <script src="assets/js/dashboard-core.js"></script>
+  
+  <!-- Firebase Firestore for Temperature and Sanitizer Logs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, addDoc, onSnapshot, collection, query, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    
+    // Get Firebase config
+    let app, db, auth;
+    let userId = null;
+    let isAuthReady = false;
+    
+    // Initialize Firebase
+    async function initFirebase() {
+      try {
+        if (window.firebaseConfig) {
+          app = initializeApp(window.firebaseConfig);
+          db = getFirestore(app);
+          auth = getAuth(app);
+          
+          onAuthStateChanged(auth, async (user) => {
+            if (user) {
+              userId = user.uid;
+              isAuthReady = true;
+              console.log('🔥 Firebase Auth Ready. User ID:', userId);
+              tempLogManager.startListener();
+              sanitizerLogManager.startListener();
+            } else {
+              // Try anonymous sign-in
+              try {
+                await signInAnonymously(auth);
+              } catch (error) {
+                console.warn('⚠️ Anonymous sign-in failed:', error);
+              }
+            }
+          });
+        } else {
+          console.warn('⚠️ Firebase config not available');
+        }
+      } catch (error) {
+        console.error('❌ Firebase initialization error:', error);
+      }
+    }
+    
+    // Temperature Log Manager
+    const REFRIGERATION_PATH = 'refrigeration_units';
+    window.tempLogManager = {
+      addUnit: async function() {
+        const name = prompt("Enter the Name of the New Refrigeration Unit (e.g., Walk-In Cooler 1, Line Fridge):");
+        if (name && name.trim()) {
+          if (!db) {
+            console.error('Firestore not initialized');
+            alert('Database not ready. Please wait a moment and try again.');
+            return;
+          }
+          try {
+            await addDoc(collection(db, REFRIGERATION_PATH), {
+              name: name.trim(),
+              type: 'Refrigerator',
+              minTemp: 0,
+              maxTemp: 5,
+              createdAt: new Date()
+            });
+            console.log('✅ New unit added:', name);
+          } catch (error) {
+            console.error('❌ Error adding unit:', error);
+            alert('Failed to add unit. Please try again.');
+          }
+        }
+      },
+      startListener: function() {
+        if (!db || !isAuthReady) {
+          setTimeout(() => this.startListener(), 500);
+          return;
+        }
+        const q = query(collection(db, REFRIGERATION_PATH));
+        onSnapshot(q, (snapshot) => {
+          const units = [];
+          snapshot.forEach((doc) => {
+            units.push({ id: doc.id, ...doc.data() });
+          });
+          renderRefrigerationUnits(units);
+        }, (error) => {
+          console.error('❌ Temp log listener error:', error);
+        });
+      }
+    };
+
+    // Sanitizer Log Manager
+    const SANITIZER_PATH = 'sanitizer_locations';
+    window.sanitizerLogManager = {
+      addLocation: async function() {
+        const name = prompt("Enter the Name of the New Sanitizer Checkpoint (e.g., 3-Bay Sink, Dish Machine, Mop Sink):");
+        if (name && name.trim()) {
+          if (!db) {
+            console.error('Firestore not initialized');
+            alert('Database not ready. Please wait a moment and try again.');
+            return;
+          }
+          try {
+            await addDoc(collection(db, SANITIZER_PATH), {
+              name: name.trim(),
+              requiredPPM: 150,
+              createdAt: new Date()
+            });
+            console.log('✅ New location added:', name);
+          } catch (error) {
+            console.error('❌ Error adding location:', error);
+            alert('Failed to add location. Please try again.');
+          }
+        }
+      },
+      startListener: function() {
+        if (!db || !isAuthReady) {
+          setTimeout(() => this.startListener(), 500);
+          return;
+        }
+        const q = query(collection(db, SANITIZER_PATH));
+        onSnapshot(q, (snapshot) => {
+          const locations = [];
+          snapshot.forEach((doc) => {
+            locations.push({ id: doc.id, ...doc.data() });
+          });
+          renderSanitizerLocations(locations);
+        }, (error) => {
+          console.error('❌ Sanitizer log listener error:', error);
+        });
+      }
+    };
+    
+    // Initialize Firebase on load
+    initFirebase();
+  </script>
+  
+  <!-- Temperature and Sanitizer Log Rendering -->
+  <script>
+
+    // Render empty states for temperature and sanitizer logs
+    function renderRefrigerationUnits(units) {
+      const container = document.getElementById('refrigeration-unit-list');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      
+      if (units.length === 0) {
+        container.innerHTML = '<li class="text-sm text-center py-4" style="color: var(--brand-text-muted);">No units found. Add one to begin logging temperatures.</li>';
+            return;
+          }
+
+      // Render units from Firestore
+      units.sort((a, b) => a.name.localeCompare(b.name)).forEach(unit => {
+        // Get latest temperature reading (if available in unit data)
+        const tempC = unit.lastReading || null;
+        const hasReading = tempC !== null;
+        const statusClass = hasReading && tempC <= (unit.maxTemp || 5) ? 'text-green-600' : hasReading ? 'text-red-600 font-bold' : 'text-gray-500';
+        const statusIcon = hasReading && tempC <= (unit.maxTemp || 5) ? 'fa-check' : hasReading ? 'fa-triangle-exclamation' : 'fa-minus';
+        const displayTemp = hasReading ? `${tempC}°C` : 'No reading';
+
+        const html = `
+          <li class="flex justify-between items-center p-3 rounded-md hover:bg-gray-50 transition-colors border-b" style="border-color: var(--brand-border-light);">
+            <span class="font-medium flex-grow" style="color: var(--brand-text-primary);">${unit.name}</span>
+            <div class="flex items-center space-x-4">
+              <span class="text-sm" style="color: var(--brand-text-muted);">Target: <span class="font-semibold">≤${unit.maxTemp || 5}°C</span></span>
+              <span class="text-lg ${statusClass} flex items-center">
+                <i class="fa-solid ${statusIcon} w-5 mr-1"></i>
+                ${displayTemp}
+              </span>
+              <button title="Record Reading" onclick="recordTemperatureReading('${unit.id}', '${unit.name}')" class="text-xs py-1 px-3 rounded-md text-white hover:opacity-90 transition-opacity" style="background-color: var(--brand-secondary-accent);">
+                <i class="fa-solid fa-file-pen"></i> Log
+              </button>
+            </div>
+          </li>
+        `;
+        container.innerHTML += html;
+      });
+    }
+
+    function renderSanitizerLocations(locations) {
+      const container = document.getElementById('sanitizer-location-list');
+      if (!container) return;
+      
+      container.innerHTML = '';
+      
+      if (locations.length === 0) {
+        container.innerHTML = '<li class="text-sm text-center py-4" style="color: var(--brand-text-muted);">No check locations defined. Add one to begin checks.</li>';
+            return;
+          }
+
+      // Render locations from Firestore
+      locations.sort((a, b) => a.name.localeCompare(b.name)).forEach(location => {
+        // Get latest PPM reading (if available in location data)
+        const actualPPM = location.lastReading || null;
+        const hasReading = actualPPM !== null;
+        const passed = hasReading && actualPPM >= 100 && actualPPM <= 200;
+        const statusClass = hasReading && passed ? 'text-green-600' : hasReading ? 'text-red-600 font-bold' : 'text-gray-500';
+        const statusText = hasReading ? (passed ? 'PASS' : 'FAIL') : 'No check';
+        const displayPPM = hasReading ? `${actualPPM} PPM` : 'No reading';
+
+        const html = `
+          <li class="flex justify-between items-center p-3 rounded-md hover:bg-gray-50 transition-colors border-b" style="border-color: var(--brand-border-light);">
+            <span class="font-medium flex-grow" style="color: var(--brand-text-primary);">${location.name}</span>
+            <div class="flex items-center space-x-4">
+              <span class="text-sm" style="color: var(--brand-text-muted);">Req: <span class="font-semibold">${location.requiredPPM || 150} PPM</span></span>
+              <span class="text-lg ${statusClass} flex items-center">
+                ${displayPPM}
+              </span>
+              <span class="text-xs px-2 py-1 rounded-full font-semibold ${hasReading ? (passed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700') : 'bg-gray-100 text-gray-700'}">${statusText}</span>
+              <button title="Record Check" onclick="recordSanitizerCheck('${location.id}', '${location.name}')" class="text-xs py-1 px-3 rounded-md text-white hover:opacity-90 transition-opacity" style="background-color: var(--brand-secondary-accent);">
+                <i class="fa-solid fa-vial"></i> Check
+              </button>
+            </div>
+          </li>
+        `;
+        container.innerHTML += html;
+      });
+    }
+
+    // Helper functions for recording readings
+    window.recordTemperatureReading = async function(unitId, unitName) {
+      const tempInput = prompt(`Enter temperature reading for ${unitName} (in Celsius):`);
+      if (tempInput && !isNaN(tempInput)) {
+        const tempC = parseFloat(tempInput);
+        // TODO: Save to Firestore temperature_readings collection
+        console.log(`Recording temperature: ${tempC}°C for ${unitName}`);
+        alert(`Temperature ${tempC}°C recorded for ${unitName}. Full logging feature coming soon!`);
+      }
+    };
+
+    window.recordSanitizerCheck = async function(locationId, locationName) {
+      const ppmInput = prompt(`Enter PPM reading for ${locationName}:`);
+      if (ppmInput && !isNaN(ppmInput)) {
+        const ppm = parseFloat(ppmInput);
+        // TODO: Save to Firestore sanitizer_readings collection
+        console.log(`Recording PPM: ${ppm} for ${locationName}`);
+        alert(`PPM ${ppm} recorded for ${locationName}. Full logging feature coming soon!`);
+      }
+    };
+
+    // Initialize empty lists (will be populated by Firestore listeners)
+    renderRefrigerationUnits([]);
+    renderSanitizerLocations([]);
+  </script>
+
+  <!-- Chart Initialization -->
+  <script>
+      document.addEventListener('DOMContentLoaded', () => {
+      // Initialize R&D Success Rate Chart
+      const ctx = document.getElementById('successRateChart');
+      if (ctx) {
+        const rAndDData = {
+          successRate: { approved: 55, inProgress: 30, archived: 15 },
+        };
+
+        new Chart(ctx.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Approved', 'In Progress', 'Archived'],
+            datasets: [{
+              data: [rAndDData.successRate.approved, rAndDData.successRate.inProgress, rAndDData.successRate.archived],
+              backgroundColor: [
+                'var(--brand-primary-accent)',
+                'var(--brand-secondary-accent)',
+                'var(--brand-text-muted)',
+              ],
+              hoverOffset: 15,
+              borderWidth: 0,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '75%',
+            plugins: {
+              legend: { 
+                position: 'bottom', 
+                labels: { 
+                  color: 'var(--brand-text-secondary)',
+                  font: { family: 'Inter' }
+                } 
+              },
+              tooltip: { 
+                callbacks: { 
+                  label: function(context) { 
+                    return context.label + ': ' + context.formattedValue + '%'; 
+                  } 
+                } 
+              }
+            }
+          }
+        });
+      }
+    });
+  </script>
+
+  <!-- User and Project Info Initialization -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load user info
+      try {
+        const currentUser = JSON.parse(localStorage.getItem('current_user') || '{}');
+        const userName = currentUser.name || currentUser.email?.split('@')[0] || 'Chef';
+        const userEmail = currentUser.email || 'Loading...';
+        const userInitial = userName.charAt(0).toUpperCase();
+
+        document.getElementById('user-name').textContent = userName;
+        document.getElementById('user-email').textContent = userEmail;
+        document.getElementById('user-avatar').textContent = userInitial;
+      } catch (e) {
+        console.warn('Failed to load user info:', e);
+      }
+
+      // Load project info
+      function updateProjectChips(projectName) {
+        const name = projectName || 'Master Project';
+        const sidebarChip = document.getElementById('sidebar-project-chip');
+        const headerChip = document.getElementById('header-project-chip');
+        
+        if (sidebarChip) sidebarChip.textContent = name;
+        if (headerChip) headerChip.textContent = `Project: ${name}`;
+      }
+
+      // Listen for project changes
+      document.addEventListener('projectChanged', (event) => {
+        const detail = event.detail || {};
+        const project = detail.project || detail;
+        const projectName = project?.name || project?.title || detail.projectName || 'Master Project';
+        updateProjectChips(projectName);
+      });
+
+      // Initial project load
+      setTimeout(() => {
+        if (window.projectManager?.currentProject) {
+          updateProjectChips(window.projectManager.currentProject.name);
+        } else {
+          const storedName = localStorage.getItem('active_project_name');
+          updateProjectChips(storedName);
+        }
+      }, 500);
+    });
+  </script>
+</body>
+</html>

@@ -1,65 +1,63 @@
 /**
  * ITERUM CULINARY APP - MASTER BRAND KIT
  *
- * Single source of truth for Iterum’s Nordic landing-page system.
+ * Single source of truth for Iterum's Nordic landing-page system.
  * Updating variables here keeps every screen in visual sync.
  *
- * Last Updated: 2025-11-13
+ * IMPORTANT: This file should be loaded FIRST on all pages to ensure color consistency.
+ *
+ * Last Updated: 2025-11-19
  */
 
-@import url('app-improvements.css');
-@import url('ui-polish-v2.css');
-@import url('enhanced-colors.css');
-@import url('ui-smooth-polish.css');
-@import url('unified-color-system.css');
-@import url('app-wide-ui-overhaul.css');
+/* Import unified colors FIRST to establish base */
+@import url('iterum-unified-colors.css');
 
 :root {
     /* ============================================
        BRAND COLORS – Index (Daily Ops) Palette
        ============================================ */
 
-    /* Background Layers (dark board) */
-    --brand-bg-primary: #0f141a;
-    --brand-bg-secondary: #13171d;
-    --brand-bg-tertiary: #1a1f27;
+    /* Background Layers - Nordic Earthy */
+    --brand-bg-primary: #FAFBFC;
+    --brand-bg-secondary: #F5F7F9;
+    --brand-bg-tertiary: #E8F4F8;
     --brand-bg-gradient:
-        radial-gradient(circle at top left, rgba(99, 102, 241, 0.18), transparent 45%),
-        radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.12), transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1), transparent 55%),
-        linear-gradient(180deg, #0f141a 0%, #0f141a 100%);
+        radial-gradient(circle at top left, rgba(91, 155, 173, 0.08), transparent 45%),
+        radial-gradient(circle at 20% 80%, rgba(107, 142, 111, 0.06), transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(163, 139, 123, 0.04), transparent 55%),
+        linear-gradient(180deg, #FAFBFC 0%, #F5F7F9 100%);
 
-    /* Surface Layers (cards slightly elevated dark) */
-    --brand-card-bg: rgba(19, 23, 29, 0.92);
-    --brand-card-bg-elevated: rgba(19, 23, 29, 0.96);
-    --brand-card-bg-subtle: rgba(19, 23, 29, 0.86);
-    --brand-card-bg-dark: rgba(15, 19, 25, 0.98);
+    /* Surface Layers (cards white/light) */
+    --brand-card-bg: #ffffff;
+    --brand-card-bg-elevated: #ffffff;
+    --brand-card-bg-subtle: #f8fafc;
+    --brand-card-bg-dark: #f1f5f9;
 
     /* Borders */
-    --brand-border-light: rgba(148, 163, 184, 0.25);
-    --brand-border-medium: rgba(148, 163, 184, 0.35);
-    --brand-border-dark: rgba(148, 163, 184, 0.45);
+    --brand-border-light: rgba(15, 23, 42, 0.12);
+    --brand-border-medium: rgba(15, 23, 42, 0.20);
+    --brand-border-dark: rgba(15, 23, 42, 0.30);
 
-    /* Typography Palette */
-    --brand-text-primary: #f8fafc;
-    --brand-text-secondary: rgba(226, 232, 240, 0.9);
-    --brand-text-tertiary: rgba(203, 213, 225, 0.78);
-    --brand-text-muted: rgba(148, 163, 184, 0.78);
+       /* Typography Palette - Higher Contrast for Better Readability */
+       --brand-text-primary: #1A2E35; /* Very Dark Blue-Gray (increased contrast) */
+       --brand-text-secondary: #2C3E46; /* Dark Charcoal (increased contrast) */
+       --brand-text-tertiary: #3A5A6A; /* Darker Blue (increased contrast) */
+       --brand-text-muted: #6B757D; /* Darker Gray (increased contrast) */
 
-    /* Accent & Semantic Colors */
-    --brand-accent-primary: #8d7bff; /* index accent */
-    --brand-accent-secondary: #38bdf8;
-    --brand-accent-forest: #22c55e;
+    /* Accent & Semantic Colors - Nordic Earthy */
+    --brand-accent-primary: #6B8E6F; /* Nordic Moss */
+    --brand-accent-secondary: #5B9BAD; /* Nordic Blue */
+    --brand-accent-forest: #6B8E6F; /* Nordic Moss */
 
-    --brand-success: #22c55e;
-    --brand-warning: #f59e0b;
-    --brand-error: #ef4444;
-    --brand-info: #60a5fa;
+    --brand-success: #6B8E6F;
+    --brand-warning: #D4A574;
+    --brand-error: #C97676;
+    --brand-info: #5B9BAD;
 
-    /* Buttons */
-    --brand-btn-primary: linear-gradient(135deg, #8d7bff 0%, #6366f1 100%);
-    --brand-btn-secondary: linear-gradient(135deg, rgba(148, 163, 184, 0.18) 0%, rgba(148, 163, 184, 0.28) 100%);
-    --brand-btn-accent: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    /* Buttons - Nordic Earthy */
+    --brand-btn-primary: linear-gradient(135deg, #6B8E6F 0%, #5B9BAD 100%);
+    --brand-btn-secondary: linear-gradient(135deg, rgba(91, 155, 173, 0.12) 0%, rgba(107, 142, 111, 0.18) 100%);
+    --brand-btn-accent: linear-gradient(135deg, #6B8E6F 0%, #5B7C5F 100%);
 
     /* Navigation */
         --brand-header-bg: rgba(255, 255, 255, 0.82);
@@ -150,7 +148,8 @@ html {
 }
 
 body {
-    background: var(--brand-bg-gradient) !important;
+    background: var(--brand-bg-primary) !important;
+    background-image: var(--brand-bg-gradient) !important;
     color: var(--brand-text-secondary) !important;
     font-family: var(--font-family-primary) !important;
     font-weight: var(--font-weight-medium);
@@ -277,40 +276,60 @@ button[class*="btn"],
    ============================================ */
 input,
 select,
-textarea {
+textarea,
+.form-input,
+.form-textarea,
+.form-select {
     background: var(--brand-card-bg) !important;
-    border: 1px solid var(--brand-border-light) !important;
-    color: var(--brand-text-primary) !important;
+    border: 1.5px solid rgba(44, 74, 82, 0.25) !important; /* Darker border */
+    color: #1A2E35 !important; /* Very dark text - maximum contrast */
     padding: 12px 16px;
     border-radius: var(--radius-md);
     font-family: var(--font-family-primary);
-    font-weight: var(--font-weight-medium);
+    font-weight: 500 !important; /* Medium weight for readability */
+    font-size: 15px !important; /* Slightly larger */
     transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
     box-shadow: var(--shadow-inset);
 }
 
 input:focus,
 select:focus,
-textarea:focus {
+textarea:focus,
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
     outline: none;
-    border-color: rgba(37, 99, 235, 0.8) !important;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18), var(--shadow-inset);
+    border-color: var(--brand-accent-secondary) !important; /* Nordic Blue */
+    box-shadow: 0 0 0 3px rgba(91, 155, 173, 0.2) !important, var(--shadow-inset); /* Stronger focus ring */
     background: var(--brand-card-bg-elevated) !important;
+    color: #1A2E35 !important; /* Darkest in focus */
 }
 
-label {
-    color: var(--brand-text-tertiary) !important;
-    font-weight: var(--font-weight-semibold);
+label,
+.form-label {
+    color: #1A2E35 !important; /* Very dark for labels */
+    font-weight: 600 !important; /* Bold labels */
     font-size: var(--font-size-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.02em;
     margin-bottom: var(--space-xs);
     display: block;
+    text-transform: none; /* Remove uppercase for better readability */
 }
 
-::placeholder {
-    color: rgba(100, 116, 139, 0.72);
-    opacity: 1;
+.form-help,
+small.form-help {
+    color: #4A5A65 !important; /* Darker gray, more visible */
+    font-weight: 500 !important;
+    opacity: 1 !important;
+    font-size: 0.875rem !important;
+}
+
+::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: #6B757D !important; /* Darker placeholder */
+    opacity: 0.75 !important; /* More visible */
+    font-weight: 400 !important;
 }
 
 
@@ -323,32 +342,32 @@ table {
 }
 
 thead {
-    background: rgba(15, 23, 42, 0.96);
+    background: linear-gradient(135deg, #5B9BAD 0%, #6B8E6F 100%);
 }
 
 thead th {
-    color: rgba(241, 245, 249, 0.96) !important;
+    color: #FFFFFF !important;
     padding: 16px;
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-sm);
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    border-bottom: 2px solid rgba(59, 130, 246, 0.6);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 tbody tr {
-    background: rgba(248, 250, 252, 0.95);
+    background: #FFFFFF;
     transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
 }
 
 tbody tr:nth-child(even) {
-    background: rgba(241, 245, 249, 0.95);
+    background: #FAFBFC; /* Nordic Snow */
 }
 
 tbody tr:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-sm);
-    background: rgba(219, 234, 254, 0.85);
+    background: rgba(232, 244, 248, 0.85); /* Nordic Ice tint */
 }
 
 tbody td {
@@ -372,9 +391,9 @@ tbody td {
 
 .modal-header,
 [class*="modal-header"] {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(37, 99, 235, 0.88) 100%);
+    background: linear-gradient(135deg, #5B9BAD 0%, #6B8E6F 100%);
     color: white !important;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     padding: var(--space-lg);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }

@@ -15,6 +15,7 @@ class UnifiedNavHeader {
         if (path.includes('recipe-library')) return 'recipes';
         if (path.includes('recipe-developer')) return 'developer';
         if (path.includes('menu-builder')) return 'menu';
+        if (path.includes('calendar')) return 'calendar';
         if (path.includes('kitchen-management')) return 'kitchen';
         if (path.includes('ingredients')) return 'ingredients';
         if (path.includes('vendor')) return 'vendors';
@@ -27,9 +28,9 @@ class UnifiedNavHeader {
     }
 
     init() {
-        // Check if header already exists
-        if (document.querySelector('.unified-nav-header')) {
-            console.log('Navigation header already exists');
+        // Check if sidebar already exists
+        if (document.querySelector('.unified-nav-sidebar')) {
+            console.log('Navigation sidebar already exists');
             return;
         }
 
@@ -37,12 +38,34 @@ class UnifiedNavHeader {
     }
 
     injectHeader() {
-        const header = document.createElement('nav');
-        header.className = 'unified-nav-header';
-        header.innerHTML = this.getHeaderHTML();
+        // Check if sidebar already exists
+        if (document.querySelector('.unified-nav-sidebar')) {
+            console.log('Navigation sidebar already exists');
+            return;
+        }
 
-        // Insert at top of body
-        document.body.insertBefore(header, document.body.firstChild);
+        const sidebar = document.createElement('aside');
+        sidebar.className = 'unified-nav-sidebar';
+        sidebar.innerHTML = this.getSidebarHTML();
+
+        // Insert at start of body
+        document.body.insertBefore(sidebar, document.body.firstChild);
+
+        // Add main content wrapper if it doesn't exist
+        if (!document.querySelector('.main-content-wrapper')) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'main-content-wrapper';
+            
+            // Move all existing body children (except sidebar) into wrapper
+            const children = Array.from(document.body.children);
+            children.forEach(child => {
+                if (child !== sidebar && !child.classList.contains('main-content-wrapper')) {
+                    wrapper.appendChild(child);
+                }
+            });
+            
+            document.body.appendChild(wrapper);
+        }
 
         // Add styles
         this.injectStyles();
@@ -50,7 +73,10 @@ class UnifiedNavHeader {
         // Setup dropdown hover delay
         this.setupDropdownHover();
 
-        console.log('✅ Navigation header injected');
+        // Setup mobile toggle
+        this.setupMobileToggle();
+
+        console.log('✅ Navigation sidebar injected');
     }
 
     setupDropdownHover() {
@@ -79,14 +105,19 @@ class UnifiedNavHeader {
         });
     }
 
-    getHeaderHTML() {
+    getSidebarHTML() {
         return `
-            <div class="nav-container">
+            <div class="sidebar-header">
                 <a href="index.html" class="nav-logo">
                     <span class="nav-logo-icon">🍳</span>
-                    <span class="nav-logo-text">Iterum Culinary</span>
+                    <span class="nav-logo-text">Iterum</span>
                 </a>
+                <button class="sidebar-toggle-mobile" id="sidebar-toggle">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
 
+            <nav class="sidebar-nav">
                 <div class="nav-links">
                     <a href="index.html" class="nav-link nav-link-emphasis ${this.currentPage === 'dashboard' ? 'active' : ''}">
                         <span>🏠</span> Dashboard
@@ -96,6 +127,9 @@ class UnifiedNavHeader {
                     </a>
                     <a href="menu-builder.html" class="nav-link ${this.currentPage === 'menu' ? 'active' : ''}">
                         <span>🍽️</span> Menus
+                    </a>
+                    <a href="calendar.html" class="nav-link ${this.currentPage === 'calendar' ? 'active' : ''}">
+                        <span>📅</span> Calendar
                     </a>
                     <a href="kitchen-management.html" class="nav-link ${this.currentPage === 'kitchen' ? 'active' : ''}">
                         <span>🔪</span> Kitchen
@@ -135,19 +169,31 @@ class UnifiedNavHeader {
                         </div>
                     </div>
                 </div>
+            </nav>
 
-                <div class="nav-meta">
-                    <div class="nav-project-chip" id="nav-project-chip">Project: Master Project</div>
-                    <div class="nav-dropdown">
-                        <button class="nav-link nav-user-btn">
-                            <span class="nav-avatar" id="nav-user-avatar">👤</span>
-                            <span class="nav-label" id="nav-user-name">User</span>
+            <div class="sidebar-footer">
+                <div class="nav-project-chip" id="nav-project-chip">Project: Master Project</div>
+                
+                <!-- User Profile Section -->
+                <div class="sidebar-user-profile">
+                    <div class="flex items-center mb-2">
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-white text-sm sidebar-user-avatar" id="nav-user-avatar" style="background-color: #4d7c0f;">C</div>
+                        <div class="ml-2.5 flex-1 min-w-0">
+                            <div class="text-sm font-semibold truncate sidebar-user-name" id="nav-user-name" style="color: #78350f;">Chef</div>
+                            <div class="text-xs truncate sidebar-user-email" id="nav-user-email" style="color: #b45309;">Loading...</div>
+                        </div>
+                    </div>
+                    
+                    <!-- User Menu Dropdown -->
+                    <div class="nav-dropdown" style="width: 100%;">
+                        <button class="nav-user-menu-btn" style="width: 100%; text-align: left; padding: 8px; border-radius: 4px; border: 1px solid rgba(252, 211, 77, 0.3); background: rgba(255, 251, 235, 0.5); cursor: pointer;">
+                            <span style="font-size: 0.75rem;">⚙️ Settings</span>
                         </button>
                         <div class="nav-dropdown-content nav-user-menu">
                             <a href="user-profile.html">👤 Profile & Settings</a>
                             <a href="project-hub.html">📂 Project Hub</a>
                             <hr>
-                            <a href="#" onclick="event.preventDefault(); signOut?.();">🚪 Sign Out</a>
+                            <a href="#" onclick="event.preventDefault(); if (window.authManager) { window.authManager.signOut(); } window.location.href='index.html';">🚪 Sign Out</a>
                         </div>
                     </div>
                 </div>
@@ -155,30 +201,140 @@ class UnifiedNavHeader {
         `;
     }
 
+    setupMobileToggle() {
+        const toggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.querySelector('.unified-nav-sidebar');
+        
+        if (toggle && sidebar) {
+            toggle.addEventListener('click', () => {
+                sidebar.classList.toggle('mobile-open');
+            });
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768 && 
+                    sidebar.classList.contains('mobile-open') &&
+                    !sidebar.contains(e.target) &&
+                    !toggle.contains(e.target)) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            });
+        }
+    }
+
     injectStyles() {
         const style = document.createElement('style');
         style.textContent = `
-            .unified-nav-header {
-                background: var(--brand-header-bg);
-                color: var(--brand-header-text);
-                padding: 0;
-                position: sticky;
+            /* Sidebar Styles */
+            .unified-nav-sidebar {
+                position: fixed;
+                left: 0;
                 top: 0;
+                width: 280px;
+                height: 100vh;
+                background: rgba(255, 255, 255, 0.98);
+                border-right: 1px solid rgba(226, 232, 240, 0.8);
+                box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+                display: flex;
+                flex-direction: column;
                 z-index: 1000;
-                border-bottom: 1px solid var(--brand-header-border);
-                box-shadow: 0 24px 48px rgba(15, 23, 42, 0.35);
-                backdrop-filter: blur(18px);
-                -webkit-backdrop-filter: blur(18px);
+                overflow-y: auto;
+                transition: transform 0.3s ease;
             }
 
-            .nav-container {
-                max-width: 1240px;
-                margin: 0 auto;
-                padding: 0 32px;
+            .main-content-wrapper {
+                margin-left: 280px;
+                min-height: 100vh;
+            }
+
+            .sidebar-header {
+                padding: 24px 20px;
+                border-bottom: 1px solid rgba(226, 232, 240, 0.8);
                 display: flex;
                 align-items: center;
-                gap: 24px;
-                height: 74px;
+                justify-content: space-between;
+            }
+
+            .sidebar-toggle-mobile {
+                display: none;
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: #2C4A52;
+                padding: 8px;
+            }
+
+            .sidebar-nav {
+                flex: 1;
+                padding: 16px 0;
+                overflow-y: auto;
+            }
+
+            .sidebar-footer {
+                padding: 20px;
+                border-top: 1px solid rgba(226, 232, 240, 0.8);
+                background: rgba(248, 250, 252, 0.5);
+            }
+
+            .sidebar-user-profile {
+                margin-top: 16px;
+                padding-top: 16px;
+                border-top: 1px solid rgba(226, 232, 240, 0.8);
+            }
+
+            .sidebar-user-avatar {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                color: white;
+                font-size: 0.875rem;
+                flex-shrink: 0;
+            }
+
+            .sidebar-user-name {
+                font-size: 0.875rem;
+                font-weight: 600;
+                color: #78350f;
+                line-height: 1.2;
+            }
+
+            .sidebar-user-email {
+                font-size: 0.75rem;
+                color: #b45309;
+                line-height: 1.2;
+                margin-top: 2px;
+            }
+
+            .nav-user-menu-btn {
+                margin-top: 8px;
+            }
+
+            .nav-user-menu-btn:hover {
+                background: rgba(252, 211, 77, 0.3) !important;
+            }
+
+            /* Mobile Styles */
+            @media (max-width: 768px) {
+                .unified-nav-sidebar {
+                    transform: translateX(-100%);
+                }
+
+                .unified-nav-sidebar.mobile-open {
+                    transform: translateX(0);
+                }
+
+                .main-content-wrapper {
+                    margin-left: 0;
+                }
+
+                .sidebar-toggle-mobile {
+                    display: block;
+                }
             }
 
             .nav-logo {
@@ -186,35 +342,34 @@ class UnifiedNavHeader {
                 align-items: center;
                 gap: 12px;
                 text-decoration: none;
-                color: #ffffff;
+                color: #2C4A52;
                 font-weight: 800;
-                font-size: 1.28rem;
+                font-size: 1.4rem;
                 letter-spacing: -0.02em;
-                white-space: nowrap;
             }
 
             .nav-logo-icon {
-                font-size: 1.7rem;
-                filter: drop-shadow(0 8px 18px rgba(37, 99, 235, 0.42));
+                font-size: 1.8rem;
             }
 
             .nav-links {
                 display: flex;
-                align-items: center;
-                gap: 6px;
-                flex: 1;
+                flex-direction: column;
+                gap: 4px;
+                padding: 0 12px;
             }
 
             .nav-link {
-                color: var(--brand-header-text);
+                color: #3E4C54;
                 text-decoration: none;
-                padding: 10px 18px;
-                border-radius: 999px;
-                transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-                display: inline-flex;
+                padding: 12px 16px;
+                border-radius: 8px;
+                transition: all 0.2s ease;
+                display: flex;
                 align-items: center;
-                gap: 10px;
+                gap: 12px;
                 font-weight: 500;
+                font-size: 0.95rem;
                 background: transparent;
                 border: 1px solid transparent;
                 cursor: pointer;
@@ -228,17 +383,15 @@ class UnifiedNavHeader {
 
             .nav-link:hover,
             .nav-link:focus {
-                background: rgba(148, 163, 184, 0.16);
-                border-color: rgba(148, 163, 184, 0.22);
-                transform: translateY(-1px);
-                color: #ffffff;
+                background: rgba(148, 163, 184, 0.1);
+                color: #2C4A52;
             }
 
             .nav-link.active {
                 color: #ffffff;
-                background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
                 border-color: transparent;
-                box-shadow: 0 18px 36px rgba(37, 99, 235, 0.38);
+                box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
                 font-weight: 600;
             }
 
@@ -276,15 +429,16 @@ class UnifiedNavHeader {
             .nav-dropdown-content {
                 display: none;
                 position: absolute;
-                top: calc(100% + 14px);
-                right: 0;
-                background: rgba(15, 23, 42, 0.94);
-                border-radius: 18px;
-                box-shadow: 0 30px 60px rgba(15, 23, 42, 0.4);
-                min-width: 260px;
-                padding: 14px;
+                left: 100%;
+                top: 0;
+                margin-left: 8px;
+                background: rgba(255, 255, 255, 0.98);
+                border-radius: 12px;
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+                min-width: 240px;
+                padding: 12px;
                 z-index: 1001;
-                border: 1px solid rgba(96, 165, 250, 0.22);
+                border: 1px solid rgba(226, 232, 240, 0.8);
                 backdrop-filter: blur(18px);
                 -webkit-backdrop-filter: blur(18px);
             }
@@ -384,21 +538,42 @@ class UnifiedNavHeader {
 
     updateUserInfo(user) {
         const nameEl = document.getElementById('nav-user-name');
+        const emailEl = document.getElementById('nav-user-email');
         const avatarEl = document.getElementById('nav-user-avatar');
         
         if (nameEl && user) {
-            const displayName = user.displayName || user.name || user.email?.split('@')[0] || 'User';
+            const displayName = user.displayName || user.name || user.email?.split('@')[0] || 'Chef';
             nameEl.textContent = displayName;
+        }
+
+        if (emailEl && user) {
+            emailEl.textContent = user.email || 'Loading...';
         }
 
         if (avatarEl && user) {
             if (user.photoURL || user.avatarUrl) {
                 avatarEl.innerHTML = `<img src="${user.photoURL || user.avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
             } else {
-                const initial = (user.name || user.email || 'U')[0].toUpperCase();
+                const initial = (user.name || user.email || 'C')[0].toUpperCase();
                 avatarEl.textContent = initial;
+                avatarEl.style.backgroundColor = '#4d7c0f'; // Olive green
             }
         }
+    }
+}
+
+// Load user info from localStorage as fallback
+function loadUserInfoFromStorage() {
+    try {
+        const currentUserStr = localStorage.getItem('current_user');
+        if (currentUserStr) {
+            const user = JSON.parse(currentUserStr);
+            if (window.unifiedNavHeader && user) {
+                window.unifiedNavHeader.updateUserInfo(user);
+            }
+        }
+    } catch (e) {
+        console.warn('Could not load user from storage:', e);
     }
 }
 
@@ -407,23 +582,50 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         window.unifiedNavHeader = new UnifiedNavHeader();
         
-        // Update user info when available
-        if (window.authManager?.currentUser) {
-            window.unifiedNavHeader.updateUserInfo(window.authManager.currentUser);
-        }
+        // Try to load user info immediately
+        loadUserInfoFromStorage();
         
+        // Update user info when AuthManager is ready
+        setTimeout(() => {
+            if (window.authManager?.currentUser) {
+                window.unifiedNavHeader.updateUserInfo(window.authManager.currentUser);
+            } else {
+                // Check authManager after a delay
+                const checkAuth = setInterval(() => {
+                    if (window.authManager?.currentUser) {
+                        window.unifiedNavHeader.updateUserInfo(window.authManager.currentUser);
+                        clearInterval(checkAuth);
+                    }
+                }, 500);
+                setTimeout(() => clearInterval(checkAuth), 10000); // Stop after 10s
+            }
+        }, 100);
+        
+        // Listen for auth events
         window.addEventListener('userLoggedIn', (e) => {
             if (e.detail?.user) {
                 window.unifiedNavHeader.updateUserInfo(e.detail.user);
             }
         });
+        
+        // Listen for auth state changes
+        if (window.authManager && typeof window.authManager.on === 'function') {
+            window.authManager.on('auth_state_changed', (user) => {
+                if (user) {
+                    window.unifiedNavHeader.updateUserInfo(user);
+                }
+            });
+        }
     });
 } else {
     window.unifiedNavHeader = new UnifiedNavHeader();
+    loadUserInfoFromStorage();
     
-    if (window.authManager?.currentUser) {
-        window.unifiedNavHeader.updateUserInfo(window.authManager.currentUser);
-    }
+    setTimeout(() => {
+        if (window.authManager?.currentUser) {
+            window.unifiedNavHeader.updateUserInfo(window.authManager.currentUser);
+        }
+    }, 100);
 }
 
 document.addEventListener('projectChanged', (event) => {
@@ -433,17 +635,52 @@ document.addEventListener('projectChanged', (event) => {
 });
 
 document.addEventListener('iterumAppReady', () => {
-    const storedProject = (() => {
-        try {
-            const value = localStorage.getItem('iterum_current_project');
-            return value ? JSON.parse(value) : null;
-        } catch {
-            return null;
-        }
-    })();
-    const projectName = window.projectManager?.currentProject?.name || storedProject?.name || storedProject?.projectName || 'Master Project';
+    updateHeaderProjectChip();
+});
+
+// Also listen for project changes
+document.addEventListener('projectChanged', (event) => {
+    const detail = event.detail || {};
+    const projectName = detail.project?.name || detail.projectName || 'Master Project';
     window.unifiedNavHeader?.updateProjectChip(projectName);
 });
+
+// Function to update header project chip
+function updateHeaderProjectChip() {
+    let projectName = 'Master Project';
+    
+    // Try to get from projectManager first
+    if (window.projectManager?.currentProject?.name) {
+        projectName = window.projectManager.currentProject.name;
+    } else {
+        // Try to get from localStorage (project ID stored, need to find project name)
+        const projectId = localStorage.getItem(`iterum_current_project_${window.projectManager?.currentUserId || ''}`) || 
+                         localStorage.getItem('iterum_current_project');
+        
+        if (projectId && window.projectManager) {
+            // Load projects if not loaded
+            if (!window.projectManager.projects || window.projectManager.projects.length === 0) {
+                window.projectManager.loadProjects();
+            }
+            
+            const project = window.projectManager.projects?.find(p => p.id === projectId);
+            if (project) {
+                projectName = project.name;
+            }
+        }
+    }
+    
+    window.unifiedNavHeader?.updateProjectChip(projectName);
+}
+
+// Update header when page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(updateHeaderProjectChip, 500); // Wait for projectManager to initialize
+    });
+} else {
+    setTimeout(updateHeaderProjectChip, 500);
+}
 
 // Global sign out function
 window.signOut = function() {

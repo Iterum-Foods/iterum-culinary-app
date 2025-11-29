@@ -54,10 +54,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/iterum-culinary-app.git"
+    "url": "https://github.com/Iterum-Foods/iterum-culinary-app.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/iterum-culinary-app/issues"
+    "url": "https://github.com/Iterum-Foods/iterum-culinary-app/issues"
   },
-  "homepage": "https://github.com/yourusername/iterum-culinary-app#readme"
+  "homepage": "https://github.com/Iterum-Foods/iterum-culinary-app#readme"
 }

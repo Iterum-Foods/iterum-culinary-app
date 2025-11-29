@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Variance Analysis | Iterum Culinary</title>
+    
+    <!-- Firebase & Auth -->
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    <script src="assets/js/auth-api-helper.js"></script>
+    
+    <!-- Load Cost Calculator and Food Costing Workflow -->
+    <script src="assets/js/cost-calculator.js"></script>
+    <script src="assets/js/food-costing-workflow.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- UNIFIED COLOR SYSTEM - MUST LOAD FIRST -->
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
+    <link rel="stylesheet" href="assets/css/tailwind-output.css">
+    <link rel="stylesheet" href="assets/css/iterum-design-system.css">
+    <link rel="stylesheet" href="assets/css/premium-ui-system.css">
+    <link rel="stylesheet" href="assets/css/unified-cards.css">
+    <link rel="stylesheet" href="assets/css/page-layouts.css">
+    <link rel="stylesheet" href="assets/css/header-universal.css">
+    <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
+    
+    <style>
+        body { padding-top: 84px !important; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 32px 20px; }
+        
+        .variance-header {
+            background: linear-gradient(135deg, #6B8E6F 0%, #5B9BAD 100%);
+            color: white;
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .variance-header h1 {
+            color: white;
+            margin: 0 0 12px 0;
+        }
+        
+        .variance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #E5E9EC;
+        }
+        
+        .variance-table {
+            overflow-x: auto;
+            margin-top: 24px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: var(--iterum-bg-secondary);
+            color: var(--iterum-text-primary);
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--iterum-border-medium);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--iterum-border-light);
+            color: var(--iterum-text-secondary);
+        }
+        
+        tr:hover {
+            background: var(--iterum-bg-secondary);
+        }
+        
+        .variance-positive {
+            color: #6B8E6F;
+            font-weight: 600;
+        }
+        
+        .variance-negative {
+            color: #C97676;
+            font-weight: 600;
+        }
+        
+        .variance-neutral {
+            color: #64748b;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6B8E6F 0%, #5B9BAD 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: var(--iterum-bg-secondary);
+            color: var(--iterum-text-primary);
+            border: 1px solid var(--iterum-border-medium);
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--iterum-text-primary);
+            margin-bottom: 8px;
+            font-size: 0.875rem;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--iterum-border-medium);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            color: var(--iterum-text-primary);
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--iterum-accent-primary);
+            box-shadow: 0 0 0 3px rgba(107, 142, 111, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <!-- Universal Header -->
+    <div id="universal-header-placeholder"></div>
+    
+    <main class="container">
+        <div class="variance-header">
+            <h1>📊 Phase 4: Inventory Variance Analysis</h1>
+            <p style="margin: 0; opacity: 0.9;">Compare theoretical usage (from sales) vs actual usage (from inventory) to identify waste and loss</p>
+        </div>
+        
+        <!-- Date Range Selection -->
+        <div class="card mb-6">
+            <h2 style="margin: 0 0 20px 0; color: var(--iterum-text-primary);">Select Analysis Period</h2>
+            <div class="variance-grid">
+                <div class="form-group">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" id="start-date" class="form-input" value="">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">End Date</label>
+                    <input type="date" id="end-date" class="form-input" value="">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="calculateVariance()">📊 Calculate Variance</button>
+        </div>
+        
+        <!-- Variance Results -->
+        <div id="variance-results" style="display: none;">
+            <div class="card">
+                <h2 style="margin: 0 0 24px 0; color: var(--iterum-text-primary);">Variance Analysis Results</h2>
+                
+                <div class="variance-table">
+                    <table id="variance-table">
+                        <thead>
+                            <tr>
+                                <th style="position: sticky; left: 0; background: var(--iterum-bg-secondary); z-index: 11;">Ingredient</th>
+                                <th>Theoretical Usage</th>
+                                <th>Actual Usage</th>
+                                <th>Variance</th>
+                                <th>Variance %</th>
+                                <th>Unit Cost</th>
+                                <th>Variance Cost</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="variance-table-body">
+                            <!-- Results will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="margin-top: 24px; padding: 20px; background: var(--iterum-bg-secondary); border-radius: 8px;">
+                    <h3 style="margin: 0 0 12px 0; color: var(--iterum-text-primary);">Summary</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--iterum-text-tertiary); text-transform: uppercase; margin-bottom: 4px;">Total Variance Cost</div>
+                            <div id="total-variance-cost" style="font-size: 1.5rem; font-weight: 700; color: var(--iterum-text-primary);">$0.00</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--iterum-text-tertiary); text-transform: uppercase; margin-bottom: 4px;">Items with Variance</div>
+                            <div id="items-with-variance" style="font-size: 1.5rem; font-weight: 700; color: var(--iterum-text-primary);">0</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--iterum-text-tertiary); text-transform: uppercase; margin-bottom: 4px;">Positive Variance</div>
+                            <div id="positive-variance" style="font-size: 1.5rem; font-weight: 700; color: #6B8E6F;">$0.00</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--iterum-text-tertiary); text-transform: uppercase; margin-bottom: 4px;">Negative Variance</div>
+                            <div id="negative-variance" style="font-size: 1.5rem; font-weight: 700; color: #C97676;">$0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Instructions Card -->
+        <div class="card" style="background: #F5F7F9; border: 2px solid #5B9BAD;">
+            <h3 style="margin: 0 0 16px 0; color: var(--iterum-text-primary); display: flex; align-items: center; gap: 8px;">
+                <span>📋</span> How to Use Variance Analysis
+            </h3>
+            <ol style="margin: 0; padding-left: 24px; color: var(--iterum-text-secondary); line-height: 1.8;">
+                <li><strong>Log Sales Data:</strong> Record daily sales quantities in your sales tracking system</li>
+                <li><strong>Take Physical Inventory:</strong> Record opening inventory, purchases, and closing inventory for the period</li>
+                <li><strong>Select Date Range:</strong> Choose the period you want to analyze</li>
+                <li><strong>Calculate Variance:</strong> The system will automatically calculate theoretical usage from sales and compare to actual usage</li>
+                <li><strong>Review Results:</strong> Negative variance indicates waste/loss. Positive variance may indicate unrecorded usage or errors</li>
+            </ol>
+        </div>
+    </main>
+    
+    <!-- Load Universal Header -->
+    <script src="assets/js/unified-nav-header.js" defer></script>
+    
+    <script>
+        // Set default dates (last 30 days)
+        document.addEventListener('DOMContentLoaded', function() {
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - 30);
+            
+            document.getElementById('end-date').value = endDate.toISOString().split('T')[0];
+            document.getElementById('start-date').value = startDate.toISOString().split('T')[0];
+        });
+        
+        // Phase 4: Calculate Variance
+        function calculateVariance() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            
+            if (!startDate || !endDate) {
+                alert('Please select both start and end dates');
+                return;
+            }
+            
+            if (!window.foodCostingWorkflow) {
+                alert('Food Costing Workflow not loaded. Please refresh the page.');
+                return;
+            }
+            
+            // Load menu items and recipes
+            const user = window.authManager?.currentUser;
+            const userId = user?.userId || user?.id;
+            const menusKey = `menus_${userId}`;
+            const menus = JSON.parse(localStorage.getItem(menusKey) || '[]');
+            
+            if (menus.length === 0) {
+                alert('No menus found. Please create menus and link recipes first.');
+                return;
+            }
+            
+            // Get all menu items with recipes
+            const menuItems = [];
+            menus.forEach(menu => {
+                if (menu.items) {
+                    menu.items.forEach(item => {
+                        if (item.recipeId) {
+                            menuItems.push(item);
+                        }
+                    });
+                }
+            });
+            
+            if (menuItems.length === 0) {
+                alert('No menu items with linked recipes found. Please link recipes to menu items first.');
+                return;
+            }
+            
+            // Load sales data (for now, using placeholder - in production this would come from sales tracking)
+            const salesData = loadSalesData(startDate, endDate);
+            
+            // Load recipe data
+            const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
+            const recipeIdeas = JSON.parse(localStorage.getItem('recipe_ideas') || '[]');
+            const recipeStubs = JSON.parse(localStorage.getItem('recipe_stubs') || '[]');
+            const allRecipes = [...recipes, ...recipeIdeas, ...recipeStubs];
+            
+            // Calculate theoretical usage
+            const theoreticalUsage = window.foodCostingWorkflow.calculateTheoreticalUsage(menuItems, salesData, allRecipes);
+            
+            // Load inventory data
+            const inventoryData = loadInventoryData(startDate, endDate);
+            
+            // Load ingredient costs
+            const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
+            
+            // Calculate variance for each ingredient
+            const varianceResults = [];
+            let totalVarianceCost = 0;
+            let itemsWithVariance = 0;
+            let positiveVariance = 0;
+            let negativeVariance = 0;
+            
+            Object.keys(theoreticalUsage).forEach(ingredientName => {
+                const theoretical = theoreticalUsage[ingredientName];
+                const inventory = inventoryData[ingredientName] || {};
+                const actual = window.foodCostingWorkflow.calculateActualUsage(
+                    inventory.opening || 0,
+                    inventory.purchases || 0,
+                    inventory.closing || 0
+                );
+                
+                const variance = window.foodCostingWorkflow.calculateVariance(actual, theoretical);
+                
+                // Find ingredient cost
+                const ingredient = ingredients.find(ing => 
+                    ing.name.toLowerCase() === ingredientName.toLowerCase() && 
+                    !ing.isVariant
+                );
+                const unitCost = ingredient?.cost || 0;
+                
+                const varianceCost = window.foodCostingWorkflow.calculateVarianceCost(variance, unitCost);
+                
+                varianceResults.push({
+                    ingredientName: ingredientName,
+                    theoretical: theoretical,
+                    actual: actual,
+                    variance: variance,
+                    variancePercentage: theoretical > 0 ? (variance / theoretical * 100) : 0,
+                    unitCost: unitCost,
+                    varianceCost: varianceCost,
+                    status: variance > 0 ? 'overage' : variance < 0 ? 'shortage' : 'exact'
+                });
+                
+                totalVarianceCost += Math.abs(varianceCost);
+                if (variance !== 0) itemsWithVariance++;
+                if (variance > 0) positiveVariance += Math.abs(varianceCost);
+                if (variance < 0) negativeVariance += Math.abs(varianceCost);
+            });
+            
+            // Display results
+            displayVarianceResults(varianceResults, totalVarianceCost, itemsWithVariance, positiveVariance, negativeVariance);
+        }
+        
+        // Load sales data (placeholder - in production this would come from actual sales tracking)
+        function loadSalesData(startDate, endDate) {
+            // TODO: Implement actual sales data loading
+            // For now, return empty object - user would need to input sales data
+            const salesDataKey = `sales_data_${startDate}_${endDate}`;
+            return JSON.parse(localStorage.getItem(salesDataKey) || '{}');
+        }
+        
+        // Load inventory data
+        function loadInventoryData(startDate, endDate) {
+            const inventoryKey = 'inventory_items';
+            const inventory = JSON.parse(localStorage.getItem(inventoryKey) || '[]');
+            
+            // Group by ingredient name
+            const inventoryData = {};
+            
+            inventory.forEach(item => {
+                const name = item.name || item.ingredient;
+                if (!inventoryData[name]) {
+                    inventoryData[name] = {
+                        opening: item.openingInventory || 0,
+                        purchases: item.purchases || 0,
+                        closing: item.closingInventory || 0
+                    };
+                }
+            });
+            
+            return inventoryData;
+        }
+        
+        // Display variance results
+        function displayVarianceResults(results, totalCost, itemsCount, positiveCost, negativeCost) {
+            const tbody = document.getElementById('variance-table-body');
+            const resultsDiv = document.getElementById('variance-results');
+            
+            if (results.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: var(--iterum-text-tertiary);">
+                            <div style="font-size: 3rem; margin-bottom: 16px;">📊</div>
+                            <h3>No Variance Data Available</h3>
+                            <p>Please ensure you have:</p>
+                            <ul style="text-align: left; display: inline-block; margin-top: 12px;">
+                                <li>Menu items with linked recipes</li>
+                                <li>Sales data recorded for the selected period</li>
+                                <li>Inventory data (opening, purchases, closing) for the period</li>
+                            </ul>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = results.map(result => {
+                    const varianceClass = result.variance > 0 ? 'variance-positive' : 
+                                        result.variance < 0 ? 'variance-negative' : 'variance-neutral';
+                    const statusBadge = result.status === 'overage' ? 
+                        '<span style="background: #6B8E6F; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;">Overage</span>' :
+                        result.status === 'shortage' ?
+                        '<span style="background: #C97676; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;">Shortage</span>' :
+                        '<span style="background: #64748b; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;">Exact</span>';
+                    
+                    return `
+                        <tr>
+                            <td style="position: sticky; left: 0; background: white; z-index: 1; font-weight: 600; color: var(--iterum-text-primary);">
+                                ${result.ingredientName}
+                            </td>
+                            <td>${result.theoretical.toFixed(2)}</td>
+                            <td>${result.actual.toFixed(2)}</td>
+                            <td class="${varianceClass}">${result.variance > 0 ? '+' : ''}${result.variance.toFixed(2)}</td>
+                            <td class="${varianceClass}">${result.variancePercentage > 0 ? '+' : ''}${result.variancePercentage.toFixed(1)}%</td>
+                            <td>$${result.unitCost.toFixed(4)}</td>
+                            <td class="${varianceClass}">${result.varianceCost > 0 ? '+' : ''}$${Math.abs(result.varianceCost).toFixed(2)}</td>
+                            <td>${statusBadge}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+            
+            // Update summary
+            document.getElementById('total-variance-cost').textContent = '$' + totalCost.toFixed(2);
+            document.getElementById('items-with-variance').textContent = itemsCount;
+            document.getElementById('positive-variance').textContent = '$' + positiveCost.toFixed(2);
+            document.getElementById('negative-variance').textContent = '$' + negativeCost.toFixed(2);
+            
+            resultsDiv.style.display = 'block';
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    </script>
+</body>
+</html>
+

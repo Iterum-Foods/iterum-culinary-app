@@ -97,8 +97,13 @@ class ProjectManagementSystem {
             // Load projects from storage
             this.loadProjects();
             
-            // Set current project to master
-            this.setCurrentProject(this.masterProjectId);
+            // Load current project (don't force master - use saved selection)
+            this.loadCurrentProject();
+            
+            // If no current project found, default to master
+            if (!this.currentProject) {
+                this.setCurrentProject(this.masterProjectId);
+            }
             
             // Update UI
             this.updateProjectUI();
@@ -226,20 +231,69 @@ class ProjectManagementSystem {
      */
     loadCurrentProject() {
         try {
+            // Load projects first to ensure we have the full list
+            this.loadProjects();
+            
+            // Try multiple storage keys (user-specific first, then legacy)
             const userCurrentProjectKey = this.getUserStorageKey(this.currentProjectKey);
-            const projectId = localStorage.getItem(userCurrentProjectKey);
+            let projectId = localStorage.getItem(userCurrentProjectKey);
+            
+            // Fallback to legacy keys
+            if (!projectId) {
+                projectId = localStorage.getItem(this.currentProjectKey);
+            }
+            if (!projectId) {
+                projectId = localStorage.getItem('iterum_current_project');
+            }
+            if (!projectId && this.currentUserId) {
+                projectId = localStorage.getItem(`iterum_current_project_${this.currentUserId}`);
+            }
+            
+            console.log('🔍 Loading current project. Found projectId:', projectId);
+            console.log('📚 Available projects:', this.projects.map(p => ({id: p.id, name: p.name})));
+            
             if (projectId) {
                 this.currentProject = this.projects.find(p => p.id === projectId);
-                if (!this.currentProject) {
-                    this.setCurrentProject(this.masterProjectId);
+                
+                if (this.currentProject) {
+                    console.log('✅ Loaded current project:', this.currentProject.name);
+                    // Ensure it's saved in all keys for compatibility
+                    const userCurrentProjectKey = this.getUserStorageKey(this.currentProjectKey);
+                    localStorage.setItem(userCurrentProjectKey, projectId);
+                    localStorage.setItem(this.currentProjectKey, projectId);
+                    localStorage.setItem('iterum_current_project', projectId);
+                } else {
+                    console.warn('⚠️ Project ID', projectId, 'not found in projects list. Available:', this.projects.map(p => p.id));
+                    // Try to find master project
+                    if (this.projects.some(p => p.id === this.masterProjectId)) {
+                        console.log('📋 Falling back to master project');
+                        this.setCurrentProject(this.masterProjectId);
+                    } else if (this.projects.length > 0) {
+                        // Use first available project
+                        console.log('📋 Using first available project:', this.projects[0].name);
+                        this.setCurrentProject(this.projects[0].id);
+                    }
                 }
             } else {
-                this.setCurrentProject(this.masterProjectId);
+                // No saved project - default to master or first available
+                if (this.projects.some(p => p.id === this.masterProjectId)) {
+                    console.log('📋 No saved project, defaulting to master');
+                    this.setCurrentProject(this.masterProjectId);
+                } else if (this.projects.length > 0) {
+                    console.log('📋 No saved project, using first available:', this.projects[0].name);
+                    this.setCurrentProject(this.projects[0].id);
+                }
             }
-            console.log('📋 Current project for user', this.currentUserId + ':', this.currentProject?.name);
+            
+            console.log('📋 Final current project for user', this.currentUserId + ':', this.currentProject?.name);
         } catch (error) {
             console.error('❌ Error loading current project:', error);
-            this.setCurrentProject(this.masterProjectId);
+            // Fallback to master
+            if (this.projects.some(p => p.id === this.masterProjectId)) {
+                this.setCurrentProject(this.masterProjectId);
+            } else if (this.projects.length > 0) {
+                this.setCurrentProject(this.projects[0].id);
+            }
         }
     }
 
@@ -251,11 +305,33 @@ class ProjectManagementSystem {
         if (project) {
             this.currentProject = project;
             const userCurrentProjectKey = this.getUserStorageKey(this.currentProjectKey);
+            
+            // Save to ALL storage keys to ensure persistence
             localStorage.setItem(userCurrentProjectKey, projectId);
+            localStorage.setItem(this.currentProjectKey, projectId);
+            localStorage.setItem('iterum_current_project', projectId);
+            
+            // Also save with user ID
+            if (this.currentUserId) {
+                localStorage.setItem(`iterum_current_project_${this.currentUserId}`, projectId);
+            }
+            
+            // Force immediate write completion
+            if (localStorage.getItem(userCurrentProjectKey) !== projectId) {
+                console.error('❌ Failed to save project ID to localStorage!');
+                return false;
+            }
+            
+            console.log('✅ Project ID saved to localStorage:', projectId);
+            console.log('📋 Current project:', project.name);
+            
             this.updateProjectUI();
             this.dispatchProjectChangeEvent();
             console.log('📋 User', this.currentUserId, 'switched to project:', project.name);
             return true;
+        } else {
+            console.warn('⚠️ Project not found:', projectId);
+            console.warn('📚 Available projects:', this.projects.map(p => ({id: p.id, name: p.name})));
         }
         return false;
     }
@@ -275,12 +351,28 @@ class ProjectManagementSystem {
             color: projectData.color || this.getRandomProjectColor(),
             icon: projectData.icon || '📋',
             tags: projectData.tags || [],
+            userId: this.currentUserId, // Ensure user ID is set
             ...projectData
         };
 
+        // Add to projects array
         this.projects.push(newProject);
+        
+        // Save projects FIRST
         this.saveProjects();
-        console.log('✅ Created new project:', newProject.name);
+        console.log('💾 Projects saved, total count:', this.projects.length);
+        
+        // AUTO-SET AS CURRENT: Automatically set the new project as current
+        const setSuccess = this.setCurrentProject(newProject.id);
+        
+        if (setSuccess) {
+            console.log('✅ Created new project:', newProject.name, 'and set as current');
+            console.log('📋 Current project ID:', this.currentProject?.id);
+            console.log('📋 Current project name:', this.currentProject?.name);
+        } else {
+            console.error('❌ Failed to set new project as current');
+        }
+        
         return newProject;
     }
 

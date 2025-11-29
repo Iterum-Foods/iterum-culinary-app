@@ -72,7 +72,7 @@ A comprehensive culinary research and development application for chefs, food se
 ### **Option 2: Local HTTP Server (Recommended)**
 1. Clone this repository:
    ```bash
-   git clone https://github.com/Iterum-Foods/iterum-chef-notebook.git
+   git clone https://github.com/Iterum-Foods/iterum-culinary-app.git
    cd iterum-culinary-app
    ```
 2. Install dependencies:

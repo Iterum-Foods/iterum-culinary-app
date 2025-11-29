@@ -322,7 +322,79 @@ class KitchenManagementSystem {
       serviceDate
     });
 
+    // Save prep list to localStorage for calendar tracking
+    this.savePrepList(plan);
+
     return plan;
+  }
+
+  /**
+   * Save prep list to localStorage for calendar tracking
+   */
+  savePrepList(prepList) {
+    try {
+      const userId = this.userId || this.getUserId();
+      const prepListsKey = `prep_lists_${userId}`;
+      
+      // Load existing prep lists
+      let prepLists = [];
+      const existing = localStorage.getItem(prepListsKey);
+      if (existing) {
+        prepLists = JSON.parse(existing);
+      }
+
+      // Add unique ID if not present
+      if (!prepList.id) {
+        prepList.id = `prep_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      }
+
+      // Check if prep list for this date already exists
+      const existingIndex = prepLists.findIndex(p => 
+        (p.prepDate || p.date) === (prepList.prepDate || prepList.date)
+      );
+
+      if (existingIndex >= 0) {
+        // Update existing
+        prepLists[existingIndex] = prepList;
+      } else {
+        // Add new
+        prepLists.push(prepList);
+      }
+
+      // Sort by date (newest first)
+      prepLists.sort((a, b) => {
+        const dateA = new Date(a.prepDate || a.date || a.generatedDate);
+        const dateB = new Date(b.prepDate || b.date || b.generatedDate);
+        return dateB - dateA;
+      });
+
+      // Keep only last 100 prep lists
+      if (prepLists.length > 100) {
+        prepLists = prepLists.slice(0, 100);
+      }
+
+      // Save to localStorage
+      localStorage.setItem(prepListsKey, JSON.stringify(prepLists));
+
+      // Also save to legacy key for backward compatibility
+      localStorage.setItem('prep_lists', JSON.stringify(prepLists));
+
+      console.log('✅ Prep list saved for calendar tracking');
+    } catch (error) {
+      console.error('❌ Error saving prep list:', error);
+    }
+  }
+
+  /**
+   * Get user ID helper
+   */
+  getUserId() {
+    try {
+      const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+      return user.userId || user.id || 'guest';
+    } catch {
+      return 'guest';
+    }
   }
 
   generateFOHBriefing(serviceDate = null) {

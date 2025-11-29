@@ -19,16 +19,68 @@ class CostCalculator {
 
     /**
      * Load ingredient prices from localStorage
+     * Updated to use enhanced ingredients manager and vendor price comparator
      */
     loadIngredientPrices() {
         try {
-            // Load from vendor price lists
+            // Use enhanced ingredients manager if available
+            let ingredients = [];
+            if (window.ingredientsManager) {
+                ingredients = window.ingredientsManager.getAllIngredients();
+            } else {
+                ingredients = JSON.parse(
+                    localStorage.getItem('ingredients_database') || 
+                    localStorage.getItem('ingredients') || 
+                    '[]'
+                );
+            }
+
+            // Load from ingredients database with vendor prices
+            ingredients.forEach(ingredient => {
+                const key = ingredient.name.toLowerCase();
+                
+                // Use best price from vendor comparator if available
+                let price = ingredient.cost || 0;
+                let unit = ingredient.unit || ingredient.default_unit || 'lb';
+                let vendor = ingredient.supplier || 'Default';
+
+                if (ingredient.bestPrice) {
+                    // Use normalized best price
+                    price = ingredient.bestPrice.normalizedPrice || ingredient.bestPrice.price || price;
+                    unit = ingredient.bestPrice.baseUnit || unit;
+                    vendor = ingredient.bestPrice.vendor || vendor;
+                } else if (ingredient.vendorPrices && ingredient.vendorPrices.length > 0 && window.vendorPriceComparator) {
+                    // Calculate best price
+                    window.vendorPriceComparator.updateBestPrice(ingredient);
+                    if (ingredient.bestPrice) {
+                        price = ingredient.bestPrice.normalizedPrice || ingredient.bestPrice.price || price;
+                        unit = ingredient.bestPrice.baseUnit || unit;
+                        vendor = ingredient.bestPrice.vendor || vendor;
+                    }
+                }
+
+                // Update or set price
+                if (price > 0) {
+                    this.ingredientPrices[key] = {
+                        name: ingredient.name,
+                        price: price,
+                        unit: unit,
+                        vendor: vendor,
+                        ingredientId: ingredient.id,
+                        caseSize: ingredient.casePricing?.caseSize,
+                        casePricing: ingredient.casePricing
+                    };
+                }
+            });
+
+            // Also load from legacy vendor price lists for backward compatibility
             const vendors = JSON.parse(localStorage.getItem('vendors') || '[]');
             vendors.forEach(vendor => {
                 if (vendor.priceList) {
                     vendor.priceList.forEach(item => {
                         const key = item.ingredient?.toLowerCase() || item.item?.toLowerCase();
                         if (key && item.price) {
+                            // Only use if not already set from ingredients database
                             if (!this.ingredientPrices[key] || item.price < this.ingredientPrices[key].price) {
                                 this.ingredientPrices[key] = {
                                     name: item.ingredient || item.item,
@@ -40,20 +92,6 @@ class CostCalculator {
                             }
                         }
                     });
-                }
-            });
-
-            // Load from ingredients database
-            const ingredients = JSON.parse(localStorage.getItem('ingredients') || '[]');
-            ingredients.forEach(ingredient => {
-                const key = ingredient.name.toLowerCase();
-                if (ingredient.price && !this.ingredientPrices[key]) {
-                    this.ingredientPrices[key] = {
-                        name: ingredient.name,
-                        price: parseFloat(ingredient.price),
-                        unit: ingredient.defaultUnit || 'lb',
-                        vendor: ingredient.preferredVendor || 'Unknown'
-                    };
                 }
             });
 
@@ -77,7 +115,7 @@ class CostCalculator {
         const ingredientCosts = [];
         let missingPrices = [];
 
-        // Calculate cost for each ingredient
+        // Phase 2: Calculate cost for each ingredient with TRIM/WASTE %
         recipe.ingredients.forEach(ingredient => {
             const costData = this.calculateIngredientCost(
                 ingredient.name || ingredient.ingredient,
@@ -85,8 +123,20 @@ class CostCalculator {
                 ingredient.unit
             );
 
-            ingredientCosts.push(costData);
-            totalIngredientCost += costData.cost;
+            // Phase 2: Apply TRIM/WASTE % to get ACTUAL INGREDIENT COST
+            // Formula: ACTUAL INGREDIENT COST = TOTAL INGREDIENT COST × (1 + WASTE %)
+            const wastePercentage = parseFloat(ingredient.wastePercentage || ingredient.trimPercentage || ingredient.waste || 0) / 100 || 0;
+            const actualIngredientCost = costData.cost * (1 + wastePercentage);
+            
+            const enrichedCostData = {
+                ...costData,
+                wastePercentage: wastePercentage * 100, // Store as percentage
+                actualCost: actualIngredientCost,
+                wasteCost: actualIngredientCost - costData.cost
+            };
+
+            ingredientCosts.push(enrichedCostData);
+            totalIngredientCost += actualIngredientCost; // Use actual cost with waste factored in
 
             if (!costData.priceFound) {
                 missingPrices.push(ingredient.name || ingredient.ingredient);
@@ -103,9 +153,11 @@ class CostCalculator {
         const overheadCost = subtotal * this.overheadPercentage;
         const totalCost = subtotal + overheadCost;
 
-        // Calculate per serving cost
-        const servings = parseInt(recipe.servings || recipe.yield) || 1;
-        const costPerServing = totalCost / servings;
+        // Phase 2: Calculate COST PER YIELD UNIT
+        // Formula: COST PER YIELD UNIT = SUM of all Actual Ingredient Costs / YIELD QUANTITY
+        const yieldQuantity = parseInt(recipe.yieldQuantity || recipe.servings || recipe.yield) || 1;
+        const costPerYieldUnit = totalCost / yieldQuantity;
+        const costPerServing = costPerYieldUnit; // Alias for backward compatibility
 
         // Calculate recommended pricing (various margins)
         const pricingOptions = this.calculatePricingOptions(costPerServing);
@@ -113,10 +165,12 @@ class CostCalculator {
         return {
             totalCost: totalCost.toFixed(2),
             costPerServing: costPerServing.toFixed(2),
-            ingredientCost: totalIngredientCost.toFixed(2),
+            costPerYieldUnit: costPerYieldUnit.toFixed(2), // Phase 2: Cost per yield unit
+            yieldQuantity: yieldQuantity, // Phase 2: Yield quantity
+            ingredientCost: totalIngredientCost.toFixed(2), // Phase 2: Actual cost with waste factored in
             laborCost: laborCost.toFixed(2),
             overheadCost: overheadCost.toFixed(2),
-            servings: servings,
+            servings: yieldQuantity, // Alias for backward compatibility
             ingredientCosts: ingredientCosts,
             missingPrices: missingPrices,
             pricingOptions: pricingOptions,
@@ -124,12 +178,15 @@ class CostCalculator {
                 ingredients: ((totalIngredientCost / totalCost) * 100).toFixed(1),
                 labor: ((laborCost / totalCost) * 100).toFixed(1),
                 overhead: ((overheadCost / totalCost) * 100).toFixed(1)
-            }
+            },
+            wasteTotal: ingredientCosts.reduce((sum, ing) => sum + (ing.wasteCost || 0), 0).toFixed(2) // Phase 2: Total waste cost
         };
     }
 
     /**
      * Calculate cost for a single ingredient
+     * Phase 1: Uses COST PER BASE UNIT from case pricing if available
+     * Enhanced: Uses vendor price comparator for accurate unit conversion
      * @param {string} name - Ingredient name
      * @param {number} quantity - Quantity needed
      * @param {string} unit - Unit of measurement
@@ -137,7 +194,81 @@ class CostCalculator {
      */
     calculateIngredientCost(name, quantity, unit) {
         const key = name.toLowerCase();
-        const priceData = this.ingredientPrices[key];
+        let priceData = this.ingredientPrices[key];
+        
+        // Phase 1: Load from ingredients database to get case pricing
+        // Use enhanced ingredients manager if available
+        if (!priceData) {
+            let ingredients = [];
+            if (window.ingredientsManager) {
+                ingredients = window.ingredientsManager.getAllIngredients();
+            } else {
+                ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
+            }
+            
+            const ingredient = ingredients.find(ing => 
+                (ing.name.toLowerCase() === key || (ing.baseName && ing.baseName.toLowerCase() === key)) &&
+                !ing.isVariant
+            ) || ingredients.find(ing => ing.name.toLowerCase() === key);
+            
+            if (ingredient) {
+                // Update best price if vendor comparator available
+                if (window.vendorPriceComparator && ingredient.vendorPrices && ingredient.vendorPrices.length > 0) {
+                    window.vendorPriceComparator.updateBestPrice(ingredient);
+                }
+                
+                // Use best price if available
+                if (ingredient.bestPrice) {
+                    priceData = {
+                        name: ingredient.name,
+                        price: ingredient.bestPrice.normalizedPrice || ingredient.bestPrice.price,
+                        unit: ingredient.bestPrice.baseUnit || ingredient.unit,
+                        vendor: ingredient.bestPrice.vendor || ingredient.supplier || 'Unknown',
+                        ingredientId: ingredient.id,
+                        casePricing: ingredient.casePricing || null
+                    };
+                } else if (ingredient.cost && ingredient.cost > 0) {
+                    // Phase 1: Use calculated cost per base unit
+                    priceData = {
+                        name: ingredient.name,
+                        price: ingredient.cost, // Already calculated as cost per base unit
+                        unit: ingredient.unit, // Base unit
+                        vendor: ingredient.supplier || 'Unknown',
+                        ingredientId: ingredient.id,
+                        casePricing: ingredient.casePricing || null
+                    };
+                } else if (ingredient.casePricing && ingredient.casePricing.pricePerCase > 0) {
+                    // Calculate from case pricing if cost not set
+                    const casePricing = ingredient.casePricing;
+                    let costPerBaseUnit;
+                    
+                    if (window.unitConverter) {
+                        // Use unit converter for accurate calculation
+                        const caseUnitInBase = window.unitConverter.convert(
+                            casePricing.caseSize,
+                            casePricing.caseUnit,
+                            ingredient.unit || 'g'
+                        );
+                        if (caseUnitInBase !== null && caseUnitInBase > 0) {
+                            costPerBaseUnit = casePricing.pricePerCase / (caseUnitInBase * (casePricing.conversionFactor || 1));
+                        } else {
+                            costPerBaseUnit = casePricing.pricePerCase / (casePricing.caseSize * (casePricing.conversionFactor || 1));
+                        }
+                    } else {
+                        costPerBaseUnit = casePricing.pricePerCase / (casePricing.caseSize * (casePricing.conversionFactor || 1));
+                    }
+                    
+                    priceData = {
+                        name: ingredient.name,
+                        price: costPerBaseUnit,
+                        unit: ingredient.unit,
+                        vendor: ingredient.supplier || 'Unknown',
+                        ingredientId: ingredient.id,
+                        casePricing: casePricing
+                    };
+                }
+            }
+        }
 
         if (!priceData) {
             return {
@@ -150,8 +281,18 @@ class CostCalculator {
             };
         }
 
-        // Convert quantity to match price unit if needed
-        const convertedQuantity = this.convertUnits(quantity, unit, priceData.unit);
+        // Use unit converter for accurate conversion if available
+        let convertedQuantity;
+        if (window.unitConverter) {
+            convertedQuantity = window.unitConverter.convert(quantity, unit, priceData.unit);
+            if (convertedQuantity === null) {
+                // Fallback to manual conversion if categories don't match
+                convertedQuantity = this.convertUnits(quantity, unit, priceData.unit);
+            }
+        } else {
+            convertedQuantity = this.convertUnits(quantity, unit, priceData.unit);
+        }
+        
         const cost = convertedQuantity * priceData.price;
 
         return {
@@ -162,7 +303,8 @@ class CostCalculator {
             priceFound: true,
             pricePerUnit: priceData.price,
             priceUnit: priceData.unit,
-            vendor: priceData.vendor
+            vendor: priceData.vendor,
+            casePricing: priceData.casePricing || null
         };
     }
 

@@ -128,20 +128,23 @@ class SyncStatusIndicator {
     }
 }
 
-// Add pulse animation
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.5; transform: scale(1.2); }
-    }
-    
-    #sync-status-indicator:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 30px rgba(0,0,0,0.2);
-    }
-`;
-document.head.appendChild(style);
+// Add pulse animation (only if not already added)
+if (!document.getElementById('sync-status-indicator-styles')) {
+    const syncStyle = document.createElement('style');
+    syncStyle.id = 'sync-status-indicator-styles';
+    syncStyle.textContent = `
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        #sync-status-indicator:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 30px rgba(0,0,0,0.2);
+        }
+    `;
+    document.head.appendChild(syncStyle);
+}
 
 // Auto-initialize when DOM ready
 if (document.readyState === 'loading') {

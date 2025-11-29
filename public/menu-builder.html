@@ -10,6 +10,7 @@
     <script src="assets/js/auth-manager.js"></script>
     <script src="assets/js/auth-api-helper.js"></script>
     <script src="assets/js/auth-diagnostics.js"></script>
+    <script src="assets/js/page-protection.js"></script>
     
     <!-- State Management & Data -->
     <script src="assets/js/state-persistence-manager.js"></script>
@@ -18,6 +19,9 @@
     <script src="assets/js/menu-item-viewer.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+    <!-- UNIFIED COLOR SYSTEM - MUST LOAD FIRST -->
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
     <!-- Tailwind CSS - Built from source -->
     <link rel="stylesheet" href="assets/css/tailwind-output.css">
     <link rel="stylesheet" href="assets/css/iterum-design-system.css">
@@ -29,7 +33,6 @@
     <link rel="stylesheet" href="assets/css/nordic-design-system.css">
     <link rel="stylesheet" href="assets/css/modern-nordic-vintage.css">
     <link rel="stylesheet" href="assets/css/dark-mode-enhancements.css">
-    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
     <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
     
     <!-- Force page visibility -->
@@ -1204,7 +1207,6 @@
     <script src="assets/js/unified-project-selector.js" defer></script>
     <script src="assets/js/user-data-manager.js" defer></script>
     <script src="assets/js/cloud-data-sync.js" defer></script>
-    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
     <link rel="stylesheet" href="assets/css/header-universal.css">
 </head>
 <body class="menu-builder-page min-h-screen" style="padding-top: 80px;">
@@ -1347,17 +1349,17 @@
                     </div>
                     <div class="iterum-card-body">
                         <div class="quick-actions-grid">
-                            <button class="btn btn-primary btn-large" onclick="window.showAddItemModal()">
+                            <button class="btn btn-primary btn-large" onclick="showMenuBuildStep2()">
+                                <span style="font-size: 24px;">🚀</span>
+                                <span>Upload Menu or Create from Scratch</span>
+                            </button>
+                            <button class="btn btn-secondary btn-large" onclick="window.showAddItemModal()">
                                 <span style="font-size: 24px;">➕</span>
-                                <span>Add Menu Item</span>
+                                <span>Add New Dish</span>
                             </button>
-                            <button class="btn btn-secondary btn-large" onclick="showImportModal()">
-                                <span style="font-size: 24px;">📄</span>
-                                <span>Import from File</span>
-                            </button>
-                            <button class="btn btn-secondary btn-large" onclick="showTextInputModal()">
-                                <span style="font-size: 24px;">✏️</span>
-                                <span>Paste Menu Text</span>
+                            <button class="btn btn-secondary btn-large" onclick="showBrowseExistingItemsModal()">
+                                <span style="font-size: 24px;">📚</span>
+                                <span>Add Existing Dish</span>
                             </button>
                             <button class="btn btn-secondary btn-large" onclick="window.enhancedMenuManager.downloadTemplate()">
                                 <span style="font-size: 24px;">📥</span>
@@ -1378,7 +1380,10 @@
                     <div class="iterum-card-header">
                         <h2 class="heading-2">🍽️ Menu Items</h2>
                         <button class="btn btn-primary" onclick="window.showAddItemModal()">
-                            ➕ Add Item
+                            ➕ Add New Dish
+                        </button>
+                        <button class="btn btn-secondary" onclick="showBrowseExistingItemsModal()">
+                            📚 Add Existing Dish
                         </button>
                     </div>
                     <div class="iterum-card-body">
@@ -1559,35 +1564,82 @@
                 </div>
             </div>
 
-            <!-- Import Results Modal -->
-            <div id="import-results-modal" class="modal" style="display: none;">
-                <div class="modal-content modal-large" style="max-width: 1200px;">
+            <!-- Step 2: Upload Menu or Create from Scratch -->
+            <div id="menu-build-step-2-modal" class="modal" style="display: none;">
+                <div class="modal-content modal-large">
                     <div class="modal-header">
-                        <h3>📋 Import Results - Review & Link Recipes</h3>
-                        <span class="modal-close" onclick="closeModal('import-results-modal')">&times;</span>
+                        <h3>📋 Step 2: Add Dishes to Menu</h3>
+                        <span class="modal-close" onclick="closeModal('menu-build-step-2-modal')">&times;</span>
                     </div>
                     <div class="modal-body">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                            <!-- Upload Menu Option -->
+                            <div class="card" style="padding: 32px; text-align: center; cursor: pointer; border: 2px solid var(--iterum-border-light);" onclick="showMenuUploadOptions()">
+                                <div style="font-size: 4rem; margin-bottom: 16px;">📄</div>
+                                <h3 style="margin: 0 0 12px 0; color: var(--iterum-text-primary);">Upload Menu</h3>
+                                <p style="color: var(--iterum-text-tertiary); margin: 0;">Import dishes from PDF, Word, Excel, or text file</p>
+                            </div>
+                            
+                            <!-- Create from Scratch Option -->
+                            <div class="card" style="padding: 32px; text-align: center; cursor: pointer; border: 2px solid var(--iterum-border-light);" onclick="startMenuFromScratch()">
+                                <div style="font-size: 4rem; margin-bottom: 16px;">✏️</div>
+                                <h3 style="margin: 0 0 12px 0; color: var(--iterum-text-primary);">Create from Scratch</h3>
+                                <p style="color: var(--iterum-text-tertiary); margin: 0;">Add dishes one by one or import existing dishes</p>
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 16px; background: #f0f9ff; border-radius: 8px; border: 1px solid #bae6fd;">
+                            <strong style="color: #0c4a6e !important; font-weight: 700; font-size: 1rem;">💡 Tip:</strong>
+                            <span style="color: #0c4a6e !important; font-weight: 600; opacity: 1;">After uploading, you can map each dish to an existing dish in your database or create a new one.</span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeModal('menu-build-step-2-modal')">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import Results Modal - Enhanced with Dish Mapping -->
+            <div id="import-results-modal" class="modal" style="display: none;">
+                <div class="modal-content modal-large" style="max-width: 1400px; max-height: 90vh;">
+                    <div class="modal-header">
+                        <h3>🗺️ Map Dishes to Existing or Create New</h3>
+                        <span class="modal-close" onclick="closeModal('import-results-modal')">&times;</span>
+                    </div>
+                    <div class="modal-body" style="overflow-y: auto; max-height: calc(90vh - 180px);">
                         <!-- Menu Description Display -->
-                        <div id="import-menu-info" class="import-summary" style="display: none;">
+                        <div id="import-menu-info" class="import-summary" style="display: none; margin-bottom: 20px;">
                             <h4>Menu Information</h4>
                             <div id="menu-info-display"></div>
                         </div>
                         
                         <!-- Summary Stats -->
-                        <div id="import-summary" class="import-summary">
+                        <div id="import-summary" class="import-summary" style="margin-bottom: 20px;">
                             <!-- Import summary will be populated here -->
                         </div>
                         
-                        <!-- Items Preview with Recipe Linking -->
+                        <!-- Mapping Instructions -->
+                        <div style="padding: 16px; background: #fef3c7; border: 2px solid #fbbf24; border-radius: 8px; margin-bottom: 20px;">
+                            <strong style="color: #92400e;">📋 Mapping Instructions:</strong>
+                            <ul style="margin: 8px 0 0 0; padding-left: 20px; color: #92400e;">
+                                <li><strong>Link to Existing:</strong> Select a dish from your database to reuse it</li>
+                                <li><strong>Create New:</strong> Check the box to create a new dish (recipe required)</li>
+                                <li>Each dish must have a recipe linked or created</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Items Preview with Dish Mapping -->
                         <div id="import-preview" class="import-preview">
                             <div id="import-items-list" class="parse-item-list">
-                                <!-- Imported items preview will be shown here -->
+                                <!-- Imported items with mapping options will be shown here -->
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button class="btn btn-secondary" onclick="closeModal('import-results-modal')">Cancel</button>
-                        <button class="btn btn-primary" onclick="applyImportResults()">✓ Apply to Menu</button>
+                        <button class="btn btn-primary" onclick="window.enhancedMenuImport?.applyDishMappingResults()">
+                            ✓ Apply Mapping to Menu (<span id="mapped-count">0</span> dishes)
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1632,6 +1684,39 @@
                                     <input type="number" id="item-price" name="price" class="form-input" step="0.01" min="0" required placeholder="24.99">
                                 </div>
                             </div>
+                            
+                            <!-- RECIPE REQUIRED SECTION -->
+                            <div class="form-group" style="padding: 16px; background: #fef3c7; border: 2px solid #fbbf24; border-radius: 8px; margin-top: 16px;">
+                                <label class="form-label" style="color: #78350f !important; font-weight: 700; margin-bottom: 12px; font-size: 1rem;">
+                                    📋 Recipe (Optional - Auto-created if not linked)
+                                </label>
+                                <small class="form-help" style="display: block; margin-bottom: 12px; color: #78350f !important; font-weight: 600; opacity: 1;">
+                                    Link to an existing recipe, or leave empty to automatically create a new recipe draft for this dish.
+                                </small>
+                                
+                                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label for="item-recipe-link" class="form-label">Select Existing Recipe (Optional)</label>
+                                        <select id="item-recipe-link" name="recipeId" class="form-select">
+                                            <option value="">-- Leave empty to auto-create recipe --</option>
+                                            <!-- Recipes will be populated dynamically -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label for="item-target-food-cost" class="form-label">Target Food Cost % (Phase 3)</label>
+                                        <input type="number" id="item-target-food-cost" name="targetFoodCost" class="form-input" step="0.1" min="0" max="100" placeholder="30" value="30">
+                                        <small class="form-help">Industry standard: 25-35%</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="checkbox-item" style="padding: 12px; background: #f0fdf4; border: 2px solid #86efac; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                                        <input type="checkbox" id="item-create-recipe" name="createRecipe" onchange="toggleRecipeOption()">
+                                        <span style="font-weight: 600; color: #166534;">✨ Force Create New Recipe (Uncheck to use existing recipe)</span>
+                                    </label>
+                                    <small class="form-help">If checked, a new recipe will always be created. If unchecked and no recipe is selected, a recipe will still be auto-created.</small>
+                                </div>
+                            </div>
 
                             <div class="form-group">
                                 <label for="item-allergens" class="form-label">Allergens (comma-separated)</label>
@@ -1642,20 +1727,56 @@
                                 <label for="item-dietary" class="form-label">Dietary Info (comma-separated)</label>
                                 <input type="text" id="item-dietary" name="dietaryInfo" class="form-input" placeholder="e.g., Vegetarian, Gluten-Free, Vegan">
                             </div>
-
-                            <div class="form-group">
-                                <label class="checkbox-item" style="padding: 12px; background: #f0fdf4; border: 2px solid #86efac; border-radius: 8px;">
-                                    <input type="checkbox" id="item-create-recipe" name="createRecipe" checked>
-                                    <span style="font-weight: 600; color: #166534;">✅ Automatically create recipe draft for this menu item</span>
-                                </label>
-                                <small class="form-help">This will create a recipe template you can develop later, linked to this menu item for costing.</small>
-                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" onclick="closeModal('add-menu-item-modal')">Cancel</button>
                             <button type="submit" class="btn btn-primary">Add Menu Item</button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- Browse Existing Items Modal -->
+            <div id="browse-existing-items-modal" class="modal" style="display: none;">
+                <div class="modal-content modal-large">
+                    <div class="modal-header">
+                        <h3>📚 Add Existing Dishes to Menu</h3>
+                        <span class="modal-close" onclick="closeModal('browse-existing-items-modal')">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div style="margin-bottom: 20px;">
+                            <input type="text" id="browse-search-input" class="form-input" placeholder="🔍 Search dishes by name, category, or recipe..." style="width: 100%; padding: 12px;" onkeyup="filterBrowseItems()">
+                        </div>
+                        <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                            <select id="browse-category-filter" class="form-select" onchange="filterBrowseItems()" style="flex: 1;">
+                                <option value="">All Categories</option>
+                                <option value="Appetizers">Appetizers</option>
+                                <option value="Salads">Salads</option>
+                                <option value="Soups">Soups</option>
+                                <option value="Main Courses">Main Courses</option>
+                                <option value="Sides">Sides</option>
+                                <option value="Desserts">Desserts</option>
+                                <option value="Beverages">Beverages</option>
+                            </select>
+                            <button class="btn btn-secondary" onclick="filterBrowseItems()" style="padding: 12px 24px;">
+                                🔄 Refresh
+                            </button>
+                        </div>
+                        <div id="browse-items-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; max-height: 60vh; overflow-y: auto; padding: 10px;">
+                            <!-- Existing items will be populated here -->
+                        </div>
+                        <div id="browse-empty-state" style="display: none; text-align: center; padding: 40px;">
+                            <div style="font-size: 3rem; margin-bottom: 15px;">📚</div>
+                            <h3>No Existing Dishes Found</h3>
+                            <p style="color: #64748b;">Create your first dish using "Add New Dish" button</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal('browse-existing-items-modal')">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="addSelectedItemsToMenu()">
+                            ➕ Add Selected to Menu (<span id="selected-count">0</span>)
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -1666,7 +1787,7 @@
                         <h3>✏️ Edit Menu Item</h3>
                         <span class="modal-close" onclick="closeModal('edit-menu-item-modal')">&times;</span>
                     </div>
-                    <form id="edit-menu-item-form">
+                    <form id="edit-menu-item-form" onsubmit="event.preventDefault(); window.enhancedMenuManager?.handleEditMenuItemForm?.(event);">
                         <div class="modal-body">
                             <div class="form-group">
                                 <label for="edit-item-name" class="form-label">Dish Name *</label>
@@ -1697,6 +1818,31 @@
                                 <div class="form-group">
                                     <label for="edit-item-price" class="form-label">Price *</label>
                                     <input type="number" id="edit-item-price" name="price" class="form-input" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                            
+                            <!-- RECIPE REQUIRED SECTION (Edit) -->
+                            <div class="form-group" style="padding: 16px; background: #fef3c7; border: 2px solid #fbbf24; border-radius: 8px; margin-top: 16px;">
+                                <label class="form-label" style="color: #78350f !important; font-weight: 700; margin-bottom: 12px; font-size: 1rem;">
+                                    📋 Recipe Required *
+                                </label>
+                                <small class="form-help" style="display: block; margin-bottom: 12px; color: #78350f !important; font-weight: 600; opacity: 1;">
+                                    Every menu item must have a recipe for cost tracking.
+                                </small>
+                                
+                                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label for="edit-item-recipe-link" class="form-label">Select Recipe *</label>
+                                        <select id="edit-item-recipe-link" name="recipeId" class="form-select" required>
+                                            <option value="">-- Select Recipe --</option>
+                                            <!-- Recipes will be populated dynamically -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label for="edit-item-target-food-cost" class="form-label">Target Food Cost % (Phase 3)</label>
+                                        <input type="number" id="edit-item-target-food-cost" name="targetFoodCost" class="form-input" step="0.1" min="0" max="100" placeholder="30">
+                                        <small class="form-help">Industry standard: 25-35%</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2179,41 +2325,149 @@
         // Select menu to edit
         function selectMenuToEdit(index) {
             const user = window.authManager?.currentUser;
-            if (!user) return;
+            if (!user) {
+                console.error('❌ No user logged in');
+                return;
+            }
             
             const userId = user.userId || user.id;
             const menuKey = `menus_${userId}`;
             const menus = JSON.parse(localStorage.getItem(menuKey) || '[]');
             const menu = menus[index];
             
-            if (!menu) return;
+            if (!menu) {
+                console.error('❌ Menu not found at index:', index);
+                return;
+            }
             
-            console.log(`✏️ Editing menu: ${menu.name}`);
+            // Store reference to currently selected menu
+            currentSelectedMenu = { ...menu, index: index };
+            
+            console.log(`✏️ Editing menu: ${menu.name} (${menu.items?.length || 0} items)`);
+            
+            // Ensure menu has items array
+            if (!menu.items) {
+                menu.items = [];
+            }
+            
+            // Load menu into EnhancedMenuManager if available
+            if (window.enhancedMenuManager) {
+                // Set current menu data
+                window.enhancedMenuManager.currentMenu = menu;
+                window.enhancedMenuManager.menuItems = menu.items || [];
+                
+                // Save to EnhancedMenuManager storage format
+                const projectId = window.enhancedMenuManager.getCurrentProjectId();
+                const enhancedMenuKey = `menu_data_${projectId}`;
+                const menuData = {
+                    menu: menu,
+                    items: menu.items || []
+                };
+                localStorage.setItem(enhancedMenuKey, JSON.stringify(menuData));
+                
+                console.log('✅ Menu loaded into EnhancedMenuManager:', menu.name);
+            }
             
             // Show "currently editing" section
             const editingDiv = document.getElementById('current-menu-editing');
-            editingDiv.style.display = 'block';
-            document.getElementById('current-menu-name').textContent = menu.name;
-            document.getElementById('current-menu-details').textContent = 
-                `${menu.items?.length || 0} dishes | ${menu.categories?.length || 0} categories | Created ${formatDate(menu.createdAt)}`;
+            if (editingDiv) {
+                editingDiv.style.display = 'block';
+                const nameEl = document.getElementById('current-menu-name');
+                const detailsEl = document.getElementById('current-menu-details');
+                
+                if (nameEl) nameEl.textContent = menu.name;
+                if (detailsEl) {
+                    detailsEl.textContent = 
+                        `${menu.items?.length || 0} dishes | ${menu.categories?.length || 0} categories | Created ${formatDate(menu.createdAt)}`;
+                }
+            }
             
-            // Display menu items
+            // Display menu items using the display function
             displayMenuItems(menu);
             
             // Scroll to menu items
-            document.getElementById('menu-items-grid')?.scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => {
+                const grid = document.getElementById('menu-items-grid');
+                if (grid) {
+                    grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
         }
+        
+        // Show Step 2 modal (Upload or Create from Scratch)
+        function showMenuBuildStep2() {
+            if (!currentSelectedMenu && !window.enhancedMenuManager?.currentMenu) {
+                alert('Please select a menu first by clicking on a menu card above, or create a new menu.');
+                return;
+            }
+            
+            const modal = document.getElementById('menu-build-step-2-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+        
+        // Show menu upload options
+        function showMenuUploadOptions() {
+            closeModal('menu-build-step-2-modal');
+            // Show the file import modal
+            showImportModal();
+        }
+        
+        // Start menu from scratch
+        function startMenuFromScratch() {
+            closeModal('menu-build-step-2-modal');
+            
+            // Scroll to menu items section and highlight Quick Actions
+            setTimeout(() => {
+                const menuItemsSection = document.getElementById('menu-items-section') || 
+                                       document.querySelector('.menu-items-section');
+                if (menuItemsSection) {
+                    menuItemsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    
+                    // Highlight Quick Actions briefly
+                    const quickActions = document.querySelector('.quick-actions-grid');
+                    if (quickActions) {
+                        quickActions.style.transition = 'all 0.3s ease';
+                        quickActions.style.boxShadow = '0 0 20px rgba(107, 142, 111, 0.5)';
+                        quickActions.style.borderRadius = '12px';
+                        setTimeout(() => {
+                            quickActions.style.boxShadow = '';
+                        }, 2000);
+                    }
+                }
+            }, 100);
+        }
+        
+        // Track currently selected menu
+        let currentSelectedMenu = null;
         
         // Clear menu selection
         function clearMenuSelection() {
-            document.getElementById('current-menu-editing').style.display = 'none';
-            document.getElementById('menu-items-grid').innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">🍽️</div>
-                    <h3>Select a Menu</h3>
-                    <p>Choose a menu from the list above to view and edit its items</p>
-                </div>
-            `;
+            currentSelectedMenu = null;
+            
+            const editingDiv = document.getElementById('current-menu-editing');
+            if (editingDiv) {
+                editingDiv.style.display = 'none';
+            }
+            
+            // Clear EnhancedMenuManager if available
+            if (window.enhancedMenuManager) {
+                window.enhancedMenuManager.currentMenu = null;
+                window.enhancedMenuManager.menuItems = [];
+                window.enhancedMenuManager.renderMenuItems();
+            }
+            
+            const grid = document.getElementById('menu-items-grid');
+            if (grid) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🍽️</div>
+                        <h3>Select a Menu</h3>
+                        <p>Choose a menu from the list above to view and edit its items</p>
+                    </div>
+                `;
+            }
         }
         
         // Refresh menu list
@@ -2285,15 +2539,33 @@
         // Display menu items in grid
         function displayMenuItems(menu) {
             const grid = document.getElementById('menu-items-grid');
-            if (!grid) return;
+            if (!grid) {
+                console.warn('⚠️ menu-items-grid not found');
+                return;
+            }
             
-            if (!menu.items || menu.items.length === 0) {
+            // Ensure menu has items array
+            if (!menu) {
+                console.warn('⚠️ No menu provided to displayMenuItems');
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🍽️</div>
+                        <h3>Select a Menu</h3>
+                        <p>Choose a menu from above to view its items</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const menuItems = menu.items || [];
+            
+            if (menuItems.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">🍽️</div>
                         <h3>No Items in This Menu</h3>
                         <p>Add menu items to get started</p>
-                        <button class="btn btn-primary" onclick="window.enhancedMenuManager?.showAddItemModal()">
+                        <button class="btn btn-primary" onclick="window.showAddItemModal()">
                             ➕ Add First Item
                         </button>
                     </div>
@@ -2301,7 +2573,9 @@
                 return;
             }
             
-            grid.innerHTML = menu.items.map((item, itemIndex) => `
+            console.log(`📋 Displaying ${menuItems.length} menu items for menu: ${menu.name}`);
+            
+            grid.innerHTML = menuItems.map((item, itemIndex) => `
                 <div class="card card-hover" style="margin-bottom: 15px;">
                     <div class="card-header-gradient">
                         <div class="card-title">${item.name}</div>
@@ -2314,18 +2588,52 @@
                                 <div class="stat-value text-success">$${item.price?.toFixed(2) || '0.00'}</div>
                                 <div class="stat-label">Price</div>
                             </div>
-                            ${item.cost ? `
-                                <div class="stat-item-centered">
-                                    <div class="stat-value">$${item.cost.toFixed(2)}</div>
-                                    <div class="stat-label">Cost</div>
-                                </div>
-                            ` : ''}
-                            ${item.ingredients ? `
-                                <div class="stat-item-centered">
-                                    <div class="stat-value">${Array.isArray(item.ingredients) ? item.ingredients.length : 0}</div>
-                                    <div class="stat-label">Ingredients</div>
-                                </div>
-                            ` : ''}
+                            ${(() => {
+                                // Phase 3: Calculate Food Cost % if recipe is linked
+                                let foodCostDisplay = '';
+                                let recipeCost = null;
+                                
+                                if (item.recipeId && window.foodCostingWorkflow) {
+                                    const costData = window.foodCostingWorkflow.getRecipeCostFromRecipeBuilder(item.recipeId);
+                                    if (costData && item.price) {
+                                        recipeCost = parseFloat(costData.costPerYieldUnit || costData.costPerServing || 0);
+                                        const foodCostPercent = window.foodCostingWorkflow.calculateFoodCostPercentage(recipeCost, item.price);
+                                        const targetFoodCost = item.targetFoodCost || 30; // Default 30%
+                                        const comparison = window.foodCostingWorkflow.compareFoodCostToTarget(foodCostPercent, targetFoodCost);
+                                        
+                                        foodCostDisplay = `
+                                            <div class="stat-item-centered">
+                                                <div class="stat-value" style="color: ${comparison.status === 'good' ? '#6B8E6F' : comparison.status === 'high' ? '#C97676' : '#5B9BAD'};">
+                                                    ${foodCostPercent.toFixed(1)}%
+                                                </div>
+                                                <div class="stat-label">Food Cost</div>
+                                                <small style="font-size: 0.7rem; color: #8A9299;">Target: ${targetFoodCost}%</small>
+                                            </div>
+                                        `;
+                                    }
+                                }
+                                
+                                return `
+                                    ${recipeCost ? `
+                                        <div class="stat-item-centered">
+                                            <div class="stat-value">$${recipeCost.toFixed(2)}</div>
+                                            <div class="stat-label">Recipe Cost</div>
+                                        </div>
+                                    ` : item.cost ? `
+                                        <div class="stat-item-centered">
+                                            <div class="stat-value">$${item.cost.toFixed(2)}</div>
+                                            <div class="stat-label">Cost</div>
+                                        </div>
+                                    ` : ''}
+                                    ${foodCostDisplay}
+                                    ${item.ingredients ? `
+                                        <div class="stat-item-centered">
+                                            <div class="stat-value">${Array.isArray(item.ingredients) ? item.ingredients.length : 0}</div>
+                                            <div class="stat-label">Ingredients</div>
+                                        </div>
+                                    ` : ''}
+                                `;
+                            })()}
                         </div>
                         ${item.allergens && item.allergens.length > 0 ? `
                             <div style="margin-top: 10px; padding: 10px; background: #fef3c7; border-radius: 6px;">
@@ -3409,6 +3717,8 @@
                 name: dishName,
                 description: document.getElementById('dish-description').value.trim(),
                 price: parseFloat(document.getElementById('dish-price').value) || null,
+                targetFoodCost: parseFloat(document.getElementById('dish-target-food-cost')?.value) || 30, // Phase 3
+                recipeId: document.getElementById('dish-recipe-link')?.value || null, // Phase 3
                 prepTime: parseInt(document.getElementById('dish-prep-time').value) || null,
                 servings: parseInt(document.getElementById('dish-servings').value) || null,
                 category: document.getElementById('dish-category').value
@@ -3596,23 +3906,20 @@
         
         // Wait a moment for all scripts to load
         setTimeout(() => {
-          if (typeof UnifiedAuthSystem !== 'undefined') {
-            console.log('✅ UnifiedAuthSystem class found, creating instance...');
-            window.unifiedAuthSystem = new UnifiedAuthSystem();
-            window.unifiedAuth = window.unifiedAuthSystem; // Alias for onclick handlers
-            console.log('✅ Authentication system initialized');
+          // Authentication is handled by AuthManager (already initialized via auth-manager.js)
+          if (window.authManager) {
+            console.log('✅ Authentication system (AuthManager) is ready');
+            // Create alias for backward compatibility if needed
+            if (!window.unifiedAuth) {
+              window.unifiedAuth = window.authManager;
+            }
           } else {
-            console.error('❌ UnifiedAuthSystem class not found');
+            console.warn('⚠️ AuthManager not available yet (may still be initializing)');
           }
           
-          // Initialize page protection if available
-          if (typeof PageProtection !== 'undefined') {
-            console.log('✅ PageProtection class found, creating instance...');
-            window.pageProtection = new PageProtection();
-            console.log('✅ Page protection system initialized');
-          } else {
-            console.warn('⚠️ PageProtection class not found');
-          }
+          // Page protection is handled by auth_guard.js (already loaded with defer)
+          // PageProtection class is optional and depends on UnifiedAuthSystem which we don't use
+          console.log('ℹ️ Page protection handled by auth_guard.js (using AuthManager)');
           
           // Ensure Enhanced Menu Manager is initialized
           if (window.enhancedMenuManager) {
@@ -3673,7 +3980,18 @@
       
       // Global wrapper function for showing add item modal
       window.showAddItemModal = function() {
+        // Ensure a menu is selected
+        if (!currentSelectedMenu && !window.enhancedMenuManager?.currentMenu) {
+          alert('Please select a menu first by clicking on a menu card above, or create a new menu.');
+          return;
+        }
+        
         if (window.enhancedMenuManager && typeof window.enhancedMenuManager.showAddItemModal === 'function') {
+          // Ensure current menu is set in EnhancedMenuManager
+          if (currentSelectedMenu && window.enhancedMenuManager) {
+            window.enhancedMenuManager.currentMenu = currentSelectedMenu;
+            window.enhancedMenuManager.menuItems = currentSelectedMenu.items || [];
+          }
           window.enhancedMenuManager.showAddItemModal();
         } else {
           // Fallback: show modal directly
@@ -3701,10 +4019,17 @@
     <!-- Load Smart Menu Parser -->
     <script defer src="assets/js/smart-menu-parser.js"></script>
     
+    <!-- Load Menu Items Database FIRST (before menu manager) -->
+    <script src="assets/js/menu-items-database.js"></script>
+    
     <!-- Load Integration Scripts -->
     <script defer src="assets/js/menu-recipe-integration.js"></script>
     <script defer src="assets/js/menu-manager-enhanced.js"></script>
     <script defer src="assets/js/enhanced-menu-import.js"></script>
+    
+    <!-- Load Cost Calculator and Food Costing Workflow -->
+    <script src="assets/js/cost-calculator.js"></script>
+    <script src="assets/js/food-costing-workflow.js"></script>
     
     <!-- Load Auth System Scripts - DEFERRED to prevent freezing -->
     <script type="module" defer src="assets/js/firebase-auth.js"></script>

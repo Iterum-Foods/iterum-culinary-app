@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar - Iterum Culinary</title>
+  
+  <!-- Auth check -->
+  <script>
+    (function () {
+      const sessionActive = localStorage.getItem('session_active');
+      const currentUser = localStorage.getItem('current_user');
+      if (!sessionActive || !currentUser) {
+        console.log('🔒 No active session - redirecting to launch page');
+        window.location.href = 'launch.html';
+      }
+    })();
+  </script>
+  
+  <!-- Firebase Config -->
+  <script src="assets/js/firebase-config.js"></script>
+  <script src="assets/js/auth-manager.js"></script>
+  <script src="assets/js/auth-api-helper.js"></script>
+  <script src="assets/js/auth-diagnostics.js"></script>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMDJzL+S8QZl+YgIq+3/pI7g8v+KxI8U/Gk3y6+qXq+b4iYgVd/v/w/q9y+A4k=" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- ITERUM BRAND KIT -->
+  <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+  <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
+  <link rel="stylesheet" href="assets/css/header-universal.css">
+  
+  <!-- Additional Scripts -->
+  <script src="assets/js/user-data-manager.js" defer></script>
+  <script src="assets/js/unified-nav-header.js" defer></script>
+  <script src="assets/js/unified-project-selector.js" defer></script>
+  <script src="assets/js/header-user-display.js" defer></script>
+  <script src="assets/js/project-management-system.js" defer></script>
+  
+  <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
+  
+  <style>
+    :root {
+      --brand-bg-primary: #fffbeb;
+      --brand-bg-secondary: #fef3c7;
+      --brand-bg-tertiary: #fde68a;
+      --brand-text-primary: #78350f;
+      --brand-text-secondary: #92400e;
+      --brand-text-muted: #b45309;
+      --brand-primary-accent: #d97706;
+      --brand-secondary-accent: #4d7c0f;
+      --brand-card-bg: #ffffff;
+      --brand-border-light: #fcd34d;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--brand-bg-secondary);
+      color: var(--brand-text-primary);
+      padding: 0;
+    }
+
+    .calendar-day {
+      min-height: 100px;
+      padding: 8px;
+      border: 1px solid var(--brand-border-light);
+      background: var(--brand-card-bg);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .calendar-day:hover {
+      background: var(--brand-bg-primary);
+      border-color: var(--brand-primary-accent);
+    }
+
+    .calendar-day.today {
+      background: var(--brand-bg-tertiary);
+      border-color: var(--brand-primary-accent);
+      border-width: 2px;
+    }
+
+    .calendar-day.selected {
+      background: var(--brand-primary-accent);
+      color: white;
+      border-color: var(--brand-primary-accent);
+    }
+
+    .calendar-day.other-month {
+      color: var(--brand-text-muted);
+      opacity: 0.5;
+    }
+
+    .activity-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin: 2px;
+    }
+
+    .activity-dot.temp { background-color: #ef4444; }
+    .activity-dot.sanitizer { background-color: #3b82f6; }
+    .activity-dot.notes { background-color: #10b981; }
+    .activity-dot.recipe-created { background-color: #f59e0b; }
+    .activity-dot.recipe-changed { background-color: #8b5cf6; }
+    .activity-dot.prep-list { background-color: #ec4899; }
+
+    .day-details-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .day-details-section h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--brand-text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .activity-item {
+      padding: 0.75rem;
+      background: var(--brand-bg-primary);
+      border-left: 3px solid var(--brand-primary-accent);
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+    }
+
+    .activity-item-time {
+      font-size: 0.75rem;
+      color: var(--brand-text-muted);
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header injected by unified-nav-header.js -->
+
+  <div class="container mx-auto px-4 py-6 max-w-7xl">
+    <!-- Page Header -->
+    <div class="mb-6">
+      <h1 class="text-3xl font-bold mb-2" style="color: var(--brand-text-primary);">
+        <i class="fa-solid fa-calendar-days mr-3" style="color: var(--brand-primary-accent);"></i>Activity Calendar
+      </h1>
+      <p style="color: var(--brand-text-muted);">View all logs, notes, recipe development, and prep lists by day</p>
+      <div id="calendar-project-indicator" class="mt-2 text-sm" style="color: var(--brand-text-secondary);">
+        <i class="fa-solid fa-folder mr-2"></i><span id="current-project-name">Loading project...</span>
+      </div>
+    </div>
+
+    <!-- Calendar Navigation -->
+    <div class="bg-white rounded-lg shadow-md p-4 mb-6" style="border: 1px solid var(--brand-border-light);">
+      <div class="flex justify-between items-center mb-4">
+        <button id="prev-month" class="px-4 py-2 rounded-md hover:opacity-80 transition-opacity" style="background-color: var(--brand-primary-accent); color: white;">
+          <i class="fa-solid fa-chevron-left"></i> Previous
+        </button>
+        <h2 id="current-month" class="text-xl font-bold" style="color: var(--brand-text-primary);">January 2024</h2>
+        <button id="next-month" class="px-4 py-2 rounded-md hover:opacity-80 transition-opacity" style="background-color: var(--brand-primary-accent); color: white;">
+          Next <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+      <button id="today-btn" class="w-full py-2 rounded-md text-sm font-semibold hover:opacity-80 transition-opacity" style="background-color: var(--brand-secondary-accent); color: white;">
+        <i class="fa-solid fa-calendar-check mr-2"></i>Go to Today
+      </button>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div class="bg-white rounded-lg shadow-md p-4 mb-6" style="border: 1px solid var(--brand-border-light);">
+      <!-- Day Headers -->
+      <div class="grid grid-cols-7 gap-2 mb-2">
+        <div class="text-center font-semibold text-sm" style="color: var(--brand-text-secondary);">Sun</div>
+        <div class="text-center font-semibold text-sm" style="color: var(--brand-text-secondary);">Mon</div>
+        <div class="text-center font-semibold text-sm" style="color: var(--brand-text-secondary);">Tue</div>
+        <div class="text-center font-semibold text-sm" style="color: var(--brand-text-secondary);">Wed</div>
+        <div class="text-center font-semibold text-sm" style="color: var(--brand-text-secondary);">Thu</div>
+        <div class="text-center font-semibold text-sm" style="color: var(--brand-text-secondary);">Fri</div>
+        <div class="text-center font-semibold text-sm" style="color: var(--brand-text-secondary);">Sat</div>
+      </div>
+      
+      <!-- Calendar Days -->
+      <div id="calendar-grid" class="grid grid-cols-7 gap-2">
+        <!-- Days will be populated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Selected Day Details -->
+    <div id="day-details" class="bg-white rounded-lg shadow-md p-6" style="border: 1px solid var(--brand-border-light); display: none;">
+      <h2 id="selected-date-title" class="text-2xl font-bold mb-4" style="color: var(--brand-text-primary);"></h2>
+      
+      <!-- Temperature Logs -->
+      <div class="day-details-section">
+        <h3>
+          <i class="fa-solid fa-thermometer-three-quarters" style="color: #ef4444;"></i>
+          Temperature Logs
+        </h3>
+        <div id="day-temp-logs" class="space-y-2">
+          <p class="text-sm" style="color: var(--brand-text-muted);">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Sanitizer Logs -->
+      <div class="day-details-section">
+        <h3>
+          <i class="fa-solid fa-vial-circle-check" style="color: #3b82f6;"></i>
+          Sanitizer Checks
+        </h3>
+        <div id="day-sanitizer-logs" class="space-y-2">
+          <p class="text-sm" style="color: var(--brand-text-muted);">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="day-details-section">
+        <h3>
+          <i class="fa-solid fa-note-sticky" style="color: #10b981;"></i>
+          Notes
+        </h3>
+        <div id="day-notes" class="space-y-2">
+          <p class="text-sm" style="color: var(--brand-text-muted);">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Recipes Created -->
+      <div class="day-details-section">
+        <h3>
+          <i class="fa-solid fa-plus-circle" style="color: #f59e0b;"></i>
+          Recipes Created
+        </h3>
+        <div id="day-recipes-created" class="space-y-2">
+          <p class="text-sm" style="color: var(--brand-text-muted);">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Recipes Changed -->
+      <div class="day-details-section">
+        <h3>
+          <i class="fa-solid fa-edit" style="color: #8b5cf6;"></i>
+          Recipes Modified
+        </h3>
+        <div id="day-recipes-changed" class="space-y-2">
+          <p class="text-sm" style="color: var(--brand-text-muted);">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Prep Lists -->
+      <div class="day-details-section">
+        <h3>
+          <i class="fa-solid fa-clipboard-list" style="color: #ec4899;"></i>
+          Prep Lists
+        </h3>
+        <div id="day-prep-lists" class="space-y-2">
+          <p class="text-sm" style="color: var(--brand-text-muted);">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Recipe Frequency Analysis -->
+      <div class="day-details-section">
+        <h3>
+          <i class="fa-solid fa-chart-line" style="color: #06b6d4;"></i>
+          Recipe Preparation Frequency (Last 30 Days)
+        </h3>
+        <div id="recipe-frequency-chart" class="mt-4">
+          <p class="text-sm" style="color: var(--brand-text-muted);">Loading frequency data...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase and Calendar Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    class CalendarPage {
+      constructor() {
+        this.currentDate = new Date();
+        this.selectedDate = new Date();
+        this.db = null;
+        this.auth = null;
+        this.userId = null;
+        this.isAuthReady = false;
+        this.currentProjectId = null;
+        this.currentProjectName = 'All Projects';
+        
+        // Data caches
+        this.tempLogs = [];
+        this.sanitizerLogs = [];
+        this.notes = [];
+        this.recipes = [];
+        this.prepLists = [];
+        this.recipeFrequency = new Map();
+        
+        this.init();
+      }
+
+      async init() {
+        // Wait a bit for project manager to initialize
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Get current project first
+        this.loadCurrentProject();
+        await this.initFirebase();
+        this.setupEventListeners();
+        this.loadLocalData();
+        this.renderCalendar();
+        
+        // Listen for project changes
+        window.addEventListener('storage', (e) => {
+          if (e.key === 'iterum_current_project' || e.key === 'userCurrentProjectKey') {
+            this.loadCurrentProject();
+            this.loadLocalData();
+            this.renderCalendar();
+            if (this.selectedDate) {
+              this.updateDayDetails(this.selectedDate);
+            }
+          }
+        });
+        
+        // Also listen for project manager updates
+        if (window.projectManager) {
+          // Check periodically for project changes
+          setInterval(() => {
+            const newProjectId = window.projectManager?.currentProject?.id || 
+                                 localStorage.getItem('iterum_current_project') || 
+                                 'master';
+            if (newProjectId !== this.currentProjectId) {
+              this.loadCurrentProject();
+              this.loadLocalData();
+              this.renderCalendar();
+              if (this.selectedDate) {
+                this.updateDayDetails(this.selectedDate);
+              }
+            }
+          }, 1000);
+        }
+      }
+
+      loadCurrentProject() {
+        try {
+          // Try multiple storage keys for compatibility
+          const projectId = localStorage.getItem('iterum_current_project') || 
+                           localStorage.getItem('userCurrentProjectKey') ||
+                           localStorage.getItem('currentProjectId');
+          
+          if (projectId) {
+            this.currentProjectId = projectId;
+            
+            // Get project name from project manager if available
+            if (window.projectManager && window.projectManager.currentProject) {
+              this.currentProjectName = window.projectManager.currentProject.name || 'Current Project';
+            } else {
+              // Try to get from projects list
+              const projects = JSON.parse(localStorage.getItem('iterum_projects') || '[]');
+              const project = projects.find(p => p.id === projectId);
+              if (project) {
+                this.currentProjectName = project.name;
+              }
+            }
+          } else {
+            this.currentProjectId = 'master';
+            this.currentProjectName = 'Master Project';
+          }
+          
+          // Update project selector if it exists
+          this.updateProjectSelector();
+        } catch (e) {
+          console.warn('Error loading current project:', e);
+          this.currentProjectId = 'master';
+          this.currentProjectName = 'Master Project';
+        }
+      }
+
+      updateProjectSelector() {
+        // Update project indicator
+        const indicator = document.getElementById('current-project-name');
+        if (indicator) {
+          indicator.textContent = this.currentProjectName;
+        }
+        
+        // Add project selector to page header if not exists
+        const header = document.querySelector('.mb-6');
+        if (header && !document.getElementById('calendar-project-selector')) {
+          const selector = document.createElement('div');
+          selector.id = 'calendar-project-selector';
+          selector.className = 'mt-4';
+          selector.innerHTML = `
+            <label class="block text-sm font-medium mb-2" style="color: var(--brand-text-secondary);">Filter by Project:</label>
+            <select id="project-filter" class="px-4 py-2 rounded-md border w-full max-w-xs" style="border-color: var(--brand-border-light); background: white;">
+              <option value="all">All Projects</option>
+            </select>
+          `;
+          header.appendChild(selector);
+          
+          // Populate projects
+          this.populateProjectSelector();
+          
+          // Add change listener
+          document.getElementById('project-filter').addEventListener('change', (e) => {
+            if (e.target.value === 'all') {
+              this.currentProjectId = null;
+              this.currentProjectName = 'All Projects';
+            } else {
+              this.currentProjectId = e.target.value;
+              const projects = JSON.parse(localStorage.getItem('iterum_projects') || '[]');
+              const project = projects.find(p => p.id === e.target.value);
+              this.currentProjectName = project ? project.name : 'Selected Project';
+            }
+            
+            // Update indicator
+            if (indicator) {
+              indicator.textContent = this.currentProjectName;
+            }
+            
+            this.loadLocalData();
+            this.renderCalendar();
+            this.updateDayDetails(this.selectedDate);
+          });
+        } else if (document.getElementById('project-filter')) {
+          // Update existing selector
+          this.populateProjectSelector();
+        }
+      }
+
+      populateProjectSelector() {
+        const selector = document.getElementById('project-filter');
+        if (!selector) return;
+        
+        try {
+          const projects = JSON.parse(localStorage.getItem('iterum_projects') || '[]');
+          const currentValue = selector.value;
+          
+          // Clear and repopulate
+          selector.innerHTML = '<option value="all">All Projects</option>';
+          
+          projects.forEach(project => {
+            const option = document.createElement('option');
+            option.value = project.id;
+            option.textContent = project.name;
+            if (project.id === this.currentProjectId) {
+              option.selected = true;
+            }
+            selector.appendChild(option);
+          });
+        } catch (e) {
+          console.warn('Error populating project selector:', e);
+        }
+      }
+
+      async initFirebase() {
+        if (!window.firebaseConfig) {
+          console.warn('⚠️ Firebase config not available');
+          return;
+        }
+
+        try {
+          const app = initializeApp(window.firebaseConfig);
+          this.db = getFirestore(app);
+          this.auth = getAuth(app);
+
+          onAuthStateChanged(this.auth, async (user) => {
+            if (user) {
+              this.userId = user.uid;
+              this.isAuthReady = true;
+              this.startListeners();
+            } else {
+              try {
+                await signInAnonymously(this.auth);
+              } catch (error) {
+                console.warn('⚠️ Anonymous sign-in failed:', error);
+              }
+            }
+          });
+        } catch (error) {
+          console.error('❌ Firebase initialization error:', error);
+        }
+      }
+
+      startListeners() {
+        if (!this.db || !this.isAuthReady) return;
+
+        // Listen to temperature logs
+        const tempQuery = query(collection(this.db, 'temperature_readings'));
+        onSnapshot(tempQuery, (snapshot) => {
+          this.tempLogs = [];
+          snapshot.forEach((doc) => {
+            this.tempLogs.push({ id: doc.id, ...doc.data() });
+          });
+          this.renderCalendar();
+          this.updateDayDetails(this.selectedDate);
+        });
+
+        // Listen to sanitizer logs
+        const sanitizerQuery = query(collection(this.db, 'sanitizer_readings'));
+        onSnapshot(sanitizerQuery, (snapshot) => {
+          this.sanitizerLogs = [];
+          snapshot.forEach((doc) => {
+            this.sanitizerLogs.push({ id: doc.id, ...doc.data() });
+          });
+          this.renderCalendar();
+          this.updateDayDetails(this.selectedDate);
+        });
+      }
+
+      loadLocalData() {
+        // Load notes from dashboard (project-aware)
+        try {
+          const notesData = localStorage.getItem('dashboard_notes');
+          if (notesData) {
+            const parsed = JSON.parse(notesData);
+            this.notes = Array.isArray(parsed) ? parsed : [];
+            
+            // Filter by project if project is selected
+            if (this.currentProjectId) {
+              this.notes = this.notes.filter(note => 
+                !note.projectId || note.projectId === this.currentProjectId || note.projectId === 'master'
+              );
+            }
+          }
+        } catch (e) {
+          this.notes = [];
+        }
+
+        // Load recipes from localStorage (project-aware)
+        try {
+          const userId = this.getUserId();
+          
+          // Try multiple storage keys
+          const recipesKeys = [
+            `recipes_${userId}`,
+            `user_${userId}_recipes`,
+            'recipes'
+          ];
+          
+          let allRecipes = [];
+          for (const key of recipesKeys) {
+            const recipesData = localStorage.getItem(key);
+            if (recipesData) {
+              try {
+                const parsed = JSON.parse(recipesData);
+                if (Array.isArray(parsed)) {
+                  allRecipes = allRecipes.concat(parsed);
+                }
+              } catch (e) {
+                console.warn(`Error parsing recipes from ${key}:`, e);
+              }
+            }
+          }
+          
+          // Filter by project if project is selected
+          if (this.currentProjectId) {
+            this.recipes = allRecipes.filter(recipe => 
+              recipe.projectId === this.currentProjectId || 
+              recipe.project === this.currentProjectId ||
+              (!recipe.projectId && this.currentProjectId === 'master')
+            );
+          } else {
+            this.recipes = allRecipes;
+          }
+          
+          // Ensure recipes have creation dates
+          this.recipes = this.recipes.map(recipe => ({
+            ...recipe,
+            createdAt: recipe.createdAt || recipe.created || recipe.date || new Date().toISOString(),
+            updatedAt: recipe.updatedAt || recipe.updated || recipe.modifiedAt || recipe.createdAt || new Date().toISOString()
+          }));
+        } catch (e) {
+          console.warn('Error loading recipes:', e);
+          this.recipes = [];
+        }
+
+        // Load prep lists from localStorage (project-aware)
+        try {
+          const userId = this.getUserId();
+          const prepListsKeys = [
+            `prep_lists_${userId}`,
+            `iterum_prep_lists_${userId}`,
+            'prep_lists',
+            'iterum_prep_lists'
+          ];
+          
+          let allPrepLists = [];
+          for (const key of prepListsKeys) {
+            const prepListsData = localStorage.getItem(key);
+            if (prepListsData) {
+              try {
+                const parsed = JSON.parse(prepListsData);
+                if (Array.isArray(parsed)) {
+                  allPrepLists = allPrepLists.concat(parsed);
+                }
+              } catch (e) {
+                console.warn(`Error parsing prep lists from ${key}:`, e);
+              }
+            }
+          }
+          
+          // Filter by project if project is selected
+          if (this.currentProjectId) {
+            this.prepLists = allPrepLists.filter(prep => 
+              prep.projectId === this.currentProjectId ||
+              prep.project === this.currentProjectId ||
+              (!prep.projectId && this.currentProjectId === 'master')
+            );
+          } else {
+            this.prepLists = allPrepLists;
+          }
+          
+          // Ensure prep lists have dates
+          this.prepLists = this.prepLists.map(prep => ({
+            ...prep,
+            prepDate: prep.prepDate || prep.date || prep.generatedDate || prep.completedDate || new Date().toISOString()
+          }));
+        } catch (e) {
+          console.warn('Error loading prep lists:', e);
+          this.prepLists = [];
+        }
+
+        // Filter temp logs by project if available
+        if (this.currentProjectId && this.tempLogs.length > 0) {
+          this.tempLogs = this.tempLogs.filter(log => 
+            !log.projectId || log.projectId === this.currentProjectId
+          );
+        }
+        
+        // Filter sanitizer logs by project if available
+        if (this.currentProjectId && this.sanitizerLogs.length > 0) {
+          this.sanitizerLogs = this.sanitizerLogs.filter(log => 
+            !log.projectId || log.projectId === this.currentProjectId
+          );
+        }
+
+        // Calculate recipe frequency from prep lists
+        this.calculateRecipeFrequency();
+      }
+
+      getUserId() {
+        try {
+          const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+          return user.userId || user.id || 'guest';
+        } catch {
+          return 'guest';
+        }
+      }
+
+      setupEventListeners() {
+        document.getElementById('prev-month')?.addEventListener('click', () => this.previousMonth());
+        document.getElementById('next-month')?.addEventListener('click', () => this.nextMonth());
+        document.getElementById('today-btn')?.addEventListener('click', () => this.goToToday());
+      }
+
+      renderCalendar() {
+        const monthElement = document.getElementById('current-month');
+        const gridElement = document.getElementById('calendar-grid');
+        
+        if (!monthElement || !gridElement) return;
+
+        // Update month display
+        monthElement.textContent = this.currentDate.toLocaleDateString('en-US', { 
+          month: 'long', 
+          year: 'numeric' 
+        });
+
+        // Clear grid
+        gridElement.innerHTML = '';
+
+        // Get first day of month
+        const firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
+        const lastDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0);
+        const startDate = new Date(firstDay);
+        startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+        // Generate 42 days (6 weeks)
+        for (let i = 0; i < 42; i++) {
+          const date = new Date(startDate);
+          date.setDate(startDate.getDate() + i);
+          
+          const dayElement = this.createDayElement(date);
+          gridElement.appendChild(dayElement);
+        }
+      }
+
+      createDayElement(date) {
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'calendar-day';
+        
+        const isCurrentMonth = date.getMonth() === this.currentDate.getMonth();
+        const isToday = this.isToday(date);
+        const isSelected = this.isSameDate(date, this.selectedDate);
+
+        if (!isCurrentMonth) {
+          dayDiv.classList.add('other-month');
+        }
+        if (isToday) {
+          dayDiv.classList.add('today');
+        }
+        if (isSelected) {
+          dayDiv.classList.add('selected');
+        }
+
+        // Day number
+        const dayNumber = document.createElement('div');
+        dayNumber.className = 'font-semibold mb-1';
+        dayNumber.textContent = date.getDate();
+        dayDiv.appendChild(dayNumber);
+
+        // Activity indicators
+        const activities = this.getDayActivities(date);
+        if (activities.length > 0) {
+          const activityDiv = document.createElement('div');
+          activityDiv.className = 'flex flex-wrap gap-1';
+          
+          activities.forEach(activity => {
+            const dot = document.createElement('span');
+            dot.className = `activity-dot ${activity.type}`;
+            dot.title = activity.title;
+            activityDiv.appendChild(dot);
+          });
+          
+          dayDiv.appendChild(activityDiv);
+        }
+
+        dayDiv.addEventListener('click', () => this.selectDate(date));
+        return dayDiv;
+      }
+
+      getDayActivities(date) {
+        const activities = [];
+        const dateStr = this.formatDate(date);
+
+        // Check temperature logs
+        const tempCount = this.tempLogs.filter(log => this.isSameDate(new Date(log.timestamp?.toDate?.() || log.timestamp || log.date), date)).length;
+        if (tempCount > 0) {
+          activities.push({ type: 'temp', title: `${tempCount} temperature log${tempCount > 1 ? 's' : ''}` });
+        }
+
+        // Check sanitizer logs
+        const sanitizerCount = this.sanitizerLogs.filter(log => this.isSameDate(new Date(log.timestamp?.toDate?.() || log.timestamp || log.date), date)).length;
+        if (sanitizerCount > 0) {
+          activities.push({ type: 'sanitizer', title: `${sanitizerCount} sanitizer check${sanitizerCount > 1 ? 's' : ''}` });
+        }
+
+        // Check notes
+        const notesCount = this.notes.filter(note => this.isSameDate(new Date(note.date || note.timestamp), date)).length;
+        if (notesCount > 0) {
+          activities.push({ type: 'notes', title: `${notesCount} note${notesCount > 1 ? 's' : ''}` });
+        }
+
+        // Check recipes created
+        const recipesCreated = this.recipes.filter(recipe => {
+          const created = new Date(recipe.createdAt || recipe.created || recipe.date);
+          return this.isSameDate(created, date);
+        }).length;
+        if (recipesCreated > 0) {
+          activities.push({ type: 'recipe-created', title: `${recipesCreated} recipe${recipesCreated > 1 ? 's' : ''} created` });
+        }
+
+        // Check recipes changed
+        const recipesChanged = this.recipes.filter(recipe => {
+          const updated = new Date(recipe.updatedAt || recipe.updated || recipe.modifiedAt);
+          return this.isSameDate(updated, date) && !this.isSameDate(new Date(recipe.createdAt || recipe.created || recipe.date), date);
+        }).length;
+        if (recipesChanged > 0) {
+          activities.push({ type: 'recipe-changed', title: `${recipesChanged} recipe${recipesChanged > 1 ? 's' : ''} modified` });
+        }
+
+        // Check prep lists
+        const prepListCount = this.prepLists.filter(prep => {
+          const prepDate = new Date(prep.prepDate || prep.date || prep.generatedDate);
+          return this.isSameDate(prepDate, date);
+        }).length;
+        if (prepListCount > 0) {
+          activities.push({ type: 'prep-list', title: `${prepListCount} prep list${prepListCount > 1 ? 's' : ''}` });
+        }
+
+        return activities;
+      }
+
+      selectDate(date) {
+        this.selectedDate = date;
+        this.renderCalendar();
+        this.updateDayDetails(date);
+      }
+
+      async updateDayDetails(date) {
+        const detailsDiv = document.getElementById('day-details');
+        const titleDiv = document.getElementById('selected-date-title');
+        
+        if (!detailsDiv || !titleDiv) return;
+
+        detailsDiv.style.display = 'block';
+        titleDiv.textContent = date.toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+
+        const dateStr = this.formatDate(date);
+
+        // Update temperature logs
+        this.updateTempLogs(date);
+        
+        // Update sanitizer logs
+        this.updateSanitizerLogs(date);
+        
+        // Update notes
+        this.updateNotes(date);
+        
+        // Update recipes created
+        this.updateRecipesCreated(date);
+        
+        // Update recipes changed
+        this.updateRecipesChanged(date);
+        
+        // Update prep lists
+        this.updatePrepLists(date);
+        
+        // Update recipe frequency chart
+        this.updateRecipeFrequencyChart();
+      }
+
+      updateTempLogs(date) {
+        const container = document.getElementById('day-temp-logs');
+        if (!container) return;
+
+        const logs = this.tempLogs.filter(log => {
+          const logDate = new Date(log.timestamp?.toDate?.() || log.timestamp || log.date);
+          return this.isSameDate(logDate, date);
+        });
+
+        if (logs.length === 0) {
+          container.innerHTML = '<p class="text-sm" style="color: var(--brand-text-muted);">No temperature logs for this date</p>';
+          return;
+        }
+
+        container.innerHTML = logs.map(log => `
+          <div class="activity-item">
+            <div class="font-medium">${log.unitName || log.unit || 'Unknown Unit'}</div>
+            <div class="text-sm" style="color: var(--brand-text-secondary);">${log.temperature || 'N/A'}°C</div>
+            <div class="activity-item-time">${this.formatTime(log.timestamp?.toDate?.() || log.timestamp || log.date)}</div>
+          </div>
+        `).join('');
+      }
+
+      updateSanitizerLogs(date) {
+        const container = document.getElementById('day-sanitizer-logs');
+        if (!container) return;
+
+        const logs = this.sanitizerLogs.filter(log => {
+          const logDate = new Date(log.timestamp?.toDate?.() || log.timestamp || log.date);
+          return this.isSameDate(logDate, date);
+        });
+
+        if (logs.length === 0) {
+          container.innerHTML = '<p class="text-sm" style="color: var(--brand-text-muted);">No sanitizer checks for this date</p>';
+          return;
+        }
+
+        container.innerHTML = logs.map(log => `
+          <div class="activity-item">
+            <div class="font-medium">${log.locationName || log.location || 'Unknown Location'}</div>
+            <div class="text-sm" style="color: var(--brand-text-secondary);">${log.ppm || 'N/A'} PPM - ${log.passed ? 'PASS' : 'FAIL'}</div>
+            <div class="activity-item-time">${this.formatTime(log.timestamp?.toDate?.() || log.timestamp || log.date)}</div>
+          </div>
+        `).join('');
+      }
+
+      updateNotes(date) {
+        const container = document.getElementById('day-notes');
+        if (!container) return;
+
+        const notes = this.notes.filter(note => {
+          const noteDate = new Date(note.date || note.timestamp);
+          return this.isSameDate(noteDate, date);
+        });
+
+        if (notes.length === 0) {
+          container.innerHTML = '<p class="text-sm" style="color: var(--brand-text-muted);">No notes for this date</p>';
+          return;
+        }
+
+        container.innerHTML = notes.map(note => `
+          <div class="activity-item">
+            <div class="text-sm whitespace-pre-wrap">${note.content || note.text || note.notes || 'No content'}</div>
+            <div class="activity-item-time">${this.formatTime(note.date || note.timestamp)}</div>
+          </div>
+        `).join('');
+      }
+
+      updateRecipesCreated(date) {
+        const container = document.getElementById('day-recipes-created');
+        if (!container) return;
+
+        const recipes = this.recipes.filter(recipe => {
+          const created = new Date(recipe.createdAt || recipe.created || recipe.date);
+          return this.isSameDate(created, date);
+        });
+
+        if (recipes.length === 0) {
+          container.innerHTML = '<p class="text-sm" style="color: var(--brand-text-muted);">No recipes created on this date</p>';
+          return;
+        }
+
+        container.innerHTML = recipes.map(recipe => `
+          <div class="activity-item">
+            <div class="font-medium">${recipe.name || recipe.title || 'Untitled Recipe'}</div>
+            <div class="text-sm" style="color: var(--brand-text-secondary);">${recipe.description || recipe.summary || ''}</div>
+            <div class="activity-item-time">${this.formatTime(recipe.createdAt || recipe.created || recipe.date)}</div>
+          </div>
+        `).join('');
+      }
+
+      updateRecipesChanged(date) {
+        const container = document.getElementById('day-recipes-changed');
+        if (!container) return;
+
+        const recipes = this.recipes.filter(recipe => {
+          const updated = new Date(recipe.updatedAt || recipe.updated || recipe.modifiedAt);
+          const created = new Date(recipe.createdAt || recipe.created || recipe.date);
+          return this.isSameDate(updated, date) && !this.isSameDate(created, date);
+        });
+
+        if (recipes.length === 0) {
+          container.innerHTML = '<p class="text-sm" style="color: var(--brand-text-muted);">No recipes modified on this date</p>';
+          return;
+        }
+
+        container.innerHTML = recipes.map(recipe => `
+          <div class="activity-item">
+            <div class="font-medium">${recipe.name || recipe.title || 'Untitled Recipe'}</div>
+            <div class="text-sm" style="color: var(--brand-text-secondary);">${recipe.description || recipe.summary || ''}</div>
+            <div class="activity-item-time">${this.formatTime(recipe.updatedAt || recipe.updated || recipe.modifiedAt)}</div>
+          </div>
+        `).join('');
+      }
+
+      previousMonth() {
+        this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+        this.renderCalendar();
+      }
+
+      nextMonth() {
+        this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+        this.renderCalendar();
+      }
+
+      goToToday() {
+        this.currentDate = new Date();
+        this.selectedDate = new Date();
+        this.renderCalendar();
+        this.updateDayDetails(this.selectedDate);
+      }
+
+      isToday(date) {
+        const today = new Date();
+        return this.isSameDate(date, today);
+      }
+
+      isSameDate(date1, date2) {
+        return date1.getDate() === date2.getDate() &&
+               date1.getMonth() === date2.getMonth() &&
+               date1.getFullYear() === date2.getFullYear();
+      }
+
+      formatDate(date) {
+        return date.toISOString().split('T')[0];
+      }
+
+      formatTime(date) {
+        const d = new Date(date);
+        return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      }
+
+      updatePrepLists(date) {
+        const container = document.getElementById('day-prep-lists');
+        if (!container) return;
+
+        const prepLists = this.prepLists.filter(prep => {
+          const prepDate = new Date(prep.prepDate || prep.date || prep.generatedDate);
+          return this.isSameDate(prepDate, date);
+        });
+
+        if (prepLists.length === 0) {
+          container.innerHTML = '<p class="text-sm" style="color: var(--brand-text-muted);">No prep lists for this date</p>';
+          return;
+        }
+
+        container.innerHTML = prepLists.map(prep => {
+          const recipeCount = prep.menuSummary?.length || prep.components?.length || 0;
+          const stationCount = Object.keys(prep.stations || {}).length;
+          return `
+            <div class="activity-item">
+              <div class="font-medium">${prep.menuName || prep.restaurant || 'Prep List'}</div>
+              <div class="text-sm" style="color: var(--brand-text-secondary);">
+                ${recipeCount} recipe${recipeCount !== 1 ? 's' : ''} • ${stationCount} station${stationCount !== 1 ? 's' : ''}
+              </div>
+              <div class="activity-item-time">${this.formatTime(prep.generatedDate || prep.date)}</div>
+              <button onclick="window.calendarPage.viewPrepList('${prep.id || prep.prepDate}')" class="text-xs mt-2 px-3 py-1 rounded-md hover:opacity-80 transition-opacity" style="background-color: var(--brand-primary-accent); color: white;">
+                View Details
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      calculateRecipeFrequency() {
+        this.recipeFrequency.clear();
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        this.prepLists.forEach(prep => {
+          const prepDate = new Date(prep.prepDate || prep.date || prep.generatedDate);
+          if (prepDate >= thirtyDaysAgo) {
+            // Count recipes from menu summary
+            if (prep.menuSummary) {
+              prep.menuSummary.forEach(item => {
+                if (item.recipeId || item.recipeName) {
+                  const recipeId = item.recipeId || item.recipeName;
+                  const count = this.recipeFrequency.get(recipeId) || 0;
+                  this.recipeFrequency.set(recipeId, count + 1);
+                }
+              });
+            }
+            // Also count from components
+            if (prep.components) {
+              prep.components.forEach(comp => {
+                if (comp.recipeName) {
+                  const count = this.recipeFrequency.get(comp.recipeName) || 0;
+                  this.recipeFrequency.set(comp.recipeName, count + 1);
+                }
+              });
+            }
+          }
+        });
+      }
+
+      updateRecipeFrequencyChart() {
+        const container = document.getElementById('recipe-frequency-chart');
+        if (!container) return;
+
+        if (this.recipeFrequency.size === 0) {
+          container.innerHTML = '<p class="text-sm" style="color: var(--brand-text-muted);">No prep list data available for frequency analysis</p>';
+          return;
+        }
+
+        // Sort by frequency
+        const sorted = Array.from(this.recipeFrequency.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10); // Top 10
+
+        const maxFreq = sorted[0]?.[1] || 1;
+
+        container.innerHTML = `
+          <div class="space-y-3">
+            ${sorted.map(([recipeName, count]) => {
+              const percentage = (count / maxFreq) * 100;
+              return `
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <span class="text-sm font-medium" style="color: var(--brand-text-primary);">${recipeName}</span>
+                    <span class="text-sm font-bold" style="color: var(--brand-primary-accent);">${count} time${count !== 1 ? 's' : ''}</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="h-2 rounded-full transition-all" style="background-color: var(--brand-primary-accent); width: ${percentage}%;"></div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+
+      viewPrepList(prepListId) {
+        const prep = this.prepLists.find(p => (p.id || p.prepDate) === prepListId);
+        if (!prep) {
+          alert('Prep list not found');
+          return;
+        }
+
+        // Open prep list in a new window or modal
+        const prepListWindow = window.open('', '_blank', 'width=800,height=600');
+        prepListWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Prep List - ${prep.prepDate || prep.date}</title>
+            <style>
+              body { font-family: Inter, sans-serif; padding: 20px; }
+              h1 { color: #78350f; }
+              .section { margin-bottom: 30px; }
+              .station { background: #fffbeb; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+            </style>
+          </head>
+          <body>
+            <h1>Prep List for ${prep.prepDate || prep.date}</h1>
+            <p><strong>${prep.menuName || prep.restaurant}</strong></p>
+            
+            ${Object.values(prep.stations || {}).map(station => `
+              <div class="station">
+                <h2>${station.station}</h2>
+                <ul>
+                  ${station.tasks.map(task => `<li>${task.name} - ${task.covers} covers</li>`).join('')}
+                </ul>
+              </div>
+            `).join('')}
+            
+            <div class="section">
+              <h2>Shopping List</h2>
+              <ul>
+                ${(prep.shopping || []).map(item => `<li>${item.name} - ${item.quantity} ${item.unit}</li>`).join('')}
+              </ul>
+            </div>
+          </body>
+          </html>
+        `);
+      }
+    }
+
+    // Initialize calendar when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      window.calendarPage = new CalendarPage();
+    });
+  </script>
+</body>
+</html>
+

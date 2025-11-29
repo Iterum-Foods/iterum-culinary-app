@@ -1,0 +1,40 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // User uploads - only authenticated users can upload to their own folder
+    match /users/{userId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Recipe photos - users can upload photos for their recipes
+    match /recipes/{userId}/{recipeId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Menu images
+    match /menus/{userId}/{menuId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Ingredient photos
+    match /ingredients/{userId}/{ingredientId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Public images (read-only for all authenticated users)
+    match /public/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if false; // Admin only - managed via backend
+    }
+    
+    // Default: deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

@@ -2,64 +2,65 @@
   "firestore": {
     "rules": "firestore.rules"
   },
-  "hosting": {
-    "site": "iterum-culinary-app",
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**",
-      "**/venv/**",
-      "**/__pycache__/**",
-      "**/*.py",
-      "**/requirements.txt",
-      "**/pytest.ini",
-      "**/jest.config.js",
-      "**/playwright.config.js",
-      "**/tailwind.config.js",
-      "**/postcss.config.js",
-      "**/*.db",
-      "**/*.csv",
-      "**/migrations/**",
-      "**/tests/**",
-      "**/scripts/**",
-      "**/documentation/**",
-      "**/docs/**",
-      "**/archive/**",
-      "**/Test files/**",
-      "**/*.bat",
-      "**/*.ps1",
-      "**/*.md",
-      "**/*.txt",
-      "**/*.log"
-    ],
-    "headers": [
-      {
-        "source": "**/*.@(js|css|png|jpg|jpeg|gif|ico|svg)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "max-age=31536000"
-          }
-        ]
-      },
-      {
-        "source": "**/*.html",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-cache"
-          }
-        ]
-      }
-    ],
-    "cleanUrls": true,
-    "trailingSlash": false,
-    "rewrites": [
-      {
-        "source": "/",
-        "destination": "/launch.html"
-      }
-    ]
-  }
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "hosting": [
+    {
+      "site": "iterum-culinary-app",
+      "public": "public",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "!**/.nojekyll",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "/",
+          "destination": "/index.html"
+        },
+        {
+          "source": "/app/**",
+          "destination": "/index.html"
+        },
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    },
+    {
+      "site": "iterum-culinary-app2",
+      "public": "public",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "!**/.nojekyll",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "/",
+          "destination": "/landing.html"
+        },
+        {
+          "source": "/tech-stage",
+          "destination": "/landing.html"
+        },
+        {
+          "source": "/business-plan",
+          "destination": "/landing.html"
+        },
+        {
+          "source": "/investors",
+          "destination": "/landing.html"
+        },
+        {
+          "source": "**",
+          "destination": "/landing.html"
+        }
+      ]
+    }
+  ]
 }

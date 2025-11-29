@@ -8,11 +8,15 @@
     <!-- Firebase & Auth -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/auth-manager.js"></script>
     <script src="assets/js/auth-api-helper.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- UNIFIED COLOR SYSTEM - MUST LOAD FIRST -->
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
     <link rel="stylesheet" href="assets/css/tailwind-output.css">
     <link rel="stylesheet" href="assets/css/iterum-design-system.css">
     <link rel="stylesheet" href="assets/css/premium-ui-system.css">
@@ -106,6 +110,18 @@
             border: 2px solid #e2e8f0;
             border-radius: 8px;
             font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .form-select {
+            cursor: pointer;
+            background: white;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
         .alert {
@@ -121,7 +137,6 @@
     <!-- Unified Navigation & Project Selector -->
     <script src="assets/js/unified-nav-header.js" defer></script>
     <script src="assets/js/unified-project-selector.js" defer></script>
-    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
     <link rel="stylesheet" href="assets/css/header-universal.css">
 </head>
 <body style="padding-top: 80px;">
@@ -191,19 +206,19 @@
         </div>
 
         <!-- Inventory Table -->
-        <div class="inventory-table">
-            <table>
+        <div class="inventory-table" style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; min-width: 1000px;">
                 <thead>
-                    <tr>
-                        <th>Ingredient</th>
-                        <th>Quantity</th>
-                        <th>Unit</th>
-                        <th>Location</th>
-                        <th>Par Level</th>
-                        <th>Reorder Point</th>
-                        <th>Status</th>
-                        <th>Last Updated</th>
-                        <th>Actions</th>
+                    <tr style="background: linear-gradient(135deg, #5B9BAD 0%, #6B8E6F 100%); color: white;">
+                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap; position: sticky; left: 0; z-index: 10;">Ingredient</th>
+                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Quantity</th>
+                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Unit</th>
+                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Location</th>
+                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Par Level</th>
+                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Reorder Point</th>
+                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Status</th>
+                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Last Updated</th>
+                        <th style="padding: 14px 16px; text-align: center; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="inventory-tbody">
@@ -302,28 +317,48 @@
             tbody.innerHTML = inventory.map(item => {
                 const status = getStockStatus(item);
                 const rowClass = status === 'Low Stock' ? 'low-stock' : status === 'Out of Stock' ? 'out-of-stock' : '';
+                const statusBg = getStatusColor(status);
                 
                 return `
-                    <tr class="${rowClass}">
-                        <td style="font-weight: 600;">${item.ingredientName}</td>
-                        <td>${item.quantity.toFixed(2)}</td>
-                        <td>${item.unit}</td>
-                        <td>${item.location}</td>
-                        <td>${item.parLevel || '-'}</td>
-                        <td>${item.reorderPoint || '-'}</td>
-                        <td>
-                            <span style="padding: 4px 8px; background: ${getStatusColor(status)}; color: white; border-radius: 4px; font-size: 12px; font-weight: 600;">
+                    <tr class="${rowClass}" style="border-bottom: 1px solid #e2e8f0; transition: background 0.2s;">
+                        <td style="padding: 14px 16px; font-weight: 600; color: #2C4A52; position: sticky; left: 0; background: ${rowClass ? (status === 'Low Stock' ? '#fef3c7' : '#fee2e2') : 'white'}; z-index: 1;">${item.ingredientName}</td>
+                        <td style="padding: 14px 16px; color: #3E4C54; font-weight: 500;">${item.quantity.toFixed(2)}</td>
+                        <td style="padding: 14px 16px; color: #64748b;">${item.unit}</td>
+                        <td style="padding: 14px 16px; color: #3E4C54;">${item.location}</td>
+                        <td style="padding: 14px 16px; color: #64748b;">${item.parLevel || '-'}</td>
+                        <td style="padding: 14px 16px; color: #64748b;">${item.reorderPoint || '-'}</td>
+                        <td style="padding: 14px 16px;">
+                            <span style="padding: 6px 12px; background: ${statusBg}; color: white; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
                                 ${status}
                             </span>
                         </td>
-                        <td>${new Date(item.lastUpdated).toLocaleDateString()}</td>
-                        <td>
-                            <button onclick="adjustStock('${item.id}', 'add')" style="padding: 4px 8px; background: #22c55e; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 4px;">+</button>
-                            <button onclick="adjustStock('${item.id}', 'remove')" style="padding: 4px 8px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">-</button>
+                        <td style="padding: 14px 16px; color: #64748b; font-size: 0.875rem;">${new Date(item.lastUpdated).toLocaleDateString()}</td>
+                        <td style="padding: 14px 16px; text-align: center;">
+                            <div style="display: flex; gap: 6px; justify-content: center;">
+                                <button onclick="adjustStock('${item.id}', 'add')" style="padding: 6px 12px; background: #6B8E6F; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500;">+</button>
+                                <button onclick="adjustStock('${item.id}', 'remove')" style="padding: 6px 12px; background: #C97676; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500;">-</button>
+                            </div>
                         </td>
                     </tr>
                 `;
             }).join('');
+
+            // Add hover effects
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    const currentBg = this.classList.contains('low-stock') ? '#fef3c7' : this.classList.contains('out-of-stock') ? '#fee2e2' : '#E8F4F8';
+                    this.style.background = currentBg;
+                    const stickyCell = this.querySelector('td:first-child');
+                    if (stickyCell) stickyCell.style.background = currentBg;
+                });
+                row.addEventListener('mouseleave', function() {
+                    const defaultBg = this.classList.contains('low-stock') ? '#fef3c7' : this.classList.contains('out-of-stock') ? '#fee2e2' : '';
+                    this.style.background = defaultBg;
+                    const stickyCell = this.querySelector('td:first-child');
+                    if (stickyCell) stickyCell.style.background = defaultBg || 'white';
+                });
+            });
         }
 
         function getStockStatus(item) {
@@ -460,21 +495,257 @@
         function showImportModal() {
             const input = document.createElement('input');
             input.type = 'file';
-            input.accept = '.csv';
+            input.accept = '.csv,.xlsx,.xls';
             input.onchange = async (e) => {
                 const file = e.target.files[0];
-                if (file) {
-                    try {
-                        const result = await window.inventoryManager.importFromCSV(file);
+                if (!file) return;
+
+                const extension = file.name.split('.').pop().toLowerCase();
+                
+                // Handle Excel files
+                if (extension === 'xlsx' || extension === 'xls') {
+                    if (typeof XLSX === 'undefined') {
+                        alert('Excel parser not loaded. Please use CSV format.');
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        try {
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(data, { type: 'array' });
+                            const sheetName = workbook.SheetNames[0];
+                            const sheet = workbook.Sheets[sheetName];
+                            const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                            
+                            if (!rawData || rawData.length === 0) {
+                                alert('Excel sheet appears to be empty');
+                                return;
+                            }
+
+                            const headers = (rawData[0] || []).map(h => String(h || '').trim());
+                            const sampleRows = [];
+                            const allRows = [];
+                            
+                            for (let i = 1; i < rawData.length; i++) {
+                                const row = (rawData[i] || []).map(cell => String(cell || '').trim());
+                                if (row.length > 0 && row.some(c => c)) {
+                                    allRows.push(row);
+                                    if (sampleRows.length < 5) {
+                                        sampleRows.push(row);
+                                    }
+                                }
+                            }
+
+                            showInventoryColumnMapper(headers, sampleRows, allRows);
+                        } catch (error) {
+                            alert('Error parsing Excel: ' + error.message);
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                    return;
+                }
+
+                // Handle CSV files
+                try {
+                    const result = await window.inventoryManager.importFromCSV(file);
+                    if (result.needsMapping) {
+                        showInventoryColumnMapper(result.headers, result.sampleRows, result.allRows, file);
+                    } else {
                         alert(`✅ Imported ${result.imported} items`);
                         loadInventory();
                         updateStats();
-                    } catch (error) {
-                        alert('❌ Import failed: ' + error.message);
                     }
+                } catch (error) {
+                    alert('❌ Import failed: ' + error.message);
                 }
             };
             input.click();
+        }
+
+        // Show column mapper for inventory
+        function showInventoryColumnMapper(headers, sampleRows, allRows, file = null) {
+            // Create modal
+            const modal = document.createElement('div');
+            modal.id = 'inventory-column-mapper';
+            modal.style.cssText = `
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10001;
+            `;
+
+            // Auto-detect mappings
+            const mappings = {
+                ingredient: findBestHeaderMatch('ingredient', headers) || findBestHeaderMatch('name', headers) || '',
+                quantity: findBestHeaderMatch('quantity', headers) || findBestHeaderMatch('amount', headers) || '',
+                unit: findBestHeaderMatch('unit', headers) || '',
+                location: findBestHeaderMatch('location', headers) || ''
+            };
+
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 16px; width: min(800px, 94vw); max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+                    <div style="padding: 24px; border-bottom: 1px solid #e2e8f0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <h2 style="margin: 0; font-size: 1.3rem; font-weight: 700;">Map Inventory Columns</h2>
+                        <p style="margin: 8px 0 0 0; opacity: 0.95; font-size: 0.9rem;">Select which column from your file corresponds to each field</p>
+                    </div>
+                    <div style="padding: 24px; flex: 1; overflow-y: auto;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                            <label style="display: flex; flex-direction: column; gap: 8px;">
+                                <span style="font-weight: 600; color: #1e293b;">Ingredient Name *</span>
+                                <select id="map-ingredient" class="form-select" style="padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                                    <option value="">-- Not Mapped --</option>
+                                    ${headers.map(h => `<option value="${h}" ${h === mappings.ingredient ? 'selected' : ''}>${h}</option>`).join('')}
+                                </select>
+                            </label>
+                            <label style="display: flex; flex-direction: column; gap: 8px;">
+                                <span style="font-weight: 600; color: #1e293b;">Quantity</span>
+                                <select id="map-quantity" class="form-select" style="padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                                    <option value="">-- Not Mapped --</option>
+                                    ${headers.map(h => `<option value="${h}" ${h === mappings.quantity ? 'selected' : ''}>${h}</option>`).join('')}
+                                </select>
+                            </label>
+                            <label style="display: flex; flex-direction: column; gap: 8px;">
+                                <span style="font-weight: 600; color: #1e293b;">Unit</span>
+                                <select id="map-unit" class="form-select" style="padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                                    <option value="">-- Not Mapped --</option>
+                                    ${headers.map(h => `<option value="${h}" ${h === mappings.unit ? 'selected' : ''}>${h}</option>`).join('')}
+                                </select>
+                            </label>
+                            <label style="display: flex; flex-direction: column; gap: 8px;">
+                                <span style="font-weight: 600; color: #1e293b;">Location</span>
+                                <select id="map-location" class="form-select" style="padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px;">
+                                    <option value="">-- Not Mapped --</option>
+                                    ${headers.map(h => `<option value="${h}" ${h === mappings.location ? 'selected' : ''}>${h}</option>`).join('')}
+                                </select>
+                            </label>
+                        </div>
+
+                        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: #1e293b;">Preview (First 5 Rows)</h3>
+                        <div style="overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 20px;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: #f8fafc;">
+                                        ${headers.map(h => `<th style="padding: 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #e2e8f0;">${h}</th>`).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${sampleRows.map(row => 
+                                        `<tr>${row.map(cell => `<td style="padding: 12px; border-bottom: 1px solid #f1f5f9;">${cell || ''}</td>`).join('')}</tr>`
+                                    ).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div style="padding: 20px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px; background: #f8fafc;">
+                        <button onclick="closeInventoryMapper()" class="btn btn-secondary">Cancel</button>
+                        <button onclick="confirmInventoryMapping(${JSON.stringify(allRows).replace(/"/g, '&quot;')}, ${JSON.stringify(headers).replace(/"/g, '&quot;')})" class="btn btn-primary">Import</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+            
+            // Store data for processing
+            window.inventoryMapperData = { allRows, headers, file };
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeInventoryMapper();
+            });
+        }
+
+        function closeInventoryMapper() {
+            const modal = document.getElementById('inventory-column-mapper');
+            if (modal) modal.remove();
+            window.inventoryMapperData = null;
+        }
+
+        async function confirmInventoryMapping(allRows, headers) {
+            const ingredientMap = document.getElementById('map-ingredient').value;
+            const quantityMap = document.getElementById('map-quantity').value;
+            const unitMap = document.getElementById('map-unit').value;
+            const locationMap = document.getElementById('map-location').value;
+
+            if (!ingredientMap) {
+                alert('Please map the Ingredient Name column');
+                return;
+            }
+
+            const mappings = {
+                ingredient: ingredientMap,
+                quantity: quantityMap,
+                unit: unitMap,
+                location: locationMap
+            };
+
+            closeInventoryMapper();
+
+            // Create header index map
+            const headerIndexMap = {};
+            headers.forEach((header, index) => {
+                headerIndexMap[header] = index;
+            });
+
+            // Process rows
+            let imported = 0;
+            for (const row of allRows) {
+                if (row.length === 0) continue;
+
+                const ingredientName = row[headerIndexMap[mappings.ingredient]]?.trim() || '';
+                const quantity = mappings.quantity && row[headerIndexMap[mappings.quantity]]
+                    ? parseFloat(row[headerIndexMap[mappings.quantity]]) || 0 
+                    : 0;
+                const unit = mappings.unit && row[headerIndexMap[mappings.unit]]
+                    ? row[headerIndexMap[mappings.unit]].trim() 
+                    : 'unit';
+                const location = mappings.location && row[headerIndexMap[mappings.location]]
+                    ? row[headerIndexMap[mappings.location]].trim() 
+                    : 'Main Kitchen';
+
+                if (ingredientName) {
+                    window.inventoryManager.upsertInventoryItem(
+                        `ing_import_${Date.now()}_${imported}`,
+                        ingredientName,
+                        quantity,
+                        unit,
+                        location
+                    );
+                    imported++;
+                }
+            }
+
+            alert(`✅ Imported ${imported} inventory items`);
+            loadInventory();
+            updateStats();
+        }
+
+        function findBestHeaderMatch(fieldKey, headers) {
+            const keywords = {
+                'ingredient': ['ingredient', 'name', 'item', 'product'],
+                'name': ['name', 'ingredient', 'item'],
+                'quantity': ['quantity', 'qty', 'amount', 'count'],
+                'amount': ['amount', 'quantity', 'qty'],
+                'unit': ['unit', 'units', 'measurement'],
+                'location': ['location', 'place', 'storage']
+            };
+
+            const searchTerms = keywords[fieldKey] || [fieldKey];
+            
+            for (const term of searchTerms) {
+                const match = headers.find(h => h.toLowerCase() === term.toLowerCase());
+                if (match) return match;
+                
+                const partial = headers.find(h => 
+                    h.toLowerCase().includes(term.toLowerCase()) || 
+                    term.toLowerCase().includes(h.toLowerCase())
+                );
+                if (partial) return partial;
+            }
+
+            return '';
         }
 
         function generateShoppingList() {

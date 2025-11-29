@@ -112,6 +112,9 @@
                         <div style="font-size: 48px; margin-bottom: 12px;">💰</div>
                         <div style="font-size: 16px; margin-bottom: 8px;">Add ingredients to see cost analysis</div>
                         <div style="font-size: 12px; opacity: 0.7;">Costs will update automatically as you add ingredients</div>
+                        <div style="font-size: 11px; opacity: 0.6; margin-top: 12px; padding: 12px; background: rgba(107, 142, 111, 0.1); border-radius: 8px; border: 1px solid rgba(107, 142, 111, 0.2);">
+                            <strong>Phase 2:</strong> Add Waste/Trim % to ingredients for accurate cost calculation
+                        </div>
                     </div>
                 `;
             }

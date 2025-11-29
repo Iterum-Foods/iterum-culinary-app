@@ -1,0 +1,587 @@
+/**
+ * Modal High Contrast Styles
+ * Ensures maximum readability in ALL modal popups across the entire application
+ * Last Updated: 2025-01-20
+ */
+
+/* ============================================
+   MODAL BASE - HIGH CONTRAST
+   ============================================ */
+
+/* Modal Content - High Contrast */
+.modal-content,
+.modal,
+[class*="modal-content"],
+[class*="modal"] {
+    background: #FFFFFF !important;
+    color: #1A2E35 !important; /* Very dark text */
+}
+
+/* Modal Overlay - Darker backdrop for better contrast */
+.modal,
+[class*="modal-overlay"],
+[class*="overlay"] {
+    background: rgba(15, 23, 42, 0.75) !important; /* Darker backdrop */
+}
+
+/* Modal Body - All text high contrast */
+.modal-body {
+    color: #1A2E35 !important;
+    background: #FFFFFF !important;
+}
+
+.modal-body * {
+    color: inherit;
+}
+
+/* Modal Headers - Very Dark */
+.modal-header h1,
+.modal-header h2,
+.modal-header h3,
+.modal-header h4,
+.modal-header h5,
+.modal-header h6 {
+    color: #1A2E35 !important;
+    font-weight: 700 !important;
+    font-size: 1.5rem !important;
+}
+
+/* Form Labels - Maximum Contrast */
+.form-label,
+label.form-label,
+.modal-body label,
+.modal-body .form-label {
+    color: #1A2E35 !important; /* Very dark */
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    letter-spacing: 0.01em;
+    margin-bottom: 8px !important;
+    display: block;
+}
+
+/* Form Inputs - High Contrast Text */
+.form-input,
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="url"],
+textarea,
+.form-textarea,
+select,
+.form-select {
+    color: #1A2E35 !important; /* Very dark text */
+    background: #FFFFFF !important;
+    border: 1.5px solid rgba(44, 74, 82, 0.25) !important; /* Darker border */
+    font-weight: 500 !important;
+    font-size: 15px !important; /* Slightly larger */
+    padding: 12px 14px !important;
+}
+
+.form-input:focus,
+input:focus,
+textarea:focus,
+select:focus {
+    color: #1A2E35 !important;
+    border-color: #5B9BAD !important; /* Nordic Blue */
+    box-shadow: 0 0 0 3px rgba(91, 155, 173, 0.2) !important;
+    outline: none !important;
+}
+
+/* Placeholders - More Visible */
+.form-input::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: #6B757D !important; /* Darker gray */
+    opacity: 0.75 !important;
+    font-weight: 400 !important;
+}
+
+/* Help Text - Better Contrast */
+.form-help,
+small.form-help,
+.modal-body small {
+    color: #4A5A65 !important; /* Darker than before */
+    font-weight: 500 !important;
+    opacity: 1 !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+}
+
+/* Form Groups - Ensure spacing and contrast */
+.form-group {
+    margin-bottom: 20px !important;
+}
+
+.form-group label {
+    color: #1A2E35 !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+}
+
+/* Select Options - High Contrast */
+select option,
+.form-select option {
+    color: #1A2E35 !important;
+    background: #FFFFFF !important;
+    padding: 10px !important;
+}
+
+/* Textarea - High Contrast */
+textarea,
+.form-textarea {
+    color: #1A2E35 !important;
+    background: #FFFFFF !important;
+    border: 1.5px solid rgba(44, 74, 82, 0.25) !important;
+    font-weight: 500 !important;
+    font-size: 15px !important;
+    line-height: 1.6 !important;
+    padding: 12px 14px !important;
+}
+
+textarea:focus,
+.form-textarea:focus {
+    color: #1A2E35 !important;
+    border-color: #5B9BAD !important;
+    box-shadow: 0 0 0 3px rgba(91, 155, 173, 0.2) !important;
+}
+
+/* Checkbox Labels - High Contrast */
+.checkbox-item,
+label.checkbox-item {
+    color: #1A2E35 !important;
+    font-weight: 600 !important;
+}
+
+.checkbox-item span {
+    color: #1A2E35 !important;
+}
+
+/* Required Fields Indicator */
+.form-label:has(+ input[required])::after,
+label[for*="item-name"]::after,
+label[for*="item-price"]::after,
+label[for*="item-category"]::after {
+    color: #C97676 !important; /* Nordic Coral for required */
+    font-weight: 700 !important;
+}
+
+/* ============================================
+   SPECIFIC MODAL OVERRIDES - ALL MODALS
+   ============================================ */
+
+/* Menu Builder Modals */
+#edit-menu-item-modal .modal-body,
+#add-menu-item-modal .modal-body,
+#browse-existing-items-modal .modal-body,
+#import-results-modal .modal-body,
+#menu-build-step-2-modal .modal-body,
+#dish-mapping-modal .modal-body {
+    color: #1A2E35 !important;
+    background: #FFFFFF !important;
+}
+
+#edit-menu-item-modal .form-label,
+#add-menu-item-modal .form-label,
+#browse-existing-items-modal .form-label,
+#import-results-modal .form-label,
+#menu-build-step-2-modal .form-label {
+    color: #1A2E35 !important;
+    font-weight: 600 !important;
+}
+
+#edit-menu-item-modal input,
+#edit-menu-item-modal textarea,
+#edit-menu-item-modal select,
+#add-menu-item-modal input,
+#add-menu-item-modal textarea,
+#add-menu-item-modal select,
+#browse-existing-items-modal input,
+#browse-existing-items-modal select,
+#import-results-modal input,
+#import-results-modal select {
+    color: #1A2E35 !important;
+    font-weight: 500 !important;
+    font-size: 15px !important;
+}
+
+/* Recipe Developer Modals */
+#recipe-modal .modal-body,
+#add-recipe-modal .modal-body,
+#edit-recipe-modal .modal-body,
+#recipe-import-modal .modal-body {
+    color: #1A2E35 !important;
+    background: #FFFFFF !important;
+}
+
+/* Ingredients Modals */
+#add-ingredient-modal .modal-body,
+#edit-ingredient-modal .modal-body,
+#bulk-import-modal .modal-body,
+#ingredient-import-modal .modal-body {
+    color: #1A2E35 !important;
+    background: #FFFFFF !important;
+}
+
+/* Inventory Modals */
+#add-inventory-modal .modal-body,
+#edit-inventory-modal .modal-body,
+#inventory-import-modal .modal-body {
+    color: #1A2E35 !important;
+    background: #FFFFFF !important;
+}
+
+/* Equipment Modals */
+#add-equipment-modal .modal-body,
+#edit-equipment-modal .modal-body,
+#equipment-import-modal .modal-body {
+    color: #1A2E35 !important;
+    background: #FFFFFF !important;
+}
+
+/* Vendor Modals */
+#add-vendor-modal .modal-body,
+#edit-vendor-modal .modal-body {
+    color: #1A2E35 !important;
+    background: #FFFFFF !important;
+}
+
+/* Production Planning Modals */
+#production-modal .modal-body,
+#production-plan-modal .modal-body {
+    color: #1A2E35 !important;
+    background: #FFFFFF !important;
+}
+
+/* Kitchen Management Modals */
+#kitchen-modal .modal-body,
+#station-modal .modal-body {
+    color: #1A2E35 !important;
+    background: #FFFFFF !important;
+}
+
+/* Universal Modal Text - High Contrast */
+.modal-body p,
+.modal-body span,
+.modal-body div:not(.form-group),
+.modal-body li {
+    color: #1A2E35 !important;
+    font-weight: 500 !important;
+}
+
+/* Modal Lists - High Contrast */
+.modal-body ul,
+.modal-body ol {
+    color: #1A2E35 !important;
+}
+
+.modal-body ul li,
+.modal-body ol li {
+    color: #1A2E35 !important;
+    font-weight: 500 !important;
+}
+
+/* Modal Footer Buttons - High Contrast Text */
+.modal-footer button {
+    font-weight: 600 !important;
+}
+
+.modal-footer .btn-primary {
+    color: #FFFFFF !important;
+}
+
+.modal-footer .btn-secondary {
+    color: #1A2E35 !important;
+    font-weight: 600 !important;
+}
+
+/* Special sections (like recipe required) */
+.modal-body > div[style*="background: #fef3c7"] {
+    background: #fef3c7 !important;
+}
+
+.modal-body > div[style*="background: #fef3c7"] * {
+    color: #78350f !important; /* Darker brown for better contrast on yellow */
+    font-weight: 600 !important;
+}
+
+.modal-body > div[style*="background: #f0f9ff"] {
+    background: #f0f9ff !important;
+}
+
+.modal-body > div[style*="background: #f0f9ff"] * {
+    color: #0c4a6e !important; /* Darker blue for better contrast */
+    font-weight: 600 !important;
+}
+
+/* Close button - High contrast */
+.modal-close,
+[class*="modal-close"],
+[class*="close-button"] {
+    color: #1A2E35 !important;
+    font-weight: 700 !important;
+    font-size: 1.75rem !important;
+    opacity: 0.9 !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 50% !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+}
+
+.modal-close:hover,
+[class*="modal-close"]:hover,
+[class*="close-button"]:hover {
+    color: #000000 !important;
+    opacity: 1 !important;
+    background: rgba(255, 255, 255, 1) !important;
+    transform: scale(1.1) !important;
+}
+
+/* Modal Headers - Enhanced Contrast */
+.modal-header {
+    background: #FFFFFF !important;
+    border-bottom: 2px solid rgba(44, 74, 82, 0.15) !important;
+    padding: 20px 24px !important;
+}
+
+.modal-header * {
+    color: #1A2E35 !important;
+    font-weight: 700 !important;
+}
+
+/* All modal types - universal high contrast */
+[class*="modal"],
+[id*="modal"],
+[class*="Modal"],
+[id*="Modal"],
+.dialog,
+.popup,
+[class*="dialog"],
+[class*="popup"] {
+    color: #1A2E35 !important;
+}
+
+[class*="modal"] *,
+[id*="modal"] *,
+.dialog *,
+.popup * {
+    color: inherit;
+}
+
+/* Modal backdrop/overlay */
+.modal-backdrop,
+[class*="backdrop"],
+.overlay {
+    background: rgba(26, 46, 53, 0.7) !important; /* Darker backdrop */
+}
+
+/* All input types in modals */
+[class*="modal"] input,
+[id*="modal"] input,
+[class*="modal"] textarea,
+[id*="modal"] textarea,
+[class*="modal"] select,
+[id*="modal"] select {
+    color: #1A2E35 !important;
+    font-weight: 500 !important;
+    font-size: 15px !important;
+    border: 1.5px solid rgba(44, 74, 82, 0.25) !important;
+}
+
+[class*="modal"] input:focus,
+[id*="modal"] input:focus,
+[class*="modal"] textarea:focus,
+[id*="modal"] textarea:focus,
+[class*="modal"] select:focus,
+[id*="modal"] select:focus {
+    color: #1A2E35 !important;
+    border-color: #5B9BAD !important;
+    box-shadow: 0 0 0 3px rgba(91, 155, 173, 0.2) !important;
+}
+
+[class*="modal"] input::placeholder,
+[id*="modal"] input::placeholder,
+[class*="modal"] textarea::placeholder,
+[id*="modal"] textarea::placeholder {
+    color: #6B757D !important;
+    opacity: 0.75 !important;
+}
+
+/* All labels in modals */
+[class*="modal"] label,
+[id*="modal"] label {
+    color: #1A2E35 !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+}
+
+/* All headings in modals */
+[class*="modal"] h1,
+[id*="modal"] h1,
+[class*="modal"] h2,
+[id*="modal"] h2,
+[class*="modal"] h3,
+[id*="modal"] h3,
+[class*="modal"] h4,
+[id*="modal"] h4 {
+    color: #1A2E35 !important;
+    font-weight: 700 !important;
+}
+
+/* All paragraph and text in modals */
+[class*="modal"] p,
+[id*="modal"] p,
+[class*="modal"] span,
+[id*="modal"] span,
+[class*="modal"] div,
+[id*="modal"] div {
+    color: #1A2E35 !important;
+}
+
+/* Dropdowns and selects in modals */
+[class*="modal"] select option,
+[id*="modal"] select option {
+    color: #1A2E35 !important;
+    background: #FFFFFF !important;
+    padding: 10px !important;
+}
+
+/* Table text in modals */
+[class*="modal"] table,
+[id*="modal"] table {
+    color: #1A2E35 !important;
+}
+
+[class*="modal"] table th,
+[id*="modal"] table th,
+[class*="modal"] table td,
+[id*="modal"] table td {
+    color: #1A2E35 !important;
+}
+
+/* Lists in modals */
+[class*="modal"] ul,
+[id*="modal"] ul,
+[class*="modal"] ol,
+[id*="modal"] ol,
+[class*="modal"] li,
+[id*="modal"] li {
+    color: #1A2E35 !important;
+}
+
+/* Alert boxes and notification boxes in modals */
+[class*="modal"] .alert,
+[id*="modal"] .alert,
+[class*="modal"] .notification,
+[id*="modal"] .notification,
+[class*="modal"] .message,
+[id*="modal"] .message {
+    color: #1A2E35 !important;
+}
+
+/* Breadcrumbs in modals */
+[class*="modal"] .breadcrumb,
+[id*="modal"] .breadcrumb {
+    color: #1A2E35 !important;
+}
+
+/* Badges and chips in modals */
+[class*="modal"] .badge,
+[id*="modal"] .badge,
+[class*="modal"] .chip,
+[id*="modal"] .chip {
+    color: #1A2E35 !important;
+    font-weight: 600 !important;
+}
+
+/* Tooltips in modals */
+[class*="modal"] .tooltip,
+[id*="modal"] .tooltip {
+    color: #1A2E35 !important;
+    background: #FFFFFF !important;
+}
+
+/* Special modals by ID */
+#import-results-modal,
+#menu-build-step-2-modal,
+#browse-existing-items-modal,
+#dish-mapping-modal,
+#add-ingredient-modal,
+#edit-ingredient-modal,
+#add-inventory-modal,
+#edit-inventory-modal,
+#add-recipe-modal,
+#edit-recipe-modal,
+#import-modal,
+#column-mapping-modal {
+    color: #1A2E35 !important;
+}
+
+#import-results-modal *,
+#menu-build-step-2-modal *,
+#browse-existing-items-modal *,
+#dish-mapping-modal *,
+#add-ingredient-modal *,
+#edit-ingredient-modal *,
+#add-inventory-modal *,
+#edit-inventory-modal *,
+#add-recipe-modal *,
+#edit-recipe-modal *,
+#import-modal *,
+#column-mapping-modal * {
+    color: inherit;
+}
+
+/* Ensure text in colored boxes still has contrast */
+[style*="background: #fef3c7"] *,
+[style*="background: #f0fdf4"] *,
+[style*="background: #f0f9ff"] *,
+[style*="background: #fee2e2"] *,
+[style*="background: #dbeafe"] * {
+    color: inherit !important;
+    font-weight: 600 !important;
+}
+
+/* Error and success messages in modals */
+[class*="modal"] .error,
+[id*="modal"] .error {
+    color: #B91C1C !important; /* Dark red */
+    font-weight: 600 !important;
+}
+
+[class*="modal"] .success,
+[id*="modal"] .success {
+    color: #166534 !important; /* Dark green */
+    font-weight: 600 !important;
+}
+
+[class*="modal"] .warning,
+[id*="modal"] .warning {
+    color: #78350f !important; /* Dark brown/orange */
+    font-weight: 600 !important;
+}
+
+[class*="modal"] .info,
+[id*="modal"] .info {
+    color: #0c4a6e !important; /* Dark blue */
+    font-weight: 600 !important;
+}
+
+/* Links in modals */
+[class*="modal"] a,
+[id*="modal"] a {
+    color: #5B9BAD !important; /* Nordic Blue */
+    font-weight: 600 !important;
+}
+
+[class*="modal"] a:hover,
+[id*="modal"] a:hover {
+    color: #4A8A9F !important;
+    text-decoration: underline !important;
+}
+

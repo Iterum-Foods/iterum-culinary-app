@@ -37,8 +37,8 @@ class CSPConfig {
             ],
             'connect-src': [
                 "'self'",
-                'https://iterum-culinary-app.firebaseapp.com',
-                'https://iterum-culinary-app.firebasestorage.app',
+                'https://iterum-culinary-app2.firebaseapp.com',
+                'https://iterum-culinary-app2.firebasestorage.app',
                 'https://firebase.googleapis.com',
                 'https://identitytoolkit.googleapis.com',
                 'https://securetoken.googleapis.com',

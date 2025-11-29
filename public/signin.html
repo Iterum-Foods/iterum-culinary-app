@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Iterum Foods</title>
+    <meta name="description" content="Sign in to your Iterum Foods account to access professional culinary tools and restaurant management platform.">
+    
+    <!-- ITERUM BRAND KIT -->
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MC8Q3SZ47K"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-MC8Q3SZ47K');
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+            background: linear-gradient(135deg, var(--nordic-forest, #2d5016) 0%, var(--nordic-pine, #1a3d0a) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-5, 2rem);
+        }
+        
+        .signin-container {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 450px;
+            width: 100%;
+            padding: var(--space-8, 4rem) var(--space-6, 3rem);
+        }
+        
+        .logo-section {
+            text-align: center;
+            margin-bottom: var(--space-8, 4rem);
+        }
+        
+        .logo-section h1 {
+            font-size: var(--text-3xl, 2rem);
+            font-weight: 700;
+            color: var(--nordic-forest, #2d5016);
+            margin-bottom: var(--space-2, 0.5rem);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-3, 1rem);
+        }
+        
+        .logo-section p {
+            color: var(--nordic-slate, #666);
+            font-size: var(--text-sm, 0.875rem);
+        }
+        
+        .auth-tabs {
+            display: flex;
+            background: var(--nordic-stone, #f5f5f5);
+            border-radius: 0.75rem;
+            padding: 4px;
+            margin-bottom: var(--space-6, 3rem);
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: var(--space-3, 1rem);
+            border: none;
+            background: transparent;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: var(--text-base, 1rem);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--nordic-slate, #666);
+        }
+        
+        .auth-tab.active {
+            background: white;
+            color: var(--nordic-forest, #2d5016);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: var(--space-5, 2rem);
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--nordic-charcoal, #1a1a1a);
+            margin-bottom: var(--space-2, 0.5rem);
+            font-size: var(--text-sm, 0.875rem);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: var(--space-4, 1rem);
+            border: 2px solid var(--nordic-stone, #e0e0e0);
+            border-radius: 0.5rem;
+            font-size: var(--text-base, 1rem);
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--nordic-forest, #2d5016);
+            box-shadow: 0 0 0 3px rgba(45, 80, 22, 0.1);
+        }
+        
+        .form-input.error {
+            border-color: #dc2626;
+        }
+        
+        .error-message {
+            color: #dc2626;
+            font-size: var(--text-sm, 0.875rem);
+            margin-top: var(--space-2, 0.5rem);
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: var(--space-4, 1rem);
+            border: none;
+            border-radius: 0.5rem;
+            font-size: var(--text-base, 1rem);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2, 0.5rem);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--nordic-forest, #2d5016) 0%, var(--nordic-pine, #1a3d0a) 100%);
+            color: white;
+            margin-bottom: var(--space-4, 1rem);
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(45, 80, 22, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-google {
+            background: white;
+            color: var(--nordic-charcoal, #1a1a1a);
+            border: 2px solid var(--nordic-stone, #e0e0e0);
+            margin-bottom: var(--space-4, 1rem);
+        }
+        
+        .btn-google:hover {
+            background: var(--nordic-stone, #f5f5f5);
+        }
+        
+        .divider {
+            text-align: center;
+            margin: var(--space-6, 3rem) 0;
+            position: relative;
+        }
+        
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--nordic-stone, #e0e0e0);
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 var(--space-3, 1rem);
+            color: var(--nordic-slate, #666);
+            font-size: var(--text-sm, 0.875rem);
+            position: relative;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: var(--space-6, 3rem);
+        }
+        
+        .back-link a {
+            color: var(--nordic-forest, #2d5016);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: var(--text-sm, 0.875rem);
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="signin-container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <h1>
+                <span>🌿</span>
+                Iterum Foods
+            </h1>
+            <p>Sign in to your account</p>
+        </div>
+        
+        <!-- Auth Tabs -->
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="switchTab('signin')">Sign In</button>
+            <button class="auth-tab" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+        
+        <!-- Sign In Form -->
+        <form id="signin-form" class="auth-form active" onsubmit="handleSignIn(event)">
+            <div class="form-group">
+                <label class="form-label" for="signin-email">Email</label>
+                <input 
+                    type="email" 
+                    id="signin-email" 
+                    class="form-input" 
+                    placeholder="your@email.com"
+                    required
+                >
+                <div class="error-message" id="signin-email-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="signin-password">Password</label>
+                <input 
+                    type="password" 
+                    id="signin-password" 
+                    class="form-input" 
+                    placeholder="Enter your password"
+                    required
+                >
+                <div class="error-message" id="signin-password-error"></div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" id="signin-btn">
+                <span id="signin-btn-text">Sign In</span>
+                <div class="spinner" id="signin-spinner"></div>
+            </button>
+        </form>
+        
+        <!-- Sign Up Form -->
+        <form id="signup-form" class="auth-form" onsubmit="handleSignUp(event)">
+            <div class="form-group">
+                <label class="form-label" for="signup-name">Full Name</label>
+                <input 
+                    type="text" 
+                    id="signup-name" 
+                    class="form-input" 
+                    placeholder="John Doe"
+                    required
+                >
+                <div class="error-message" id="signup-name-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="signup-email">Email</label>
+                <input 
+                    type="email" 
+                    id="signup-email" 
+                    class="form-input" 
+                    placeholder="your@email.com"
+                    required
+                >
+                <div class="error-message" id="signup-email-error"></div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="signup-password">Password</label>
+                <input 
+                    type="password" 
+                    id="signup-password" 
+                    class="form-input" 
+                    placeholder="Create a password"
+                    required
+                    minlength="6"
+                >
+                <div class="error-message" id="signup-password-error"></div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" id="signup-btn">
+                <span id="signup-btn-text">Create Account</span>
+                <div class="spinner" id="signup-spinner"></div>
+            </button>
+        </form>
+        
+        <!-- Divider -->
+        <div class="divider">
+            <span>or</span>
+        </div>
+        
+        <!-- Google Sign In -->
+        <button class="btn btn-google" onclick="handleGoogleSignIn()">
+            <i class="fab fa-google"></i>
+            Continue with Google
+        </button>
+        
+        <!-- Back to Landing -->
+        <div class="back-link">
+            <a href="/">← Back to home</a>
+        </div>
+    </div>
+    
+    <!-- Firebase Config & Auth -->
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    <script src="assets/js/auth-ui.js"></script>
+    
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            // Update tabs
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update forms
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            if (tab === 'signin') {
+                document.getElementById('signin-form').classList.add('active');
+            } else {
+                document.getElementById('signup-form').classList.add('active');
+            }
+        }
+        
+        // Sign In Handler (using auth-ui.js)
+        async function handleSignIn(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('signin-email').value;
+            const password = document.getElementById('signin-password').value;
+            const btn = document.getElementById('signin-btn');
+            const btnText = document.getElementById('signin-btn-text');
+            const spinner = document.getElementById('signin-spinner');
+            
+            // Show loading
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            spinner.style.display = 'block';
+            
+            // Clear errors
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.classList.remove('show');
+                el.textContent = '';
+            });
+            document.querySelectorAll('.form-input').forEach(el => el.classList.remove('error'));
+            
+            try {
+                // Wait for AuthManager
+                if (!window.authManager) {
+                    await new Promise(resolve => {
+                        const check = setInterval(() => {
+                            if (window.authManager) {
+                                clearInterval(check);
+                                resolve();
+                            }
+                        }, 100);
+                        setTimeout(() => clearInterval(check), 5000);
+                    });
+                }
+                
+                // Sign in
+                const user = await window.authManager.signInWithEmail(email, password);
+                
+                console.log('✅ Sign-in successful:', user.email);
+                
+                // Redirect to dashboard after successful sign-in
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 500);
+                
+            } catch (error) {
+                console.error('❌ Sign-in error:', error);
+                
+                let errorMessage = 'Sign in failed. Please try again.';
+                if (error.message.includes('wrong-password')) {
+                    errorMessage = 'Incorrect password. Please try again.';
+                } else if (error.message.includes('user-not-found')) {
+                    errorMessage = 'No account found with this email.';
+                } else if (error.message.includes('invalid-email')) {
+                    errorMessage = 'Invalid email address.';
+                }
+                
+                document.getElementById('signin-password-error').textContent = errorMessage;
+                document.getElementById('signin-password-error').classList.add('show');
+                document.getElementById('signin-password').classList.add('error');
+                
+                btn.disabled = false;
+                btnText.style.display = 'block';
+                spinner.style.display = 'none';
+            }
+        }
+        
+        // Sign Up Handler
+        async function handleSignUp(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const btn = document.getElementById('signup-btn');
+            const btnText = document.getElementById('signup-btn-text');
+            const spinner = document.getElementById('signup-spinner');
+            
+            // Show loading
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            spinner.style.display = 'block';
+            
+            // Clear errors
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.classList.remove('show');
+                el.textContent = '';
+            });
+            document.querySelectorAll('.form-input').forEach(el => el.classList.remove('error'));
+            
+            try {
+                // Wait for AuthManager
+                if (!window.authManager) {
+                    await new Promise(resolve => {
+                        const check = setInterval(() => {
+                            if (window.authManager) {
+                                clearInterval(check);
+                                resolve();
+                            }
+                        }, 100);
+                        setTimeout(() => clearInterval(check), 5000);
+                    });
+                }
+                
+                // Sign up
+                const user = await window.authManager.createUserWithEmail(email, password, { name });
+                
+                console.log('✅ Sign-up successful:', user.email);
+                
+                // Redirect to dashboard after successful sign-in
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 500);
+                
+            } catch (error) {
+                console.error('❌ Sign-up error:', error);
+                
+                let errorMessage = 'Sign up failed. Please try again.';
+                if (error.message.includes('email-already-in-use')) {
+                    errorMessage = 'This email is already registered. Please sign in instead.';
+                } else if (error.message.includes('weak-password')) {
+                    errorMessage = 'Password should be at least 6 characters.';
+                }
+                
+                document.getElementById('signup-password-error').textContent = errorMessage;
+                document.getElementById('signup-password-error').classList.add('show');
+                document.getElementById('signup-password').classList.add('error');
+                
+                btn.disabled = false;
+                btnText.style.display = 'block';
+                spinner.style.display = 'none';
+            }
+        }
+        
+        // Google Sign In Handler
+        async function handleGoogleSignIn() {
+            try {
+                if (!window.authManager) {
+                    alert('Authentication system is loading. Please try again in a moment.');
+                    return;
+                }
+                
+                const user = await window.authManager.signInWithGoogle();
+                console.log('✅ Google sign-in successful:', user.email);
+                
+                // Redirect to dashboard after successful sign-in
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 500);
+                
+            } catch (error) {
+                console.error('❌ Google sign-in error:', error);
+                alert('Google sign-in failed. Please try again.');
+            }
+        }
+        
+        // Track page view
+        window.addEventListener('load', function() {
+            gtag('event', 'page_view', {
+                page_title: 'Sign In - Iterum Foods',
+                page_location: window.location.href
+            });
+        });
+    </script>
+</body>
+</html>
+

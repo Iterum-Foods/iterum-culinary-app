@@ -310,6 +310,7 @@
     <script src="assets/js/unified-project-selector.js" defer></script>
     <script src="assets/js/ingredient-url-scraper.js"></script>
     <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
     <link rel="stylesheet" href="assets/css/header-universal.css">
     <link rel="stylesheet" href="assets/css/modern-nordic-vintage.css">
     <link rel="stylesheet" href="assets/css/dark-mode-enhancements.css">
@@ -404,7 +405,7 @@
                     <thead>
                         <tr>
                             <th>Ingredient Name</th>
-                            <th>Category</th>
+                            <th>Category / Subcategory</th>
                             <th>Unit</th>
                             <th>Cost</th>
                             <th>Status</th>
@@ -518,10 +519,40 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const csvContent = XLSX.utils.sheet_to_csv(firstSheet);
                     
+                    // Parse to JSON with headers
+                    const rawData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                    
+                    if (!rawData || rawData.length === 0) {
+                        alert('Excel sheet appears to be empty');
+                        resetUpload();
+                        return;
+                    }
+
+                    // First row as headers
+                    const headers = (rawData[0] || []).map(h => String(h || '').trim());
+                    
+                    // Store raw data
+                    window.tempCSVData = {
+                        headers: headers,
+                        rawRows: []
+                    };
+
+                    // Convert rows to arrays and store
+                    window.tempCSVAllRows = [];
+                    for (let i = 1; i < rawData.length; i++) {
+                        const row = (rawData[i] || []).map(cell => String(cell || '').trim());
+                        if (row.length > 0 && row.some(c => c)) {
+                            window.tempCSVAllRows.push(row);
+                            if (window.tempCSVData.rawRows.length < 5) {
+                                window.tempCSVData.rawRows.push(row);
+                            }
+                        }
+                    }
+
                     console.log('✅ Excel parsed');
-                    setTimeout(() => parseCSV(csvContent), 500);
+                    document.getElementById('loadingState').classList.remove('active');
+                    showColumnMapping();
                 } catch (error) {
                     alert('Error parsing Excel: ' + error.message);
                     resetUpload();
@@ -530,49 +561,318 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // Parse CSV
+        // Parse CSV with column mapping
         function parseCSV(content) {
+            // First, parse the CSV to detect headers
             const lines = content.split('\n').filter(line => line.trim());
-            const data = [];
-
-            // Detect if first row is header
-            const firstLine = lines[0].toLowerCase();
-            const hasHeader = firstLine.includes('name') || firstLine.includes('ingredient');
-            const startIndex = hasHeader ? 1 : 0;
-
-            for (let i = startIndex; i < lines.length; i++) {
-                const fields = lines[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
-                const cleanFields = fields.map(f => f.replace(/^"|"$/g, '').trim());
-
-                if (cleanFields.length >= 2) {
-                    const ingredient = {
-                        name: cleanFields[0],
-                        category: cleanFields[1] || 'Uncategorized',
-                        unit: cleanFields[2] || 'ea',
-                        cost: parseFloat(cleanFields[3]) || null,
-                        supplier: cleanFields[4] || '',
-                        isDuplicate: false,
-                        duplicateOf: null,
-                        matchScore: 0,
-                        action: 'add' // 'add', 'skip', 'merge', 'update'
-                    };
-
-                    // Check for duplicates
-                    const duplicate = findDuplicate(ingredient.name);
-                    if (duplicate) {
-                        ingredient.isDuplicate = true;
-                        ingredient.duplicateOf = duplicate;
-                        ingredient.matchScore = duplicate.score;
-                        ingredient.action = duplicate.score > 90 ? 'skip' : 'review';
-                    }
-
-                    data.push(ingredient);
-                }
+            if (lines.length === 0) {
+                alert('File appears to be empty');
+                resetUpload();
+                return;
             }
 
+            // Detect delimiter
+            const delimiter = detectDelimiter(content);
+            
+            // Parse first line as headers
+            const headers = parseCSVLine(lines[0], delimiter);
+            
+            // Store raw data for mapping
+            window.tempCSVData = {
+                headers: headers,
+                rawRows: []
+            };
+
+            // Parse sample rows for preview
+            for (let i = 1; i < Math.min(lines.length, 6); i++) {
+                const row = parseCSVLine(lines[i], delimiter);
+                window.tempCSVData.rawRows.push(row);
+            }
+
+            // Store all rows
+            window.tempCSVAllRows = [];
+            for (let i = 1; i < lines.length; i++) {
+                const row = parseCSVLine(lines[i], delimiter);
+                window.tempCSVAllRows.push(row);
+            }
+
+            // Show column mapping UI
+            showColumnMapping();
+        }
+
+        // Show column mapping interface
+        function showColumnMapping() {
+            const headers = window.tempCSVData.headers;
+            const rawRows = window.tempCSVData.rawRows;
+
+            // Hide loading, show mapping UI
+            document.getElementById('loadingState').classList.remove('active');
+            
+            // Create mapping section if it doesn't exist
+            let mappingSection = document.getElementById('columnMappingSection');
+            if (!mappingSection) {
+                mappingSection = document.createElement('div');
+                mappingSection.id = 'columnMappingSection';
+                mappingSection.className = 'upload-section';
+                mappingSection.style.display = 'block';
+                document.querySelector('.container').insertBefore(mappingSection, document.getElementById('reviewSection'));
+            }
+
+            // Define expected fields
+            const expectedFields = [
+                { key: 'name', label: 'Ingredient Name', required: true },
+                { key: 'category', label: 'Category', required: false },
+                { key: 'subcategory', label: 'Subcategory / Type / Brand', required: false },
+                { key: 'unit', label: 'Unit', required: false },
+                { key: 'cost', label: 'Cost', required: false },
+                { key: 'supplier', label: 'Supplier', required: false }
+            ];
+
+            // Auto-detect mappings
+            const mappings = {};
+            expectedFields.forEach(field => {
+                const match = findBestHeaderMatch(field.key, headers);
+                mappings[field.key] = match || '';
+            });
+
+            // Store mappings globally
+            window.columnMappings = mappings;
+
+            // Build mapping UI
+            mappingSection.innerHTML = `
+                <h2 style="margin-bottom: 20px; color: #1e293b;">Map Columns</h2>
+                <p style="color: #64748b; margin-bottom: 20px;">
+                    Select which column from your file corresponds to each field below.
+                </p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 30px;">
+                    ${expectedFields.map(field => {
+                        const options = [
+                            '<option value="">-- Not Mapped --</option>',
+                            ...headers.map(header => 
+                                `<option value="${header}" ${header === mappings[field.key] ? 'selected' : ''}>${header}</option>`
+                            )
+                        ].join('');
+                        
+                        return `
+                            <label style="display: flex; flex-direction: column; gap: 8px;">
+                                <span style="font-weight: 600; color: #1e293b;">
+                                    ${field.label}${field.required ? ' *' : ''}
+                                </span>
+                                <select class="form-select" data-field="${field.key}" style="padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px;" onchange="updateColumnMapping('${field.key}', this.value)">
+                                    ${options}
+                                </select>
+                            </label>
+                        `;
+                    }).join('')}
+                </div>
+
+                <h3 style="margin-bottom: 12px; color: #1e293b;">Preview (First 5 Rows)</h3>
+                <div style="overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 20px;">
+                    <table class="ingredient-table">
+                        <thead>
+                            <tr>
+                                ${headers.map(h => `<th>${h}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rawRows.map(row => 
+                                `<tr>${row.map(cell => `<td>${cell || ''}</td>`).join('')}</tr>`
+                            ).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="cancelColumnMapping()">
+                        <span>✕</span>
+                        <span>Cancel</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="confirmColumnMapping()">
+                        <span>✓</span>
+                        <span>Continue with Import</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        // Update column mapping
+        function updateColumnMapping(fieldKey, headerValue) {
+            if (!window.columnMappings) window.columnMappings = {};
+            window.columnMappings[fieldKey] = headerValue;
+        }
+
+        // Cancel column mapping
+        function cancelColumnMapping() {
+            window.tempCSVData = null;
+            window.tempCSVAllRows = null;
+            window.columnMappings = null;
+            const mappingSection = document.getElementById('columnMappingSection');
+            if (mappingSection) mappingSection.remove();
+            resetUpload();
+        }
+
+        // Confirm and process with mappings
+        function confirmColumnMapping() {
+            if (!window.columnMappings || !window.tempCSVAllRows || !window.tempCSVData) {
+                alert('Please map at least the Ingredient Name column');
+                return;
+            }
+
+            if (!window.columnMappings.name) {
+                alert('Ingredient Name mapping is required');
+                return;
+            }
+
+            // Hide mapping section
+            const mappingSection = document.getElementById('columnMappingSection');
+            if (mappingSection) mappingSection.style.display = 'none';
+
+            // Process rows with mappings
+            processMappedRows();
+        }
+
+        // Process rows using column mappings
+        function processMappedRows() {
+            document.getElementById('loadingState').classList.add('active');
+            
+            const mappings = window.columnMappings;
+            const headers = window.tempCSVData.headers;
+            const allRows = window.tempCSVAllRows;
+            const data = [];
+
+            // Create header index map
+            const headerIndexMap = {};
+            headers.forEach((header, index) => {
+                headerIndexMap[header] = index;
+            });
+
+            // Process each row
+            allRows.forEach((row, rowIndex) => {
+                const ingredientName = (mappings.name && row[headerIndexMap[mappings.name]]) ? row[headerIndexMap[mappings.name]].trim() : '';
+                const supplier = (mappings.supplier && row[headerIndexMap[mappings.supplier]]) ? row[headerIndexMap[mappings.supplier]].trim() : '';
+                const cost = (mappings.cost && row[headerIndexMap[mappings.cost]]) ? parseFloat(row[headerIndexMap[mappings.cost]]) || null : null;
+                
+                const ingredient = {
+                    name: ingredientName,
+                    category: (mappings.category && row[headerIndexMap[mappings.category]]) ? row[headerIndexMap[mappings.category]].trim() : 'Uncategorized',
+                    subcategory: (mappings.subcategory && row[headerIndexMap[mappings.subcategory]]) ? row[headerIndexMap[mappings.subcategory]].trim() : null,
+                    unit: (mappings.unit && row[headerIndexMap[mappings.unit]]) ? row[headerIndexMap[mappings.unit]].trim() : 'ea',
+                    cost: cost,
+                    supplier: supplier,
+                    isDuplicate: false,
+                    duplicateOf: null,
+                    matchScore: 0,
+                    action: 'add',
+                    willCreateVariant: false // Flag if this should be a variant
+                };
+                
+                // Check if main ingredient exists (will create variant if supplier or price exists)
+                if (ingredientName && (supplier || cost > 0)) {
+                    const existingIngredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
+                    const existingMain = existingIngredients.find(ing => 
+                        ing.name.toLowerCase() === ingredientName.toLowerCase() && 
+                        !ing.isVariant && 
+                        !ing.parentIngredientId
+                    );
+                    
+                    if (existingMain) {
+                        ingredient.willCreateVariant = true;
+                        ingredient.parentIngredientId = existingMain.id;
+                        ingredient.baseName = existingMain.name;
+                    }
+                }
+
+                // Skip if no name
+                if (!ingredient.name) return;
+
+                // Check for duplicates
+                const duplicate = findDuplicate(ingredient.name);
+                if (duplicate) {
+                    ingredient.isDuplicate = true;
+                    ingredient.duplicateOf = duplicate;
+                    ingredient.matchScore = duplicate.score;
+                    ingredient.action = duplicate.score > 90 ? 'skip' : 'review';
+                }
+
+                data.push(ingredient);
+            });
+
             uploadedIngredients = data;
-            console.log('✅ Parsed ' + data.length + ' ingredients');
+            console.log('✅ Parsed ' + data.length + ' ingredients with column mapping');
+            
+            // Clean up temp data
+            window.tempCSVData = null;
+            window.tempCSVAllRows = null;
+            window.columnMappings = null;
+            
             showReview();
+        }
+
+        // Helper: Parse CSV line
+        function parseCSVLine(line, delimiter) {
+            const cells = [];
+            let currentCell = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1];
+
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        currentCell += '"';
+                        i++; // Skip next quote
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === delimiter && !inQuotes) {
+                    cells.push(currentCell.trim());
+                    currentCell = '';
+                } else {
+                    currentCell += char;
+                }
+            }
+            cells.push(currentCell.trim());
+            return cells;
+        }
+
+        // Helper: Detect delimiter
+        function detectDelimiter(text) {
+            const commaCount = (text.match(/,/g) || []).length;
+            const semicolonCount = (text.match(/;/g) || []).length;
+            const tabCount = (text.match(/\t/g) || []).length;
+            if (tabCount > commaCount && tabCount > semicolonCount) return '\t';
+            if (semicolonCount > commaCount) return ';';
+            return ',';
+        }
+
+        // Helper: Find best header match
+        function findBestHeaderMatch(fieldKey, headers) {
+            const normalizedField = fieldKey.toLowerCase();
+            const fieldKeywords = {
+                'name': ['name', 'ingredient', 'item', 'product'],
+                'category': ['category', 'type', 'class'],
+                'unit': ['unit', 'units', 'measurement'],
+                'cost': ['cost', 'price', 'amount'],
+                'supplier': ['supplier', 'vendor', 'provider']
+            };
+
+            const keywords = fieldKeywords[normalizedField] || [normalizedField];
+            
+            // Try exact match
+            for (const keyword of keywords) {
+                const match = headers.find(h => h.toLowerCase() === keyword);
+                if (match) return match;
+            }
+
+            // Try partial match
+            for (const keyword of keywords) {
+                const match = headers.find(h => h.toLowerCase().includes(keyword) || keyword.includes(h.toLowerCase()));
+                if (match) return match;
+            }
+
+            return '';
         }
 
         // Find duplicate ingredients
@@ -682,7 +982,7 @@
 
                 row.innerHTML = `
                     <td><strong>${item.name}</strong></td>
-                    <td>${item.category}</td>
+                    <td>${item.category}${item.subcategory ? `<br><small style="color: #64748b;">${item.subcategory}</small>` : ''}</td>
                     <td>${item.unit}</td>
                     <td>${item.cost ? '$' + item.cost.toFixed(2) : '-'}</td>
                     <td>${statusBadge}</td>
@@ -729,15 +1029,47 @@
 
             // Add new ingredients
             toAdd.forEach(item => {
-                const newIngredient = {
-                    id: Date.now() + Math.random(),
-                    name: item.name,
-                    category: item.category,
-                    unit: item.unit,
-                    cost: item.cost,
-                    supplier: item.supplier,
-                    createdAt: new Date().toISOString()
-                };
+                let newIngredient;
+                
+                if (item.willCreateVariant) {
+                    // Create as variant
+                    newIngredient = {
+                        id: 'ing_variant_' + Date.now() + '_' + Math.random(),
+                        parentIngredientId: item.parentIngredientId,
+                        isVariant: true,
+                        name: `${item.name} - ${item.supplier || 'Unknown Vendor'}`,
+                        baseName: item.baseName || item.name,
+                        category: item.category,
+                        subcategory: item.subcategory || null,
+                        unit: item.unit,
+                        cost: item.cost || 0,
+                        supplier: item.supplier,
+                        dateAdded: new Date().toISOString(),
+                        priceHistory: item.cost > 0 ? [{
+                            price: item.cost,
+                            date: new Date().toISOString(),
+                            vendor: item.supplier || 'Default'
+                        }] : []
+                    };
+                } else {
+                    // Create as main ingredient
+                    newIngredient = {
+                        id: 'ing_' + Date.now() + '_' + Math.random(),
+                        name: item.name,
+                        category: item.category,
+                        subcategory: item.subcategory || null,
+                        unit: item.unit,
+                        cost: item.cost || 0,
+                        supplier: item.supplier,
+                        dateAdded: new Date().toISOString(),
+                        variants: [],
+                        priceHistory: item.cost > 0 ? [{
+                            price: item.cost,
+                            date: new Date().toISOString(),
+                            vendor: item.supplier || 'Default'
+                        }] : []
+                    };
+                }
                 existingIngredients.push(newIngredient);
                 addedCount++;
             });
@@ -801,6 +1133,11 @@
         // Reset upload
         function resetUpload() {
             uploadedIngredients = [];
+            window.tempCSVData = null;
+            window.tempCSVAllRows = null;
+            window.columnMappings = null;
+            const mappingSection = document.getElementById('columnMappingSection');
+            if (mappingSection) mappingSection.remove();
             document.getElementById('reviewSection').classList.remove('active');
             document.getElementById('loadingState').classList.remove('active');
             document.querySelector('.upload-section').style.display = 'block';

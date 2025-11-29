@@ -33,6 +33,7 @@ class ImportService {
       fields: [
         { key: 'name', label: 'Ingredient Name', required: true },
         { key: 'category', label: 'Category', required: true },
+        { key: 'subcategory', label: 'Subcategory / Type / Brand', required: false },
         { key: 'unit', label: 'Base Unit (e.g. g, kg, ml, l)', required: true },
         { key: 'cost', label: 'Cost', required: false },
         { key: 'costPer', label: 'Cost Per (unit)', required: false },
@@ -458,6 +459,7 @@ https://example.com/product-2"></textarea>
         id: `ing_csv_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
         name: row.name,
         category: row.category || 'other',
+        subcategory: row.subcategory ? row.subcategory.trim() : null,
         unit: row.unit || 'g',
         cost: Number.isFinite(cost) ? cost : 0,
         costPer: row.costPer || row.unit || 'unit',

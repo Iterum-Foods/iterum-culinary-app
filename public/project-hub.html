@@ -10,6 +10,9 @@
     <script src="assets/js/auth-manager.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- UNIFIED COLOR SYSTEM - MUST LOAD FIRST -->
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
     <link rel="stylesheet" href="assets/css/tailwind-output.css">
     <link rel="stylesheet" href="assets/css/iterum-design-system.css">
     <link rel="stylesheet" href="assets/css/premium-ui-system.css">
@@ -247,7 +250,6 @@
     <!-- Unified Navigation & Project Selector -->
     <script src="assets/js/unified-nav-header.js" defer></script>
     <script src="assets/js/unified-project-selector.js" defer></script>
-    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
     <link rel="stylesheet" href="assets/css/header-universal.css">
     <link rel="stylesheet" href="assets/css/modern-nordic-vintage.css">
     <link rel="stylesheet" href="assets/css/dark-mode-enhancements.css">
@@ -720,9 +722,32 @@
 
         function openProject(projectId) {
             if (window.projectManager) {
-                window.projectManager.setCurrentProject(projectId);
-                alert('✅ Project activated!\n\nRedirecting to dashboard...');
-                window.location.href = 'index.html';
+                console.log('🔄 Setting current project to:', projectId);
+                const success = window.projectManager.setCurrentProject(projectId);
+                if (success) {
+                    console.log('✅ Project set as current, projects:', window.projectManager.projects.map(p => ({id: p.id, name: p.name})));
+                    console.log('✅ Current project:', window.projectManager.currentProject?.name);
+                    
+                    // Wait a moment to ensure localStorage is saved
+                    setTimeout(() => {
+                        // Verify it was saved
+                        const savedProjectId = localStorage.getItem(`iterum_current_project_${window.projectManager.currentUserId}`) || 
+                                             localStorage.getItem('iterum_current_project');
+                        console.log('🔍 Saved project ID:', savedProjectId);
+                        
+                        if (savedProjectId === projectId) {
+                            console.log('✅ Project ID saved correctly, redirecting...');
+                            alert('✅ Project activated!\n\nRedirecting to dashboard...');
+                            window.location.href = 'index.html';
+                        } else {
+                            console.error('❌ Project ID mismatch! Saved:', savedProjectId, 'Expected:', projectId);
+                            alert('⚠️ Error saving project selection. Please try again.');
+                        }
+                    }, 200);
+                } else {
+                    console.error('❌ Failed to set project as current');
+                    alert('⚠️ Error activating project. Please try again.');
+                }
             }
         }
 

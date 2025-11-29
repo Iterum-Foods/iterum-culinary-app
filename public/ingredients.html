@@ -15,6 +15,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Shadows+Into+Light:wght@400&family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- UNIFIED COLOR SYSTEM - MUST LOAD FIRST -->
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
     <link rel="stylesheet" href="assets/css/tailwind-output.css">
     <link rel="stylesheet" href="assets/css/iterum-design-system.css">
     <link rel="stylesheet" href="assets/css/premium-ui-system.css">
@@ -36,6 +39,12 @@
     
     <!-- Base Ingredients Loader -->
     <script src="assets/js/base-ingredients-loader.js"></script>
+    <!-- Enhanced Ingredients Manager -->
+    <script src="assets/js/ingredients-manager-enhanced.js"></script>
+    <!-- Unit Converter -->
+    <script src="assets/js/unit-converter.js"></script>
+    <!-- Vendor Price Comparator -->
+    <script src="assets/js/vendor-price-comparator.js"></script>
     
     <!-- State Persistence -->
     <script src="assets/js/state-persistence-manager.js"></script>
@@ -82,7 +91,7 @@
                         </div>
                         <div class="form-group">
                             <label for="ingredient-category" class="form-label">Category</label>
-                            <select id="ingredient-category" class="form-select" required>
+                            <select id="ingredient-category" class="form-select" required onchange="updateSubcategoryOptions()">
                                 <option value="">Select category</option>
                                 <option value="vegetables">Vegetables</option>
                                 <option value="fruits">Fruits</option>
@@ -94,11 +103,19 @@
                                 <option value="other">Other</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label for="ingredient-subcategory" class="form-label">Subcategory / Type / Brand</label>
+                            <input type="text" id="ingredient-subcategory" class="form-input" placeholder="e.g., Organic, Premium Brand, Extra Virgin" list="subcategory-suggestions">
+                            <datalist id="subcategory-suggestions">
+                                <!-- Options will be populated dynamically -->
+                            </datalist>
+                            <small style="color: #64748b; font-size: 0.875rem; display: block; margin-top: 4px;">Optional: Specify type, brand, or specific variety</small>
+                        </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="ingredient-unit" class="form-label">Base Unit</label>
+                            <label for="ingredient-unit" class="form-label">Base Unit <span style="color: #64748b; font-weight: 400;">(for recipes)</span></label>
                             <select id="ingredient-unit" class="form-select" required>
                                 <option value="g">Grams (g)</option>
                                 <option value="kg">Kilograms (kg)</option>
@@ -106,11 +123,77 @@
                                 <option value="l">Liters (l)</option>
                                 <option value="piece">Piece</option>
                                 <option value="bunch">Bunch</option>
+                                <option value="oz">Ounces (oz)</option>
+                                <option value="lb">Pounds (lb)</option>
+                                <option value="cup">Cups</option>
                             </select>
+                            <small style="color: #64748b; font-size: 0.75rem; display: block; margin-top: 4px;">Standard unit used in all recipes</small>
                         </div>
                         <div class="form-group">
-                            <label for="ingredient-cost" class="form-label">Cost per Unit</label>
-                            <input type="number" id="ingredient-cost" class="form-input" step="0.01" min="0" placeholder="0.00">
+                            <label for="ingredient-cost" class="form-label">Cost per Base Unit</label>
+                            <input type="number" id="ingredient-cost" class="form-input" step="0.01" min="0" placeholder="0.00" readonly>
+                            <small style="color: #64748b; font-size: 0.75rem; display: block; margin-top: 4px;">Auto-calculated from case pricing</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Phase 1: Case Pricing Fields -->
+                    <div class="card" style="background: #F5F7F9; border: 2px solid #5B9BAD; margin: 20px 0; padding: 20px;">
+                        <h3 style="color: #1F2D35; font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                            <span>📦</span> Phase 1: Vendor Case Pricing (Source of Truth)
+                        </h3>
+                        <p style="color: #64748b; font-size: 0.875rem; margin-bottom: 16px;">Enter vendor invoice pricing to calculate accurate unit costs</p>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="price-per-case" class="form-label">Price per Case ($)</label>
+                                <input type="number" id="price-per-case" class="form-input" step="0.01" min="0" placeholder="0.00" onchange="calculateBaseUnitCost()" oninput="calculateBaseUnitCost()">
+                                <small style="color: #64748b; font-size: 0.75rem; display: block; margin-top: 4px;">From vendor invoice (e.g., $45.99)</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="case-size" class="form-label">Case Size</label>
+                                <input type="number" id="case-size" class="form-input" step="0.01" min="0" placeholder="e.g., 12" onchange="calculateBaseUnitCost()" oninput="calculateBaseUnitCost()">
+                                <small style="color: #64748b; font-size: 0.75rem; display: block; margin-top: 4px;">Quantity in case (e.g., 12 pieces, 50 lbs)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="case-unit" class="form-label">Case Unit</label>
+                                <select id="case-unit" class="form-select" onchange="calculateBaseUnitCost()" oninput="calculateBaseUnitCost()">
+                                    <option value="each">Each (pieces)</option>
+                                    <option value="lb">Pounds (lb)</option>
+                                    <option value="oz">Ounces (oz)</option>
+                                    <option value="g">Grams (g)</option>
+                                    <option value="kg">Kilograms (kg)</option>
+                                    <option value="gal">Gallons (gal)</option>
+                                    <option value="qt">Quarts (qt)</option>
+                                    <option value="l">Liters (l)</option>
+                                    <option value="ml">Milliliters (ml)</option>
+                                    <option value="case">Case</option>
+                                </select>
+                                <small style="color: #64748b; font-size: 0.75rem; display: block; margin-top: 4px;">Unit sold by vendor</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="conversion-factor" class="form-label">Conversion Factor</label>
+                                <input type="number" id="conversion-factor" class="form-input" step="0.01" min="0" placeholder="1.0" value="1.0" onchange="calculateBaseUnitCost()" oninput="calculateBaseUnitCost()">
+                                <small style="color: #64748b; font-size: 0.75rem; display: block; margin-top: 4px;">
+                                    To convert case unit to base unit
+                                    <span style="display: block; margin-top: 2px; color: #8A9299; font-size: 0.7rem;">
+                                        Example: If case is in lbs and base unit is grams, use 453.592 (1 lb = 453.592 g)
+                                    </span>
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div id="calculation-error" style="display: none;"></div>
+                        
+                        <div style="background: white; padding: 12px; border-radius: 8px; margin-top: 12px; border: 1px solid #E5E9EC;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: #3E4C54; font-weight: 600; font-size: 0.875rem;">Cost per Base Unit:</span>
+                                <span id="calculated-base-cost" style="color: #8A9299; font-weight: 700; font-size: 1.1rem;">$0.00</span>
+                            </div>
+                            <small style="color: #8A9299; font-size: 0.7rem; display: block; margin-top: 4px;">Formula: (Price per Case) ÷ (Case Size × Conversion Factor)</small>
+                            <div id="calculation-formula"></div>
                         </div>
                     </div>
                     
@@ -145,7 +228,7 @@
                     </div>
                     <div class="form-group">
                         <label for="filter-category" class="form-label">Category</label>
-                        <select id="filter-category" class="form-select">
+                        <select id="filter-category" class="form-select" onchange="updateSubcategoryFilterOptions()">
                             <option value="">All Categories</option>
                             <option value="vegetables">Vegetables</option>
                             <option value="fruits">Fruits</option>
@@ -155,6 +238,12 @@
                             <option value="spices">Spices & Herbs</option>
                             <option value="oils">Oils & Fats</option>
                             <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filter-subcategory" class="form-label">Subcategory / Type / Brand</label>
+                        <select id="filter-subcategory" class="form-select">
+                            <option value="">All Subcategories</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -177,10 +266,58 @@
                 <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
             </div>
 
-            <!-- Ingredients Grid -->
-            <div id="ingredients-container">
+            <!-- View Toggle and Section Toggle -->
+            <div style="display: flex; justify-content: space-between; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <span style="color: #64748b; font-weight: 500; font-size: 0.875rem;">Show:</span>
+                    <button id="show-all-btn" class="btn btn-primary" onclick="filterIngredients('all')" style="padding: 8px 16px; font-size: 0.875rem;">
+                        <span>📚</span> All
+                    </button>
+                    <button id="show-builtin-btn" class="btn btn-secondary" onclick="filterIngredients('builtin')" style="padding: 8px 16px; font-size: 0.875rem;">
+                        <span>📦</span> Built-in
+                    </button>
+                    <button id="show-custom-btn" class="btn btn-secondary" onclick="filterIngredients('custom')" style="padding: 8px 16px; font-size: 0.875rem;">
+                        <span>➕</span> My Products
+                    </button>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <span style="color: #64748b; font-weight: 500; font-size: 0.875rem;">View:</span>
+                    <button id="grid-view-btn" class="btn btn-secondary" onclick="switchView('grid')" style="padding: 8px 16px; font-size: 0.875rem;">
+                        <span>🃏</span> Cards
+                    </button>
+                    <button id="table-view-btn" class="btn btn-primary" onclick="switchView('table')" style="padding: 8px 16px; font-size: 0.875rem;">
+                        <span>📊</span> Spreadsheet
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ingredients Grid View -->
+            <div id="ingredients-grid-container" style="display: none;">
                 <div class="grid-3-col" id="ingredients-grid">
                     <!-- Ingredients will be populated here -->
+                </div>
+            </div>
+
+            <!-- Ingredients Table View (Spreadsheet Style) -->
+            <div id="ingredients-table-container">
+                <div class="card" style="overflow-x: auto;">
+                    <table id="ingredients-table" style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: linear-gradient(135deg, #5B9BAD 0%, #6B8E6F 100%); color: white;">
+                                <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap; position: sticky; left: 0; z-index: 10;">Ingredient Name</th>
+                                <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Category</th>
+                                <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Subcategory</th>
+                                <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Unit</th>
+                                <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Cost</th>
+                                <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Supplier</th>
+                                <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Date Added</th>
+                                <th style="padding: 14px 16px; text-align: center; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ingredients-table-body">
+                            <!-- Table rows will be populated here -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -198,8 +335,14 @@
             // Wait a moment for auth to be ready
             await waitForAuth();
             
-            // Load ingredients
+            // Initialize ingredients manager
+            await window.ingredientsManager.init();
+            
+            // Load ingredients FIRST
             await loadIngredientsDatabase();
+            
+            // THEN initialize view mode (which will display the loaded ingredients)
+            switchView(currentView);
             
             console.log('✅ Ingredients Page Ready');
         });
@@ -224,17 +367,23 @@
                 // Load from cache immediately
                 try {
                     const cached = JSON.parse(storedIngredients);
-                    console.log(`📦 Found ${cached.length} cached ingredients`);
-                    displayIngredients(cached);
-                    updateStats(cached);
-                    return;
+                    console.log(`📦 Found ${cached.length} cached ingredients in localStorage`);
+                    if (cached && Array.isArray(cached) && cached.length > 0) {
+                        console.log('✅ Valid ingredients array found, will display after view initialization');
+                        // Store in a global variable so it can be accessed by displayIngredients
+                        window._loadedIngredients = cached;
+                        updateStats(cached);
+                        return;
+                    } else {
+                        console.warn('⚠️ Cached ingredients array is empty or invalid');
+                    }
                 } catch (e) {
                     console.error('❌ Error parsing cached ingredients:', e);
                 }
             }
             
             // Show loading and fetch from database
-            console.log('📥 Fetching ingredients from database...');
+            console.log('📥 No valid ingredients found in localStorage, fetching from database...');
             showLoadingState();
             await directImportAndDisplay();
         }
@@ -275,16 +424,28 @@
                 const ingredients = database.ingredients;
                 console.log(`✅ Loaded ${ingredients.length} ingredients from database`);
                 
+                // Ensure it's an array
+                if (!Array.isArray(ingredients)) {
+                    throw new Error('Ingredients is not an array');
+                }
+                
                 // Save to localStorage (both keys for compatibility)
                 localStorage.setItem('ingredients_database', JSON.stringify(ingredients));
                 localStorage.setItem('ingredients', JSON.stringify(ingredients));
                 
+                // Store in global variable for immediate access
+                window._loadedIngredients = ingredients;
+                
                 console.log(`💾 Saved ${ingredients.length} ingredients to localStorage`);
                 
-                // Display immediately
-                console.log(`🎨 Displaying ${ingredients.length} ingredients...`);
-                displayIngredients(ingredients);
-                updateStats(ingredients);
+                // Display immediately if view is already initialized
+                if (document.getElementById('ingredients-table-body') || document.getElementById('ingredients-grid')) {
+                    console.log(`🎨 Displaying ${ingredients.length} ingredients...`);
+                    displayIngredients(ingredients);
+                    updateStats(ingredients);
+                } else {
+                    console.log('⏳ View containers not ready yet, ingredients will display when view initializes');
+                }
                 
                 console.log(`✅ SUCCESS: ${ingredients.length} ingredients displayed!`);
                 
@@ -390,15 +551,30 @@
         }
 
         function loadIngredients() {
-            // Load ingredients from localStorage
-            let ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
-            
-            // Fallback to old key if database is empty
-            if (ingredients.length === 0) {
-                ingredients = JSON.parse(localStorage.getItem('ingredients') || '[]');
+            // Load ingredients from localStorage or global variable
+            let ingredients = null;
+            if (window._loadedIngredients && Array.isArray(window._loadedIngredients)) {
+                ingredients = window._loadedIngredients;
+                console.log(`📊 Using cached ingredients from memory: ${ingredients.length}`);
+            } else {
+                const stored = localStorage.getItem('ingredients_database') || localStorage.getItem('ingredients');
+                ingredients = stored ? JSON.parse(stored) : [];
+                
+                // Fallback to old key if database is empty
+                if (!ingredients || ingredients.length === 0) {
+                    const oldKey = localStorage.getItem('ingredients');
+                    ingredients = oldKey ? JSON.parse(oldKey) : [];
+                }
+                
+                // Store in global for future use
+                window._loadedIngredients = ingredients;
+                console.log(`📊 Loaded ${ingredients.length} ingredients from localStorage`);
             }
             
-            console.log(`📊 Displaying ${ingredients.length} ingredients`);
+            if (!ingredients || !Array.isArray(ingredients)) {
+                console.warn('⚠️ Invalid ingredients data, resetting to empty array');
+                ingredients = [];
+            }
             
             displayIngredients(ingredients);
             updateStats(ingredients);
@@ -412,7 +588,63 @@
             }
         }
 
+        // Current view mode (grid or table)
+        let currentView = localStorage.getItem('ingredients_view_mode') || 'table';
+
+        function switchView(mode) {
+            currentView = mode;
+            localStorage.setItem('ingredients_view_mode', mode);
+            
+            const gridContainer = document.getElementById('ingredients-grid-container');
+            const tableContainer = document.getElementById('ingredients-table-container');
+            const gridBtn = document.getElementById('grid-view-btn');
+            const tableBtn = document.getElementById('table-view-btn');
+            
+            if (mode === 'grid') {
+                gridContainer.style.display = 'block';
+                tableContainer.style.display = 'none';
+                gridBtn.classList.add('btn-primary');
+                gridBtn.classList.remove('btn-secondary');
+                tableBtn.classList.add('btn-secondary');
+                tableBtn.classList.remove('btn-primary');
+            } else {
+                gridContainer.style.display = 'none';
+                tableContainer.style.display = 'block';
+                tableBtn.classList.add('btn-primary');
+                tableBtn.classList.remove('btn-secondary');
+                gridBtn.classList.add('btn-secondary');
+                gridBtn.classList.remove('btn-primary');
+            }
+            
+            // Reload ingredients in the current view
+            let ingredients = null;
+            if (window._loadedIngredients && Array.isArray(window._loadedIngredients)) {
+                ingredients = window._loadedIngredients;
+            } else {
+                const stored = localStorage.getItem('ingredients_database') || localStorage.getItem('ingredients');
+                ingredients = stored ? JSON.parse(stored) : [];
+            }
+            displayIngredients(ingredients);
+        }
+
         function displayIngredients(ingredients) {
+            // Ensure ingredients is an array
+            if (!ingredients || !Array.isArray(ingredients)) {
+                console.warn('⚠️ displayIngredients called with invalid data:', ingredients);
+                ingredients = [];
+            }
+            
+            console.log(`📊 Displaying ${ingredients.length} ingredients in ${currentView} view`);
+            
+            // Show in table view by default, grid view as option
+            if (currentView === 'table') {
+                displayIngredientsTable(ingredients);
+            } else {
+                displayIngredientsGrid(ingredients);
+            }
+        }
+
+        function displayIngredientsGrid(ingredients) {
             const grid = document.getElementById('ingredients-grid');
             
             if (!grid) {
@@ -448,79 +680,399 @@
                 return;
             }
 
-            console.log(`✅ Displaying ${ingredients.length} ingredients`);
+            console.log(`✅ Displaying ${filteredIngredients.length} ingredients in grid view (filter: ${currentFilter})`);
+            
+            // Show section headers if showing all
+            if (currentFilter === 'all') {
+                const builtIn = filteredIngredients.filter(ing => ingredientsManager.isBuiltIn(ing));
+                const custom = filteredIngredients.filter(ing => ingredientsManager.isCustom(ing));
+                
+                if (builtIn.length > 0) {
+                    grid.innerHTML += `
+                        <div class="card" style="grid-column: 1 / -1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; margin-bottom: 10px;">
+                            <h2 style="font-size: 1.3rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 10px;">
+                                <span>📦</span> Built-in Ingredients (${builtIn.length})
+                            </h2>
+                            <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 0.9rem;">Professional culinary ingredients database</p>
+                        </div>
+                    `;
+                }
+                
+                builtIn.forEach(ingredient => {
+                    const card = createIngredientCard(ingredient, true); // true = isBuiltIn
+                    grid.appendChild(card);
+                });
+                
+                if (custom.length > 0) {
+                    grid.innerHTML += `
+                        <div class="card" style="grid-column: 1 / -1; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px; margin: 20px 0 10px 0;">
+                            <h2 style="font-size: 1.3rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 10px;">
+                                <span>➕</span> My Products (${custom.length})
+                            </h2>
+                            <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 0.9rem;">Your custom ingredients and products</p>
+                        </div>
+                    `;
+                }
+                
+                custom.forEach(ingredient => {
+                    const card = createIngredientCard(ingredient, false); // false = isCustom
+                    grid.appendChild(card);
+                });
+            } else {
+                // Show filtered list without section headers
+                filteredIngredients.forEach(ingredient => {
+                    const isBuiltIn = ingredientsManager.isBuiltIn(ingredient);
+                    const card = createIngredientCard(ingredient, isBuiltIn);
+                    grid.appendChild(card);
+                });
+            }
+        }
 
-            ingredients.forEach(ingredient => {
-                const card = createIngredientCard(ingredient);
-                grid.appendChild(card);
+        function displayIngredientsTable(ingredients) {
+            const tbody = document.getElementById('ingredients-table-body');
+            
+            if (!tbody) {
+                console.error('❌ Ingredients table body not found');
+                return;
+            }
+            
+            tbody.innerHTML = '';
+
+            if (!ingredients || ingredients.length === 0) {
+                const isLoading = !localStorage.getItem('ingredients_database') && !localStorage.getItem('ingredients');
+                
+                if (isLoading) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 60px; color: #64748b;">
+                                <div style="font-size: 4rem; margin-bottom: 20px;">📦</div>
+                                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 10px;">Loading Ingredients...</h3>
+                                <p>Please wait while we import the ingredient database.</p>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 60px; color: #64748b;">
+                                <div style="font-size: 4rem; margin-bottom: 20px;">🥬</div>
+                                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 10px;">No Ingredients Found</h3>
+                                <p style="margin-bottom: 25px;">The ingredient database appears to be empty.</p>
+                                <button class="btn btn-primary" onclick="directImportAndDisplay()">🔄 Reload Database</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+                return;
+            }
+
+            console.log(`✅ Displaying ${ingredients.length} ingredients in table view`);
+
+            // Organize ingredients: main ingredients first, then their variants
+            const organizedIngredients = organizeIngredientsWithVariants(ingredients);
+            
+            tbody.innerHTML = organizedIngredients.map(item => {
+                if (item.isVariant) {
+                    // Render variant row (indented)
+                    return `
+                        <tr style="border-bottom: 1px solid #e8f0f6; transition: background 0.2s; background: #FAFBFC;">
+                            <td style="padding: 12px 16px 12px 48px; font-weight: 500; color: #64748b; position: sticky; left: 0; background: #FAFBFC; z-index: 1; font-size: 0.9rem;">
+                                <span style="color: #8A9299;">└─</span> ${item.supplier || 'Unknown Vendor'}
+                            </td>
+                            <td style="padding: 12px 16px; color: #64748b; font-size: 0.875rem;">-</td>
+                            <td style="padding: 12px 16px; color: #64748b; font-size: 0.875rem;">-</td>
+                            <td style="padding: 12px 16px; color: #64748b; font-size: 0.875rem;">${item.unit || 'g'}</td>
+                            <td style="padding: 12px 16px; color: #3E4C54; font-weight: 600;">
+                                $${(item.cost || 0).toFixed(2)}
+                                ${item.priceHistory && item.priceHistory.length > 1 ? 
+                                    `<span style="color: #8A9299; font-size: 0.75rem; margin-left: 4px;">(${item.priceHistory.length} prices)</span>` : ''}
+                            </td>
+                            <td style="padding: 12px 16px; color: #64748b; font-size: 0.875rem; font-weight: 500;">${item.supplier || '-'}</td>
+                            <td style="padding: 12px 16px; color: #64748b; font-size: 0.875rem;">
+                                ${item.dateAdded ? new Date(item.dateAdded).toLocaleDateString() : '-'}
+                            </td>
+                            <td style="padding: 12px 16px; text-align: center;">
+                                <div style="display: flex; gap: 6px; justify-content: center;">
+                                    <button onclick="editVariant('${item.id}')" title="Edit Variant" style="padding: 4px 10px; background: #5B9BAD; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.7rem;">✏️</button>
+                                    <button onclick="viewPriceHistory('${item.id}')" title="Price History" style="padding: 4px 10px; background: #6B8E6F; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.7rem;">📊</button>
+                                    <button onclick="addVariantPrice('${item.parentIngredientId || item.id}')" title="Add New Price" style="padding: 4px 10px; background: #D4A574; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.7rem;">💰</button>
+                                    <button onclick="deleteIngredient('${item.id}')" title="Delete Variant" style="padding: 4px 10px; background: #C97676; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.7rem;">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    // Render main ingredient row
+                    const variants = item.variants || [];
+                    const variantCount = variants.length;
+                    return `
+                        <tr style="border-bottom: ${variantCount > 0 ? 'none' : '1px solid #e2e8f0'}; transition: background 0.2s; background: white;">
+                            <td style="padding: 14px 16px; font-weight: 700; color: #2C4A52; position: sticky; left: 0; background: white; z-index: 1; font-size: 1rem;">
+                                ${item.name || 'N/A'}
+                                ${ingredientsManager.isBuiltIn(item) ? `<span style="display: inline-block; padding: 2px 8px; background: #667eea; color: white; border-radius: 8px; font-size: 0.7rem; font-weight: 600; margin-left: 8px;">📦 Built-in</span>` : `<span style="display: inline-block; padding: 2px 8px; background: #10b981; color: white; border-radius: 8px; font-size: 0.7rem; font-weight: 600; margin-left: 8px;">➕ My Product</span>`}
+                                ${variantCount > 0 ? `<span style="color: #64748b; font-weight: 500; font-size: 0.75rem; margin-left: 8px;">(${variantCount} vendor${variantCount !== 1 ? 's' : ''})</span>` : ''}
+                            </td>
+                            <td style="padding: 14px 16px; color: #3E4C54; font-weight: 500;">
+                                ${item.category || 'Uncategorized'}
+                            </td>
+                            <td style="padding: 14px 16px; color: #64748b;">
+                                ${item.subcategory || '-'}
+                            </td>
+                            <td style="padding: 14px 16px; color: #3E4C54;">
+                                ${item.unit || 'g'}
+                            </td>
+                            <td style="padding: 14px 16px; color: #3E4C54; font-weight: 600;">
+                                ${item.cost > 0 ? `
+                                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                                        <span style="color: #6B8E6F; font-weight: 700; font-size: 1rem;">$${item.cost.toFixed(4)}</span>
+                                        <span style="color: #8A9299; font-size: 0.7rem;">per ${item.unit || 'unit'}</span>
+                                    </div>
+                                ` : '-'}
+                                ${item.casePricing ? `
+                                    <div style="margin-top: 6px; padding: 6px 8px; background: #F5F7F9; border-radius: 6px; border-left: 3px solid #5B9BAD;">
+                                        <div style="color: #3E4C54; font-size: 0.7rem; font-weight: 600; margin-bottom: 2px;">📦 Case Pricing:</div>
+                                        <div style="color: #64748b; font-size: 0.65rem; line-height: 1.4;">
+                                            $${item.casePricing.pricePerCase.toFixed(2)} / ${item.casePricing.caseSize} ${item.casePricing.caseUnit}
+                                            ${item.casePricing.conversionFactor !== 1 ? `<br>Conv: ${item.casePricing.conversionFactor}` : ''}
+                                        </div>
+                                        ${item.casePricing.lastUpdated ? `
+                                            <div style="color: #8A9299; font-size: 0.6rem; margin-top: 2px;">
+                                                Updated: ${new Date(item.casePricing.lastUpdated).toLocaleDateString()}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                ` : ''}
+                                ${variantCount > 0 ? `<span style="color: #8A9299; font-size: 0.75rem; display: block; margin-top: 2px;">See variants below</span>` : ''}
+                            </td>
+                            <td style="padding: 14px 16px; color: #64748b;">
+                                ${item.supplier || '-'}
+                            </td>
+                            <td style="padding: 14px 16px; color: #64748b; font-size: 0.875rem;">
+                                ${item.dateAdded ? new Date(item.dateAdded).toLocaleDateString() : '-'}
+                            </td>
+                            <td style="padding: 14px 16px; text-align: center;">
+                                <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
+                                    <button onclick="editIngredient('${item.id}')" style="padding: 6px 12px; background: #5B9BAD; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500;">✏️ Edit</button>
+                                    <button onclick="addVariantPrice('${item.id}')" style="padding: 6px 12px; background: #D4A574; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500;">💰 Add Vendor</button>
+                                    <button onclick="viewIngredient('${item.id}')" style="padding: 6px 12px; background: #6B8E6F; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500;">👁️ View</button>
+                                    <button onclick="deleteIngredient('${item.id}')" style="padding: 6px 12px; background: #C97676; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500;">🗑️ Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }
+            }).join('');
+
+            // Add hover effects
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.background = '#E8F4F8';
+                    // Also update sticky column
+                    const stickyCell = this.querySelector('td:first-child');
+                    if (stickyCell) stickyCell.style.background = '#E8F4F8';
+                });
+                row.addEventListener('mouseleave', function() {
+                    this.style.background = '';
+                    const stickyCell = this.querySelector('td:first-child');
+                    if (stickyCell) stickyCell.style.background = 'white';
+                });
             });
         }
 
-        function createIngredientCard(ingredient) {
+        function createIngredientCard(ingredient, isBuiltIn = false) {
             const card = document.createElement('div');
             card.className = 'card card-hover';
+            const subcategoryBadge = ingredient.subcategory 
+                ? `<span style="display: inline-block; padding: 4px 10px; background: #E8F4F8; color: #5B9BAD; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-left: 8px;">${ingredient.subcategory}</span>` 
+                : '';
+            // Badge for built-in vs custom
+            const typeBadge = isBuiltIn 
+                ? `<span style="display: inline-block; padding: 4px 10px; background: #667eea; color: white; border-radius: 12px; font-size: 0.7rem; font-weight: 600; margin-left: 8px;">📦 Built-in</span>`
+                : `<span style="display: inline-block; padding: 4px 10px; background: #10b981; color: white; border-radius: 12px; font-size: 0.7rem; font-weight: 600; margin-left: 8px;">➕ My Product</span>`;
+
+            // Vendor prices info
+            const vendorCount = ingredient.vendorPrices?.length || 0;
+            const bestPrice = ingredient.bestPrice;
+            const vendorInfo = vendorCount > 0 
+                ? `<div style="padding: 8px; background: #f0f9ff; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #3b82f6;">
+                    <div style="font-size: 0.7rem; color: #1e40af; font-weight: 600; margin-bottom: 2px;">💰 ${vendorCount} Vendor${vendorCount !== 1 ? 's' : ''}</div>
+                    ${bestPrice ? `<div style="font-size: 0.65rem; color: #64748b;">Best: $${bestPrice.price.toFixed(2)}/${bestPrice.unit} from ${bestPrice.vendor}</div>` : ''}
+                </div>`
+                : '';
+
             card.innerHTML = `
                 <div class="card-header-gradient">
-                    <div class="card-title">${ingredient.name}</div>
-                    <div class="card-subtitle">${ingredient.category}</div>
+                    <div class="card-title">${ingredient.name}${typeBadge}</div>
+                    <div class="card-subtitle">${ingredient.category || 'Uncategorized'}${subcategoryBadge}</div>
                 </div>
                 <div class="card-body">
                     <div class="stats-row mb-4">
                         <div class="stat-item-centered">
-                            <div class="stat-value text-primary">$${(ingredient.cost || 0).toFixed(2)}</div>
-                            <div class="stat-label">Cost</div>
+                            <div class="stat-value text-primary">$${(ingredient.cost || 0).toFixed(4)}</div>
+                            <div class="stat-label">Cost per ${ingredient.unit || 'unit'}</div>
                         </div>
                         <div class="stat-item-centered">
                             <div class="stat-value text-primary">${ingredient.unit || 'g'}</div>
-                            <div class="stat-label">Unit</div>
+                            <div class="stat-label">Base Unit</div>
                         </div>
                     </div>
+                    ${vendorInfo}
+                    ${ingredient.casePricing ? `
+                        <div style="padding: 10px; background: #F5F7F9; border-radius: 8px; margin-bottom: 12px; border-left: 3px solid #5B9BAD;">
+                            <div style="font-size: 0.7rem; color: #3E4C54; font-weight: 600; margin-bottom: 4px;">📦 Case Pricing:</div>
+                            <div style="font-size: 0.65rem; color: #64748b; line-height: 1.4;">
+                                $${ingredient.casePricing.pricePerCase.toFixed(2)} / ${ingredient.casePricing.caseSize} ${ingredient.casePricing.caseUnit}
+                            </div>
+                        </div>
+                    ` : ''}
                     <div class="button-group">
-                        <button class="btn btn-sm btn-secondary" onclick="editIngredient('${ingredient.id}')">✏️ Edit</button>
+                        ${!isBuiltIn ? `<button class="btn btn-sm btn-secondary" onclick="editIngredient('${ingredient.id}')">✏️ Edit</button>` : ''}
                         <button class="btn btn-sm btn-secondary" onclick="viewIngredient('${ingredient.id}')">👁️ View</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteIngredient('${ingredient.id}')">🗑️ Delete</button>
+                        <button class="btn btn-sm btn-secondary" onclick="manageVendorPrices('${ingredient.id}')">💰 Vendors</button>
+                        ${!isBuiltIn ? `<button class="btn btn-sm btn-danger" onclick="deleteIngredient('${ingredient.id}')">🗑️ Delete</button>` : ''}
                     </div>
                 </div>
             `;
             return card;
         }
 
+        // Phase 1: Calculate Cost per Base Unit from Case Pricing
+        function calculateBaseUnitCost() {
+            const pricePerCase = parseFloat(document.getElementById('price-per-case').value) || 0;
+            const caseSize = parseFloat(document.getElementById('case-size').value) || 0;
+            const conversionFactor = parseFloat(document.getElementById('conversion-factor').value) || 1.0;
+            const baseUnit = document.getElementById('ingredient-unit').value;
+            const calculatedDisplay = document.getElementById('calculated-base-cost');
+            const costInput = document.getElementById('ingredient-cost');
+            const formulaDisplay = document.getElementById('calculation-formula');
+            
+            // Validation
+            let errors = [];
+            if (pricePerCase < 0) errors.push('Price per Case cannot be negative');
+            if (caseSize < 0) errors.push('Case Size cannot be negative');
+            if (conversionFactor < 0) errors.push('Conversion Factor cannot be negative');
+            if (pricePerCase > 0 && caseSize === 0) errors.push('Case Size is required when Price per Case is entered');
+            if (pricePerCase > 0 && conversionFactor === 0) errors.push('Conversion Factor cannot be zero');
+            
+            // Show errors if any
+            const errorDisplay = document.getElementById('calculation-error');
+            if (errorDisplay) {
+                if (errors.length > 0) {
+                    errorDisplay.innerHTML = '<div style="color: #C97676; font-size: 0.75rem; margin-top: 4px;">⚠️ ' + errors.join('<br>') + '</div>';
+                    errorDisplay.style.display = 'block';
+                    calculatedDisplay.textContent = '$0.00';
+                    if (costInput) costInput.value = '';
+                    return;
+                } else {
+                    errorDisplay.style.display = 'none';
+                }
+            }
+            
+            if (pricePerCase > 0 && caseSize > 0 && conversionFactor > 0) {
+                // Formula: COST PER BASE UNIT = PRICE PER CASE / (CASE SIZE × CONVERSION FACTOR)
+                const costPerBaseUnit = pricePerCase / (caseSize * conversionFactor);
+                const denominator = caseSize * conversionFactor;
+                
+                if (costInput) costInput.value = costPerBaseUnit.toFixed(4);
+                calculatedDisplay.textContent = '$' + costPerBaseUnit.toFixed(4) + ' / ' + baseUnit;
+                calculatedDisplay.style.color = '#6B8E6F';
+                
+                // Show detailed calculation breakdown
+                if (formulaDisplay) {
+                    formulaDisplay.innerHTML = `
+                        <div style="margin-top: 8px; padding: 8px; background: #FAFBFC; border-radius: 6px; font-size: 0.7rem; color: #64748b; line-height: 1.6;">
+                            <strong>Calculation:</strong><br>
+                            $${pricePerCase.toFixed(2)} ÷ (${caseSize} × ${conversionFactor}) = $${pricePerCase.toFixed(2)} ÷ ${denominator.toFixed(2)} = <strong style="color: #6B8E6F;">$${costPerBaseUnit.toFixed(4)}</strong>
+                        </div>
+                    `;
+                }
+            } else {
+                if (costInput) costInput.value = '';
+                calculatedDisplay.textContent = '$0.00';
+                calculatedDisplay.style.color = '#8A9299';
+                if (formulaDisplay) formulaDisplay.innerHTML = '';
+            }
+        }
+
         function addIngredient() {
             const formData = new FormData(document.getElementById('add-ingredient-form'));
-            const ingredient = {
-                id: 'ing_' + Date.now(),
-                name: document.getElementById('ingredient-name').value,
-                category: document.getElementById('ingredient-category').value,
-                unit: document.getElementById('ingredient-unit').value,
-                cost: parseFloat(document.getElementById('ingredient-cost').value) || 0,
-                supplier: document.getElementById('ingredient-supplier').value,
-                dateAdded: new Date().toISOString()
-            };
+            const ingredientName = document.getElementById('ingredient-name').value.trim();
+            const category = document.getElementById('ingredient-category').value;
+            const subcategory = document.getElementById('ingredient-subcategory').value.trim() || null;
+            const unit = document.getElementById('ingredient-unit').value;
+            const cost = parseFloat(document.getElementById('ingredient-cost').value) || 0;
+            const supplier = document.getElementById('ingredient-supplier').value.trim();
+            
+            // Phase 1: Case pricing data
+            const pricePerCase = parseFloat(document.getElementById('price-per-case').value) || 0;
+            const caseSize = parseFloat(document.getElementById('case-size').value) || 0;
+            const caseUnit = document.getElementById('case-unit').value;
+            const conversionFactor = parseFloat(document.getElementById('conversion-factor').value) || 1.0;
 
             // Validate required fields
-            if (!ingredient.name || !ingredient.category) {
+            if (!ingredientName || !category) {
                 alert('Please fill in ingredient name and category');
                 return;
             }
-
-            // Load from primary database
-            const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
-            ingredients.push(ingredient);
             
-            // Save to BOTH storage keys for compatibility
-            localStorage.setItem('ingredients_database', JSON.stringify(ingredients));
-            localStorage.setItem('ingredients', JSON.stringify(ingredients));
+            // Validate case pricing if provided
+            if (pricePerCase > 0 && (caseSize === 0 || conversionFactor === 0)) {
+                alert('Please provide Case Size and Conversion Factor when entering Price per Case');
+                return;
+            }
+
+            // Calculate cost from case pricing if provided
+            let calculatedCost = cost;
+            if (pricePerCase > 0 && caseSize > 0 && conversionFactor > 0) {
+                calculatedCost = pricePerCase / (caseSize * conversionFactor);
+            }
+
+            // Create new custom ingredient (user-added product)
+            const newIngredient = {
+                name: ingredientName,
+                category: category,
+                subcategory: subcategory,
+                unit: unit, // Base unit (for recipes)
+                cost: calculatedCost, // Cost per base unit (calculated)
+                supplier: supplier,
+                dateAdded: new Date().toISOString(),
+                priceHistory: calculatedCost > 0 ? [{
+                    price: calculatedCost,
+                    date: new Date().toISOString(),
+                    vendor: supplier || 'Default'
+                }] : [],
+                // Phase 1: Case pricing data (Source of Truth)
+                casePricing: pricePerCase > 0 ? {
+                    pricePerCase: pricePerCase,
+                    caseSize: caseSize,
+                    caseUnit: caseUnit,
+                    conversionFactor: conversionFactor,
+                    lastUpdated: new Date().toISOString()
+                } : null
+            };
+
+            // Use enhanced ingredients manager to add as custom ingredient
+            const ingredientsManager = window.ingredientsManager;
+            ingredientsManager.addCustomIngredient(newIngredient);
 
             // Refresh display
             loadIngredients();
             clearForm();
             
-            console.log('✅ Ingredient added:', ingredient);
-            alert(`✅ Ingredient "${ingredient.name}" added successfully!`);
+            console.log('✅ Custom ingredient added:', ingredientName);
+            alert(`✅ Product "${ingredientName}" added to your products!`);
         }
 
         function clearForm() {
             document.getElementById('add-ingredient-form').reset();
+            // Phase 1: Reset case pricing fields
+            document.getElementById('price-per-case').value = '';
+            document.getElementById('case-size').value = '';
+            document.getElementById('case-unit').value = 'each';
+            document.getElementById('conversion-factor').value = '1.0';
+            document.getElementById('calculated-base-cost').textContent = '$0.00';
+            document.getElementById('ingredient-cost').value = '';
         }
 
         function autoImportBaseIngredients() {
@@ -551,6 +1103,7 @@
         function searchIngredients() {
             const query = document.getElementById('search-query').value.toLowerCase();
             const category = document.getElementById('filter-category').value;
+            const subcategory = document.getElementById('filter-subcategory').value;
             const supplier = document.getElementById('filter-supplier').value;
             const sortBy = document.getElementById('sort-by').value;
 
@@ -558,10 +1111,13 @@
 
             // Filter
             ingredients = ingredients.filter(ingredient => {
-                const matchesQuery = !query || ingredient.name.toLowerCase().includes(query);
+                const matchesQuery = !query || 
+                    ingredient.name.toLowerCase().includes(query) ||
+                    (ingredient.subcategory && ingredient.subcategory.toLowerCase().includes(query));
                 const matchesCategory = !category || ingredient.category === category;
+                const matchesSubcategory = !subcategory || ingredient.subcategory === subcategory;
                 const matchesSupplier = !supplier || ingredient.supplier === supplier;
-                return matchesQuery && matchesCategory && matchesSupplier;
+                return matchesQuery && matchesCategory && matchesSubcategory && matchesSupplier;
             });
 
             // Sort
@@ -581,9 +1137,269 @@
         function resetFilters() {
             document.getElementById('search-query').value = '';
             document.getElementById('filter-category').value = '';
+            document.getElementById('filter-subcategory').value = '';
             document.getElementById('filter-supplier').value = '';
             document.getElementById('sort-by').value = 'name';
+            updateSubcategoryFilterOptions();
             searchIngredients();
+        }
+
+        // Organize ingredients with their variants grouped
+        function organizeIngredientsWithVariants(ingredients) {
+            const mainIngredients = [];
+            const variants = [];
+            
+            // Separate main ingredients and variants
+            ingredients.forEach(ing => {
+                if (ing.isVariant || ing.parentIngredientId) {
+                    variants.push(ing);
+                } else {
+                    mainIngredients.push(ing);
+                }
+            });
+            
+            // Sort main ingredients
+            mainIngredients.sort((a, b) => a.name.localeCompare(b.name));
+            
+            // Group variants under their parents
+            const organized = [];
+            mainIngredients.forEach(main => {
+                // Find variants for this ingredient
+                const ingredientVariants = variants.filter(v => 
+                    v.parentIngredientId === main.id || 
+                    (v.baseName && v.baseName.toLowerCase() === main.name.toLowerCase())
+                );
+                
+                // Attach variants to main ingredient
+                main.variants = ingredientVariants;
+                
+                // Add main ingredient
+                organized.push(main);
+                
+                // Add variants immediately after
+                ingredientVariants.forEach(variant => {
+                    organized.push({ ...variant, isVariant: true });
+                });
+            });
+            
+            // Add any orphaned variants
+            variants.forEach(variant => {
+                if (!variant.parentIngredientId && !variant.baseName) {
+                    organized.push({ ...variant, isVariant: false });
+                } else if (!mainIngredients.find(m => 
+                    m.id === variant.parentIngredientId || 
+                    (variant.baseName && variant.baseName.toLowerCase() === m.name.toLowerCase())
+                )) {
+                    organized.push({ ...variant, isVariant: false });
+                }
+            });
+            
+            return organized;
+        }
+
+        // Add new vendor variant/price to existing ingredient
+        function addVariantPrice(parentIngredientId) {
+            const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
+            const parentIngredient = ingredients.find(ing => ing.id === parentIngredientId);
+            
+            if (!parentIngredient) {
+                alert('Parent ingredient not found');
+                return;
+            }
+            
+            const supplier = prompt(`Enter vendor/supplier name for "${parentIngredient.name}":`);
+            if (!supplier || !supplier.trim()) return;
+            
+            const priceInput = prompt(`Enter price for ${supplier}:`);
+            const price = parseFloat(priceInput);
+            if (isNaN(price) || price <= 0) {
+                alert('Please enter a valid price');
+                return;
+            }
+            
+            // Check if variant already exists for this vendor
+            const existingVariant = ingredients.find(ing => 
+                (ing.parentIngredientId === parentIngredientId || ing.baseName?.toLowerCase() === parentIngredient.name.toLowerCase()) &&
+                ing.supplier?.toLowerCase() === supplier.toLowerCase().trim() &&
+                ing.isVariant
+            );
+            
+            if (existingVariant) {
+                // Add to price history instead of creating new variant
+                if (!existingVariant.priceHistory) {
+                    existingVariant.priceHistory = [];
+                }
+                
+                // Only add if price changed
+                const lastPrice = existingVariant.priceHistory[existingVariant.priceHistory.length - 1];
+                if (!lastPrice || lastPrice.price !== price) {
+                    existingVariant.priceHistory.push({
+                        price: price,
+                        date: new Date().toISOString(),
+                        vendor: supplier.trim()
+                    });
+                    existingVariant.cost = price;
+                    existingVariant.lastPriceUpdate = new Date().toISOString();
+                    
+                    localStorage.setItem('ingredients_database', JSON.stringify(ingredients));
+                    localStorage.setItem('ingredients', JSON.stringify(ingredients));
+                    
+                    loadIngredients();
+                    alert(`✅ Price updated for ${supplier}. Total price history: ${existingVariant.priceHistory.length} entries.`);
+                } else {
+                    alert('Price is the same as the last entry.');
+                }
+            } else {
+                // Create new variant
+                const variant = {
+                    id: 'ing_variant_' + Date.now(),
+                    parentIngredientId: parentIngredientId,
+                    isVariant: true,
+                    name: `${parentIngredient.name} - ${supplier.trim()}`,
+                    baseName: parentIngredient.name,
+                    category: parentIngredient.category,
+                    subcategory: parentIngredient.subcategory,
+                    unit: parentIngredient.unit,
+                    cost: price,
+                    supplier: supplier.trim(),
+                    dateAdded: new Date().toISOString(),
+                    priceHistory: [{
+                        price: price,
+                        date: new Date().toISOString(),
+                        vendor: supplier.trim()
+                    }]
+                };
+                
+                ingredients.push(variant);
+                localStorage.setItem('ingredients_database', JSON.stringify(ingredients));
+                localStorage.setItem('ingredients', JSON.stringify(ingredients));
+                
+                loadIngredients();
+                alert(`✅ New vendor variant added: ${supplier} at $${price.toFixed(2)}`);
+            }
+        }
+
+        // View price history for a variant
+        function viewPriceHistory(variantId) {
+            const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
+            const variant = ingredients.find(ing => ing.id === variantId);
+            
+            if (!variant || !variant.priceHistory || variant.priceHistory.length === 0) {
+                alert('No price history available for this variant.');
+                return;
+            }
+            
+            const historyText = variant.priceHistory
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .map((entry, idx) => 
+                    `${idx + 1}. $${entry.price.toFixed(2)} on ${new Date(entry.date).toLocaleDateString()}${entry.vendor ? ` (${entry.vendor})` : ''}`
+                ).join('\n');
+            
+            alert(`Price History for ${variant.supplier || variant.name}:\n\n${historyText}`);
+        }
+
+        // Edit variant
+        function editVariant(variantId) {
+            const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
+            const variant = ingredients.find(ing => ing.id === variantId);
+            
+            if (!variant) {
+                alert('Variant not found');
+                return;
+            }
+            
+            const newPrice = prompt(`Current price: $${(variant.cost || 0).toFixed(2)}\n\nEnter new price:`, variant.cost || 0);
+            if (newPrice === null) return;
+            
+            const price = parseFloat(newPrice);
+            if (isNaN(price) || price <= 0) {
+                alert('Please enter a valid price');
+                return;
+            }
+            
+            // Add to price history if price changed
+            if (!variant.priceHistory) {
+                variant.priceHistory = [];
+            }
+            
+            const lastPrice = variant.priceHistory[variant.priceHistory.length - 1];
+            if (!lastPrice || lastPrice.price !== price) {
+                variant.priceHistory.push({
+                    price: price,
+                    date: new Date().toISOString(),
+                    vendor: variant.supplier || 'Default'
+                });
+            }
+            
+            variant.cost = price;
+            variant.lastPriceUpdate = new Date().toISOString();
+            
+            localStorage.setItem('ingredients_database', JSON.stringify(ingredients));
+            localStorage.setItem('ingredients', JSON.stringify(ingredients));
+            
+            loadIngredients();
+            alert(`✅ Price updated. Total price history: ${variant.priceHistory.length} entries.`);
+        }
+
+        // Update subcategory options based on selected category
+        function updateSubcategoryOptions() {
+            const category = document.getElementById('ingredient-category').value;
+            const subcategoryInput = document.getElementById('ingredient-subcategory');
+            const datalist = document.getElementById('subcategory-suggestions');
+            
+            // Clear existing options
+            datalist.innerHTML = '';
+            
+            // Common subcategories by category
+            const subcategoriesByCategory = {
+                'vegetables': ['Organic', 'Baby', 'Heirloom', 'Fresh', 'Frozen', 'Canned'],
+                'fruits': ['Organic', 'Fresh', 'Frozen', 'Dried', 'Premium', 'Local'],
+                'proteins': ['Organic', 'Grass-Fed', 'Free-Range', 'Premium', 'Wild-Caught', 'Halal', 'Kosher'],
+                'dairy': ['Organic', 'Whole Milk', '2%', 'Skim', 'Raw', 'Pasteurized', 'Lactose-Free'],
+                'oils': ['Extra Virgin', 'Cold-Pressed', 'Organic', 'Refined', 'Unrefined'],
+                'spices': ['Whole', 'Ground', 'Organic', 'Premium', 'Smoked'],
+                'grains': ['Organic', 'Whole Grain', 'Refined', 'Gluten-Free', 'Ancient Grain'],
+                'other': ['Organic', 'Premium', 'Artisanal', 'Local', 'Imported']
+            };
+            
+            const suggestions = subcategoriesByCategory[category] || [];
+            suggestions.forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub;
+                datalist.appendChild(option);
+            });
+        }
+
+        // Update subcategory filter options based on selected category
+        function updateSubcategoryFilterOptions() {
+            const category = document.getElementById('filter-category').value;
+            const subcategoryFilter = document.getElementById('filter-subcategory');
+            
+            // Clear existing options
+            subcategoryFilter.innerHTML = '<option value="">All Subcategories</option>';
+            
+            if (!category) {
+                return; // Show all if no category selected
+            }
+            
+            // Get all ingredients
+            const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
+            
+            // Get unique subcategories for selected category
+            const subcategories = new Set();
+            ingredients.forEach(ing => {
+                if (ing.category === category && ing.subcategory) {
+                    subcategories.add(ing.subcategory);
+                }
+            });
+            
+            // Sort and add options
+            Array.from(subcategories).sort().forEach(sub => {
+                const option = document.createElement('option');
+                option.value = sub;
+                option.textContent = sub;
+                subcategoryFilter.appendChild(option);
+            });
         }
 
         async function previewURLImport() {
@@ -825,10 +1641,16 @@
                         <!-- Basic Info -->
                         <div style="padding: 25px; background: white; border-bottom: 2px solid #f1f5f9;">
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
-                                ${ingredient.default_unit ? `
+                                ${ingredient.unit || ingredient.default_unit ? `
                                     <div>
-                                        <div style="font-size: 0.85rem; color: #64748b; font-weight: 600; margin-bottom: 5px;">Default Unit</div>
-                                        <div style="font-size: 1.1rem; font-weight: 700; color: #0f172a;">${ingredient.default_unit}</div>
+                                        <div style="font-size: 0.85rem; color: #64748b; font-weight: 600; margin-bottom: 5px;">Base Unit</div>
+                                        <div style="font-size: 1.1rem; font-weight: 700; color: #0f172a;">${ingredient.unit || ingredient.default_unit}</div>
+                                    </div>
+                                ` : ''}
+                                ${ingredient.cost ? `
+                                    <div>
+                                        <div style="font-size: 0.85rem; color: #64748b; font-weight: 600; margin-bottom: 5px;">Cost per Base Unit</div>
+                                        <div style="font-size: 1.1rem; font-weight: 700; color: #6B8E6F;">$${ingredient.cost.toFixed(4)}</div>
                                     </div>
                                 ` : ''}
                                 ${ingredient.storage ? `
@@ -845,6 +1667,47 @@
                                 ` : ''}
                             </div>
                         </div>
+                        
+                        <!-- Phase 1: Case Pricing Info -->
+                        ${ingredient.casePricing ? `
+                            <div style="padding: 25px; background: #F5F7F9; border-bottom: 2px solid #E5E9EC;">
+                                <h3 style="font-size: 1.2rem; font-weight: 700; color: #1F2D35; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px;">
+                                    <span>📦</span> Phase 1: Vendor Case Pricing (Source of Truth)
+                                </h3>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+                                    <div style="background: white; padding: 15px; border-radius: 12px; border: 1px solid #E5E9EC;">
+                                        <div style="font-size: 0.85rem; color: #64748b; font-weight: 600; margin-bottom: 5px;">Price per Case</div>
+                                        <div style="font-size: 1.3rem; font-weight: 700; color: #1F2D35;">$${ingredient.casePricing.pricePerCase.toFixed(2)}</div>
+                                    </div>
+                                    <div style="background: white; padding: 15px; border-radius: 12px; border: 1px solid #E5E9EC;">
+                                        <div style="font-size: 0.85rem; color: #64748b; font-weight: 600; margin-bottom: 5px;">Case Size</div>
+                                        <div style="font-size: 1.3rem; font-weight: 700; color: #1F2D35;">${ingredient.casePricing.caseSize}</div>
+                                    </div>
+                                    <div style="background: white; padding: 15px; border-radius: 12px; border: 1px solid #E5E9EC;">
+                                        <div style="font-size: 0.85rem; color: #64748b; font-weight: 600; margin-bottom: 5px;">Case Unit</div>
+                                        <div style="font-size: 1.3rem; font-weight: 700; color: #1F2D35;">${ingredient.casePricing.caseUnit}</div>
+                                    </div>
+                                    <div style="background: white; padding: 15px; border-radius: 12px; border: 1px solid #E5E9EC;">
+                                        <div style="font-size: 0.85rem; color: #64748b; font-weight: 600; margin-bottom: 5px;">Conversion Factor</div>
+                                        <div style="font-size: 1.3rem; font-weight: 700; color: #1F2D35;">${ingredient.casePricing.conversionFactor}</div>
+                                    </div>
+                                </div>
+                                <div style="background: white; padding: 15px; border-radius: 12px; margin-top: 15px; border: 2px solid #6B8E6F;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="color: #3E4C54; font-weight: 700; font-size: 1rem;">Calculated Cost per Base Unit:</span>
+                                        <span style="color: #6B8E6F; font-weight: 700; font-size: 1.5rem;">$${ingredient.cost.toFixed(4)} / ${ingredient.unit || 'unit'}</span>
+                                    </div>
+                                    <small style="color: #8A9299; font-size: 0.7rem; display: block; margin-top: 6px;">
+                                        Formula: $${ingredient.casePricing.pricePerCase.toFixed(2)} ÷ (${ingredient.casePricing.caseSize} × ${ingredient.casePricing.conversionFactor}) = $${ingredient.cost.toFixed(4)}
+                                    </small>
+                                    ${ingredient.casePricing.lastUpdated ? `
+                                        <small style="color: #8A9299; font-size: 0.7rem; display: block; margin-top: 4px;">
+                                            Last updated: ${new Date(ingredient.casePricing.lastUpdated).toLocaleDateString()}
+                                        </small>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
 
                         <!-- Nutritional Info -->
                         ${nutritionHTML}
@@ -1007,7 +1870,59 @@
                             </div>
                             <div>
                                 <label style="display: block; font-weight: 600; color: #0f172a; margin-bottom: 8px;">Preferred Vendor</label>
-                                <input type="text" id="edit-ing-vendor" value="${ingredient.preferred_vendor || ''}" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 1rem;">
+                                <input type="text" id="edit-ing-vendor" value="${ingredient.supplier || ingredient.preferred_vendor || ''}" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 1rem;">
+                            </div>
+                        </div>
+                        
+                        <!-- Phase 1: Case Pricing Section -->
+                        <div style="background: #F5F7F9; border: 2px solid #5B9BAD; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                            <h3 style="color: #1F2D35; font-size: 1rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                                <span>📦</span> Phase 1: Vendor Case Pricing (Source of Truth)
+                            </h3>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                <div>
+                                    <label style="display: block; font-weight: 600; color: #0f172a; margin-bottom: 8px;">Price per Case ($)</label>
+                                    <input type="number" id="edit-price-per-case" value="${ingredient.casePricing?.pricePerCase || ''}" step="0.01" min="0" onchange="calculateEditBaseUnitCost()" oninput="calculateEditBaseUnitCost()" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 1rem;">
+                                </div>
+                                <div>
+                                    <label style="display: block; font-weight: 600; color: #0f172a; margin-bottom: 8px;">Case Size</label>
+                                    <input type="number" id="edit-case-size" value="${ingredient.casePricing?.caseSize || ''}" step="0.01" min="0" onchange="calculateEditBaseUnitCost()" oninput="calculateEditBaseUnitCost()" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 1rem;">
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                <div>
+                                    <label style="display: block; font-weight: 600; color: #0f172a; margin-bottom: 8px;">Case Unit</label>
+                                    <select id="edit-case-unit" onchange="calculateEditBaseUnitCost()" oninput="calculateEditBaseUnitCost()" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 1rem;">
+                                        <option value="each" ${ingredient.casePricing?.caseUnit === 'each' ? 'selected' : ''}>Each (pieces)</option>
+                                        <option value="lb" ${ingredient.casePricing?.caseUnit === 'lb' ? 'selected' : ''}>Pounds (lb)</option>
+                                        <option value="oz" ${ingredient.casePricing?.caseUnit === 'oz' ? 'selected' : ''}>Ounces (oz)</option>
+                                        <option value="g" ${ingredient.casePricing?.caseUnit === 'g' ? 'selected' : ''}>Grams (g)</option>
+                                        <option value="kg" ${ingredient.casePricing?.caseUnit === 'kg' ? 'selected' : ''}>Kilograms (kg)</option>
+                                        <option value="gal" ${ingredient.casePricing?.caseUnit === 'gal' ? 'selected' : ''}>Gallons (gal)</option>
+                                        <option value="qt" ${ingredient.casePricing?.caseUnit === 'qt' ? 'selected' : ''}>Quarts (qt)</option>
+                                        <option value="l" ${ingredient.casePricing?.caseUnit === 'l' ? 'selected' : ''}>Liters (l)</option>
+                                        <option value="ml" ${ingredient.casePricing?.caseUnit === 'ml' ? 'selected' : ''}>Milliliters (ml)</option>
+                                        <option value="case" ${ingredient.casePricing?.caseUnit === 'case' ? 'selected' : ''}>Case</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display: block; font-weight: 600; color: #0f172a; margin-bottom: 8px;">Conversion Factor</label>
+                                    <input type="number" id="edit-conversion-factor" value="${ingredient.casePricing?.conversionFactor || '1.0'}" step="0.01" min="0" onchange="calculateEditBaseUnitCost()" oninput="calculateEditBaseUnitCost()" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 1rem;">
+                                    <small style="color: #64748b; font-size: 0.7rem; display: block; margin-top: 4px;">
+                                        Example: If case is in lbs and base unit is grams, use 453.592
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div style="background: white; padding: 12px; border-radius: 8px; border: 1px solid #E5E9EC;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: #3E4C54; font-weight: 600; font-size: 0.875rem;">Cost per Base Unit:</span>
+                                    <span id="edit-calculated-base-cost" style="color: #6B8E6F; font-weight: 700; font-size: 1.1rem;">$${(ingredient.cost || 0).toFixed(4)}</span>
+                                </div>
+                                <small style="color: #8A9299; font-size: 0.7rem; display: block; margin-top: 4px;">Formula: (Price per Case) ÷ (Case Size × Conversion Factor)</small>
+                                <div id="edit-calculation-formula"></div>
                             </div>
                         </div>
 
@@ -1032,6 +1947,26 @@
             document.body.appendChild(modal);
         }
 
+        // Phase 1: Calculate cost for edit modal
+        function calculateEditBaseUnitCost() {
+            const pricePerCase = parseFloat(document.getElementById('edit-price-per-case').value) || 0;
+            const caseSize = parseFloat(document.getElementById('edit-case-size').value) || 0;
+            const conversionFactor = parseFloat(document.getElementById('edit-conversion-factor').value) || 1.0;
+            const baseUnit = document.getElementById('edit-ing-unit').value;
+            
+            if (pricePerCase > 0 && caseSize > 0 && conversionFactor > 0) {
+                const costPerBaseUnit = pricePerCase / (caseSize * conversionFactor);
+                document.getElementById('edit-calculated-base-cost').textContent = '$' + costPerBaseUnit.toFixed(4) + ' / ' + baseUnit;
+            } else {
+                const currentCost = document.getElementById('edit-calculated-base-cost').textContent.match(/\$([\d.]+)/);
+                if (currentCost) {
+                    document.getElementById('edit-calculated-base-cost').textContent = '$' + currentCost[1];
+                } else {
+                    document.getElementById('edit-calculated-base-cost').textContent = '$0.00';
+                }
+            }
+        }
+
         function saveIngredientEdit(index) {
             const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || localStorage.getItem('ingredients') || '[]');
             
@@ -1048,6 +1983,21 @@
             const storage = document.getElementById('edit-ing-storage').value;
             const shelfLife = parseInt(document.getElementById('edit-ing-shelf-life').value) || null;
             const vendor = document.getElementById('edit-ing-vendor').value.trim();
+            
+            // Phase 1: Get case pricing values
+            const pricePerCase = parseFloat(document.getElementById('edit-price-per-case').value) || 0;
+            const caseSize = parseFloat(document.getElementById('edit-case-size').value) || 0;
+            const caseUnit = document.getElementById('edit-case-unit').value;
+            const conversionFactor = parseFloat(document.getElementById('edit-conversion-factor').value) || 1.0;
+            
+            // Phase 1: Calculate cost per base unit if case pricing provided
+            let cost = ingredients[index].cost || 0;
+            if (pricePerCase > 0 && caseSize > 0 && conversionFactor > 0) {
+                cost = pricePerCase / (caseSize * conversionFactor);
+            } else if (price > 0) {
+                // Fallback to price per lb if no case pricing
+                cost = price;
+            }
 
             if (!name) {
                 alert('Please enter an ingredient name');
@@ -1055,11 +2005,35 @@
             }
 
             // Update ingredient
-            ingredients[index] = {
+            const updatedIngredient = {
                 ...ingredients[index],
                 name,
                 category,
-                default_unit: unit,
+                unit: unit, // Base unit
+                default_unit: unit, // Legacy support
+                cost: cost, // Phase 1: Calculated cost per base unit
+                avg_price_per_lb: price, // Legacy support
+                storage,
+                shelf_life_days: shelfLife,
+                supplier: vendor,
+                preferred_vendor: vendor // Legacy support
+            };
+            
+            // Phase 1: Update case pricing (Source of Truth)
+            if (pricePerCase > 0 && caseSize > 0 && conversionFactor > 0) {
+                updatedIngredient.casePricing = {
+                    pricePerCase: pricePerCase,
+                    caseSize: caseSize,
+                    caseUnit: caseUnit,
+                    conversionFactor: conversionFactor,
+                    lastUpdated: new Date().toISOString()
+                };
+            } else if (ingredients[index].casePricing) {
+                // Keep existing case pricing if not updated
+                updatedIngredient.casePricing = ingredients[index].casePricing;
+            }
+            
+            ingredients[index] = updatedIngredient;
                 avg_price_per_lb: price,
                 storage,
                 shelf_life_days: shelfLife,
@@ -1104,16 +2078,156 @@
         }
 
         function deleteIngredient(id) {
+            const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
+            const ingredient = ingredients.find(i => i.id === id);
+            
+            // Check if it's a built-in ingredient
+            if (ingredient && /^ing_\d+$/.test(ingredient.id)) {
+                alert('⚠️ Cannot delete built-in ingredients. You can only delete your custom products.');
+                return;
+            }
+            
             if (confirm('Are you sure you want to delete this ingredient?')) {
-                const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
-                const filtered = ingredients.filter(i => i.id !== id);
-                
-                // Save to BOTH storage keys for compatibility
-                localStorage.setItem('ingredients_database', JSON.stringify(filtered));
-                localStorage.setItem('ingredients', JSON.stringify(filtered));
+                // Use enhanced manager for custom ingredients
+                if (window.ingredientsManager) {
+                    window.ingredientsManager.deleteCustomIngredient(id);
+                } else {
+                    const filtered = ingredients.filter(i => i.id !== id);
+                    localStorage.setItem('ingredients_database', JSON.stringify(filtered));
+                    localStorage.setItem('ingredients', JSON.stringify(filtered));
+                }
                 
                 loadIngredients();
                 console.log('🗑️ Ingredient deleted:', id);
+            }
+        }
+
+        function manageVendorPrices(ingredientId) {
+            const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
+            const ingredient = ingredients.find(i => i.id === ingredientId);
+            
+            if (!ingredient) {
+                alert('Ingredient not found');
+                return;
+            }
+
+            const baseUnit = ingredient.unit || ingredient.default_unit || 'g';
+            const vendorPrices = ingredient.vendorPrices || [];
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            `;
+
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 16px; padding: 32px; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
+                    <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 8px;">💰 Vendor Prices: ${ingredient.name}</h2>
+                    <p style="color: #64748b; margin-bottom: 24px;">Base Unit: <strong>${baseUnit}</strong></p>
+
+                    <div style="margin-bottom: 24px;">
+                        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">Add New Vendor Price</h3>
+                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                            <input type="text" id="new-vendor-name" placeholder="Vendor Name" style="padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px;">
+                            <input type="number" id="new-vendor-price" placeholder="Price" step="0.01" style="padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px;">
+                            <select id="new-vendor-unit" style="padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px;">
+                                <option value="g">g</option>
+                                <option value="kg">kg</option>
+                                <option value="oz">oz</option>
+                                <option value="lb">lb</option>
+                                <option value="ml">ml</option>
+                                <option value="l">L</option>
+                                <option value="fl oz">fl oz</option>
+                                <option value="cup">cup</option>
+                                <option value="piece">piece</option>
+                            </select>
+                            <button onclick="addVendorPriceToIngredient('${ingredientId}')" style="padding: 12px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Add</button>
+                        </div>
+                    </div>
+
+                    <div id="vendor-prices-list">
+                        ${vendorPrices.length === 0 ? '<p style="color: #64748b; text-align: center; padding: 40px;">No vendor prices added yet</p>' : ''}
+                        ${vendorPrices.map((vp, idx) => {
+                            const normalized = window.unitConverter?.convertPrice(vp.price, vp.unit, baseUnit) || vp.price;
+                            return `
+                                <div style="padding: 16px; background: #f8fafc; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #10b981;">
+                                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                                        <div>
+                                            <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 4px;">${vp.vendor}</div>
+                                            <div style="color: #64748b; font-size: 0.9rem;">
+                                                $${vp.price.toFixed(2)} / ${vp.unit}
+                                                ${vp.unit !== baseUnit ? ` = $${normalized.toFixed(4)} / ${baseUnit}` : ''}
+                                            </div>
+                                            ${vp.dateAdded ? `<div style="color: #8A9299; font-size: 0.75rem; margin-top: 4px;">Added: ${new Date(vp.dateAdded).toLocaleDateString()}</div>` : ''}
+                                        </div>
+                                        <button onclick="removeVendorPrice('${ingredientId}', ${idx})" style="padding: 6px 12px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">Remove</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    ${ingredient.bestPrice ? `
+                        <div style="margin-top: 24px; padding: 16px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 8px;">
+                            <div style="font-weight: 700; margin-bottom: 8px;">🏆 Best Price</div>
+                            <div>${ingredient.bestPrice.vendor}: $${ingredient.bestPrice.price.toFixed(2)}/${ingredient.bestPrice.unit} = $${ingredient.bestPrice.normalizedPrice.toFixed(4)}/${baseUnit}</div>
+                        </div>
+                    ` : ''}
+
+                    <div style="margin-top: 24px; display: flex; gap: 12px;">
+                        <button onclick="this.closest('div[style*=\"position: fixed\"]').remove()" style="flex: 1; padding: 14px; background: #f1f5f9; color: #64748b; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Close</button>
+                    </div>
+                </div>
+            `;
+
+            modal.onclick = (e) => {
+                if (e.target === modal) modal.remove();
+            };
+
+            document.body.appendChild(modal);
+        }
+
+        function addVendorPriceToIngredient(ingredientId) {
+            const vendor = document.getElementById('new-vendor-name').value.trim();
+            const price = parseFloat(document.getElementById('new-vendor-price').value);
+            const unit = document.getElementById('new-vendor-unit').value;
+
+            if (!vendor || !price || price <= 0) {
+                alert('Please enter vendor name and valid price');
+                return;
+            }
+
+            window.vendorPriceComparator.addVendorPrice(ingredientId, {
+                vendor,
+                price,
+                unit
+            });
+
+            // Refresh modal
+            manageVendorPrices(ingredientId);
+        }
+
+        function removeVendorPrice(ingredientId, index) {
+            const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
+            const ingredient = ingredients.find(i => i.id === ingredientId);
+            
+            if (ingredient && ingredient.vendorPrices) {
+                ingredient.vendorPrices.splice(index, 1);
+                window.vendorPriceComparator.updateBestPrice(ingredient);
+                
+                localStorage.setItem('ingredients_database', JSON.stringify(ingredients));
+                localStorage.setItem('ingredients', JSON.stringify(ingredients));
+                
+                // Refresh modal
+                manageVendorPrices(ingredientId);
             }
         }
 

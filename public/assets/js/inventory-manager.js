@@ -286,25 +286,65 @@ class InventoryManager {
   }
 
   /**
-   * Import inventory from CSV
+   * Import inventory from CSV with column mapping
    */
-  async importFromCSV(file) {
+  async importFromCSV(file, columnMappings = null) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       
       reader.onload = (e) => {
         try {
           const text = e.target.result;
-          const lines = text.split('\n').filter(line => line.trim());
-          const headers = lines[0].split(',');
+          const delimiter = this.detectDelimiter(text);
+          const lines = text.split(/\r?\n/).filter(line => line.trim());
           
+          if (lines.length === 0) {
+            reject(new Error('File appears to be empty'));
+            return;
+          }
+
+          // Parse headers
+          const headers = this.parseCSVLine(lines[0], delimiter);
+          
+          // If no mappings provided, return data for mapping UI
+          if (!columnMappings) {
+            const rawRows = [];
+            for (let i = 1; i < Math.min(lines.length, 6); i++) {
+              rawRows.push(this.parseCSVLine(lines[i], delimiter));
+            }
+            resolve({ 
+              success: true, 
+              needsMapping: true, 
+              headers: headers, 
+              sampleRows: rawRows,
+              allRows: lines.slice(1).map(line => this.parseCSVLine(line, delimiter))
+            });
+            return;
+          }
+
+          // Process with mappings
+          const headerIndexMap = {};
+          headers.forEach((header, index) => {
+            headerIndexMap[header] = index;
+          });
+
           let imported = 0;
           for (let i = 1; i < lines.length; i++) {
-            const values = lines[i].split(',');
-            const ingredientName = values[0]?.trim();
-            const quantity = parseFloat(values[1]) || 0;
-            const unit = values[2]?.trim() || 'unit';
-            const location = values[3]?.trim() || 'Main Kitchen';
+            const row = this.parseCSVLine(lines[i], delimiter);
+            if (row.length === 0) continue;
+
+            const ingredientName = columnMappings.ingredient && row[headerIndexMap[columnMappings.ingredient]]
+              ? row[headerIndexMap[columnMappings.ingredient]].trim() 
+              : '';
+            const quantity = columnMappings.quantity && row[headerIndexMap[columnMappings.quantity]]
+              ? parseFloat(row[headerIndexMap[columnMappings.quantity]]) || 0 
+              : 0;
+            const unit = columnMappings.unit && row[headerIndexMap[columnMappings.unit]]
+              ? row[headerIndexMap[columnMappings.unit]].trim() 
+              : 'unit';
+            const location = columnMappings.location && row[headerIndexMap[columnMappings.location]]
+              ? row[headerIndexMap[columnMappings.location]].trim() 
+              : 'Main Kitchen';
             
             if (ingredientName) {
               this.upsertInventoryItem(
@@ -327,6 +367,48 @@ class InventoryManager {
       reader.onerror = reject;
       reader.readAsText(file);
     });
+  }
+
+  /**
+   * Helper: Parse CSV line
+   */
+  parseCSVLine(line, delimiter) {
+    const cells = [];
+    let currentCell = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      const nextChar = line[i + 1];
+
+      if (char === '"') {
+        if (inQuotes && nextChar === '"') {
+          currentCell += '"';
+          i++; // Skip next quote
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === delimiter && !inQuotes) {
+        cells.push(currentCell.trim());
+        currentCell = '';
+      } else {
+        currentCell += char;
+      }
+    }
+    cells.push(currentCell.trim());
+    return cells;
+  }
+
+  /**
+   * Helper: Detect delimiter
+   */
+  detectDelimiter(text) {
+    const commaCount = (text.match(/,/g) || []).length;
+    const semicolonCount = (text.match(/;/g) || []).length;
+    const tabCount = (text.match(/\t/g) || []).length;
+    if (tabCount > commaCount && tabCount > semicolonCount) return '\t';
+    if (semicolonCount > commaCount) return ';';
+    return ',';
   }
 
   /**

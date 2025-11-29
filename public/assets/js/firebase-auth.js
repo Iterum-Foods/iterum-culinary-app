@@ -5,14 +5,15 @@
  */
 
 // Firebase configuration - embedded directly to avoid loading issues
-const firebaseConfig = {
-    apiKey: "AIzaSyB94rVT-7xyBLJBH9zpjGyCZL5aEKmK7Hc",
-    authDomain: "iterum-culinary-app.firebaseapp.com",
-    projectId: "iterum-culinary-app",
-    storageBucket: "iterum-culinary-app.firebasestorage.app",
-    messagingSenderId: "812528299163",
-    appId: "1:812528299163:web:328cdc056d16c752206a3e",
-    measurementId: "G-4HFR4GRY9R"
+// Uses global config from firebase-config.js if available, otherwise fallback to embedded config
+const firebaseConfig = window.firebaseConfig || {
+    apiKey: "AIzaSyDnoHJC-p22f-sBsdo_5UTeFiurFZ5Q4Yw",
+    authDomain: "iterum-culinary-app2.firebaseapp.com",
+    projectId: "iterum-culinary-app2",
+    storageBucket: "iterum-culinary-app2.firebasestorage.app",
+    messagingSenderId: "109643878536",
+    appId: "1:109643878536:web:65a701743af85b083a0f3d",
+    measurementId: "G-X9Y60QRWMT"
 };
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -92,7 +93,7 @@ class FirebaseAuthSystem {
             });
             
             this.isInitialized = true;
-            console.log('✅ Firebase Auth initialized successfully for iterum-culinary-app');
+            console.log('✅ Firebase Auth initialized successfully for iterum-culinary-app2');
             
             // Add alias for backward compatibility
             this.createAccountWithEmail = this.createUserWithEmail;

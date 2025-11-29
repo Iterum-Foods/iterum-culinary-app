@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iterum Foods - Investment Opportunity | Professional Culinary Platform</title>
+    <meta name="description" content="Transform the culinary industry with Iterum Foods. $15B market opportunity. $50K MRR. Seeking $500K seed funding for expansion.">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://iterum-culinary-app.web.app/pitch">
+    <meta property="og:title" content="Iterum Foods - Investment Opportunity">
+    <meta property="og:description" content="Professional culinary platform transforming restaurant operations. $50K MRR, 25% MoM growth.">
+    
+    <!-- Nordic Branding Kit -->
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MC8Q3SZ47K"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-MC8Q3SZ47K');
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+            line-height: 1.6;
+            color: var(--nordic-charcoal, #1a1a1a);
+            background: #ffffff;
+        }
+        
+        .pitch-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-8, 4rem) var(--space-5, 2rem);
+        }
+        
+        .pitch-hero {
+            text-align: center;
+            padding: var(--space-10, 5rem) 0;
+            background: linear-gradient(135deg, var(--nordic-forest, #2d5016) 0%, var(--nordic-pine, #1a3d0a) 100%);
+            color: white;
+            margin-bottom: var(--space-10, 5rem);
+            border-radius: 0 0 2rem 2rem;
+        }
+        
+        .pitch-hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: var(--space-4, 1.5rem);
+            line-height: 1.2;
+        }
+        
+        .pitch-hero .tagline {
+            font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            margin-bottom: var(--space-12, 6rem);
+        }
+        
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            color: var(--nordic-forest, #2d5016);
+            margin-bottom: var(--space-6, 3rem);
+            text-align: center;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-5, 2rem);
+            margin-bottom: var(--space-8, 4rem);
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: var(--space-6, 3rem) var(--space-5, 2rem);
+            border-radius: 1rem;
+            text-align: center;
+            border: 2px solid var(--nordic-stone, #e0e0e0);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .metric-value {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            color: var(--nordic-forest, #2d5016);
+            margin-bottom: var(--space-2, 0.5rem);
+        }
+        
+        .metric-label {
+            font-size: var(--text-base, 1rem);
+            color: var(--nordic-slate, #666);
+            font-weight: 600;
+        }
+        
+        .opportunity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-6, 3rem);
+        }
+        
+        .opportunity-card {
+            padding: var(--space-6, 3rem);
+            background: #ffffff;
+            border-radius: 1rem;
+            border: 2px solid var(--nordic-stone, #e0e0e0);
+        }
+        
+        .opportunity-card h3 {
+            font-size: var(--text-2xl, 1.5rem);
+            color: var(--nordic-forest, #2d5016);
+            margin-bottom: var(--space-4, 1.5rem);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3, 1rem);
+        }
+        
+        .opportunity-card h3 i {
+            font-size: 2rem;
+            color: var(--nordic-pine, #1a3d0a);
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, var(--nordic-forest, #2d5016) 0%, var(--nordic-pine, #1a3d0a) 100%);
+            color: white;
+            padding: var(--space-12, 6rem) var(--space-5, 2rem);
+            border-radius: 2rem;
+            text-align: center;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: var(--space-4, 1.5rem);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: var(--space-6, 3rem);
+        }
+        
+        .btn {
+            padding: var(--space-4, 1.5rem) var(--space-6, 3rem);
+            border-radius: 0.5rem;
+            font-size: var(--text-lg, 1.125rem);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: var(--nordic-forest, #2d5016);
+        }
+        
+        .btn-primary:hover {
+            background: var(--nordic-pine, #1a3d0a);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border-color: white;
+        }
+        
+        .btn-outline:hover {
+            background: white;
+            color: var(--nordic-forest, #2d5016);
+        }
+        
+        .investment-ask {
+            background: #f8f9fa;
+            padding: var(--space-8, 4rem) var(--space-5, 2rem);
+            border-radius: 1rem;
+            margin: var(--space-8, 4rem) 0;
+        }
+        
+        .investment-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-5, 2rem);
+            margin-top: var(--space-6, 3rem);
+        }
+        
+        .investment-item {
+            text-align: center;
+        }
+        
+        .investment-item .value {
+            font-size: var(--text-3xl, 2rem);
+            font-weight: 700;
+            color: var(--nordic-forest, #2d5016);
+            margin-bottom: var(--space-2, 0.5rem);
+        }
+        
+        .investment-item .label {
+            color: var(--nordic-slate, #666);
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .pitch-container {
+                padding: var(--space-5, 2rem) var(--space-3, 1rem);
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="pitch-container">
+        <!-- Hero Section -->
+        <div class="pitch-hero">
+            <h1>Iterum Foods</h1>
+            <p class="tagline">Transforming the Culinary Industry Through Technology</p>
+            <p class="tagline" style="font-size: clamp(1rem, 2vw, 1.25rem); margin-top: var(--space-4); opacity: 0.9;">
+                Professional tools for culinary innovation and restaurant success
+            </p>
+        </div>
+
+        <!-- Traction Metrics -->
+        <section class="section">
+            <h2 class="section-title">Current Traction</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">$50K</div>
+                    <div class="metric-label">Monthly Recurring Revenue</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">25%</div>
+                    <div class="metric-label">Month-over-Month Growth</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">10K+</div>
+                    <div class="metric-label">Total Users</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">50K+</div>
+                    <div class="metric-label">Recipes Created</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">98%</div>
+                    <div class="metric-label">Customer Satisfaction</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">4.5:1</div>
+                    <div class="metric-label">LTV/CAC Ratio</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Market Opportunity -->
+        <section class="section">
+            <h2 class="section-title">Market Opportunity</h2>
+            <div class="opportunity-grid">
+                <div class="opportunity-card">
+                    <h3><i class="fas fa-chart-line"></i> $15B Market</h3>
+                    <p>The global restaurant software market represents a massive opportunity. With increasing digitalization and demand for efficiency in the culinary industry, we're positioned to capture significant market share.</p>
+                </div>
+                <div class="opportunity-card">
+                    <h3><i class="fas fa-users"></i> Growing Demand</h3>
+                    <p>Chefs and restaurateurs are actively seeking professional tools to streamline operations, reduce waste, and increase profitability. Our platform addresses critical pain points.</p>
+                </div>
+                <div class="opportunity-card">
+                    <h3><i class="fas fa-rocket"></i> Proven Product-Market Fit</h3>
+                    <p>With $50K MRR and strong user engagement, we've validated demand. Our 25% MoM growth demonstrates market traction and scalability potential.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Financial Projections -->
+        <section class="section">
+            <h2 class="section-title">Financial Projections</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">$1M</div>
+                    <div class="metric-label">Year 1 ARR Target</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">$5M</div>
+                    <div class="metric-label">Year 2 ARR Target</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">$15M</div>
+                    <div class="metric-label">Year 3 ARR Target</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">Month 18</div>
+                    <div class="metric-label">Path to Profitability</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Investment Ask -->
+        <section class="investment-ask">
+            <h2 class="section-title">Investment Opportunity</h2>
+            <p style="text-align: center; font-size: var(--text-xl, 1.25rem); color: var(--nordic-slate, #666); max-width: 800px; margin: 0 auto var(--space-6, 3rem);">
+                We're seeking strategic partners to accelerate growth and expand our market presence. This seed round will enable us to scale product development, expand marketing efforts, and capture a larger share of the $15B market.
+            </p>
+            
+            <div class="investment-details">
+                <div class="investment-item">
+                    <div class="value">$500K</div>
+                    <div class="label">Seed Round</div>
+                </div>
+                <div class="investment-item">
+                    <div class="value">15-20%</div>
+                    <div class="label">Equity</div>
+                </div>
+                <div class="investment-item">
+                    <div class="value">$2.5-3M</div>
+                    <div class="label">Pre-Money Valuation</div>
+                </div>
+            </div>
+
+            <div style="margin-top: var(--space-8, 4rem);">
+                <h3 style="font-size: var(--text-2xl, 1.5rem); margin-bottom: var(--space-5, 2rem); text-align: center;">Use of Funds</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">40%</div>
+                        <div class="metric-label">Product Development</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">35%</div>
+                        <div class="metric-label">Marketing & Growth</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">15%</div>
+                        <div class="metric-label">Operations</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">10%</div>
+                        <div class="metric-label">Reserve</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="cta-section">
+            <h2 style="font-size: clamp(2rem, 4vw, 3rem); margin-bottom: var(--space-4, 1.5rem);">Ready to Partner with Us?</h2>
+            <p style="font-size: var(--text-xl, 1.25rem); opacity: 0.95; max-width: 700px; margin: 0 auto;">
+                Join us in transforming the culinary industry. Let's discuss how we can work together to build the future of professional culinary technology.
+            </p>
+            <div class="cta-buttons">
+                <a href="mailto:hello@iterumfoods.xyz?subject=Investment Inquiry" class="btn btn-primary">
+                    <i class="fas fa-envelope"></i> Contact Us
+                </a>
+                <a href="mailto:hello@iterumfoods.xyz?subject=Schedule Investor Call" class="btn btn-outline">
+                    <i class="fas fa-calendar"></i> Schedule a Call
+                </a>
+                <a href="https://iterum-culinary-app.web.app" class="btn btn-outline">
+                    <i class="fas fa-rocket"></i> View Platform
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Track page view
+        window.addEventListener('load', function() {
+            gtag('event', 'page_view', {
+                page_title: 'Iterum Foods - Investment Pitch',
+                page_location: window.location.href
+            });
+        });
+
+        // Track CTA clicks
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const label = this.textContent.trim();
+                gtag('event', 'click', {
+                    event_category: 'Pitch CTA',
+                    event_label: label
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

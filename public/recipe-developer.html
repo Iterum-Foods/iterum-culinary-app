@@ -15,6 +15,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Shadows+Into+Light:wght@400&family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- UNIFIED COLOR SYSTEM - MUST LOAD FIRST -->
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
     <link rel="stylesheet" href="assets/css/tailwind-output.css">
     <link rel="stylesheet" href="assets/css/iterum-design-system.css">
     <link rel="stylesheet" href="assets/css/premium-ui-system.css">
@@ -26,7 +29,6 @@
     <link rel="stylesheet" href="assets/css/dark-mode-enhancements.css">
     <link rel="stylesheet" href="assets/css/page-ui-improvements.css">
     <link rel="stylesheet" href="assets/css/recipe-developer-enhanced.css">
-    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
     <link rel="stylesheet" href="assets/css/header-universal.css">
     <link rel="stylesheet" href="assets/css/recipe-developer-contrast-fix.css">
     <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
@@ -779,23 +781,10 @@
                         Ingredients
                     </div>
                     <div id="ingredients-container">
-                        <div class="ingredient-row">
-                            <select class="form-select ingredient-select" onchange="handleIngredientSelect(this)">
-                                <option value="">Select ingredient...</option>
-                                <option value="__CREATE_NEW__" style="color: #10b981; font-weight: 700;">➕ Create New Ingredient...</option>
-                            </select>
-                            <input type="text" class="form-input" placeholder="Amount">
-                            <select class="form-select">
-                                <option value="g">grams</option>
-                                <option value="kg">kilograms</option>
-                                <option value="ml">milliliters</option>
-                                <option value="l">liters</option>
-                                <option value="tsp">teaspoon</option>
-                                <option value="tbsp">tablespoon</option>
-                                <option value="cup">cup</option>
-                                <option value="piece">piece</option>
-                            </select>
-                            <input type="text" class="form-input" placeholder="Notes">
+                        <div class="ingredient-row" data-ingredient-index="0">
+                            <div id="ingredient-select-0" class="ingredient-select-container"></div>
+                            <div id="ingredient-qty-unit-0" class="quantity-unit-container"></div>
+                            <input type="text" class="form-input ingredient-notes" placeholder="Notes">
                             <button class="btn btn-secondary" onclick="removeIngredient(this)">🗑️</button>
                         </div>
                     </div>
@@ -1214,6 +1203,18 @@
             
             // Auto-import base ingredients if none exist
             checkAndAutoLoadIngredients();
+            
+            // Initialize enhanced ingredients system
+            if (window.ingredientsManager) {
+                window.ingredientsManager.init();
+            }
+            
+            // Initialize ingredient selector
+            if (window.ingredientSelector) {
+                window.ingredientSelector.init().then(() => {
+                    initializeIngredientSelectors();
+                });
+            }
             
             // Load ingredients database
             loadIngredientsDatabase();
@@ -2591,7 +2592,7 @@
         }
 
         // Recipe Form Functions
-        function addIngredient(name = '', amount = '', unit = 'g', notes = '') {
+        function addIngredient(name = '', amount = '', unit = 'g', notes = '', wastePercentage = 0) {
             const container = document.getElementById('ingredients-container');
             if (!container) return;
             
@@ -2610,6 +2611,7 @@
                     <option value="cup" ${unit === 'cup' ? 'selected' : ''}>cup</option>
                     <option value="piece" ${unit === 'piece' ? 'selected' : ''}>piece</option>
                 </select>
+                <input type="number" class="form-input" placeholder="Waste %" min="0" max="100" step="0.1" value="${wastePercentage}" style="width: 90px;" title="Phase 2: Trim/Waste percentage (e.g., 10 for 10% waste)">
                 <input type="text" class="form-input" placeholder="Notes" value="${notes}">
                 <button class="btn btn-secondary" onclick="removeIngredient(this)">🗑️</button>
             `;
@@ -2668,6 +2670,8 @@
                 category: document.getElementById('recipe-category').value,
                 cuisine: document.getElementById('recipe-cuisine').value,
                 servings: parseInt(document.getElementById('recipe-servings').value) || 4,
+                yieldQuantity: parseInt(document.getElementById('recipe-servings').value) || 4, // Phase 2: Yield quantity
+                yield: parseInt(document.getElementById('recipe-servings').value) || 4, // Legacy support
                 ingredients: collectIngredients(),
                 instructions: collectInstructions(),
                 equipmentNeeded: equipmentData.ids,
@@ -2864,20 +2868,29 @@
             rows.forEach(row => {
                 // Get the ingredient select dropdown (first element)
                 const ingredientSelect = row.querySelector('.ingredient-select');
-                const amountInput = row.querySelectorAll('input')[0];
+                const inputs = row.querySelectorAll('input');
+                const amountInput = inputs[0];
+                const wasteInput = inputs[1] && inputs[1].type === 'number' && inputs[1].placeholder.includes('Waste') ? inputs[1] : null;
+                const notesInput = inputs.find(inp => inp.type === 'text' && inp.placeholder && inp.placeholder.toLowerCase().includes('note'));
                 const unitSelect = row.querySelectorAll('select')[1];
-                const notesInput = row.querySelectorAll('input')[1];
                 
                 if (ingredientSelect && ingredientSelect.value) {
                     // Get ingredient name from dropdown
                     const ingredientId = ingredientSelect.value;
                     const ingredientName = ingredientSelect.options[ingredientSelect.selectedIndex].text;
                     
+                    // Phase 2: Get waste/trim percentage
+                    const wastePercentage = wasteInput ? parseFloat(wasteInput.value) || 0 : 0;
+                    
                     ingredients.push({
                         id: ingredientId,
                         name: ingredientName,
-                        amount: amountInput ? amountInput.value.trim() : '',
+                        quantity: amountInput ? amountInput.value.trim() : '',
+                        amount: amountInput ? amountInput.value.trim() : '', // Legacy support
                         unit: unitSelect ? unitSelect.value : '',
+                        wastePercentage: wastePercentage, // Phase 2: Trim/Waste %
+                        trimPercentage: wastePercentage, // Alias for compatibility
+                        waste: wastePercentage, // Legacy support
                         notes: notesInput ? notesInput.value.trim() : ''
                     });
                 }
@@ -3378,28 +3391,47 @@
         
         function addIngredient() {
             const container = document.getElementById('ingredients-container');
+            const index = container.querySelectorAll('.ingredient-row').length;
+            
             const newRow = document.createElement('div');
             newRow.className = 'ingredient-row';
+            newRow.setAttribute('data-ingredient-index', index);
+            
             newRow.innerHTML = `
-                <select class="form-select ingredient-select" onchange="handleIngredientSelect(this)">
-                    <option value="">Select ingredient...</option>
-                    ${getIngredientOptions()}
-                </select>
-                <input type="text" class="form-input" placeholder="Amount">
-                <select class="form-select">
-                    <option value="g">grams</option>
-                    <option value="kg">kilograms</option>
-                    <option value="ml">milliliters</option>
-                    <option value="l">liters</option>
-                    <option value="tsp">teaspoon</option>
-                    <option value="tbsp">tablespoon</option>
-                    <option value="cup">cup</option>
-                    <option value="piece">piece</option>
-                </select>
-                <input type="text" class="form-input" placeholder="Notes">
+                <div id="ingredient-select-${index}" class="ingredient-select-container" style="flex: 2;"></div>
+                <div id="ingredient-qty-unit-${index}" class="quantity-unit-container" style="display: flex; gap: 8px; flex: 1.5;"></div>
+                <input type="number" class="form-input ingredient-waste" placeholder="Waste %" min="0" max="100" step="0.1" style="width: 90px;" title="Trim/Waste percentage">
+                <input type="text" class="form-input ingredient-notes" placeholder="Notes" style="flex: 1;">
                 <button class="btn btn-secondary" onclick="removeIngredient(this)">🗑️</button>
             `;
+            
             container.appendChild(newRow);
+            
+            // Initialize selector for new row
+            if (window.ingredientSelector && window.ingredientSelector.initialized) {
+                const selectContainer = newRow.querySelector('.ingredient-select-container');
+                const qtyContainer = newRow.querySelector('.quantity-unit-container');
+                
+                // Create ingredient selector
+                const selector = window.ingredientSelector.createSelector({
+                    id: `ingredient-select-${index}`,
+                    name: `ingredient_${index}`,
+                    onSelect: (ingredient) => {
+                        updateQuantityUnitSelector(index, ingredient);
+                    }
+                });
+                selectContainer.appendChild(selector);
+            } else {
+                console.warn('⚠️ Ingredient selector not ready, using fallback');
+                // Fallback to old dropdown
+                const selectContainer = newRow.querySelector('.ingredient-select-container');
+                selectContainer.innerHTML = `
+                    <select class="form-select ingredient-select" onchange="handleIngredientSelect(this)">
+                        <option value="">Select ingredient...</option>
+                        ${getIngredientOptions()}
+                    </select>
+                `;
+            }
         }
         
         // Component Recipes Management
@@ -4068,6 +4100,21 @@
     
     <!-- Base Ingredients Loader - Auto-imports ingredients -->
     <script src="assets/js/base-ingredients-loader.js"></script>
+    
+    <!-- Enhanced Ingredients Manager -->
+    <script src="assets/js/ingredients-manager-enhanced.js"></script>
+    
+    <!-- Unit Converter -->
+    <script src="assets/js/unit-converter.js"></script>
+    
+    <!-- Vendor Price Comparator -->
+    <script src="assets/js/vendor-price-comparator.js"></script>
+    
+    <!-- Integrated Ingredient Selector -->
+    <script src="assets/js/ingredient-selector-integrated.js"></script>
+    
+    <!-- Enhanced Recipe Cost Integration -->
+    <script src="assets/js/recipe-cost-integration-enhanced.js"></script>
     
     <!-- Universal Recipe Manager - Ensures all recipes go to library -->
     <script src="assets/js/universal-recipe-manager.js"></script>

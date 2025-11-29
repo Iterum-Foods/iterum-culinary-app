@@ -13,7 +13,7 @@ Thank you for your interest in contributing to Iterum Culinary App! This documen
 
 1. **Fork and Clone**
    ```bash
-   git clone https://github.com/Iterum-Foods/iterum-chef-notebook.git
+   git clone https://github.com/Iterum-Foods/iterum-culinary-app.git
    cd iterum-culinary-app
    ```
 

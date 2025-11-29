@@ -17,6 +17,43 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Verify public directory exists
+        run: |
+          if [ ! -d "public" ]; then
+            echo "Error: public directory not found"
+            exit 1
+          fi
+          if [ ! -f "public/index.html" ]; then
+            echo "Warning: public/index.html not found"
+          fi
+          echo "✓ Public directory structure verified"
+      
+      - name: Create .nojekyll file
+        run: |
+          touch public/.nojekyll
+          echo "✓ Created .nojekyll file to prevent Jekyll processing"
+
+      - name: Verify Firebase configuration
+        run: |
+          if [ ! -f "firebase.json" ]; then
+            echo "Error: firebase.json not found"
+            exit 1
+          fi
+          if [ ! -f ".firebaserc" ]; then
+            echo "Error: .firebaserc not found"
+            exit 1
+          fi
+          echo "✓ Firebase configuration files verified"
+
+      - name: Check Firebase token
+        run: |
+          if [ -z "${{ secrets.FIREBASE_TOKEN }}" ]; then
+            echo "Error: FIREBASE_TOKEN secret is not set in GitHub repository settings"
+            echo "Please set it at: Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+          echo "✓ Firebase token is configured"
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -24,17 +61,35 @@ jobs:
           cache: 'npm'
 
       - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+        run: npm install -g firebase-tools@latest
+
+      - name: Verify Firebase CLI
+        run: firebase --version
 
       - name: Deploy to Firebase
-        run: firebase deploy --only hosting --non-interactive
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          firebase deploy --only hosting --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}"
+        continue-on-error: false
 
       - name: Deployment Summary
+        if: success()
         run: |
           echo "## 🚀 Deployment Complete" >> $GITHUB_STEP_SUMMARY
           echo "- **Site**: https://iterum-culinary-app.web.app" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deployed at**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+
+      - name: Deployment Error Summary
+        if: failure()
+        run: |
+          echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Common Issues:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Check if FIREBASE_TOKEN secret is set correctly" >> $GITHUB_STEP_SUMMARY
+          echo "2. Verify Firebase project ID matches .firebaserc" >> $GITHUB_STEP_SUMMARY
+          echo "3. Ensure public directory contains index.html" >> $GITHUB_STEP_SUMMARY
+          echo "4. Check Firebase project permissions" >> $GITHUB_STEP_SUMMARY
 

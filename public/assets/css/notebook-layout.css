@@ -1,0 +1,258 @@
+/**
+ * ITERUM NOTEBOOK LAYOUT
+ * Reusable notebook-style layout with Heritage Warmth theme
+ * Applied to all main application pages
+ */
+
+:root {
+  /* Background Layers */
+  --brand-bg-primary: #fffbeb; /* Creamy Beige */
+  --brand-bg-secondary: #fef3c7; /* Light Yellow/Butter */
+  --brand-bg-tertiary: #fde68a; /* Warm Yellow */
+
+  /* Text Colors */
+  --brand-text-primary: #78350f; /* Dark Brown */
+  --brand-text-secondary: #92400e; /* Medium Brown */
+  --brand-text-muted: #b45309; /* Rust/Muted */
+
+  /* Accent Colors */
+  --brand-primary-accent: #d97706; /* Terracotta/Rust Orange */
+  --brand-secondary-accent: #4d7c0f; /* Olive Green */
+
+  /* UI Elements */
+  --brand-card-bg: #ffffff;
+  --brand-border-light: #fcd34d; /* Yellow/Gold border */
+
+  /* Spacing & Radius */
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+
+  /* Custom Notebook Styling */
+  --notebook-line-color: rgba(217, 119, 6, 0.15); /* Faint Rust line */
+}
+
+/* Base Layout */
+body.notebook-layout {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--brand-bg-secondary);
+  color: var(--brand-text-primary);
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  height: 100vh;
+}
+
+/* Sidebar Styles */
+.notebook-sidebar {
+  width: 14rem; /* w-56 */
+  flex-shrink: 0;
+  border-right: 1px solid var(--brand-border-light);
+  padding: 1rem;
+  background-color: var(--brand-bg-primary);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.notebook-sidebar .logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--brand-primary-accent);
+  margin-bottom: 2rem;
+}
+
+.notebook-sidebar nav {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.notebook-sidebar .nav-section-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  padding: 0 0.5rem;
+  color: var(--brand-text-muted);
+}
+
+.notebook-sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--brand-text-primary);
+  text-decoration: none;
+  transition: background-color 0.2s;
+  gap: 0.625rem;
+}
+
+.notebook-sidebar .nav-link:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.notebook-sidebar .nav-link.active {
+  background-color: var(--brand-primary-accent);
+  color: white;
+  font-weight: 600;
+}
+
+.notebook-sidebar .nav-link i {
+  width: 18px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.notebook-sidebar .divider {
+  border-top: 1px solid var(--brand-border-light);
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  padding-top: 1rem;
+}
+
+/* Main Content Area */
+.notebook-main-content {
+  flex-grow: 1;
+  background-color: var(--brand-bg-secondary);
+  background-image: linear-gradient(to bottom, var(--notebook-line-color) 1px, transparent 1px);
+  background-size: 100% 28px;
+  padding-top: 28px;
+  padding-right: 1.5rem;
+  padding-bottom: 3rem;
+  padding-left: 1.5rem;
+  overflow-y: auto;
+  height: 100vh;
+  position: relative;
+}
+
+/* Page Header */
+.notebook-page-header {
+  padding: 1.5rem 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--brand-border-light);
+  position: sticky;
+  top: 0;
+  background-color: var(--brand-bg-secondary);
+  z-index: 10;
+}
+
+.notebook-page-header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--brand-text-primary);
+  margin: 0;
+}
+
+.notebook-page-header .page-description {
+  font-size: 0.875rem;
+  color: var(--brand-text-muted);
+  margin-top: 0.5rem;
+}
+
+/* Card Styles */
+.notebook-card {
+  background-color: var(--brand-card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--brand-border-light);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.notebook-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--brand-border-light);
+}
+
+.notebook-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--brand-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.notebook-card-title i {
+  color: var(--brand-primary-accent);
+}
+
+/* Buttons */
+.notebook-btn {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  border: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.notebook-btn-primary {
+  background-color: var(--brand-primary-accent);
+  color: white;
+}
+
+.notebook-btn-primary:hover {
+  background-color: #b45309;
+}
+
+.notebook-btn-secondary {
+  background-color: var(--brand-secondary-accent);
+  color: white;
+}
+
+.notebook-btn-secondary:hover {
+  background-color: #365314;
+}
+
+/* Form Elements */
+.notebook-input,
+.notebook-textarea,
+.notebook-select {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--brand-border-light);
+  background: var(--brand-card-bg);
+  color: var(--brand-text-primary);
+  padding: 0.625rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+}
+
+.notebook-input:focus,
+.notebook-textarea:focus,
+.notebook-select:focus {
+  outline: none;
+  border-color: var(--brand-primary-accent);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .notebook-sidebar {
+    display: none;
+  }
+  
+  .notebook-main-content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Hide default header if notebook layout is used */
+.notebook-layout .unified-nav-header,
+.notebook-layout .unified-nav-sidebar {
+  display: none;
+}
+

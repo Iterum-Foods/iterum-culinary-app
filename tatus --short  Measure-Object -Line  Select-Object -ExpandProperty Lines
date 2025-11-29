@@ -1,0 +1,5 @@
+[33m5ebc94f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Unlink from old Firebase site - update to iterum-culinary-app
+[33ma873eee[m Add .nojekyll file and urgent instructions to disable GitHub Pages in settings
+[33mf151d90[m Add GitHub improvements: PR template, CONTRIBUTING, LICENSE, Firebase deploy workflow, lint workflow, CHANGELOG, and updated README
+[33m72dc0dd[m Add guide to disable GitHub Pages
+[33mf9c4140[m Disable GitHub Pages deployment - using Firebase Hosting instead
