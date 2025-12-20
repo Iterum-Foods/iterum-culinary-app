@@ -72,10 +72,27 @@ jobs:
           node --version
           echo "✓ Versions verified"
 
+      - name: Set Firebase Project
+        run: |
+          echo "Setting Firebase project to iterum-culinary-app2..."
+          firebase use iterum-culinary-app2 --token "${{ secrets.FIREBASE_TOKEN }}" || {
+            echo "❌ Failed to set Firebase project"
+            exit 1
+          }
+          echo "✅ Project set to iterum-culinary-app2"
+
+      - name: Verify Firebase Configuration
+        run: |
+          echo "Verifying Firebase configuration..."
+          firebase use --token "${{ secrets.FIREBASE_TOKEN }}"
+          echo "✅ Configuration verified"
+
       - name: Deploy to Firebase Landing Site
         run: |
           echo "🚀 Deploying to iterum-culinary-landing..."
-          firebase deploy --only hosting:iterum-culinary-landing --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" || {
+          echo "Project: iterum-culinary-app2"
+          echo "Site: iterum-culinary-landing"
+          firebase deploy --only hosting:iterum-culinary-landing --project iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" || {
             echo "❌ Deployment to landing site failed"
             echo "Checking Firebase project..."
             firebase projects:list --token "${{ secrets.FIREBASE_TOKEN }}" || echo "Cannot list projects - token may be invalid"
@@ -86,7 +103,9 @@ jobs:
       - name: Deploy to Firebase App Site
         run: |
           echo "🚀 Deploying to iterum-culinary-app2..."
-          firebase deploy --only hosting:iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" || {
+          echo "Project: iterum-culinary-app2"
+          echo "Site: iterum-culinary-app2"
+          firebase deploy --only hosting:iterum-culinary-app2 --project iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" || {
             echo "❌ Deployment to app site failed"
             echo "Checking Firebase project..."
             firebase projects:list --token "${{ secrets.FIREBASE_TOKEN }}" || echo "Cannot list projects - token may be invalid"
