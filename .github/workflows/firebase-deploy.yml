@@ -66,16 +66,22 @@ jobs:
       - name: Verify Firebase CLI
         run: firebase --version
 
-      - name: Deploy to Firebase
+      - name: Deploy to Firebase Landing Site
         run: |
-          firebase deploy --only hosting --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}"
+          firebase deploy --only hosting:iterum-culinary-landing --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}"
+        continue-on-error: false
+
+      - name: Deploy to Firebase App Site
+        run: |
+          firebase deploy --only hosting:iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}"
         continue-on-error: false
 
       - name: Deployment Summary
         if: success()
         run: |
           echo "## 🚀 Deployment Complete" >> $GITHUB_STEP_SUMMARY
-          echo "- **Site**: https://iterum-culinary-app.web.app" >> $GITHUB_STEP_SUMMARY
+          echo "- **Landing Site**: https://iterum-culinary-landing.web.app" >> $GITHUB_STEP_SUMMARY
+          echo "- **App Site**: https://iterum-culinary-app2.web.app" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Deployed at**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY

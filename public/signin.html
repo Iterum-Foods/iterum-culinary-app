@@ -356,6 +356,8 @@
     
     <!-- Firebase Config & Auth -->
     <script src="assets/js/firebase-config.js"></script>
+    <!-- Firebase Auth (ES Module) - Must load before auth-manager -->
+    <script type="module" src="assets/js/firebase-auth.js"></script>
     <script src="assets/js/auth-manager.js"></script>
     <script src="assets/js/auth-ui.js"></script>
     
@@ -376,8 +378,16 @@
         }
         
         // Sign In Handler (using auth-ui.js)
+        // Note: auth-ui.js will handle the form submission automatically
+        // This is a fallback handler in case auth-ui.js hasn't loaded yet
         async function handleSignIn(event) {
             event.preventDefault();
+            
+            // Check if auth-ui.js has already set up handlers
+            if (window.authUIInitialized) {
+                console.log('ℹ️ Auth UI already handling sign-in');
+                return;
+            }
             
             const email = document.getElementById('signin-email').value;
             const password = document.getElementById('signin-password').value;
@@ -398,7 +408,7 @@
             document.querySelectorAll('.form-input').forEach(el => el.classList.remove('error'));
             
             try {
-                // Wait for AuthManager
+                // Wait for AuthManager and Firebase Auth
                 if (!window.authManager) {
                     await new Promise(resolve => {
                         const check = setInterval(() => {
@@ -407,8 +417,12 @@
                                 resolve();
                             }
                         }, 100);
-                        setTimeout(() => clearInterval(check), 5000);
+                        setTimeout(() => clearInterval(check), 10000); // Increased timeout
                     });
+                }
+                
+                if (!window.authManager) {
+                    throw new Error('Authentication system not available. Please refresh the page.');
                 }
                 
                 // Sign in
@@ -418,19 +432,23 @@
                 
                 // Redirect to dashboard after successful sign-in
                 setTimeout(() => {
-                    window.location.href = '/dashboard.html';
+                    window.location.href = 'dashboard.html';
                 }, 500);
                 
             } catch (error) {
                 console.error('❌ Sign-in error:', error);
                 
                 let errorMessage = 'Sign in failed. Please try again.';
-                if (error.message.includes('wrong-password')) {
-                    errorMessage = 'Incorrect password. Please try again.';
+                if (error.message.includes('wrong-password') || error.message.includes('invalid-credential')) {
+                    errorMessage = 'Incorrect email or password. Please try again.';
                 } else if (error.message.includes('user-not-found')) {
                     errorMessage = 'No account found with this email.';
                 } else if (error.message.includes('invalid-email')) {
                     errorMessage = 'Invalid email address.';
+                } else if (error.message.includes('Firebase Auth not available')) {
+                    errorMessage = 'Authentication system is loading. Please wait a moment and try again.';
+                } else if (error.message) {
+                    errorMessage = error.message;
                 }
                 
                 document.getElementById('signin-password-error').textContent = errorMessage;

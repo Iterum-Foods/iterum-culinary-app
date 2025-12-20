@@ -7,31 +7,7 @@
   },
   "hosting": [
     {
-      "site": "iterum-culinary-app",
-      "public": "public",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "!**/.nojekyll",
-        "**/node_modules/**"
-      ],
-      "rewrites": [
-        {
-          "source": "/",
-          "destination": "/index.html"
-        },
-        {
-          "source": "/app/**",
-          "destination": "/index.html"
-        },
-        {
-          "source": "**",
-          "destination": "/index.html"
-        }
-      ]
-    },
-    {
-      "site": "iterum-culinary-app2",
+      "site": "iterum-culinary-landing",
       "public": "public",
       "ignore": [
         "firebase.json",
@@ -57,8 +33,48 @@
           "destination": "/landing.html"
         },
         {
+          "source": "/pitch",
+          "destination": "/pitch.html"
+        },
+        {
+          "source": "/pitch.html",
+          "destination": "/pitch.html"
+        },
+        {
           "source": "**",
           "destination": "/landing.html"
+        }
+      ]
+    },
+    {
+      "site": "iterum-culinary-app2",
+      "public": "public",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "!**/.nojekyll",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "/",
+          "destination": "/index.html"
+        },
+        {
+          "source": "/dashboard.html",
+          "destination": "/dashboard.html"
+        },
+        {
+          "source": "/signin.html",
+          "destination": "/signin.html"
+        },
+        {
+          "source": "/app/**",
+          "destination": "/index.html"
+        },
+        {
+          "source": "**",
+          "destination": "/index.html"
         }
       ]
     }

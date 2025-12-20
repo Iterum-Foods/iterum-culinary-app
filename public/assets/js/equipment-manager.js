@@ -321,6 +321,7 @@ class EquipmentManager {
             serialNumber: equipmentData.serialNumber || '',
             purchaseDate: equipmentData.purchaseDate || '',
             purchasePrice: parseFloat(equipmentData.purchasePrice) || 0,
+            purchaseUrl: equipmentData.purchaseUrl || '',
             currentValue: parseFloat(equipmentData.currentValue) || parseFloat(equipmentData.purchasePrice) || 0,
             warranty: equipmentData.warranty || '',
             warrantyExpiry: equipmentData.warrantyExpiry || '',

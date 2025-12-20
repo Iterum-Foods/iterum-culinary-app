@@ -1,19 +1,14 @@
 {
   "projects": {
     "default": "iterum-culinary-app2",
-    "app": "iterum-culinary-app",
     "app2": "iterum-culinary-app2"
   },
   "targets": {
-    "iterum-culinary-app": {
-      "hosting": {
-        "iterum-culinary-app": [
-          "iterum-culinary-app"
-        ]
-      }
-    },
     "iterum-culinary-app2": {
       "hosting": {
+        "iterum-culinary-landing": [
+          "iterum-culinary-landing"
+        ],
         "iterum-culinary-app2": [
           "iterum-culinary-app2"
         ]

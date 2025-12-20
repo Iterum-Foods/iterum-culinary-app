@@ -102,22 +102,35 @@ class RecipePhotoManager {
     }
     
     /**
-     * Upload to Firebase Storage
+     * Upload to Firebase Storage (using new modular SDK)
      */
     async uploadToFirebase(photo, file) {
-        if (!window.firebase || !window.firebase.storage) {
-            throw new Error('Firebase not available');
+        // Wait for Firebase Storage to be initialized
+        if (!window.firebaseStorage || !window.firebaseStorage.isInitialized) {
+            // Wait up to 5 seconds for Storage to initialize
+            let attempts = 0;
+            while (attempts < 50 && (!window.firebaseStorage || !window.firebaseStorage.isInitialized)) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (!window.firebaseStorage || !window.firebaseStorage.isInitialized) {
+                throw new Error('Firebase Storage not available');
+            }
         }
         
-        const storage = window.firebase.storage();
-        const storageRef = storage.ref();
-        const photoRef = storageRef.child(`recipe-photos/${photo.recipeId}/${photo.id}`);
+        // Use new Storage SDK
+        const storagePath = `recipes/${photo.recipeId}/${photo.id}`;
+        const result = await window.firebaseStorage.uploadFile(file, storagePath, {
+            contentType: file.type || 'image/jpeg',
+            customMetadata: {
+                recipeId: photo.recipeId,
+                photoId: photo.id
+            }
+        });
         
-        await photoRef.put(file);
-        const downloadURL = await photoRef.getDownloadURL();
-        
-        photo.firebaseUrl = downloadURL;
-        return downloadURL;
+        photo.firebaseUrl = result.url;
+        return result.url;
     }
     
     /**
@@ -171,14 +184,14 @@ class RecipePhotoManager {
         const photosKey = `recipe_photos_${recipeId}`;
         localStorage.setItem(photosKey, JSON.stringify(filtered));
         
-        // Delete from Firebase if it exists
-        if (window.firebase && window.firebase.storage) {
+        // Delete from Firebase Storage if it exists (using new SDK)
+        if (window.firebaseStorage && window.firebaseStorage.isInitialized) {
             try {
-                const storage = window.firebase.storage();
-                const photoRef = storage.ref().child(`recipe-photos/${recipeId}/${photoId}`);
-                await photoRef.delete();
+                const storagePath = `recipes/${recipeId}/${photoId}`;
+                await window.firebaseStorage.deleteFile(storagePath);
+                console.log(`✅ Photo deleted from Firebase Storage: ${storagePath}`);
             } catch (error) {
-                console.warn('Firebase delete failed:', error);
+                console.warn('Firebase Storage delete failed:', error);
             }
         }
         

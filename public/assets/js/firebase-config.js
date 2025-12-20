@@ -106,7 +106,7 @@ validateFirebaseConfig();
  * 1. CREATE FIREBASE PROJECT:
  *    - Go to https://console.firebase.google.com/
  *    - Click "Create a project" or "Add project"
- *    - Enter project name (e.g., "iterum-culinary-app")
+ *    - Enter project name (e.g., "iterum-culinary-app2")
  *    - Enable/disable Google Analytics as needed
  *    - Click "Create project"
  * 

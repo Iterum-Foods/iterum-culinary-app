@@ -353,10 +353,12 @@
             <div style="background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin-top: 20px;">
                 <h3 style="color: #1e40af; margin-bottom: 15px;">📋 Expected Format</h3>
                 <ul style="list-style: none; padding: 0;">
-                    <li style="padding: 8px 0; color: #1e40af;">✓ Columns: Name, Category, Unit, Cost (optional), Supplier (optional)</li>
-                    <li style="padding: 8px 0; color: #1e40af;">✓ Example: "Chicken Breast, Protein, lb, 12.99, ACME Foods"</li>
+                    <li style="padding: 8px 0; color: #1e40af;"><strong>Required:</strong> Ingredient Name, Category, Unit</li>
+                    <li style="padding: 8px 0; color: #1e40af;"><strong>Optional:</strong> Subcategory, Cost, Supplier, Storage Type, Shelf Life</li>
+                    <li style="padding: 8px 0; color: #1e40af;"><strong>Inventory:</strong> Initial Quantity, Location, Par Level, Reorder Point</li>
                     <li style="padding: 8px 0; color: #1e40af;">✓ Header row recommended</li>
-                    <li style="padding: 8px 0; color: #1e40af;">✓ Any order is fine - we'll detect columns</li>
+                    <li style="padding: 8px 0; color: #1e40af;">✓ Any order is fine - we'll detect columns automatically</li>
+                    <li style="padding: 8px 0; color: #1e40af;">✓ If Initial Quantity is provided, inventory will be created automatically</li>
                 </ul>
                 <button class="btn btn-secondary" onclick="downloadTemplate()" style="margin-top: 15px;">
                     <span>📥</span>
@@ -1146,15 +1148,15 @@
 
         // Download template
         function downloadTemplate() {
-            const template = `Ingredient Name,Category,Unit,Cost,Supplier
-Chicken Breast,Protein,lb,12.99,ACME Foods
-Olive Oil Extra Virgin,Oils,gal,24.50,Italian Imports
-Roma Tomatoes,Produce,lb,2.99,Local Farm
-All Purpose Flour,Dry Goods,lb,0.89,Grain Supply Co
-Sea Salt,Seasonings,lb,3.99,Specialty Foods
-Garlic Fresh,Produce,lb,4.50,Local Farm
-Butter Unsalted,Dairy,lb,5.99,Dairy Farm
-Heavy Cream,Dairy,qt,6.50,Dairy Farm
+            const template = `Ingredient Name,Category,Subcategory,Unit,Cost,Cost Per Unit,Supplier,Storage Type,Shelf Life (days),Initial Quantity,Location,Par Level,Reorder Point,Notes
+Chicken Breast,Proteins,Poultry,lb,12.99,lb,ACME Foods,Refrigerated,2,50,Main Kitchen,25,10,Organic free-range
+Olive Oil Extra Virgin,Oils & Fats,Olive Oil,gal,24.50,gal,Italian Imports,Dry,365,10,Pantry,5,2,Cold-pressed
+Roma Tomatoes,Produce,Tomatoes,lb,2.99,lb,Local Farm,Refrigerated,7,20,Walk-in Cooler,10,5,Heirloom variety
+All Purpose Flour,Dry Goods,Flour,lb,0.89,lb,Grain Supply Co,Dry,180,100,Pantry,50,25,Unbleached
+Sea Salt,Seasonings,Salt,lb,3.99,lb,Specialty Foods,Dry,999,15,Pantry,10,5,Coarse grain
+Garlic Fresh,Produce,Alliums,lb,4.50,lb,Local Farm,Dry,30,10,Pantry,5,2,California grown
+Butter Unsalted,Dairy,Butter,lb,5.99,lb,Dairy Farm,Refrigerated,14,25,Walk-in Cooler,15,8,European style
+Heavy Cream,Dairy,Cream,qt,6.50,qt,Dairy Farm,Refrigerated,7,12,Walk-in Cooler,6,3,40% butterfat
 `;
 
             const blob = new Blob([template], { type: 'text/csv' });

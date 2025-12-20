@@ -16,8 +16,8 @@ const firebaseConfig = window.firebaseConfig || {
     measurementId: "G-X9Y60QRWMT"
 };
 
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+import { getAnalytics } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js';
 import { 
     getAuth, 
     signInWithPopup, 
@@ -29,8 +29,22 @@ import {
     signOut,
     onAuthStateChanged,
     updateProfile
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import analyticsTracker from './analytics-tracker.js';
+} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+
+// Analytics tracker (optional - import with error handling)
+let analyticsTracker = null;
+try {
+    // Dynamic import to avoid breaking if file doesn't exist
+    import('./analytics-tracker.js').then(module => {
+        analyticsTracker = module.default || module;
+    }).catch(() => {
+        // Analytics tracker is optional
+        console.warn('⚠️ Analytics tracker not available (non-critical)');
+    });
+} catch (e) {
+    // Analytics tracker is optional - don't fail Firebase Auth if it's missing
+    console.warn('⚠️ Analytics tracker import failed (non-critical)');
+}
 
 class FirebaseAuthSystem {
     constructor() {
@@ -42,8 +56,11 @@ class FirebaseAuthSystem {
         this.unifiedAuthSystem = null;
         this.retryAttempted = false;
         
-        // Delay initialization to ensure config is loaded
-        setTimeout(() => this.init(), 500);
+        // Set window.firebaseAuth immediately for other scripts
+        window.firebaseAuth = this;
+        
+        // Initialize immediately - config is embedded in this file
+        this.init();
     }
 
     /**
@@ -66,13 +83,23 @@ class FirebaseAuthSystem {
             this.app = initializeApp(firebaseConfig);
             this.auth = getAuth(this.app);
             
-            // Initialize Analytics
+            // Initialize Analytics (optional - don't fail if it doesn't work)
             if (firebaseConfig.measurementId) {
-                this.analytics = getAnalytics(this.app);
-                console.log('📊 Firebase Analytics initialized');
-                
-                // Initialize Analytics Tracker
-                await analyticsTracker.init(this.app);
+                try {
+                    this.analytics = getAnalytics(this.app);
+                    console.log('📊 Firebase Analytics initialized');
+                    
+                    // Initialize Analytics Tracker (if available)
+                    if (analyticsTracker && typeof analyticsTracker.init === 'function') {
+                        try {
+                            await analyticsTracker.init(this.app);
+                        } catch (analyticsError) {
+                            console.warn('⚠️ Analytics tracker init failed (non-critical):', analyticsError);
+                        }
+                    }
+                } catch (analyticsError) {
+                    console.warn('⚠️ Firebase Analytics initialization failed (non-critical):', analyticsError);
+                }
             }
             
             // Setup providers
@@ -97,6 +124,13 @@ class FirebaseAuthSystem {
             
             // Add alias for backward compatibility
             this.createAccountWithEmail = this.createUserWithEmail;
+            
+            // Make sure window.firebaseAuth is set and mark as ready
+            window.firebaseAuth = this;
+            window.firebaseAuthReady = true;
+            
+            // Dispatch event for other scripts
+            window.dispatchEvent(new CustomEvent('firebaseAuthReady', { detail: this }));
             
             // Connect with unified auth system
             this.connectWithUnifiedAuth();
@@ -388,8 +422,30 @@ class FirebaseAuthSystem {
     }
 }
 
-// Initialize Firebase Auth System
-window.firebaseAuth = new FirebaseAuthSystem();
+// Initialize Firebase Auth System immediately
+let firebaseAuthInstance = null;
+
+// Initialize synchronously to set window.firebaseAuth immediately
+try {
+    firebaseAuthInstance = new FirebaseAuthSystem();
+    window.firebaseAuth = firebaseAuthInstance;
+    console.log('🔥 Firebase Auth System instance created');
+} catch (error) {
+    console.error('❌ Failed to create Firebase Auth System:', error);
+    // Create a placeholder object so waitForFirebaseAuth doesn't fail immediately
+    window.firebaseAuth = {
+        isInitialized: false,
+        init: async function() {
+            console.log('🔄 Retrying Firebase Auth initialization...');
+            try {
+                firebaseAuthInstance = new FirebaseAuthSystem();
+                window.firebaseAuth = firebaseAuthInstance;
+            } catch (e) {
+                console.error('❌ Retry failed:', e);
+            }
+        }
+    };
+}
 
 // Export for module usage
 export default FirebaseAuthSystem;

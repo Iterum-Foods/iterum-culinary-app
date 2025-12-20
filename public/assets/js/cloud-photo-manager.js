@@ -18,21 +18,21 @@ class CloudPhotoManager {
     try {
       console.log('☁️ Initializing Cloud Photo Manager...');
 
-      // Wait for Firebase to be ready AND initialized
-      if (!window.firebase || !window.firebase.storage || !window.firebase.apps || !window.firebase.apps.length) {
-        console.log('⏳ Waiting for Firebase to be fully initialized...');
-        await this.waitForFirebase();
+      // Wait for Firebase Storage to be ready (using new modular SDK)
+      if (!window.firebaseStorage || !window.firebaseStorage.isInitialized) {
+        console.log('⏳ Waiting for Firebase Storage to be initialized...');
+        await this.waitForFirebaseStorage();
       }
 
-      // Check if Firebase app is actually initialized
-      if (!window.firebase.apps || !window.firebase.apps.length) {
-        console.warn('⚠️ Firebase app not initialized, Cloud Photo Manager running in limited mode');
+      // Check if Firebase Storage is actually initialized
+      if (!window.firebaseStorage || !window.firebaseStorage.isInitialized) {
+        console.warn('⚠️ Firebase Storage not initialized, Cloud Photo Manager running in limited mode');
         this.isInitialized = false;
         return;
       }
 
-      // Initialize Firebase Storage
-      this.storage = window.firebase.storage();
+      // Use Firebase Storage System
+      this.storage = window.firebaseStorage;
       this.isInitialized = true;
 
       console.log('✅ Cloud Photo Manager initialized');
@@ -45,25 +45,25 @@ class CloudPhotoManager {
   }
 
   /**
-   * Wait for Firebase to load AND be initialized
+   * Wait for Firebase Storage to be initialized
    */
-  async waitForFirebase() {
+  async waitForFirebaseStorage() {
     return new Promise((resolve, reject) => {
       let attempts = 0;
       const maxAttempts = 100; // 10 seconds
 
-      const checkFirebase = setInterval(() => {
+      const checkStorage = setInterval(() => {
         attempts++;
         
-        // Check if Firebase is loaded AND has an initialized app
-        if (window.firebase && window.firebase.storage && window.firebase.apps && window.firebase.apps.length > 0) {
-          clearInterval(checkFirebase);
-          console.log('✅ Firebase ready with initialized app');
+        // Check if Firebase Storage is initialized
+        if (window.firebaseStorage && window.firebaseStorage.isInitialized === true) {
+          clearInterval(checkStorage);
+          console.log('✅ Firebase Storage ready');
           resolve();
         } else if (attempts >= maxAttempts) {
-          clearInterval(checkFirebase);
-          console.warn('⚠️ Firebase app not initialized within timeout');
-          reject(new Error('Firebase app not initialized'));
+          clearInterval(checkStorage);
+          console.warn('⚠️ Firebase Storage not initialized within timeout');
+          reject(new Error('Firebase Storage not initialized'));
         }
       }, 100);
     });
@@ -97,12 +97,18 @@ class CloudPhotoManager {
       const fileName = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
       const storagePath = `users/${userId}/${category}/${entityId}/${fileName}`;
 
-      // Upload to Firebase Storage
-      const storageRef = this.storage.ref(storagePath);
-      const uploadTask = await storageRef.put(compressedFile);
+      // Upload to Firebase Storage using new SDK
+      const uploadResult = await this.storage.uploadFile(compressedFile, storagePath, {
+        contentType: compressedFile.type || 'image/jpeg',
+        customMetadata: {
+          category: category,
+          entityId: entityId,
+          uploadedBy: userId
+        }
+      });
 
       // Get download URL
-      const downloadURL = await uploadTask.ref.getDownloadURL();
+      const downloadURL = uploadResult.url;
 
       // Create photo metadata
       const photoData = {
@@ -260,8 +266,7 @@ class CloudPhotoManager {
 
       // Delete from cloud if it's a cloud photo
       if (photo.storagePath !== 'localStorage' && this.isInitialized) {
-        const storageRef = this.storage.ref(photo.storagePath);
-        await storageRef.delete();
+        await this.storage.deleteFile(photo.storagePath);
         console.log(`✅ Photo deleted from cloud: ${photo.storagePath}`);
       }
 

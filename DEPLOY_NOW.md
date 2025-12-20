@@ -1,105 +1,110 @@
-# 🚀 Deploy Now - Step by Step
+# 🚀 Deploy to Firebase Now
 
-## ⚠️ **PowerShell Issue Detected**
+## Quick Deployment Steps
 
-Firebase CLI is being intercepted by PowerShell. Use one of these methods:
+### Option 1: Double-Click (Easiest)
+
+1. **Open Windows Explorer** and navigate to:
+   ```
+   C:\Users\chefm\Iterum Innovation\iterum-culinary-app
+   ```
+
+2. **Double-click** `deploy-node-direct.bat`
+
+3. The script will:
+   - Set Firebase project to `iterum-culinary-app2`
+   - Deploy Firestore rules
+   - Deploy Storage rules
+   - Deploy Landing site (`iterum-culinary-landing`)
+   - Deploy Main App site (`iterum-culinary-app2`)
 
 ---
 
-## ✅ **Method 1: Use Command Prompt (CMD)** ⭐ **RECOMMENDED**
+### Option 2: Command Prompt
 
-### **Step 1: Open Command Prompt**
-1. Press `Windows Key + R`
-2. Type: `cmd`
-3. Press Enter
+1. **Open Command Prompt (CMD)** - NOT PowerShell
+   - Press `Windows Key + R`
+   - Type: `cmd`
+   - Press Enter
 
-### **Step 2: Navigate to Project**
-```cmd
-cd "C:\Users\chefm\Iterum Innovation\iterum-culinary-app"
+2. **Navigate to project**:
+   ```cmd
+   cd "C:\Users\chefm\Iterum Innovation\iterum-culinary-app"
+   ```
+
+3. **Run deployment**:
+   ```cmd
+   deploy-node-direct.bat
+   ```
+
+---
+
+## What Will Deploy
+
+✅ **Firestore Rules** - Database security rules  
+✅ **Storage Rules** - File upload security rules  
+✅ **Landing Site** - `iterum-culinary-landing.web.app`  
+✅ **Main App Site** - `iterum-culinary-app2.web.app`
+
+---
+
+## If You Get Authentication Errors
+
+If the script says "Failed to set project" or asks for login:
+
+1. In Command Prompt, run:
+   ```cmd
+   C:\Users\chefm\AppData\Roaming\npm\firebase.cmd login --reauth
+   ```
+
+2. Follow the browser prompts to authenticate
+
+3. Then run `deploy-node-direct.bat` again
+
+**OR** use the login script:
+   ```cmd
+   firebase-login.bat
+   ```
+
+---
+
+## Expected Output
+
+You should see:
+```
+[1/5] Setting Firebase project...
+Now using project iterum-culinary-app2
+
+[2/5] Deploying Firestore rules...
+✔  Deployed Firestore rules successfully
+
+[3/5] Deploying Storage rules...
+✔  Deployed Storage rules successfully
+
+[4/5] Deploying Landing Site...
+✔  Deployed hosting site iterum-culinary-landing
+
+[5/5] Deploying Main App Site...
+✔  Deployed hosting site iterum-culinary-app2
 ```
 
-### **Step 3: Authenticate (if needed)**
-```cmd
-firebase login --reauth
-```
+---
 
-### **Step 4: Set Project**
-```cmd
-firebase use app2
-```
+## After Deployment
 
-### **Step 5: Deploy Everything**
-```cmd
-firebase deploy --only firestore:rules
-firebase deploy --only storage
-firebase deploy --only hosting:iterum-culinary-app2
-```
+Check your sites:
+- **Landing**: https://iterum-culinary-landing.web.app
+- **Main App**: https://iterum-culinary-app2.web.app
 
 ---
 
-## ✅ **Method 2: Use Firebase Console (Web Interface)**
+## Troubleshooting
 
-### **1. Deploy Firestore Rules:**
-1. Go to: https://console.firebase.google.com/project/iterum-culinary-app2/firestore/rules
-2. Open `firestore.rules` file in your editor
-3. Copy ALL content
-4. Paste into Firebase Console rules editor
-5. Click **"Publish"**
+**If you see PowerShell errors:**
+- Make sure you're using **Command Prompt (CMD)**, not PowerShell
+- Or double-click the `.bat` file in Windows Explorer
 
-### **2. Deploy Storage Rules:**
-1. Go to: https://console.firebase.google.com/project/iterum-culinary-app2/storage/rules
-2. Open `storage.rules` file in your editor
-3. Copy ALL content
-4. Paste into Firebase Console rules editor
-5. Click **"Publish"**
-
-### **3. Create Firestore Database:**
-1. Go to: https://console.firebase.google.com/project/iterum-culinary-app2/firestore
-2. Click **"Create database"**
-3. Choose **"Start in production mode"**
-4. Select **location** (recommend: `us-central`)
-5. Click **"Enable"**
-
-### **4. Initialize Storage:**
-1. Go to: https://console.firebase.google.com/project/iterum-culinary-app2/storage
-2. Click **"Get started"**
-3. Accept default rules (we'll update with custom rules)
-4. Click **"Done"**
-
-### **5. Deploy Hosting (via Console or wait for CLI fix):**
-- Option A: Use Firebase Console → Hosting → Deploy
-- Option B: Fix PowerShell and use CLI
-- Option C: Use GitHub Actions if configured
-
----
-
-## 📋 **Quick Checklist**
-
-- [ ] Open Command Prompt (not PowerShell)
-- [ ] Navigate to project folder
-- [ ] Run: `firebase login --reauth` (if needed)
-- [ ] Run: `firebase use app2`
-- [ ] Run: `firebase deploy --only firestore:rules`
-- [ ] Run: `firebase deploy --only storage`
-- [ ] Run: `firebase deploy --only hosting:iterum-culinary-app2`
-
-**OR**
-
-- [ ] Deploy Firestore rules via Console
-- [ ] Deploy Storage rules via Console
-- [ ] Create Firestore database via Console
-- [ ] Initialize Storage via Console
-- [ ] Deploy hosting (Console or wait for CLI)
-
----
-
-## 🎯 **Recommended: Use CMD**
-
-**Just switch to Command Prompt - it will work!**
-
-The PowerShell environment has something intercepting Firebase commands. CMD doesn't have this issue.
-
----
-
-**Status:** Ready to deploy - just need to use CMD instead of PowerShell
-
+**If deployment fails:**
+- Check that you're logged in: Run `firebase-login.bat`
+- Verify project: Already set in `deploy-node-direct.bat` to `iterum-culinary-app2`
+- Check Firebase Console for site status

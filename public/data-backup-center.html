@@ -12,6 +12,8 @@
     
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/auth-manager.js"></script>
+    <!-- Firebase Storage (new modular SDK) -->
+    <script type="module" src="assets/js/firebase-storage.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/tailwind-output.css">
@@ -223,6 +225,8 @@
     </div>
 
     <script src="assets/js/backup-manager.js"></script>
+    <!-- Firebase Storage (must load before cloud-photo-manager) -->
+    <script type="module" src="assets/js/firebase-storage.js"></script>
     <script src="assets/js/cloud-photo-manager.js"></script>
     <script>
         // Load stats on page load

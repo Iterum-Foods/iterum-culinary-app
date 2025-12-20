@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Recipe Builder - Iterum Culinary</title>
+    
+    <!-- Auth System -->
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    <script src="assets/js/auth-api-helper.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Brand Kit & Design System -->
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/iterum-design-system.css">
+    <link rel="stylesheet" href="assets/css/premium-ui-system.css">
+    <link rel="stylesheet" href="assets/css/unified-cards.css">
+    <link rel="stylesheet" href="assets/css/page-layouts.css">
+    <link rel="stylesheet" href="assets/css/modern-nordic-vintage.css">
+    <link rel="stylesheet" href="assets/css/nordic-design-system.css">
+    <link rel="stylesheet" href="assets/css/dark-mode-enhancements.css">
+    
+    <!-- Canvas Builder Styles -->
+    <link rel="stylesheet" href="assets/css/recipe-canvas-builder.css">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        .header-bar {
+            background: white;
+            border-bottom: 2px solid #e2e8f0;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .back-btn {
+            padding: 8px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .back-btn:hover {
+            border-color: #10b981;
+            color: #10b981;
+        }
+        
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header-bar">
+        <div class="header-left">
+            <a href="recipe-developer.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Recipe Developer
+            </a>
+            <div class="header-title">Canvas Recipe Builder</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="font-size: 14px; color: #64748b;">
+                <i class="fas fa-palette"></i> Visual Recipe Creation
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Canvas Container -->
+    <div class="recipe-canvas-container">
+        <!-- Left Sidebar - Ingredient Library -->
+        <div class="ingredient-library">
+            <div class="library-header">
+                <h3><i class="fas fa-box-open"></i> Ingredients</h3>
+            </div>
+            
+            <input type="text" 
+                   id="ingredient-search" 
+                   class="ingredient-search" 
+                   placeholder="🔍 Search ingredients...">
+            
+            <div class="ingredient-categories">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Main Canvas Area -->
+        <div class="recipe-canvas-main">
+            <div class="canvas-header">
+                <input type="text" 
+                       class="canvas-title-input" 
+                       placeholder="Enter recipe name..."
+                       id="recipe-title">
+            </div>
+
+            <div class="canvas-toolbar">
+                <button class="toolbar-btn active" data-view="canvas">
+                    <i class="fas fa-palette"></i> Canvas View
+                </button>
+                <button class="toolbar-btn" data-view="steps">
+                    <i class="fas fa-list-ol"></i> Steps
+                </button>
+                <button class="toolbar-btn" data-view="nutrition">
+                    <i class="fas fa-chart-pie"></i> Nutrition
+                </button>
+            </div>
+
+            <!-- Dish Canvas -->
+            <div class="dish-canvas empty">
+                <div style="text-align: center; color: #94a3b8; padding: 40px;">
+                    <i class="fas fa-utensils" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                    <div style="font-size: 16px; font-weight: 500;">
+                        Drag ingredients from the left sidebar to start building your dish
+                    </div>
+                </div>
+            </div>
+
+            <!-- Steps Timeline -->
+            <div class="steps-timeline">
+                <div class="timeline-header">
+                    <div class="timeline-title">
+                        <i class="fas fa-list-ol"></i> Cooking Steps
+                    </div>
+                    <button class="add-step-btn">
+                        <i class="fas fa-plus"></i> Add Step
+                    </button>
+                </div>
+                <div class="timeline-steps">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar - Properties -->
+        <div class="recipe-properties">
+            <div class="properties-section">
+                <div class="properties-title">
+                    <i class="fas fa-info-circle"></i> Recipe Info
+                </div>
+                
+                <div class="property-group">
+                    <label class="property-label">Servings</label>
+                    <input type="number" 
+                           class="property-input" 
+                           id="recipe-servings" 
+                           value="4" 
+                           min="1">
+                </div>
+                
+                <div class="property-group">
+                    <label class="property-label">Prep Time (minutes)</label>
+                    <input type="number" 
+                           class="property-input" 
+                           id="recipe-prep-time" 
+                           value="0" 
+                           min="0">
+                </div>
+                
+                <div class="property-group">
+                    <label class="property-label">Cook Time (minutes)</label>
+                    <input type="number" 
+                           class="property-input" 
+                           id="recipe-cook-time" 
+                           value="0" 
+                           min="0">
+                </div>
+                
+                <div class="property-group">
+                    <label class="property-label">Difficulty</label>
+                    <select class="property-input" id="recipe-difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                
+                <div class="property-group">
+                    <label class="property-label">Cuisine</label>
+                    <input type="text" 
+                           class="property-input" 
+                           id="recipe-cuisine" 
+                           placeholder="e.g., Italian, Asian">
+                </div>
+            </div>
+
+            <div class="properties-section">
+                <div class="properties-title">
+                    <i class="fas fa-chart-pie"></i> Nutrition
+                </div>
+                <div class="nutrition-grid">
+                    <div class="nutrition-card">
+                        <div class="nutrition-value" id="nutrition-calories">0</div>
+                        <div class="nutrition-label">Calories</div>
+                    </div>
+                    <div class="nutrition-card">
+                        <div class="nutrition-value" id="nutrition-protein">0g</div>
+                        <div class="nutrition-label">Protein</div>
+                    </div>
+                    <div class="nutrition-card">
+                        <div class="nutrition-value" id="nutrition-carbs">0g</div>
+                        <div class="nutrition-label">Carbs</div>
+                    </div>
+                    <div class="nutrition-card">
+                        <div class="nutrition-value" id="nutrition-fat">0g</div>
+                        <div class="nutrition-label">Fat</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="properties-section">
+                <div class="properties-title">
+                    <i class="fas fa-tags"></i> Tags
+                </div>
+                <div class="property-group">
+                    <input type="text" 
+                           class="property-input" 
+                           id="recipe-tags" 
+                           placeholder="e.g., vegetarian, quick, healthy">
+                    <div style="font-size: 12px; color: #94a3b8; margin-top: 8px;">
+                        Separate tags with commas
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Button -->
+    <button class="canvas-save-btn">
+        <i class="fas fa-save"></i> Save Recipe
+    </button>
+
+    <!-- Scripts -->
+    <script src="assets/js/universal-recipe-manager.js"></script>
+    <script src="assets/js/recipe-canvas-builder.js"></script>
+    <script src="assets/js/auth_guard.js"></script>
+    
+    <script>
+        // Update recipe data when properties change
+        document.addEventListener('DOMContentLoaded', () => {
+            const servings = document.getElementById('recipe-servings');
+            const prepTime = document.getElementById('recipe-prep-time');
+            const cookTime = document.getElementById('recipe-cook-time');
+            const difficulty = document.getElementById('recipe-difficulty');
+            const cuisine = document.getElementById('recipe-cuisine');
+            const tags = document.getElementById('recipe-tags');
+
+            [servings, prepTime, cookTime, difficulty, cuisine, tags].forEach(input => {
+                if (input) {
+                    input.addEventListener('change', () => {
+                        if (window.recipeCanvas) {
+                            window.recipeCanvas.recipeData.servings = parseInt(servings.value) || 4;
+                            window.recipeCanvas.recipeData.prepTime = parseInt(prepTime.value) || 0;
+                            window.recipeCanvas.recipeData.cookTime = parseInt(cookTime.value) || 0;
+                            window.recipeCanvas.recipeData.difficulty = difficulty.value;
+                            window.recipeCanvas.recipeData.cuisine = cuisine.value;
+                            window.recipeCanvas.recipeData.tags = tags.value.split(',').map(t => t.trim()).filter(Boolean);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+

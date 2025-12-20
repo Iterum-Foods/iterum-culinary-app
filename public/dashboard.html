@@ -91,6 +91,7 @@
       overflow: hidden;
       margin: 0;
       padding: 0;
+      width: 100vw;
     }
 
     .card-style {
@@ -107,10 +108,14 @@
       background-image: linear-gradient(to bottom, var(--notebook-line-color) 1px, transparent 1px);
       background-size: 100% 28px;
       padding-top: 28px;
-      padding-right: 0.75rem;
+      padding-right: 0;
       padding-bottom: 3rem;
+      padding-left: 0;
       overflow-y: auto;
       height: 100vh;
+      flex: 1;
+      min-width: 0; /* Allows flex item to shrink below content size */
+      max-width: none; /* Remove any max-width constraints */
     }
 
     .chart-container {
@@ -319,8 +324,8 @@
   </aside>
 
   <!-- MAIN CONTENT AREA (Notebook Page) -->
-  <section class="flex-grow main-content-area min-h-full">
-    <div class="max-w-7xl mx-auto px-4 py-4">
+  <section class="flex-grow main-content-area min-h-full" style="flex: 1 1 auto; min-width: 0;">
+    <div class="w-full px-5 py-4" style="max-width: none; width: 100%; margin-right: 0;">
       
       <!-- Header -->
       <header class="mb-6 flex justify-between items-start sticky top-0 z-10 pb-4" style="background-color: var(--brand-bg-secondary);">

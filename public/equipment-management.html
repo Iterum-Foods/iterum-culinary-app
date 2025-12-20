@@ -467,6 +467,17 @@
 
                 <div class="form-row">
                     <div class="form-group">
+                        <label for="equipment-purchase-price" class="form-label">Purchase Price ($)</label>
+                        <input type="number" id="equipment-purchase-price" name="equipment-purchase-price" class="form-input" placeholder="0.00" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="equipment-purchase-url" class="form-label">Purchase Link (URL)</label>
+                        <input type="url" id="equipment-purchase-url" name="equipment-purchase-url" class="form-input" placeholder="https://...">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
                         <label for="equipment-warranty" class="form-label">Warranty Expiry</label>
                         <input type="date" id="equipment-warranty" name="equipment-warranty" class="form-input">
                     </div>
@@ -570,6 +581,17 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Date</label>
                         <input type="date" id="edit-equipment-purchase-date" name="edit-equipment-purchase-date" class="notebook-input w-full">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Price ($)</label>
+                        <input type="number" id="edit-equipment-purchase-price" name="edit-equipment-purchase-price" class="notebook-input w-full" placeholder="0.00" step="0.01" min="0">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Link (URL)</label>
+                        <input type="url" id="edit-equipment-purchase-url" name="edit-equipment-purchase-url" class="notebook-input w-full" placeholder="https://...">
                     </div>
                 </div>
 
@@ -1136,10 +1158,13 @@
               category: document.getElementById('equipment-category').value,
               quantity: parseInt(document.getElementById('equipment-quantity').value) || 1,
               brand: document.getElementById('equipment-brand').value,
-              serial: document.getElementById('equipment-serial').value,
+              serialNumber: document.getElementById('equipment-serial').value,
               purchaseDate: document.getElementById('equipment-purchase-date').value,
-              warranty: document.getElementById('equipment-warranty').value,
+              purchasePrice: parseFloat(document.getElementById('equipment-purchase-price')?.value) || 0,
+              purchaseUrl: document.getElementById('equipment-purchase-url')?.value || '',
+              warrantyExpiry: document.getElementById('equipment-warranty').value,
               status: document.getElementById('equipment-status').value,
+              location: document.getElementById('equipment-location')?.value || '',
               lastMaintenance: document.getElementById('equipment-last-maintenance')?.value,
               nextMaintenance: document.getElementById('equipment-next-maintenance')?.value,
               maintenanceNotes: document.getElementById('equipment-maintenance-notes')?.value,
@@ -1737,6 +1762,8 @@
                 <div class="equipment-list-meta">
                   ${equipment.brand ? `<span>🏷️ ${equipment.brand}</span>` : ''}
                   ${equipment.purchaseDate ? `<span>🗓️ Purchased ${new Date(equipment.purchaseDate).toLocaleDateString()}</span>` : ''}
+                  ${equipment.purchasePrice ? `<span>💰 $${equipment.purchasePrice.toFixed(2)}</span>` : ''}
+                  ${equipment.purchaseUrl ? `<span><a href="${equipment.purchaseUrl}" target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: underline;">🔗 Purchase Link</a></span>` : ''}
                   ${equipment.nextMaintenance ? `<span>🛠️ Next maintenance ${new Date(equipment.nextMaintenance).toLocaleDateString()}</span>` : ''}
                 </div>
                 <div class="equipment-list-actions">
@@ -2278,11 +2305,102 @@
         document.getElementById('active-vendors').textContent = uniqueVendors.size;
       }
 
-      // Placeholder functions
+      // Edit equipment function
       function editEquipment(id) {
         console.log('✏️ Edit equipment:', id);
-        alert('Edit equipment feature coming soon!');
+        
+        const currentUser = window.authManager?.currentUser || window.currentUser;
+        const userId = currentUser?.userId || currentUser?.id || 'guest';
+        const key = `equipment_${userId}`;
+        let equipmentList = JSON.parse(localStorage.getItem(key) || '[]');
+        
+        const equipment = equipmentList.find(e => e.id === id);
+        if (!equipment) {
+          alert('Equipment not found!');
+          return;
+        }
+        
+        // Populate edit form
+        document.getElementById('edit-equipment-id').value = equipment.id;
+        document.getElementById('edit-equipment-name').value = equipment.name || '';
+        document.getElementById('edit-equipment-category').value = equipment.category || '';
+        document.getElementById('edit-equipment-quantity').value = equipment.quantity || 1;
+        document.getElementById('edit-equipment-brand').value = equipment.brand || '';
+        document.getElementById('edit-equipment-serial').value = equipment.serialNumber || equipment.serial || '';
+        document.getElementById('edit-equipment-purchase-date').value = equipment.purchaseDate || '';
+        document.getElementById('edit-equipment-purchase-price').value = equipment.purchasePrice || '';
+        document.getElementById('edit-equipment-purchase-url').value = equipment.purchaseUrl || '';
+        document.getElementById('edit-equipment-warranty').value = equipment.warrantyExpiry || equipment.warranty || '';
+        document.getElementById('edit-equipment-status').value = equipment.status || 'Active';
+        document.getElementById('edit-equipment-location').value = equipment.location || '';
+        document.getElementById('edit-equipment-last-maintenance').value = equipment.lastMaintenance || '';
+        document.getElementById('edit-equipment-next-maintenance').value = equipment.nextMaintenance || '';
+        document.getElementById('edit-equipment-maintenance-notes').value = equipment.maintenanceNotes || '';
+        document.getElementById('edit-equipment-description').value = equipment.description || '';
+        
+        // Show edit modal
+        document.getElementById('edit-equipment-modal').classList.remove('hidden');
       }
+      
+      // Handle edit form submission
+      document.addEventListener('DOMContentLoaded', function() {
+        const editForm = document.getElementById('edit-equipment-form');
+        if (editForm) {
+          editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const currentUser = window.authManager?.currentUser || window.currentUser;
+            const userId = currentUser?.userId || currentUser?.id || 'guest';
+            const key = `equipment_${userId}`;
+            let equipmentList = JSON.parse(localStorage.getItem(key) || '[]');
+            
+            const equipmentId = document.getElementById('edit-equipment-id').value;
+            const index = equipmentList.findIndex(e => e.id === equipmentId);
+            
+            if (index === -1) {
+              alert('Equipment not found!');
+              return;
+            }
+            
+            // Update equipment
+            equipmentList[index] = {
+              ...equipmentList[index],
+              name: document.getElementById('edit-equipment-name').value,
+              category: document.getElementById('edit-equipment-category').value,
+              quantity: parseInt(document.getElementById('edit-equipment-quantity').value) || 1,
+              brand: document.getElementById('edit-equipment-brand').value,
+              serialNumber: document.getElementById('edit-equipment-serial').value,
+              purchaseDate: document.getElementById('edit-equipment-purchase-date').value,
+              purchasePrice: parseFloat(document.getElementById('edit-equipment-purchase-price')?.value) || 0,
+              purchaseUrl: document.getElementById('edit-equipment-purchase-url')?.value || '',
+              warrantyExpiry: document.getElementById('edit-equipment-warranty').value,
+              status: document.getElementById('edit-equipment-status').value,
+              location: document.getElementById('edit-equipment-location').value,
+              lastMaintenance: document.getElementById('edit-equipment-last-maintenance').value,
+              nextMaintenance: document.getElementById('edit-equipment-next-maintenance').value,
+              maintenanceNotes: document.getElementById('edit-equipment-maintenance-notes').value,
+              description: document.getElementById('edit-equipment-description').value,
+              updatedAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem(key, JSON.stringify(equipmentList));
+            localStorage.setItem('equipment_list', JSON.stringify(equipmentList));
+            
+            alert(`✅ Equipment "${equipmentList[index].name}" updated successfully!`);
+            document.getElementById('edit-equipment-modal').classList.add('hidden');
+            loadEquipment();
+          });
+        }
+        
+        // Close edit modal handlers
+        document.getElementById('close-edit-equipment-modal')?.addEventListener('click', function() {
+          document.getElementById('edit-equipment-modal').classList.add('hidden');
+        });
+        
+        document.getElementById('cancel-edit-equipment')?.addEventListener('click', function() {
+          document.getElementById('edit-equipment-modal').classList.add('hidden');
+        });
+      });
 
       function viewEquipment(id) {
         console.log('👁️ View equipment:', id);

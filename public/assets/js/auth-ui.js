@@ -61,6 +61,9 @@
         window.closeTrialModal = closeTrialModal;
         window.handleTrialSignUp = handleTrialSignUp;
         
+        // Mark as initialized so inline handlers know to defer
+        window.authUIInitialized = true;
+        
         console.log('✅ Auth UI initialized');
     }
     
@@ -172,7 +175,7 @@
             // Redirect after delay
             setTimeout(() => {
                 console.log('🚀 Redirecting to main app...');
-                window.location.href = 'index.html';
+                window.location.href = 'dashboard.html';
             }, 1500);
             
         } catch (error) {
@@ -249,7 +252,7 @@
             // Redirect after delay
             setTimeout(() => {
                 console.log('🚀 Redirecting to main app...');
-                window.location.href = 'index.html';
+                window.location.href = 'dashboard.html';
             }, 1500);
             
         } catch (error) {
@@ -293,7 +296,7 @@
             // Redirect after delay
             setTimeout(() => {
                 console.log('🚀 Redirecting to main app...');
-                window.location.href = 'index.html';
+                window.location.href = 'dashboard.html';
             }, 1500);
             
         } catch (error) {
@@ -534,7 +537,7 @@
             // Redirect after delay
             setTimeout(() => {
                 console.log('🚀 Redirecting to main app...');
-                window.location.href = 'index.html';
+                window.location.href = 'dashboard.html';
             }, 2000);
             
         } catch (error) {

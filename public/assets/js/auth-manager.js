@@ -898,15 +898,38 @@ class AuthManager {
     /**
      * Wait for Firebase Auth to be ready
      */
-    async waitForFirebaseAuth(maxAttempts = 30) {
+    async waitForFirebaseAuth(maxAttempts = 50) {
         this.log('⏳ Waiting for Firebase Auth...');
         
         for (let i = 0; i < maxAttempts; i++) {
-            if (window.firebaseAuth && window.firebaseAuth.isInitialized) {
-                this.log('✅ Firebase Auth ready');
-                return window.firebaseAuth;
+            // Check if firebaseAuth exists and is initialized
+            if (window.firebaseAuth) {
+                // If it has isInitialized property, check it
+                if (window.firebaseAuth.isInitialized === true) {
+                    this.log('✅ Firebase Auth ready');
+                    return window.firebaseAuth;
+                }
+                // If it doesn't have isInitialized yet, but exists, wait a bit more
+                // Sometimes the property is set after the object is created
+                if (i > 10) {
+                    // After 1 second, check if we can use it anyway
+                    try {
+                        if (window.firebaseAuth.auth && window.firebaseAuth.isInitialized !== false) {
+                            this.log('✅ Firebase Auth ready (using auth object)');
+                            return window.firebaseAuth;
+                        }
+                    } catch (e) {
+                        // Continue waiting
+                    }
+                }
             }
             await this.sleep(100);
+        }
+        
+        // Final check - if firebaseAuth exists but isn't marked as initialized, log warning
+        if (window.firebaseAuth) {
+            this.log('⚠️ Firebase Auth object exists but not marked as initialized, attempting to use anyway...');
+            return window.firebaseAuth;
         }
         
         throw new Error('Firebase Auth not available after ' + (maxAttempts * 100) + 'ms');

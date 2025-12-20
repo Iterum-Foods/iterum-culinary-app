@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Iterum Foods - Company Information</title>
+    <meta name="description" content="Learn about Iterum Foods - our mission, vision, team, and commitment to transforming the culinary industry through innovative technology.">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://iterumfoods.xyz/company">
+    <meta property="og:title" content="About Iterum Foods - Company Information">
+    <meta property="og:description" content="Transforming the culinary industry through innovative technology">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- ITERUM BRAND KIT - MUST LOAD FIRST -->
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="assets/css/iterum-design-system.css">
+    <link rel="stylesheet" href="assets/css/premium-ui-system.css">
+    <link rel="stylesheet" href="assets/css/unified-cards.css">
+    <link rel="stylesheet" href="assets/css/page-layouts.css">
+    
+    <!-- Theme -->
+    <link rel="stylesheet" href="assets/css/modern-nordic-vintage.css">
+    <link rel="stylesheet" href="assets/css/nordic-design-system.css">
+    <link rel="stylesheet" href="assets/css/dark-mode-enhancements.css">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background: #ffffff;
+        }
+        
+        .company-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+        
+        .company-hero {
+            text-align: center;
+            padding: 5rem 0;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            margin-bottom: 4rem;
+            border-radius: 0 0 2rem 2rem;
+        }
+        
+        .company-hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+        
+        .company-hero .tagline {
+            font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            margin-bottom: 4rem;
+        }
+        
+        .section-title {
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .mission-vision-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+        
+        .mission-card, .vision-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 1rem;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .mission-card h3, .vision-card h3 {
+            font-size: 1.75rem;
+            color: #10b981;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .value-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .value-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+        
+        .value-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #10b981;
+        }
+        
+        .value-card h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+        
+        .team-section {
+            background: #f8fafc;
+            padding: 4rem 2rem;
+            border-radius: 2rem;
+            margin: 4rem 0;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .team-member {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+        }
+        
+        .team-member-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+        
+        .team-member h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+        
+        .team-member-role {
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .contact-section {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 4rem 2rem;
+            border-radius: 2rem;
+            text-align: center;
+        }
+        
+        .contact-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: #10b981;
+        }
+        
+        .btn-primary:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-outline:hover {
+            background: white;
+            color: #10b981;
+        }
+        
+        @media (max-width: 768px) {
+            .company-container {
+                padding: 2rem 1rem;
+            }
+            
+            .mission-vision-grid,
+            .values-grid,
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="company-container">
+        <!-- Hero Section -->
+        <div class="company-hero">
+            <h1>About Iterum Foods</h1>
+            <p class="tagline">Transforming the Culinary Industry Through Innovation</p>
+        </div>
+
+        <!-- Mission & Vision -->
+        <section class="section">
+            <div class="mission-vision-grid">
+                <div class="mission-card">
+                    <h3><i class="fas fa-bullseye"></i> Our Mission</h3>
+                    <p>To empower culinary professionals with cutting-edge technology that streamlines operations, reduces waste, and drives profitability. We're building the tools that chefs and restaurateurs need to succeed in an increasingly competitive industry.</p>
+                </div>
+                <div class="vision-card">
+                    <h3><i class="fas fa-eye"></i> Our Vision</h3>
+                    <p>To become the leading platform for culinary innovation, where every chef and restaurant has access to professional-grade tools that enable creativity, efficiency, and sustainable growth. We envision a future where technology and culinary artistry work in perfect harmony.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Values -->
+        <section class="section">
+            <h2 class="section-title">Our Core Values</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon"><i class="fas fa-lightbulb"></i></div>
+                    <h4>Innovation</h4>
+                    <p>We continuously push boundaries to create solutions that anticipate and meet the evolving needs of the culinary industry.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i class="fas fa-users"></i></div>
+                    <h4>User-Centric</h4>
+                    <p>Built by chefs, for chefs. Every feature is designed with the end-user in mind, ensuring our tools are intuitive and powerful.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i class="fas fa-leaf"></i></div>
+                    <h4>Sustainability</h4>
+                    <p>We're committed to helping restaurants reduce waste, optimize resources, and operate more sustainably.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h4>Reliability</h4>
+                    <p>Professional-grade tools that you can count on. We prioritize stability, security, and data protection.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i class="fas fa-heart"></i></div>
+                    <h4>Passion</h4>
+                    <p>We're driven by a genuine love for the culinary arts and a commitment to supporting the professionals who create amazing food.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i class="fas fa-chart-line"></i></div>
+                    <h4>Growth</h4>
+                    <p>We believe in continuous improvement, both for our platform and for the businesses we serve.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <section class="team-section">
+            <h2 class="section-title">Our Team</h2>
+            <p style="text-align: center; font-size: 1.125rem; color: #64748b; max-width: 700px; margin: 0 auto 2rem;">
+                We're a team of passionate technologists, chefs, and entrepreneurs dedicated to transforming how the culinary industry operates.
+            </p>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="team-member-avatar">👨‍💼</div>
+                    <h4>Leadership Team</h4>
+                    <div class="team-member-role">Executive & Strategy</div>
+                    <p style="color: #64748b; font-size: 0.9rem;">Experienced entrepreneurs with deep industry knowledge and a vision for the future of culinary technology.</p>
+                </div>
+                <div class="team-member">
+                    <div class="team-member-avatar">👨‍🍳</div>
+                    <h4>Culinary Advisors</h4>
+                    <div class="team-member-role">Industry Experts</div>
+                    <p style="color: #64748b; font-size: 0.9rem;">Award-winning chefs and restaurateurs who ensure our tools meet real-world needs.</p>
+                </div>
+                <div class="team-member">
+                    <div class="team-member-avatar">💻</div>
+                    <h4>Engineering Team</h4>
+                    <div class="team-member-role">Product Development</div>
+                    <p style="color: #64748b; font-size: 0.9rem;">Talented developers building scalable, secure, and user-friendly solutions.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <h2 style="font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 1rem;">Get in Touch</h2>
+            <p style="font-size: 1.25rem; opacity: 0.95; max-width: 700px; margin: 0 auto;">
+                Interested in learning more about Iterum Foods? We'd love to hear from you.
+            </p>
+            <div class="contact-buttons">
+                <a href="mailto:hello@iterumfoods.xyz" class="btn btn-primary">
+                    <i class="fas fa-envelope"></i> Email Us
+                </a>
+                <a href="pitch.html" class="btn btn-outline">
+                    <i class="fas fa-chart-line"></i> Investment Info
+                </a>
+                <a href="landing.html" class="btn btn-outline">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MC8Q3SZ47K"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-MC8Q3SZ47K');
+    </script>
+</body>
+</html>
+
+
