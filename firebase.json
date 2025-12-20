@@ -6,7 +6,7 @@
     "rules": "storage.rules"
   },
   "hosting": {
-    "target": "iterum-culinary-app2",
+    "site": "iterum-culinary-app2",
     "public": "public",
     "ignore": [
       "firebase.json",

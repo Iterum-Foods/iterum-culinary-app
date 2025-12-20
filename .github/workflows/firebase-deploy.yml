@@ -125,13 +125,12 @@ jobs:
           echo "🚀 Deploying to iterum-culinary-app2..."
           echo "Project: iterum-culinary-app2"
           echo "Site: iterum-culinary-app2"
-          echo "Target: iterum-culinary-app2"
           echo "Public folder: public"
           echo ""
           echo "Deployment command:"
-          echo "firebase deploy --only hosting:iterum-culinary-app2 --project iterum-culinary-app2"
+          echo "firebase deploy --only hosting --project iterum-culinary-app2"
           echo ""
-          firebase deploy --only hosting:iterum-culinary-app2 --project iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" 2>&1 | tee deploy-app.log || {
+          firebase deploy --only hosting --project iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" 2>&1 | tee deploy-app.log || {
             echo ""
             echo "❌ Deployment to app site failed"
             echo ""
@@ -142,16 +141,22 @@ jobs:
             echo "1. Site 'iterum-culinary-app2' does not exist in Firebase Console"
             echo "2. FIREBASE_TOKEN is invalid or expired"
             echo "3. Insufficient permissions"
-            echo "4. Target configuration mismatch"
+            echo "4. Configuration issue"
             echo ""
             echo "Checking Firebase project..."
             firebase projects:list --token "${{ secrets.FIREBASE_TOKEN }}" || echo "Cannot list projects - token may be invalid"
+            echo ""
+            echo "Checking firebase.json configuration:"
+            cat firebase.json | grep -A 5 "hosting" || echo "Could not read firebase.json"
             exit 1
           }
           echo ""
           echo "✅ App site deployed successfully"
-          echo "Check deployment log for details:"
-          cat deploy-app.log | grep -E "(files|deployed|hosting)" || echo "Log summary not available"
+          echo ""
+          echo "Deployment summary:"
+          cat deploy-app.log | grep -E "(files|deployed|hosting|Site)" | head -20 || echo "Log summary not available"
+          echo ""
+          echo "Site URL: https://iterum-culinary-app2.web.app"
 
       - name: Deployment Summary
         if: success()
