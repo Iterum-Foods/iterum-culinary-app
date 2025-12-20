@@ -8,6 +8,7 @@ on:
       - 'public/**'
       - 'firebase.json'
       - '.firebaserc'
+      - '.github/workflows/firebase-deploy.yml'
   workflow_dispatch:
 
 jobs:
@@ -60,8 +61,8 @@ jobs:
           node-version: '20.x'
           cache: 'npm'
 
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools@latest
+      - name: Install Firebase CLI (compatible with Node 20)
+        run: npm install -g firebase-tools@15.0.0
 
       - name: Verify Firebase CLI
         run: firebase --version
