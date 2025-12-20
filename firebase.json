@@ -7,7 +7,7 @@
   },
   "hosting": [
     {
-      "site": "iterum-culinary-landing",
+      "target": "iterum-culinary-landing",
       "public": "public",
       "ignore": [
         "firebase.json",
@@ -47,7 +47,7 @@
       ]
     },
     {
-      "site": "iterum-culinary-app2",
+      "target": "iterum-culinary-app2",
       "public": "public",
       "ignore": [
         "firebase.json",

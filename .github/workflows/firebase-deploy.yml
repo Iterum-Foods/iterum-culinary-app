@@ -91,7 +91,7 @@ jobs:
         run: |
           echo "🚀 Deploying to iterum-culinary-landing..."
           echo "Project: iterum-culinary-app2"
-          echo "Site: iterum-culinary-landing"
+          echo "Target: iterum-culinary-landing"
           firebase deploy --only hosting:iterum-culinary-landing --project iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" || {
             echo "❌ Deployment to landing site failed"
             echo "Checking Firebase project..."
@@ -104,7 +104,7 @@ jobs:
         run: |
           echo "🚀 Deploying to iterum-culinary-app2..."
           echo "Project: iterum-culinary-app2"
-          echo "Site: iterum-culinary-app2"
+          echo "Target: iterum-culinary-app2"
           firebase deploy --only hosting:iterum-culinary-app2 --project iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" || {
             echo "❌ Deployment to app site failed"
             echo "Checking Firebase project..."
