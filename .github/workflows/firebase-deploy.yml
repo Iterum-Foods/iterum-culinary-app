@@ -126,20 +126,32 @@ jobs:
           echo "Project: iterum-culinary-app2"
           echo "Site: iterum-culinary-landing"
           echo "Target: iterum-culinary-landing"
-          firebase deploy --only hosting:iterum-culinary-landing --project iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" || {
+          echo "Public folder: public"
+          echo ""
+          echo "Deployment command:"
+          echo "firebase deploy --only hosting:iterum-culinary-landing --project iterum-culinary-app2"
+          echo ""
+          firebase deploy --only hosting:iterum-culinary-landing --project iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" 2>&1 | tee deploy-landing.log || {
+            echo ""
             echo "❌ Deployment to landing site failed"
+            echo ""
+            echo "Checking deployment log..."
+            cat deploy-landing.log || echo "No log file created"
             echo ""
             echo "Possible causes:"
             echo "1. Site 'iterum-culinary-landing' does not exist in Firebase Console"
-            echo "   Create it at: https://console.firebase.google.com/project/iterum-culinary-app2/hosting"
             echo "2. FIREBASE_TOKEN is invalid or expired"
             echo "3. Insufficient permissions"
+            echo "4. Target configuration mismatch"
             echo ""
             echo "Checking Firebase project..."
             firebase projects:list --token "${{ secrets.FIREBASE_TOKEN }}" || echo "Cannot list projects - token may be invalid"
             exit 1
           }
+          echo ""
           echo "✅ Landing site deployed successfully"
+          echo "Check deployment log for details:"
+          cat deploy-landing.log | grep -E "(files|deployed|hosting)" || echo "Log summary not available"
 
       - name: Deploy to Firebase App Site
         run: |
@@ -147,20 +159,32 @@ jobs:
           echo "Project: iterum-culinary-app2"
           echo "Site: iterum-culinary-app2"
           echo "Target: iterum-culinary-app2"
-          firebase deploy --only hosting:iterum-culinary-app2 --project iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" || {
+          echo "Public folder: public"
+          echo ""
+          echo "Deployment command:"
+          echo "firebase deploy --only hosting:iterum-culinary-app2 --project iterum-culinary-app2"
+          echo ""
+          firebase deploy --only hosting:iterum-culinary-app2 --project iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" 2>&1 | tee deploy-app.log || {
+            echo ""
             echo "❌ Deployment to app site failed"
+            echo ""
+            echo "Checking deployment log..."
+            cat deploy-app.log || echo "No log file created"
             echo ""
             echo "Possible causes:"
             echo "1. Site 'iterum-culinary-app2' does not exist in Firebase Console"
-            echo "   Create it at: https://console.firebase.google.com/project/iterum-culinary-app2/hosting"
             echo "2. FIREBASE_TOKEN is invalid or expired"
             echo "3. Insufficient permissions"
+            echo "4. Target configuration mismatch"
             echo ""
             echo "Checking Firebase project..."
             firebase projects:list --token "${{ secrets.FIREBASE_TOKEN }}" || echo "Cannot list projects - token may be invalid"
             exit 1
           }
+          echo ""
           echo "✅ App site deployed successfully"
+          echo "Check deployment log for details:"
+          cat deploy-app.log | grep -E "(files|deployed|hosting)" || echo "Log summary not available"
 
       - name: Deployment Summary
         if: success()
