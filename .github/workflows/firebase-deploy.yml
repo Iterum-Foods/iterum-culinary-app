@@ -62,20 +62,37 @@ jobs:
           cache: 'npm'
 
       - name: Install Firebase CLI (compatible with Node 20)
-        run: npm install -g firebase-tools@15.0.0
+        run: |
+          npm install -g firebase-tools@15.0.0
+          echo "✓ Firebase CLI installed"
 
       - name: Verify Firebase CLI
-        run: firebase --version
+        run: |
+          firebase --version
+          node --version
+          echo "✓ Versions verified"
 
       - name: Deploy to Firebase Landing Site
         run: |
-          firebase deploy --only hosting:iterum-culinary-landing --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}"
-        continue-on-error: false
+          echo "🚀 Deploying to iterum-culinary-landing..."
+          firebase deploy --only hosting:iterum-culinary-landing --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" || {
+            echo "❌ Deployment to landing site failed"
+            echo "Checking Firebase project..."
+            firebase projects:list --token "${{ secrets.FIREBASE_TOKEN }}" || echo "Cannot list projects - token may be invalid"
+            exit 1
+          }
+          echo "✅ Landing site deployed successfully"
 
       - name: Deploy to Firebase App Site
         run: |
-          firebase deploy --only hosting:iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}"
-        continue-on-error: false
+          echo "🚀 Deploying to iterum-culinary-app2..."
+          firebase deploy --only hosting:iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" || {
+            echo "❌ Deployment to app site failed"
+            echo "Checking Firebase project..."
+            firebase projects:list --token "${{ secrets.FIREBASE_TOKEN }}" || echo "Cannot list projects - token may be invalid"
+            exit 1
+          }
+          echo "✅ App site deployed successfully"
 
       - name: Deployment Summary
         if: success()
@@ -95,8 +112,14 @@ jobs:
           echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Common Issues:" >> $GITHUB_STEP_SUMMARY
-          echo "1. Check if FIREBASE_TOKEN secret is set correctly" >> $GITHUB_STEP_SUMMARY
-          echo "2. Verify Firebase project ID matches .firebaserc" >> $GITHUB_STEP_SUMMARY
-          echo "3. Ensure public directory contains index.html" >> $GITHUB_STEP_SUMMARY
-          echo "4. Check Firebase project permissions" >> $GITHUB_STEP_SUMMARY
+          echo "1. **FIREBASE_TOKEN**: Check if secret is set correctly in GitHub Settings > Secrets" >> $GITHUB_STEP_SUMMARY
+          echo "2. **Project ID**: Verify Firebase project ID matches .firebaserc" >> $GITHUB_STEP_SUMMARY
+          echo "3. **Sites**: Ensure sites exist in Firebase Console" >> $GITHUB_STEP_SUMMARY
+          echo "4. **Permissions**: Check Firebase project permissions for the token" >> $GITHUB_STEP_SUMMARY
+          echo "5. **Node.js**: Verify Node.js 20.x is being used" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Debug Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "- Check the failed step's logs above for specific error message" >> $GITHUB_STEP_SUMMARY
+          echo "- Verify FIREBASE_TOKEN is valid: Run \`firebase login:ci\` locally" >> $GITHUB_STEP_SUMMARY
+          echo "- Check Firebase Console: https://console.firebase.google.com/project/iterum-culinary-app2/hosting" >> $GITHUB_STEP_SUMMARY
 
