@@ -5,78 +5,36 @@
   "storage": {
     "rules": "storage.rules"
   },
-  "hosting": [
-    {
-      "target": "iterum-culinary-landing",
-      "public": "public",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "!**/.nojekyll",
-        "**/node_modules/**"
-      ],
-      "rewrites": [
-        {
-          "source": "/",
-          "destination": "/landing.html"
-        },
-        {
-          "source": "/tech-stage",
-          "destination": "/landing.html"
-        },
-        {
-          "source": "/business-plan",
-          "destination": "/landing.html"
-        },
-        {
-          "source": "/investors",
-          "destination": "/landing.html"
-        },
-        {
-          "source": "/pitch",
-          "destination": "/pitch.html"
-        },
-        {
-          "source": "/pitch.html",
-          "destination": "/pitch.html"
-        },
-        {
-          "source": "**",
-          "destination": "/landing.html"
-        }
-      ]
-    },
-    {
-      "target": "iterum-culinary-app2",
-      "public": "public",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "!**/.nojekyll",
-        "**/node_modules/**"
-      ],
-      "rewrites": [
-        {
-          "source": "/",
-          "destination": "/index.html"
-        },
-        {
-          "source": "/dashboard.html",
-          "destination": "/dashboard.html"
-        },
-        {
-          "source": "/signin.html",
-          "destination": "/signin.html"
-        },
-        {
-          "source": "/app/**",
-          "destination": "/index.html"
-        },
-        {
-          "source": "**",
-          "destination": "/index.html"
-        }
-      ]
-    }
-  ]
+  "hosting": {
+    "target": "iterum-culinary-app2",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "!**/.nojekyll",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/dashboard.html",
+        "destination": "/dashboard.html"
+      },
+      {
+        "source": "/signin.html",
+        "destination": "/signin.html"
+      },
+      {
+        "source": "/app/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
 }

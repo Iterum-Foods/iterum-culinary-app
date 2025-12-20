@@ -6,9 +6,6 @@
   "targets": {
     "iterum-culinary-app2": {
       "hosting": {
-        "iterum-culinary-landing": [
-          "iterum-culinary-landing"
-        ],
         "iterum-culinary-app2": [
           "iterum-culinary-app2"
         ]
