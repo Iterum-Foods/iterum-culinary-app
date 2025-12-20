@@ -87,13 +87,28 @@ jobs:
           firebase use --token "${{ secrets.FIREBASE_TOKEN }}"
           echo "✅ Configuration verified"
 
+      - name: List Firebase Hosting Sites
+        run: |
+          echo "Checking available hosting sites..."
+          firebase hosting:sites:list --project iterum-culinary-app2 --token "${{ secrets.FIREBASE_TOKEN }}" || {
+            echo "⚠️ Could not list sites (this is OK if sites don't exist yet)"
+          }
+
       - name: Deploy to Firebase Landing Site
         run: |
           echo "🚀 Deploying to iterum-culinary-landing..."
           echo "Project: iterum-culinary-app2"
+          echo "Site: iterum-culinary-landing"
           echo "Target: iterum-culinary-landing"
           firebase deploy --only hosting:iterum-culinary-landing --project iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" || {
             echo "❌ Deployment to landing site failed"
+            echo ""
+            echo "Possible causes:"
+            echo "1. Site 'iterum-culinary-landing' does not exist in Firebase Console"
+            echo "   Create it at: https://console.firebase.google.com/project/iterum-culinary-app2/hosting"
+            echo "2. FIREBASE_TOKEN is invalid or expired"
+            echo "3. Insufficient permissions"
+            echo ""
             echo "Checking Firebase project..."
             firebase projects:list --token "${{ secrets.FIREBASE_TOKEN }}" || echo "Cannot list projects - token may be invalid"
             exit 1
@@ -104,9 +119,17 @@ jobs:
         run: |
           echo "🚀 Deploying to iterum-culinary-app2..."
           echo "Project: iterum-culinary-app2"
+          echo "Site: iterum-culinary-app2"
           echo "Target: iterum-culinary-app2"
           firebase deploy --only hosting:iterum-culinary-app2 --project iterum-culinary-app2 --non-interactive --token "${{ secrets.FIREBASE_TOKEN }}" || {
             echo "❌ Deployment to app site failed"
+            echo ""
+            echo "Possible causes:"
+            echo "1. Site 'iterum-culinary-app2' does not exist in Firebase Console"
+            echo "   Create it at: https://console.firebase.google.com/project/iterum-culinary-app2/hosting"
+            echo "2. FIREBASE_TOKEN is invalid or expired"
+            echo "3. Insufficient permissions"
+            echo ""
             echo "Checking Firebase project..."
             firebase projects:list --token "${{ secrets.FIREBASE_TOKEN }}" || echo "Cannot list projects - token may be invalid"
             exit 1
