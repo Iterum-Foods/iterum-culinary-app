@@ -24,10 +24,36 @@ jobs:
             echo "Error: public directory not found"
             exit 1
           fi
-          if [ ! -f "public/index.html" ]; then
-            echo "Warning: public/index.html not found"
+          echo "✓ Public directory exists"
+          echo ""
+          echo "Checking key files in public folder:"
+          if [ -f "public/index.html" ]; then
+            echo "  ✓ public/index.html exists"
+          else
+            echo "  ⚠️ public/index.html NOT FOUND"
           fi
-          echo "✓ Public directory structure verified"
+          if [ -f "public/landing.html" ]; then
+            echo "  ✓ public/landing.html exists"
+          else
+            echo "  ⚠️ public/landing.html NOT FOUND"
+          fi
+          if [ -f "public/dashboard.html" ]; then
+            echo "  ✓ public/dashboard.html exists"
+          else
+            echo "  ⚠️ public/dashboard.html NOT FOUND"
+          fi
+          if [ -d "public/assets" ]; then
+            echo "  ✓ public/assets/ directory exists"
+            echo "  Files in public/assets:"
+            find public/assets -type f | head -10 | sed 's/^/    /'
+          else
+            echo "  ⚠️ public/assets/ directory NOT FOUND"
+          fi
+          echo ""
+          echo "Total files in public folder:"
+          find public -type f | wc -l
+          echo ""
+          echo "✓ Public directory structure verified - deploying from 'public' folder"
       
       - name: Create .nojekyll file
         run: |
