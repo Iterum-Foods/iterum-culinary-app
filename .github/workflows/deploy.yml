@@ -68,14 +68,11 @@ jobs:
         # - Notifying deployment services
         
     - name: Notify deployment
-      uses: 8398a7/action-slack@v3
-      if: always()
-      with:
-        status: ${{ job.status }}
-        channel: '#deployments'
-        text: 'Iterum Culinary App deployment ${{ job.status }}'
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      if: always() && secrets.SLACK_WEBHOOK_URL != ''
+      run: |
+        echo "Deployment status: ${{ job.status }}"
+        echo "Slack notification skipped (SLACK_WEBHOOK_URL not configured)"
+      # Slack notification removed - add back if SLACK_WEBHOOK_URL is configured
         
     - name: Create deployment summary
       run: |

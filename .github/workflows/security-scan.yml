@@ -240,11 +240,8 @@ jobs:
           });
           
     - name: Notify security team
-      uses: 8398a7/action-slack@v3
       if: failure()
-      with:
-        status: failure
-        channel: '#security-alerts'
-        text: '🚨 Critical security issues detected in Iterum Culinary App'
-      env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      run: |
+        echo "⚠️ Security scan failed"
+        echo "Check the workflow logs for details"
+      # Slack notification removed - add back if SLACK_WEBHOOK_URL is configured

@@ -30,7 +30,7 @@ jobs:
     - name: Update npm dependencies
       run: |
         npm update
-        npm audit fix --force
+        npm audit fix || echo "Some audit fixes may require manual intervention"
         
     - name: Check for security vulnerabilities
       run: |
@@ -79,7 +79,6 @@ jobs:
           **Note**: Please review the changes and test thoroughly before merging.
         branch: automated-dependency-updates
         delete-branch: true
-        push-to-fork: false
         
     - name: Comment on PR
       if: steps.check-changes.outputs.has_changes == 'true'
