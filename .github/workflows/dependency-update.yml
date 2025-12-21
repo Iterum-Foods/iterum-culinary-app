@@ -9,12 +9,17 @@ on:
 jobs:
   update-dependencies:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
         
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -74,6 +79,7 @@ jobs:
           **Note**: Please review the changes and test thoroughly before merging.
         branch: automated-dependency-updates
         delete-branch: true
+        push-to-fork: false
         
     - name: Comment on PR
       if: steps.check-changes.outputs.has_changes == 'true'
