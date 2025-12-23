@@ -1,0 +1,98 @@
+name: Automated Dependency Updates (Simple - No PR)
+
+# Alternative version that doesn't create PRs
+# Use this if you can't enable write permissions
+
+on:
+  schedule:
+    # Run every Monday at 2 AM UTC
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        
+    - name: Check current dependencies
+      run: |
+        echo "## Current Dependencies" >> $GITHUB_STEP_SUMMARY
+        echo "Checking for outdated packages..." >> $GITHUB_STEP_SUMMARY
+        npm outdated --json > outdated.json || echo "{}" > outdated.json
+        echo "Outdated packages:" >> $GITHUB_STEP_SUMMARY
+        cat outdated.json | jq -r 'keys[]' | head -20 >> $GITHUB_STEP_SUMMARY || echo "All packages up to date" >> $GITHUB_STEP_SUMMARY
+        
+    - name: Check security vulnerabilities
+      run: |
+        echo "## Security Audit" >> $GITHUB_STEP_SUMMARY
+        npm audit --audit-level moderate --json > audit.json || echo "{}" > audit.json
+        VULNS=$(cat audit.json | jq '.vulnerabilities | length' || echo "0")
+        echo "Found $VULNS vulnerabilities" >> $GITHUB_STEP_SUMMARY
+        
+    - name: Create dependency update issue
+      if: always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          
+          let outdated = {};
+          let audit = {};
+          
+          try {
+            outdated = JSON.parse(fs.readFileSync('outdated.json', 'utf8'));
+          } catch (e) {
+            console.log('No outdated.json');
+          }
+          
+          try {
+            audit = JSON.parse(fs.readFileSync('audit.json', 'utf8'));
+          } catch (e) {
+            console.log('No audit.json');
+          }
+          
+          const outdatedCount = Object.keys(outdated).length;
+          const vulnCount = audit.vulnerabilities ? Object.keys(audit.vulnerabilities).length : 0;
+          
+          if (outdatedCount > 0 || vulnCount > 0) {
+            const body = `## 🔄 Dependency Update Check
+            
+            Automated dependency check completed.
+            
+            ### Outdated Packages: ${outdatedCount}
+            ${outdatedCount > 0 ? 'Consider updating these packages:' : 'All packages are up to date'}
+            ${Object.keys(outdated).slice(0, 10).map(pkg => `- ${pkg}`).join('\n')}
+            
+            ### Security Vulnerabilities: ${vulnCount}
+            ${vulnCount > 0 ? '⚠️ Security vulnerabilities detected. Run `npm audit fix` to address them.' : '✅ No security vulnerabilities found'}
+            
+            ### Next Steps:
+            1. Review outdated packages
+            2. Update dependencies manually
+            3. Run \`npm audit fix\` for security fixes
+            4. Test thoroughly after updates
+            
+            **Generated**: ${new Date().toISOString()}`;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔄 Dependency Update Check - ${new Date().toLocaleDateString()}`,
+              body: body,
+              labels: ['dependencies', 'automated', 'maintenance']
+            });
+          } else {
+            console.log('All dependencies up to date, no issue created');
+          }
+
