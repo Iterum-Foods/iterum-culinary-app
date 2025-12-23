@@ -23,6 +23,8 @@ jobs:
     permissions:
       contents: read
       security-events: write
+      security-events: read
+      issues: write
       actions: read
       
     steps:
