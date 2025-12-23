@@ -1,15 +1,20 @@
-name: Deploy to Firebase Hosting
+name: Deploy to Firebase Hosting (DISABLED - Using Vercel)
+
+# DISABLED: This workflow is disabled because we're using Vercel for hosting.
+# Firebase is still used for Firestore, Storage, and Authentication.
+# To manually deploy to Firebase, use: workflow_dispatch
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'public/**'
-      - 'firebase.json'
-      - '.firebaserc'
-      - '.github/workflows/firebase-deploy.yml'
-  workflow_dispatch:
+  # Disabled automatic deployments - use Vercel instead
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'public/**'
+  #     - 'firebase.json'
+  #     - '.firebaserc'
+  #     - '.github/workflows/firebase-deploy.yml'
+  workflow_dispatch:  # Manual only - if you need Firebase hosting
 
 jobs:
   deploy:
