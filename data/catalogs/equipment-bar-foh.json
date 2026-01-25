@@ -1,0 +1,104 @@
+{
+  "id": "equipment_bar_service",
+  "name": "Bar & Beverage Setup",
+  "version": "1.0.0",
+  "items": [
+    {
+      "name": "Underbar Ice Bin",
+      "category": "Beverage Equipment",
+      "subcategory": "Ice Bins",
+      "location": "Main Bar",
+      "quantity": 1,
+      "status": "Active"
+    },
+    {
+      "name": "Speed Rails",
+      "category": "Beverage Equipment",
+      "subcategory": "Bar Accessories",
+      "location": "Main Bar",
+      "quantity": 2,
+      "status": "Active"
+    },
+    {
+      "name": "Blender - Frozen Drink",
+      "category": "Beverage Equipment",
+      "subcategory": "Blenders",
+      "location": "Main Bar",
+      "quantity": 1,
+      "status": "Active"
+    },
+    {
+      "name": "Wine Chiller - Dual Zone",
+      "category": "Refrigeration",
+      "subcategory": "Wine Coolers",
+      "location": "Main Bar",
+      "quantity": 1,
+      "status": "Active"
+    },
+    {
+      "name": "Shaker Tin Sets",
+      "category": "Small Kitchenware",
+      "subcategory": "Bar Tools",
+      "location": "Main Bar",
+      "quantity": 4,
+      "status": "Active"
+    },
+    {
+      "name": "Jiggers (Assorted Sizes)",
+      "category": "Small Kitchenware",
+      "subcategory": "Bar Tools",
+      "location": "Main Bar",
+      "quantity": 8,
+      "status": "Active"
+    },
+    {
+      "name": "Highball Glasses",
+      "category": "glassware",
+      "subcategory": "Highball Glasses",
+      "location": "Service",
+      "quantity": 48,
+      "status": "Active"
+    },
+    {
+      "name": "Rocks Glasses",
+      "category": "glassware",
+      "subcategory": "Rocks Glasses",
+      "location": "Service",
+      "quantity": 48,
+      "status": "Active"
+    },
+    {
+      "name": "Dinner Plates 11\"",
+      "category": "plates",
+      "subcategory": "Dinner Plates",
+      "location": "Service",
+      "quantity": 60,
+      "status": "Active"
+    },
+    {
+      "name": "Salad Plates 8\"",
+      "category": "plates",
+      "subcategory": "Salad Plates",
+      "location": "Service",
+      "quantity": 60,
+      "status": "Active"
+    },
+    {
+      "name": "Service Forks (18/10)",
+      "category": "silverware",
+      "subcategory": "Dinner Forks",
+      "location": "Service",
+      "quantity": 80,
+      "status": "Active"
+    },
+    {
+      "name": "Service Knives (18/10)",
+      "category": "silverware",
+      "subcategory": "Dinner Knives",
+      "location": "Service",
+      "quantity": 80,
+      "status": "Active"
+    }
+  ]
+}
+

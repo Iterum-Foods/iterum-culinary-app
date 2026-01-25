@@ -1,0 +1,390 @@
+/**
+ * ITERUM UNIFIED COLOR SYSTEM
+ * 
+ * Single source of truth for ALL colors across the entire application.
+ * This file should be loaded FIRST on every page to ensure consistency.
+ * 
+ * Last Updated: 2025-11-19
+ */
+
+:root {
+    /* ============================================
+       PRIMARY BRAND COLORS - NORDIC EARTHY THEME
+       Modern, Uniform, Earthy/Nordic Aesthetic
+       ============================================ */
+    
+    /* Background Colors - Nordic Light & Earthy */
+    --iterum-bg-primary: #FAFBFC; /* Nordic Snow */
+    --iterum-bg-secondary: #F5F7F9; /* Nordic Frost */
+    --iterum-bg-tertiary: #E8F4F8; /* Nordic Ice (light blue-gray) */
+    --iterum-bg-elevated: #FFFFFF;
+    --iterum-bg-card: #FFFFFF;
+    --iterum-bg-card-elevated: #FFFFFF;
+    
+    /* Text Colors - Higher Contrast for Better Readability */
+    --iterum-text-primary: #1A2E35; /* Very Dark Blue-Gray (increased contrast from #2C4A52) */
+    --iterum-text-secondary: #2C3E46; /* Dark Charcoal (increased contrast from #3E4C54) */
+    --iterum-text-tertiary: #3A5A6A; /* Darker Blue (increased contrast from #4A7C8C) */
+    --iterum-text-muted: #6B757D; /* Darker Gray (increased contrast from #8A9299) */
+    
+    /* Border Colors - Subtle Nordic Grays */
+    --iterum-border-light: rgba(44, 74, 82, 0.12); /* Nordic Navy at 12% */
+    --iterum-border-medium: rgba(44, 74, 82, 0.20);
+    --iterum-border-dark: rgba(44, 74, 82, 0.30);
+    
+    /* Accent Colors - Nordic Earthy & Muted */
+    --iterum-accent-primary: #6B8E6F; /* Nordic Moss (earthy green) */
+    --iterum-accent-secondary: #5B9BAD; /* Nordic Blue */
+    --iterum-accent-success: #6B8E6F; /* Nordic Moss */
+    --iterum-accent-warning: #D4A574; /* Nordic Amber */
+    --iterum-accent-error: #C97676; /* Nordic Coral */
+    --iterum-accent-info: #5B9BAD; /* Nordic Blue */
+    
+    /* Earthy Accents */
+    --iterum-earth-sage: #A4B8A6;
+    --iterum-earth-wood: #A38B7B;
+    --iterum-earth-sand: #E8DED2;
+    
+    /* Button Colors - Nordic Earthy */
+    --iterum-btn-primary: linear-gradient(135deg, #6B8E6F 0%, #5B9BAD 100%); /* Moss to Blue */
+    --iterum-btn-secondary: linear-gradient(135deg, rgba(91, 155, 173, 0.12) 0%, rgba(107, 142, 111, 0.18) 100%);
+    --iterum-btn-success: linear-gradient(135deg, #6B8E6F 0%, #5B7C5F 100%); /* Deeper moss */
+    --iterum-btn-hover: #7BA47F;
+    --iterum-btn-active: #5B7C5F;
+    
+    /* Header Colors - Nordic */
+    --iterum-header-bg: rgba(255, 255, 255, 0.95);
+    --iterum-header-border: rgba(44, 74, 82, 0.12);
+    --iterum-header-text: #2C4A52;
+    --iterum-header-hover: rgba(91, 155, 173, 0.08);
+    --iterum-header-active: rgba(107, 142, 111, 0.15);
+    
+    /* Legacy Variable Mappings (for backward compatibility) */
+    --brand-bg-primary: var(--iterum-bg-primary);
+    --brand-bg-secondary: var(--iterum-bg-secondary);
+    --brand-bg-tertiary: var(--iterum-bg-tertiary);
+    --brand-card-bg: var(--iterum-bg-card);
+    --brand-card-bg-elevated: var(--iterum-bg-card-elevated);
+    --brand-border-light: var(--iterum-border-light);
+    --brand-border-medium: var(--iterum-border-medium);
+    --brand-border-dark: var(--iterum-border-dark);
+    --brand-text-primary: var(--iterum-text-primary);
+    --brand-text-secondary: var(--iterum-text-secondary);
+    --brand-text-tertiary: var(--iterum-text-tertiary);
+    --brand-text-muted: var(--iterum-text-muted);
+    --brand-accent-primary: var(--iterum-accent-primary);
+    --brand-accent-secondary: var(--iterum-accent-secondary);
+    --brand-success: var(--iterum-accent-success);
+    --brand-warning: var(--iterum-accent-warning);
+    --brand-error: var(--iterum-accent-error);
+    --brand-info: var(--iterum-accent-info);
+    --brand-btn-primary: var(--iterum-btn-primary);
+    --brand-btn-secondary: var(--iterum-btn-secondary);
+    --brand-btn-accent: var(--iterum-btn-success);
+    --brand-header-bg: var(--iterum-header-bg);
+    --brand-header-border: var(--iterum-header-border);
+    --brand-header-text: var(--iterum-header-text);
+    --brand-header-hover: var(--iterum-header-hover);
+    --brand-header-active: var(--iterum-header-active);
+    
+    /* Board/Dashboard specific (for dashboard.html) */
+    --board-bg: var(--iterum-bg-primary);
+    --board-surface: var(--iterum-bg-card);
+    --board-border: var(--iterum-border-light);
+    --board-muted: var(--iterum-text-muted);
+    --board-text: var(--iterum-text-primary);
+    --board-accent: var(--iterum-accent-primary);
+    --board-accent-soft: rgba(141, 123, 255, 0.16);
+    --board-success: var(--iterum-accent-success);
+    --board-danger: var(--iterum-accent-error);
+}
+
+/* ============================================
+   UNIVERSAL BASE STYLES
+   ============================================ */
+
+    /* Force consistent body background */
+body {
+    background: var(--iterum-bg-primary) !important;
+    color: var(--iterum-text-secondary) !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+html {
+    background: var(--iterum-bg-primary) !important;
+}
+
+/* Force consistent card backgrounds */
+.card,
+.card-container,
+[class*="card"],
+[class*="Card"] {
+    background: var(--iterum-bg-card) !important;
+    border: 1px solid var(--iterum-border-light) !important;
+    color: var(--iterum-text-secondary) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Force consistent headings */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--iterum-text-primary) !important;
+    font-weight: 600 !important;
+}
+
+/* Force consistent inputs - HIGH CONTRAST */
+input,
+textarea,
+select,
+.form-input,
+.form-textarea,
+.form-select {
+    background: var(--iterum-bg-elevated) !important;
+    border: 1.5px solid rgba(44, 74, 82, 0.25) !important; /* Darker border */
+    color: #1A2E35 !important; /* Very dark text - maximum contrast */
+    font-weight: 500 !important; /* Medium weight for readability */
+    font-size: 15px !important; /* Slightly larger */
+    padding: 12px 14px !important;
+    border-radius: 8px !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+    border-color: var(--iterum-accent-secondary) !important; /* Nordic Blue */
+    box-shadow: 0 0 0 3px rgba(91, 155, 173, 0.2) !important; /* Stronger focus ring */
+    outline: none !important;
+    color: #1A2E35 !important; /* Darkest in focus */
+}
+
+input::placeholder,
+textarea::placeholder,
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: #6B757D !important; /* Darker gray for better visibility */
+    opacity: 0.75 !important; /* More visible */
+    font-weight: 400 !important;
+}
+
+/* Labels - Maximum Contrast */
+label,
+.form-label {
+    color: #1A2E35 !important; /* Very dark for labels */
+    font-weight: 600 !important; /* Bold labels */
+    font-size: 0.9rem !important;
+}
+
+/* Help text - Better Contrast */
+.form-help,
+small.form-help {
+    color: #4A5A65 !important; /* Darker than muted */
+    font-weight: 500 !important;
+    opacity: 1 !important;
+    font-size: 0.875rem !important;
+}
+
+/* Force consistent buttons */
+.btn-primary,
+button.btn-primary,
+[class*="btn-primary"] {
+    background: var(--iterum-btn-primary) !important;
+    color: #ffffff !important;
+    border: none !important;
+    font-weight: 600 !important;
+}
+
+.btn-primary:hover,
+button.btn-primary:hover {
+    background: linear-gradient(135deg, #7BA47F 0%, #6BA5B7 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(107, 142, 111, 0.3) !important;
+}
+
+.btn-secondary,
+button.btn-secondary,
+[class*="btn-secondary"] {
+    background: #ffffff !important;
+    color: var(--iterum-text-primary) !important;
+    border: 1px solid var(--iterum-border-medium) !important;
+    font-weight: 500 !important;
+}
+
+.btn-secondary:hover,
+button.btn-secondary:hover {
+    background: var(--iterum-bg-secondary) !important;
+    border-color: var(--iterum-border-dark) !important;
+}
+
+/* Force consistent links - Nordic */
+a {
+    color: var(--iterum-accent-primary) !important;
+}
+
+a:hover {
+    color: #5B7C5F !important;
+}
+
+/* Universal page-level overrides for lighter theme */
+body,
+html,
+[class*="container"],
+[class*="page"],
+[class*="main"],
+main,
+.content,
+.page-content {
+    background: var(--iterum-bg-primary) !important;
+    color: var(--iterum-text-secondary) !important;
+}
+
+/* Table styles */
+table {
+    background: #ffffff !important;
+    color: var(--iterum-text-primary) !important;
+}
+
+th {
+    background: linear-gradient(135deg, #5B9BAD 0%, #6B8E6F 100%) !important;
+    color: #FFFFFF !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    font-weight: 600 !important;
+}
+
+td {
+    background: #ffffff !important;
+    color: var(--iterum-text-secondary) !important;
+    border-color: var(--iterum-border-light) !important;
+}
+
+tr:hover td {
+    background: #E8F4F8 !important; /* Nordic Ice */
+}
+
+/* Modal and overlay backgrounds */
+.modal,
+[class*="modal"],
+[class*="overlay"],
+.overlay {
+    background: rgba(15, 23, 42, 0.6) !important;
+}
+
+.modal-content,
+[class*="modal-content"],
+[class*="modal-body"] {
+    background: #ffffff !important;
+    color: var(--iterum-text-primary) !important;
+    border-color: var(--iterum-border-light) !important;
+}
+
+/* Dropdown and select menus */
+select,
+.dropdown-menu,
+[class*="dropdown"] {
+    background: #ffffff !important;
+    color: var(--iterum-text-primary) !important;
+    border-color: var(--iterum-border-medium) !important;
+}
+
+/* Code blocks and pre elements */
+code,
+pre {
+    background: #f1f5f9 !important;
+    color: var(--iterum-text-primary) !important;
+    border-color: var(--iterum-border-light) !important;
+}
+
+/* Ensure all text is readable - High Contrast */
+p,
+span,
+div,
+li {
+    color: var(--iterum-text-secondary) !important;
+}
+
+/* Labels get darkest color for maximum contrast */
+label,
+.form-label {
+    color: #1A2E35 !important; /* Very dark for labels */
+    font-weight: 600 !important;
+}
+
+/* Modal body text - Higher contrast */
+.modal-body,
+.modal-content {
+    color: #1A2E35 !important;
+}
+
+/* Modal headings - Very dark */
+.modal-header h1,
+.modal-header h2,
+.modal-header h3,
+.modal-header h4 {
+    color: #1A2E35 !important;
+    font-weight: 700 !important;
+}
+
+/* Ensure buttons stand out */
+button:not(.btn-primary):not(.btn-secondary) {
+    background: #ffffff !important;
+    color: var(--iterum-text-primary) !important;
+    border: 1px solid var(--iterum-border-medium) !important;
+}
+
+button:not(.btn-primary):not(.btn-secondary):hover {
+    background: var(--iterum-bg-secondary) !important;
+}
+
+/* Status badges and chips */
+.badge,
+.chip,
+[class*="badge"],
+[class*="chip"] {
+    background: #f1f5f9 !important;
+    color: var(--iterum-text-primary) !important;
+    border-color: var(--iterum-border-light) !important;
+}
+
+/* Force override any dark theme styles */
+[style*="background"][style*="#0f141a"],
+[style*="background"][style*="#13171d"],
+[style*="background"][style*="rgba(15, 23, 42"],
+[style*="background"][style*="rgba(19, 23, 29"] {
+    background: var(--iterum-bg-primary) !important;
+}
+
+/* Ensure sections and containers are light */
+.section,
+[class*="section"],
+.container,
+[class*="container"]:not([class*="modal"]),
+.wrapper,
+[class*="wrapper"],
+.content-wrapper,
+[class*="content"]:not([class*="modal-content"]) {
+    background: var(--iterum-bg-primary) !important;
+    color: var(--iterum-text-secondary) !important;
+}
+
+/* Ensure page backgrounds are light */
+.page,
+[class*="page"],
+.main-content,
+[class*="main"] {
+    background: var(--iterum-bg-primary) !important;
+}
+
+/* Force light backgrounds for all body elements */
+body * {
+    background-color: inherit;
+}
+
+/* Override any inline dark backgrounds */
+[style*="background: #0f141a"],
+[style*="background:#0f141a"],
+[style*="background: #13171d"],
+[style*="background:#13171d"] {
+    background: var(--iterum-bg-primary) !important;
+}
+

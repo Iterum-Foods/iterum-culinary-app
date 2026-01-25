@@ -1,0 +1,240 @@
+/**
+ * Dark Mode Enhancements
+ * Additional dark elements for better contrast
+ */
+
+/* Dark Navigation Bar - DISABLED: Using light theme for header across all pages */
+/* The header now uses the light theme from header-universal.css */
+/* 
+.unified-nav-header {
+    background: linear-gradient(135deg, #0F0E0C 0%, #1A1512 100%) !important;
+    border-bottom: 2px solid rgba(139, 78, 50, 0.5) !important;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+.nav-link {
+    color: #F5F2EB !important;
+    font-weight: 600 !important;
+}
+
+.nav-link:hover {
+    background: rgba(91, 122, 95, 0.3) !important;
+    color: #FFFFFF !important;
+}
+
+.nav-link.active {
+    background: rgba(91, 122, 95, 0.5) !important;
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+}
+
+.nav-logo {
+    color: #FFFFFF !important;
+    font-weight: 900 !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+}
+*/
+
+/* Dropdown Menus - DISABLED: Using light theme for header dropdowns */
+/*
+.nav-dropdown-content {
+    background: linear-gradient(135deg, #2A2420 0%, #1F1D1A 100%) !important;
+    border: 2px solid #4A3D2F !important;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5) !important;
+}
+
+.nav-dropdown-content a {
+    color: #F5F2EB !important;
+    font-weight: 600 !important;
+}
+
+.nav-dropdown-content a:hover {
+    background: rgba(91, 122, 95, 0.3) !important;
+    color: #FFFFFF !important;
+}
+*/
+
+/* Sidebar & Secondary Navigation */
+.sidebar, .secondary-nav {
+    background: linear-gradient(180deg, #2A2420 0%, #1A1512 100%);
+    border-right: 2px solid #4A3D2F;
+}
+
+/* Footer */
+footer {
+    background: linear-gradient(135deg, #1A1512 0%, #0F0E0C 100%);
+    color: #D8D4CC;
+    border-top: 2px solid #4A3D2F;
+}
+
+footer h3, footer h4 {
+    color: #FFFFFF;
+}
+
+/* Dashboard Stats - Dark Variant */
+.stat-card.dark {
+    background: linear-gradient(145deg, #2A2420 0%, #1F1D1A 100%);
+    border: 2px solid #4A3D2F;
+    color: #F5F2EB;
+}
+
+.stat-card.dark .stat-value {
+    color: #A85D3A;
+}
+
+.stat-card.dark .stat-label {
+    color: #AFA89D;
+}
+
+/* Action Cards - Dark Variant */
+.action-card.dark {
+    background: linear-gradient(145deg, #2A2420 0%, #1F1D1A 100%);
+    border: 2px solid #4A3D2F;
+    color: #F5F2EB;
+}
+
+.action-card.dark:hover {
+    border-color: #A85D3A;
+    box-shadow: 0 12px 40px rgba(168, 93, 58, 0.3);
+}
+
+.action-card.dark .action-title {
+    color: #FFFFFF;
+}
+
+/* Panel Sections */
+.panel-dark {
+    background: linear-gradient(145deg, #2A2420 0%, #1F1D1A 100%);
+    border: 2px solid #4A3D2F;
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+    color: #F5F2EB;
+}
+
+.panel-dark h2, .panel-dark h3 {
+    color: #FFFFFF;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* List Items Dark */
+.list-item-dark {
+    background: rgba(42, 36, 32, 0.3);
+    border: 1px solid #4A3D2F;
+    color: #F5F2EB;
+}
+
+.list-item-dark:hover {
+    background: rgba(91, 122, 95, 0.2);
+    border-color: #5B7A5F;
+}
+
+/* Badge Dark Variants */
+.badge-dark {
+    background: #2A2420;
+    color: #F5F2EB;
+    border: 1px solid #4A3D2F;
+}
+
+/* Code Blocks */
+pre, code {
+    background: #1A1512;
+    color: #F5F2EB;
+    border: 1px solid #4A3D2F;
+}
+
+/* Quotes & Callouts */
+blockquote {
+    background: linear-gradient(90deg, #2A2420 0%, transparent 100%);
+    border-left: 4px solid #A85D3A;
+    color: #F5F2EB;
+}
+
+/* Loading States */
+.loading-overlay {
+    background: rgba(15, 14, 12, 0.95);
+}
+
+.loading-spinner {
+    border-color: #4A3D2F;
+    border-top-color: #A85D3A;
+}
+
+/* Tooltips */
+.tooltip {
+    background: #1A1512;
+    color: #F5F2EB;
+    border: 1px solid #4A3D2F;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* Progress Bars */
+.progress-bar {
+    background: #2A2420;
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #5B7A5F, #A85D3A);
+}
+
+/* Alert Dark */
+.alert-dark {
+    background: #2A2420;
+    border: 2px solid #4A3D2F;
+    color: #F5F2EB;
+}
+
+.alert-dark.success {
+    border-color: #5B7A5F;
+    background: linear-gradient(135deg, #2F4034 0%, #2A2420 100%);
+}
+
+.alert-dark.warning {
+    border-color: #A85D3A;
+    background: linear-gradient(135deg, #5A2F1F 0%, #2A2420 100%);
+}
+
+.alert-dark.error {
+    border-color: #9B5A5A;
+    background: linear-gradient(135deg, #5A2F2F 0%, #2A2420 100%);
+}
+
+/* Input Dark Mode */
+input.dark-mode,
+select.dark-mode,
+textarea.dark-mode {
+    background: #2A2420;
+    border: 2px solid #4A3D2F;
+    color: #F5F2EB;
+}
+
+input.dark-mode:focus,
+select.dark-mode:focus,
+textarea.dark-mode:focus {
+    border-color: #5B7A5F;
+    box-shadow: 0 0 0 4px rgba(91, 122, 95, 0.2);
+    background: #1F1D1A;
+}
+
+input.dark-mode::placeholder {
+    color: #6B6560;
+}
+
+/* Scrollbar Dark */
+::-webkit-scrollbar {
+    width: 12px;
+    background: #1A1512;
+}
+
+::-webkit-scrollbar-track {
+    background: #1A1512;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4A3D2F;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #5B7A5F;
+}
+

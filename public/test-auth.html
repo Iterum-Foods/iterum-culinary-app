@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Test - Iterum</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 12px;
+            border: 2px solid #10b981;
+        }
+        .test-button {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #059669;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔐 Authentication Test</h1>
+        <p>Testing Firebase authentication setup...</p>
+        
+        <button class="test-button" onclick="testFirebaseConfig()">Test Firebase Config</button>
+        <button class="test-button" onclick="testAuthManager()">Test Auth Manager</button>
+        <button class="test-button" onclick="testSignIn()">Test Sign In</button>
+        
+        <div id="result" class="result" style="display: none;">
+            <h3>Test Results:</h3>
+            <div id="result-content"></div>
+        </div>
+    </div>
+
+    <!-- Load Firebase and Auth -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+
+    <script>
+        function showResult(content, isError = false) {
+            const result = document.getElementById('result');
+            const resultContent = document.getElementById('result-content');
+            
+            result.style.display = 'block';
+            result.className = isError ? 'result error' : 'result';
+            resultContent.innerHTML = content;
+        }
+
+        function testFirebaseConfig() {
+            try {
+                if (window.firebaseConfig) {
+                    showResult(`
+                        <strong>✅ Firebase Config Loaded:</strong><br>
+                        Project ID: ${window.firebaseConfig.projectId}<br>
+                        Auth Domain: ${window.firebaseConfig.authDomain}<br>
+                        API Key: ${window.firebaseConfig.apiKey.substring(0, 10)}...
+                    `);
+                } else {
+                    showResult('<strong>❌ Firebase Config Not Found</strong>', true);
+                }
+            } catch (error) {
+                showResult(`<strong>❌ Error:</strong> ${error.message}`, true);
+            }
+        }
+
+        function testAuthManager() {
+            try {
+                if (window.authManager) {
+                    showResult(`
+                        <strong>✅ Auth Manager Loaded:</strong><br>
+                        Initialized: ${window.authManager.initialized}<br>
+                        Authenticated: ${window.authManager.isAuthenticated}<br>
+                        Current User: ${window.authManager.currentUser ? 'Yes' : 'No'}
+                    `);
+                } else {
+                    showResult('<strong>❌ Auth Manager Not Found</strong>', true);
+                }
+            } catch (error) {
+                showResult(`<strong>❌ Error:</strong> ${error.message}`, true);
+            }
+        }
+
+        async function testSignIn() {
+            try {
+                if (!window.authManager) {
+                    showResult('<strong>❌ Auth Manager Not Available</strong>', true);
+                    return;
+                }
+
+                showResult('<strong>🔄 Testing Sign In...</strong><br>This will attempt to sign in with test credentials...');
+                
+                // Test with a simple email/password
+                const result = await window.authManager.signIn('test@example.com', 'testpassword');
+                
+                if (result.success) {
+                    showResult('<strong>✅ Sign In Test Successful!</strong>');
+                } else {
+                    showResult(`<strong>❌ Sign In Failed:</strong> ${result.error}`, true);
+                }
+            } catch (error) {
+                showResult(`<strong>❌ Error:</strong> ${error.message}`, true);
+            }
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                testFirebaseConfig();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

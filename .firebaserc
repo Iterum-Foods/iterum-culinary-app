@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "default": "iterum-culinary-app2",
+    "app2": "iterum-culinary-app2"
+  },
+  "targets": {
+    "iterum-culinary-app2": {
+      "hosting": {
+        "iterum-culinary-app2": [
+          "iterum-culinary-app2"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

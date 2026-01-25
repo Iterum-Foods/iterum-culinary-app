@@ -1,0 +1,72 @@
+{
+  "id": "equipment_core_boh",
+  "name": "Back of House Essentials",
+  "version": "1.0.0",
+  "items": [
+    {
+      "name": "Six Burner Range with Oven",
+      "category": "Large Equipment",
+      "subcategory": "Ranges",
+      "location": "Hot Line",
+      "quantity": 1,
+      "status": "Active"
+    },
+    {
+      "name": "Flat Top Griddle",
+      "category": "Large Equipment",
+      "subcategory": "Griddles",
+      "location": "Hot Line",
+      "quantity": 1,
+      "status": "Active"
+    },
+    {
+      "name": "Double Basket Fryer",
+      "category": "Large Equipment",
+      "subcategory": "Fryers",
+      "location": "Hot Line",
+      "quantity": 1,
+      "status": "Active"
+    },
+    {
+      "name": "Convection Oven",
+      "category": "Large Equipment",
+      "subcategory": "Ovens",
+      "location": "Bake Area",
+      "quantity": 1,
+      "status": "Active"
+    },
+    {
+      "name": "Lowboy Refrigeration",
+      "category": "Refrigeration",
+      "subcategory": "Reach-in Refrigerators",
+      "location": "Hot Line",
+      "quantity": 2,
+      "status": "Active"
+    },
+    {
+      "name": "Stand Mixer 20qt",
+      "category": "Small Kitchenware",
+      "subcategory": "Mixers",
+      "location": "Prep Kitchen",
+      "quantity": 1,
+      "status": "Active"
+    },
+    {
+      "name": "Food Processor",
+      "category": "Small Kitchenware",
+      "subcategory": "Processors",
+      "location": "Prep Kitchen",
+      "quantity": 1,
+      "status": "Active"
+    },
+    {
+      "name": "Immersion Blender",
+      "category": "Small Kitchenware",
+      "subcategory": "Mixers",
+      "location": "Prep Kitchen",
+      "quantity": 1,
+      "status": "Active"
+    }
+  ]
+}
+

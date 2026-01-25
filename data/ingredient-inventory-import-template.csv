@@ -1,0 +1,10 @@
+Ingredient Name,Category,Subcategory,Unit,Cost,Cost Per Unit,Supplier,Storage Type,Shelf Life (days),Initial Quantity,Location,Par Level,Reorder Point,Notes
+Chicken Breast,Proteins,Poultry,lb,12.99,lb,ACME Foods,Refrigerated,2,50,Main Kitchen,25,10,Organic free-range
+Olive Oil Extra Virgin,Oils & Fats,Olive Oil,gal,24.50,gal,Italian Imports,Dry,365,10,Pantry,5,2,Cold-pressed
+Roma Tomatoes,Produce,Tomatoes,lb,2.99,lb,Local Farm,Refrigerated,7,20,Walk-in Cooler,10,5,Heirloom variety
+All Purpose Flour,Dry Goods,Flour,lb,0.89,lb,Grain Supply Co,Dry,180,100,Pantry,50,25,Unbleached
+Sea Salt,Seasonings,Salt,lb,3.99,lb,Specialty Foods,Dry,999,15,Pantry,10,5,Coarse grain
+Garlic Fresh,Produce,Alliums,lb,4.50,lb,Local Farm,Dry,30,10,Pantry,5,2,California grown
+Butter Unsalted,Dairy,Butter,lb,5.99,lb,Dairy Farm,Refrigerated,14,25,Walk-in Cooler,15,8,European style
+Heavy Cream,Dairy,Cream,qt,6.50,qt,Dairy Farm,Refrigerated,7,12,Walk-in Cooler,6,3,40% butterfat
+

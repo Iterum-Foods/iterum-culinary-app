@@ -1,0 +1,212 @@
+/**
+ * Recipe Developer Contrast & UI Improvements
+ * Fixes white backgrounds and improves readability
+ */
+
+/* Override all white backgrounds */
+.recipe-canvas,
+.recipe-form-section,
+.recipe-section,
+.recipe-ideas-sidebar,
+.recipe-header,
+.idea-item,
+.nutrition-item,
+.history-modal-content,
+.sidebar-header,
+.ideas-filter,
+.sidebar-footer {
+    background: var(--bg-base) !important;
+    border-color: var(--border-light) !important;
+    color: var(--text-secondary) !important;
+}
+
+/* Ensure elevated sections stand out */
+.recipe-section,
+.nutrition-item,
+.history-entry {
+    background: var(--bg-elevated) !important;
+}
+
+/* Fix text colors throughout */
+.recipe-section-title,
+.sidebar-title,
+.idea-title,
+.nutrition-value,
+.status-label {
+    color: var(--text-primary) !important;
+}
+
+.idea-description,
+.nutrition-label,
+.history-date,
+.path-text,
+.user-name {
+    color: var(--text-tertiary) !important;
+}
+
+.idea-meta,
+.history-version,
+.info-label {
+    color: var(--text-muted) !important;
+}
+
+/* Fix idea item backgrounds */
+.idea-item {
+    background: var(--bg-elevated) !important;
+}
+
+.idea-item:hover {
+    background: var(--bg-base) !important;
+}
+
+.idea-item.selected {
+    background: var(--accent-main) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--accent-main) !important;
+}
+
+/* Fix progress indicator */
+.recipe-progress {
+    background: linear-gradient(135deg, var(--accent-main) 0%, var(--accent-hover) 100%) !important;
+}
+
+/* Fix modal backgrounds */
+.history-modal-content,
+.modal-content {
+    background: var(--bg-base) !important;
+    border: 2px solid var(--border-medium) !important;
+}
+
+.history-modal {
+    background: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Fix status badges */
+.idea-status-badge.new,
+.status-badge.new {
+    background: rgba(34, 197, 94, 0.2) !important;
+    color: var(--success) !important;
+}
+
+.idea-status-badge.in-progress,
+.status-badge.in-progress {
+    background: rgba(249, 115, 22, 0.2) !important;
+    color: var(--warning) !important;
+}
+
+.idea-status-badge.completed,
+.status-badge.completed {
+    background: rgba(34, 197, 94, 0.2) !important;
+    color: var(--success) !important;
+}
+
+.idea-status-badge.history,
+.history-version {
+    background: rgba(212, 165, 116, 0.2) !important;
+    color: var(--accent-main) !important;
+}
+
+/* Fix form inputs */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+textarea,
+select {
+    background: var(--bg-elevated) !important;
+    border-color: var(--border-medium) !important;
+    color: var(--text-primary) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    background: var(--bg-base) !important;
+    border-color: var(--accent-main) !important;
+    box-shadow: 0 0 0 3px var(--accent-fade) !important;
+}
+
+/* Fix user data info */
+.user-data-info {
+    background: rgba(6, 182, 212, 0.1) !important;
+    border-color: var(--info) !important;
+}
+
+.info-label,
+.path-text,
+.user-name {
+    color: var(--info) !important;
+}
+
+/* Fix links */
+.idea-url a {
+    color: var(--info) !important;
+}
+
+.idea-url a:hover {
+    color: var(--accent-main) !important;
+}
+
+/* Fix history items */
+.history-item {
+    border-left-color: var(--accent-main) !important;
+}
+
+.history-entry {
+    background: var(--bg-elevated) !important;
+    border-color: var(--border-light) !important;
+}
+
+.history-changes span {
+    background: rgba(6, 182, 212, 0.2) !important;
+    color: var(--info) !important;
+}
+
+/* Ensure all section headers are visible */
+.section-header,
+.sidebar-header,
+.recipe-header {
+    border-bottom-color: var(--border-medium) !important;
+}
+
+/* Fix spacing and shadows */
+.recipe-canvas,
+.recipe-form-section,
+.recipe-section {
+    box-shadow: var(--shadow-md) !important;
+}
+
+.recipe-canvas:hover,
+.recipe-form-section:hover,
+.recipe-section:hover {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+/* Ensure hover states work */
+.idea-item:hover {
+    border-color: var(--accent-main) !important;
+}
+
+/* Fix any remaining hardcoded grays */
+.ideas-filter,
+.sidebar-footer {
+    border-color: var(--border-light) !important;
+}
+
+/* Fix progress step colors */
+.progress-step {
+    color: rgba(212, 165, 116, 0.6) !important;
+}
+
+.progress-step.active {
+    color: var(--text-primary) !important;
+}
+
+.progress-step.completed {
+    color: var(--success) !important;
+}
+
+.progress-connector {
+    background: rgba(212, 165, 116, 0.2) !important;
+}
+

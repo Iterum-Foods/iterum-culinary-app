@@ -1,0 +1,2460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Management - Iterum Culinary</title>
+    
+    <!-- Load Auth System -->
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    <script src="assets/js/auth-api-helper.js"></script>
+    <script src="assets/js/auth-diagnostics.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- UNIFIED COLOR SYSTEM - MUST LOAD FIRST -->
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
+    
+    <!-- Unified Styles -->
+    <link rel="stylesheet" href="assets/css/tailwind-output.css">
+    <link rel="stylesheet" href="assets/css/iterum-design-system.css">
+    <link rel="stylesheet" href="assets/css/premium-ui-system.css">
+    <link rel="stylesheet" href="assets/css/unified-cards.css">
+    <link rel="stylesheet" href="assets/css/page-layouts.css">
+    <link rel="stylesheet" href="assets/css/high-contrast-universal.css">
+    <link rel="stylesheet" href="assets/css/nordic-design-system.css">
+    
+    <!-- Unified Navigation -->
+    <script src="assets/js/unified-nav-header.js" defer></script>
+    <script src="assets/js/unified-project-selector.js" defer></script>
+    
+    <link rel="stylesheet" href="assets/css/modern-nordic-vintage.css">
+    <link rel="stylesheet" href="assets/css/dark-mode-enhancements.css">
+    <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
+    <link rel="stylesheet" href="assets/css/header-universal.css">
+    <style>
+        .equipment-vertical-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .equipment-list-item {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .equipment-list-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .equipment-list-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 0.875rem;
+            color: #475569;
+        }
+
+        .equipment-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .status-active { background: #dcfce7; color: #047857; }
+        .status-maintenance { background: #fef3c7; color: #92400e; }
+        .status-repair { background: #fee2e2; color: #b91c1c; }
+        .status-retired { background: #e2e8f0; color: #475569; }
+
+        .equipment-list-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .catalog-section {
+            margin-top: 24px;
+        }
+
+        .catalog-section h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1f2937;
+        }
+
+        .catalog-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .catalog-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            border: 1px dashed rgba(37, 99, 235, 0.32);
+            border-radius: 14px;
+            padding: 16px;
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .catalog-card h4 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .catalog-card p {
+            margin: 6px 0 0;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .catalog-meta {
+            font-size: 0.8rem;
+            color: #475569;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .catalog-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(15, 23, 42, 0.05);
+            color: #1f2937;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen" style="padding-top: 80px;">
+    <!-- Header injected by unified-nav-header.js -->
+
+    <main>
+        <div class="container">
+            <!-- Page Header -->
+            <div class="card mb-6">
+                <div class="card-header-gradient">
+                    <h1 class="card-title" style="font-size: 2rem;">🔧 Equipment Management</h1>
+                    <p class="card-subtitle">Manage kitchen equipment, track inventory, and plan future purchases</p>
+                </div>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="card mb-6">
+                <div style="padding: 20px;">
+                    <div class="stats-row">
+                        <div class="stat-item-centered">
+                            <div class="stat-value" id="total-equipment">0</div>
+                            <div class="stat-label">Total Equipment</div>
+                        </div>
+                        <div class="stat-item-centered">
+                            <div class="stat-value text-warning" id="maintenance-due">0</div>
+                            <div class="stat-label">Maintenance Due</div>
+                        </div>
+                        <div class="stat-item-centered">
+                            <div class="stat-value text-error" id="repair-needed">0</div>
+                            <div class="stat-label">Repair Needed</div>
+                        </div>
+                        <div class="stat-item-centered">
+                            <div class="stat-value text-success" id="active-vendors">0</div>
+                            <div class="stat-label">Active Vendors</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="card mb-6">
+                <div style="padding: 20px;">
+                    <div class="button-group">
+                        <button onclick="openAddEquipmentModal()" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                            ➕ Add Equipment
+                        </button>
+                        <button onclick="window.importService?.openEquipmentCSVImport()" class="btn">
+                            📄 Import Equipment (CSV / Excel)
+                        </button>
+                        <button onclick="openAddWishlistModal()" class="btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
+                            ⭐ Add to Wishlist
+                        </button>
+                        <button onclick="exportEquipmentData()" class="btn">
+                            📤 Export
+                        </button>
+                        <button onclick="importEquipmentData()" class="btn">
+                            📥 Import
+                        </button>
+                        <button onclick="location.href='index.html'" class="btn">
+                            🏠 Dashboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs for Equipment Types -->
+            <div class="card mb-6">
+                <div style="padding: 20px 20px 0 20px;">
+                    <div style="display: flex; gap: 10px; border-bottom: 3px solid #e2e8f0; flex-wrap: wrap;">
+                        <button class="tab-btn active" onclick="switchEquipmentTab('current')" id="tab-current">
+                            🔧 Current Equipment
+                        </button>
+                        <button class="tab-btn" onclick="switchEquipmentTab('plates')" id="tab-plates">
+                            🍽️ Plates & Dishes
+                        </button>
+                        <button class="tab-btn" onclick="switchEquipmentTab('silverware')" id="tab-silverware">
+                            🍴 Silverware
+                        </button>
+                        <button class="tab-btn" onclick="switchEquipmentTab('glassware')" id="tab-glassware">
+                            🥃 Glassware
+                        </button>
+                        <button class="tab-btn" onclick="switchEquipmentTab('wishlist')" id="tab-wishlist">
+                            ⭐ Wishlist
+                        </button>
+                        <button class="tab-btn" onclick="switchEquipmentTab('inventory')" id="tab-inventory">
+                            📦 Inventory
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Equipment Tab -->
+            <div id="equipment-tab-current" class="equipment-tab active">
+                <div class="equipment-vertical-list" id="equipment-list">
+                    <!-- Equipment items will be populated here -->
+                </div>
+                <div class="card mt-6">
+                    <div class="catalog-section">
+                        <h3>📚 Quick Add from Catalogs</h3>
+                        <p style="color: #475569; font-size: 0.9rem; margin-bottom: 12px;">
+                            Use curated equipment packs to seed your inventory faster. Review items before importing.
+                        </p>
+                        <div id="equipment-catalog-list" class="catalog-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plates & Dishes Tab -->
+            <div id="equipment-tab-plates" class="equipment-tab hidden">
+                <div class="card">
+                    <div id="plates-inventory"></div>
+                </div>
+                <div class="card">
+                    <div class="catalog-section">
+                        <h3>📚 Quick Add Catalog</h3>
+                        <div id="plates-catalog" class="catalog-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Silverware Tab -->
+            <div id="equipment-tab-silverware" class="equipment-tab hidden">
+                <div class="card">
+                    <div id="silverware-inventory"></div>
+                </div>
+                <div class="card">
+                    <div class="catalog-section">
+                        <h3>🍴 Quick Add Catalog</h3>
+                        <div id="silverware-catalog" class="catalog-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Glassware Tab -->
+            <div id="equipment-tab-glassware" class="equipment-tab hidden">
+                <div class="card">
+                    <div id="glassware-inventory"></div>
+                </div>
+                <div class="card">
+                    <div class="catalog-section">
+                        <h3>🥂 Quick Add Catalog</h3>
+                        <div id="glassware-catalog" class="catalog-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wishlist Tab -->
+            <div id="equipment-tab-wishlist" class="equipment-tab hidden">
+                <div class="mb-6">
+                    <button onclick="openAddWishlistModal()" class="btn btn-primary">
+                        ⭐ Add to Wishlist
+                    </button>
+                </div>
+                <div class="grid-3-col" id="wishlist-grid">
+                    <!-- Wishlist items will be populated here -->
+                </div>
+            </div>
+
+            <!-- Inventory Tab -->
+            <div id="equipment-tab-inventory" class="equipment-tab hidden">
+                <div class="card mb-6">
+                    <h2 class="heading-2 mb-4">📦 Equipment Inventory Overview</h2>
+                    <div class="stats-grid-enhanced">
+                        <div class="stat-card-enhanced blue">
+                            <div class="stat-icon-enhanced">📊</div>
+                            <div class="stat-value-enhanced" id="total-items-in-stock">0</div>
+                            <div class="stat-label-enhanced">Items In Stock</div>
+                        </div>
+                        <div class="stat-card-enhanced orange">
+                            <div class="stat-icon-enhanced">⚠️</div>
+                            <div class="stat-value-enhanced" id="low-stock-count">0</div>
+                            <div class="stat-label-enhanced">Low Stock</div>
+                        </div>
+                        <div class="stat-card-enhanced green">
+                            <div class="stat-icon-enhanced">💰</div>
+                            <div class="stat-value-enhanced" id="total-equipment-value">$0</div>
+                            <div class="stat-label-enhanced">Total Value</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid-2-col" id="inventory-grid">
+                    <!-- Inventory items will be populated here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Wishlist Item Modal -->
+    <div id="add-wishlist-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="text-xl font-bold text-gray-800">⭐ Add to Future Equipment Wishlist</h3>
+                <button id="close-wishlist-modal" class="text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
+            </div>
+            <form id="add-wishlist-form" class="p-6 space-y-4">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="wishlist-name" class="form-label">Equipment Name *</label>
+                        <input type="text" id="wishlist-name" class="form-input" placeholder="e.g., Sous Vide Immersion Circulator" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="wishlist-category" class="form-label">Category *</label>
+                        <select id="wishlist-category" class="form-select" required>
+                            <option value="">Select Category</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="wishlist-cost" class="form-label">Estimated Cost</label>
+                        <input type="number" id="wishlist-cost" class="form-input" placeholder="0.00" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="wishlist-priority" class="form-label">Priority</label>
+                        <select id="wishlist-priority" class="form-select">
+                            <option value="High">🔴 High</option>
+                            <option value="Medium" selected>🟡 Medium</option>
+                            <option value="Low">🟢 Low</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="wishlist-target-date" class="form-label">Target Purchase Date</label>
+                        <input type="date" id="wishlist-target-date" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="wishlist-vendor" class="form-label">Preferred Vendor</label>
+                        <input type="text" id="wishlist-vendor" class="form-input" placeholder="Vendor name">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="wishlist-reason" class="form-label">Reason/Justification</label>
+                    <textarea id="wishlist-reason" class="form-textarea" rows="3" placeholder="Why is this equipment needed?"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="wishlist-url" class="form-label">Product URL</label>
+                    <input type="url" id="wishlist-url" class="form-input" placeholder="https://...">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        ⭐ Add to Wishlist
+                    </button>
+                    <button type="button" id="cancel-wishlist" class="btn btn-secondary">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Equipment Modal -->
+    <div id="add-equipment-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="text-xl font-bold text-gray-800">Add New Equipment</h3>
+                <button id="close-add-equipment-modal" class="text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
+            </div>
+            <form id="add-equipment-form" class="p-6 space-y-4">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="equipment-name" class="form-label">Equipment Name *</label>
+                        <input type="text" id="equipment-name" name="equipment-name" class="form-input" placeholder="e.g., Commercial Blender" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="equipment-category" class="form-label">Category *</label>
+                        <select id="equipment-category" name="equipment-category" class="form-select" required>
+                            <option value="">Select Category</option>
+                            <optgroup label="🍽️ Serving Ware">
+                                <option value="plates">🍽️ Plates & Dishes</option>
+                                <option value="silverware">🍴 Silverware & Flatware</option>
+                                <option value="glassware">🥃 Glassware & Barware</option>
+                            </optgroup>
+                            <optgroup label="⚙️ Kitchen Equipment">
+                                <option value="Front of House">🍽️ Front of House</option>
+                                <option value="Small Kitchenware">🥄 Small Kitchenware</option>
+                                <option value="Large Equipment">🏭 Large Equipment</option>
+                                <option value="Beverage Equipment">🥤 Beverage Equipment</option>
+                                <option value="Refrigeration">❄️ Refrigeration</option>
+                                <option value="Storage">📦 Storage</option>
+                                <option value="Safety">🛡️ Safety Equipment</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="equipment-quantity" class="form-label">Quantity *</label>
+                        <input type="number" id="equipment-quantity" name="equipment-quantity" class="form-input" placeholder="1" min="1" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="equipment-brand" class="form-label">Brand/Model</label>
+                        <input type="text" id="equipment-brand" name="equipment-brand" class="form-input" placeholder="e.g., Vitamix 5200">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="equipment-serial" class="form-label">Serial Number</label>
+                        <input type="text" id="equipment-serial" name="equipment-serial" class="form-input" placeholder="e.g., VM5200-12345">
+                    </div>
+                    <div class="form-group">
+                        <label for="equipment-purchase-date" class="form-label">Purchase Date</label>
+                        <input type="date" id="equipment-purchase-date" name="equipment-purchase-date" class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="equipment-purchase-price" class="form-label">Purchase Price ($)</label>
+                        <input type="number" id="equipment-purchase-price" name="equipment-purchase-price" class="form-input" placeholder="0.00" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="equipment-purchase-url" class="form-label">Purchase Link (URL)</label>
+                        <input type="url" id="equipment-purchase-url" name="equipment-purchase-url" class="form-input" placeholder="https://...">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="equipment-warranty" class="form-label">Warranty Expiry</label>
+                        <input type="date" id="equipment-warranty" name="equipment-warranty" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="equipment-status" class="form-label">Status *</label>
+                        <select id="equipment-status" name="equipment-status" class="form-select" required>
+                            <option value="Active">🟢 Active</option>
+                            <option value="Maintenance">🟡 Maintenance Due</option>
+                            <option value="Repair">🔴 Needs Repair</option>
+                            <option value="Retired">⚫ Retired</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                        <input type="text" id="equipment-location" name="equipment-location" class="notebook-input w-full" placeholder="e.g., Main Kitchen, Prep Station">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Last Maintenance Date</label>
+                        <input type="date" id="equipment-last-maintenance" name="equipment-last-maintenance" class="notebook-input w-full">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Next Maintenance Due</label>
+                        <input type="date" id="equipment-next-maintenance" name="equipment-next-maintenance" class="notebook-input w-full">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Maintenance Notes</label>
+                    <textarea id="equipment-maintenance-notes" name="equipment-maintenance-notes" class="notebook-input w-full" rows="3" placeholder="Any specific maintenance requirements or notes..."></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea id="equipment-description" name="equipment-description" class="notebook-input w-full" rows="3" placeholder="Equipment description, specifications, or usage notes..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        ➕ Add Equipment
+                    </button>
+                    <button type="button" id="cancel-add-equipment" class="btn btn-secondary">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Equipment Modal -->
+    <div id="edit-equipment-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="text-xl font-bold text-gray-800">Edit Equipment</h3>
+                <button id="close-edit-equipment-modal" class="text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
+            </div>
+            <form id="edit-equipment-form" class="p-6 space-y-4">
+                <input type="hidden" id="edit-equipment-id">
+                <!-- Same form fields as add equipment, but with edit- prefix -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Equipment Name *</label>
+                        <input type="text" id="edit-equipment-name" name="edit-equipment-name" class="notebook-input w-full" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                        <select id="edit-equipment-category" name="edit-equipment-category" class="notebook-input w-full" required>
+                            <option value="">Select Category</option>
+                            <option value="Front of House">🍽️ Front of House</option>
+                            <option value="Small Kitchenware">🥄 Small Kitchenware</option>
+                            <option value="Large Equipment">🏭 Large Equipment</option>
+                            <option value="Beverage Equipment">🥤 Beverage Equipment</option>
+                            <option value="Refrigeration">❄️ Refrigeration</option>
+                            <option value="Storage">📦 Storage</option>
+                            <option value="Safety">🛡️ Safety Equipment</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Quantity *</label>
+                        <input type="number" id="edit-equipment-quantity" name="edit-equipment-quantity" class="notebook-input w-full" placeholder="1" min="1" value="1" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Brand/Model</label>
+                        <input type="text" id="edit-equipment-brand" name="edit-equipment-brand" class="notebook-input w-full">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Serial Number</label>
+                        <input type="text" id="edit-equipment-serial" name="edit-equipment-serial" class="notebook-input w-full">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Date</label>
+                        <input type="date" id="edit-equipment-purchase-date" name="edit-equipment-purchase-date" class="notebook-input w-full">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Price ($)</label>
+                        <input type="number" id="edit-equipment-purchase-price" name="edit-equipment-purchase-price" class="notebook-input w-full" placeholder="0.00" step="0.01" min="0">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Purchase Link (URL)</label>
+                        <input type="url" id="edit-equipment-purchase-url" name="edit-equipment-purchase-url" class="notebook-input w-full" placeholder="https://...">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Warranty Expiry</label>
+                        <input type="date" id="edit-equipment-warranty" name="edit-equipment-warranty" class="notebook-input w-full">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Status *</label>
+                        <select id="edit-equipment-status" name="edit-equipment-status" class="notebook-input w-full" required>
+                            <option value="Active">🟢 Active</option>
+                            <option value="Maintenance">🟡 Maintenance Due</option>
+                            <option value="Repair">🔴 Needs Repair</option>
+                            <option value="Retired">⚫ Retired</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                        <input type="text" id="edit-equipment-location" name="edit-equipment-location" class="notebook-input w-full">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Last Maintenance Date</label>
+                        <input type="date" id="edit-equipment-last-maintenance" name="edit-equipment-last-maintenance" class="notebook-input w-full">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Next Maintenance Due</label>
+                        <input type="date" id="edit-equipment-next-maintenance" name="edit-equipment-next-maintenance" class="notebook-input w-full">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Maintenance Notes</label>
+                    <textarea id="edit-equipment-maintenance-notes" name="edit-equipment-maintenance-notes" class="notebook-input w-full" rows="3"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea id="edit-equipment-description" name="edit-equipment-description" class="notebook-input w-full" rows="3"></textarea>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold">
+                        Update Equipment
+                    </button>
+                    <button type="button" id="cancel-edit-equipment" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-4 rounded-lg">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Equipment Import Confirmation Modal -->
+    <div id="equipment-import-modal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="bg-gradient-to-r from-[#4a7c2c] to-[#6ba83d] p-6 text-white rounded-t-xl">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2">📦 Add Equipment to Inventory</h3>
+                        <p class="text-white/90 text-sm">Customize details before adding to your equipment list</p>
+                    </div>
+                    <button id="close-import-modal" class="text-white/80 hover:text-white text-3xl font-bold leading-none">&times;</button>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                <!-- Product Preview -->
+                <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 mb-6 border border-gray-200">
+                    <div class="flex items-start gap-4">
+                        <div class="w-20 h-20 bg-white rounded-lg flex items-center justify-center text-4xl shadow-sm">
+                            🍴
+                        </div>
+                        <div class="flex-1">
+                            <h4 id="import-product-name" class="text-xl font-bold text-gray-800 mb-1"></h4>
+                            <p id="import-product-category" class="text-sm text-gray-600 mb-2"></p>
+                            <div class="flex items-center gap-4">
+                                <span id="import-product-brand" class="text-sm font-medium text-gray-700"></span>
+                                <span id="import-product-price" class="text-lg font-bold text-[#4a7c2c]"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="import-product-description" class="mt-3 text-sm text-gray-700 bg-white/50 rounded p-3"></div>
+                </div>
+                
+                <!-- Customization Form -->
+                <form id="equipment-import-form" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Equipment Name *
+                            </label>
+                            <input type="text" id="import-equipment-name" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a7c2c] focus:border-transparent"
+                                   required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Brand/Manufacturer
+                            </label>
+                            <input type="text" id="import-equipment-brand" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a7c2c] focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Location in Kitchen
+                            </label>
+                            <select id="import-equipment-location" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a7c2c] focus:border-transparent">
+                                <option value="">Select location...</option>
+                                <option value="Prep Station">Prep Station</option>
+                                <option value="Cook Line">Cook Line</option>
+                                <option value="Baking Area">Baking Area</option>
+                                <option value="Dish Pit">Dish Pit</option>
+                                <option value="Walk-in Cooler">Walk-in Cooler</option>
+                                <option value="Walk-in Freezer">Walk-in Freezer</option>
+                                <option value="Dry Storage">Dry Storage</option>
+                                <option value="Office">Office</option>
+                                <option value="Mobile">Mobile</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Status
+                            </label>
+                            <select id="import-equipment-status" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a7c2c] focus:border-transparent">
+                                <option value="Active">✓ Active</option>
+                                <option value="Inactive">○ Inactive</option>
+                                <option value="Maintenance">🔧 Maintenance</option>
+                                <option value="Ordered">📦 Ordered</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Purchase Price
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                                <input type="number" id="import-equipment-price" step="0.01"
+                                       class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a7c2c] focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Purchase Date
+                            </label>
+                            <input type="date" id="import-equipment-purchase-date" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a7c2c] focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Quantity
+                            </label>
+                            <input type="number" id="import-equipment-quantity" value="1" min="1"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a7c2c] focus:border-transparent">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Warranty (months)
+                            </label>
+                            <input type="number" id="import-equipment-warranty" min="0"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a7c2c] focus:border-transparent">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Notes / Description
+                        </label>
+                        <textarea id="import-equipment-notes" rows="3"
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a7c2c] focus:border-transparent"
+                                  placeholder="Additional notes, specifications, or usage instructions..."></textarea>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex gap-3 pt-4">
+                        <button type="submit" 
+                                class="flex-1 bg-gradient-to-r from-[#4a7c2c] to-[#6ba83d] hover:from-[#3d6a25] hover:to-[#5a9632] text-white py-3 px-6 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                            <span class="text-xl">✓</span>
+                            <span>Add to Equipment</span>
+                        </button>
+                        <button type="button" id="cancel-import-modal" 
+                                class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2">
+                            <span class="text-xl">×</span>
+                            <span>Cancel</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- WebstaurantStore Integration Modal -->
+    <div id="webstaurant-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center p-6 border-b bg-gradient-to-r from-[#4a7c2c] to-[#6ba83d] text-white rounded-t-lg">
+                <div>
+                    <h3 class="text-2xl font-bold">🛒 WebstaurantStore Equipment Catalog</h3>
+                    <p class="text-white/90 text-sm mt-1">Browse 105+ commercial kitchen equipment items</p>
+                </div>
+                <button id="close-webstaurant-modal" class="text-white/80 hover:text-white text-3xl font-bold leading-none">&times;</button>
+            </div>
+            
+            <div class="p-6">
+                <!-- Search Controls -->
+                <div class="mb-6">
+                    <div class="flex gap-4 mb-4">
+                        <div class="flex-1">
+                            <input type="text" id="webstaurant-search" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a7c2c] focus:border-transparent"
+                                   placeholder="Search equipment (e.g., 'commercial mixer', 'refrigeration unit')">
+                        </div>
+                        <button id="webstaurant-search-btn" 
+                                class="px-6 py-2 bg-[#4a7c2c] text-white rounded-lg hover:bg-[#3d6a25] transition-colors">
+                            🔍 Search
+                        </button>
+                        <button id="webstaurant-browse-btn" 
+                                class="px-6 py-2 bg-[#795548] text-white rounded-lg hover:bg-[#6d4c41] transition-colors">
+                            📂 Browse Categories
+                        </button>
+                        <button id="open-url-import-btn" 
+                                class="px-6 py-2 bg-[#e67e22] text-white rounded-lg hover:bg-[#d35400] transition-colors">
+                            🔗 Import from URL
+                        </button>
+                    </div>
+                    
+                    <!-- Category Quick Links -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+                        <button class="category-btn px-3 py-1 text-sm bg-gray-100 hover:bg-[#4a7c2c] hover:text-white rounded transition-colors" data-category="refrigeration">❄️ Refrigeration</button>
+                        <button class="category-btn px-3 py-1 text-sm bg-gray-100 hover:bg-[#4a7c2c] hover:text-white rounded transition-colors" data-category="cooking">🔥 Cooking</button>
+                        <button class="category-btn px-3 py-1 text-sm bg-gray-100 hover:bg-[#4a7c2c] hover:text-white rounded transition-colors" data-category="preparation">🔪 Prep</button>
+                        <button class="category-btn px-3 py-1 text-sm bg-gray-100 hover:bg-[#4a7c2c] hover:text-white rounded transition-colors" data-category="storage">📦 Storage</button>
+                        <button class="category-btn px-3 py-1 text-sm bg-gray-100 hover:bg-[#4a7c2c] hover:text-white rounded transition-colors" data-category="cleaning">🧽 Cleaning</button>
+                        <button class="category-btn px-3 py-1 text-sm bg-gray-100 hover:bg-[#4a7c2c] hover:text-white rounded transition-colors" data-category="safety">🛡️ Safety</button>
+                        <button class="category-btn px-3 py-1 text-sm bg-gray-100 hover:bg-[#4a7c2c] hover:text-white rounded transition-colors" data-category="smallwares">🥄 Smallwares</button>
+                        <button class="category-btn px-3 py-1 text-sm bg-gray-100 hover:bg-[#4a7c2c] hover:text-white rounded transition-colors" data-category="beverage">🥤 Beverage</button>
+                    </div>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="webstaurant-loading" class="hidden text-center py-8">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4a7c2c] mx-auto mb-4"></div>
+                    <p class="text-gray-600">Searching WebstaurantStore...</p>
+                </div>
+                
+                <!-- Search Results -->
+                <div id="webstaurant-results" class="hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="text-lg font-semibold text-gray-800">Search Results</h4>
+                        <div class="text-sm text-gray-600">
+                            <span id="webstaurant-result-count">0</span> items found
+                        </div>
+                    </div>
+                    
+                    <div id="webstaurant-products" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                        <!-- Products will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- No Results -->
+                <div id="webstaurant-no-results" class="hidden text-center py-8">
+                    <div class="text-gray-400 text-6xl mb-4">🔍</div>
+                    <h4 class="text-lg font-semibold text-gray-600 mb-2">No equipment found</h4>
+                    <p class="text-gray-500">Try adjusting your search terms or browse categories</p>
+                </div>
+                
+                <!-- Error State -->
+                <div id="webstaurant-error" class="hidden text-center py-8">
+                    <div class="text-red-400 text-6xl mb-4">⚠️</div>
+                    <h4 class="text-lg font-semibold text-red-600 mb-2">Search Error</h4>
+                    <p class="text-red-500" id="webstaurant-error-message">Unable to search WebstaurantStore</p>
+                    <button id="webstaurant-retry-btn" class="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">
+                        🔄 Try Again
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Equipment Database Modal -->
+    <div id="equipment-db-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="text-xl font-bold text-gray-800">📚 Equipment Database</h3>
+                <button id="close-equipment-db-modal" class="text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
+            </div>
+            
+            <div class="p-6">
+                <!-- Database Controls -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <button id="load-equipment-db" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold">
+                            🔄 Load Equipment Database
+                        </button>
+                        <div class="flex gap-2">
+                            <input type="text" id="equipment-db-search" placeholder="🔍 Search equipment..." 
+                                   class="notebook-input px-3 py-2 w-64">
+                            <select id="equipment-db-category-filter" class="notebook-input px-3 py-2">
+                                <option value="">🏷️ All Categories</option>
+                                <option value="Front of House">🍽️ Front of House</option>
+                                <option value="Small Kitchenware">🥄 Small Kitchenware</option>
+                                <option value="Large Equipment">🏭 Large Equipment</option>
+                                <option value="Beverage Equipment">🥤 Beverage Equipment</option>
+                                <option value="Refrigeration">❄️ Refrigeration</option>
+                                <option value="Storage">📦 Storage</option>
+                                <option value="Safety">🛡️ Safety Equipment</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Database Results -->
+                <div id="equipment-db-results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Equipment database items will be populated here -->
+                </div>
+
+                <!-- No Results Message -->
+                <div id="no-equipment-db-results" class="hidden text-center py-12">
+                    <div class="text-6xl mb-4">📚</div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-2">No equipment found in database</h3>
+                    <p class="text-gray-500">Try adjusting your search or loading the database first</p>
+                </div>
+
+                <!-- Loading Message -->
+                <div id="equipment-db-loading" class="hidden text-center py-12">
+                    <div class="text-6xl mb-4">⏳</div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-2">Loading equipment database...</h3>
+                    <p class="text-gray-500">Please wait while we fetch the equipment data</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- URL Import Modal -->
+    <div id="url-import-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center p-6 border-b">
+                <h3 class="text-xl font-bold text-gray-800">🔗 Import Equipment from URL</h3>
+                <button id="close-url-import-modal" class="text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
+            </div>
+            
+            <div class="p-6">
+                <!-- URL Input Section -->
+                <div class="mb-6">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <h4 class="font-semibold text-blue-800 mb-2">🌐 Supported Suppliers</h4>
+                        <div class="text-sm text-blue-700 space-y-1">
+                            <p>• <strong>WebRestaurant Store</strong> - Complete product info with specs</p>
+                            <p>• <strong>Amazon Business</strong> - Commercial equipment listings</p>
+                            <p>• <strong>Home Depot Pro</strong> - Professional kitchen equipment</p>
+                            <p>• <strong>Restaurant Depot</strong> - Bulk commercial supplies</p>
+                            <p>• <strong>Katom</strong> - Restaurant supply equipment</p>
+                            <p>• <strong>Any supplier website</strong> - Generic parsing available</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4 mb-4">
+                        <div class="flex-1">
+                            <input type="url" id="equipment-url-input" 
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4a7c2c] focus:border-transparent text-lg"
+                                   placeholder="Paste equipment URL here (e.g., https://www.webstaurantstore.com/...)">
+                        </div>
+                        <button id="parse-url-btn" 
+                                class="px-8 py-3 bg-[#4a7c2c] text-white rounded-lg hover:bg-[#3d6a25] transition-colors font-semibold">
+                            🔍 Parse URL
+                        </button>
+                    </div>
+                    
+                    <div class="text-sm text-gray-600">
+                        <p><strong>💡 How to use:</strong> Copy the URL from any equipment product page and paste it above. We'll automatically extract the product details!</p>
+                    </div>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="url-parsing-loading" class="hidden text-center py-8">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4a7c2c] mx-auto mb-4"></div>
+                    <p class="text-gray-600">Parsing equipment data from URL...</p>
+                </div>
+                
+                <!-- Error State -->
+                <div id="url-parsing-error" class="hidden">
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                        <h4 class="font-semibold text-red-800 mb-2">❌ Parsing Error</h4>
+                        <p id="url-error-message" class="text-red-700"></p>
+                        <div class="mt-2 text-sm text-red-600">
+                            <p><strong>Troubleshooting:</strong></p>
+                            <ul class="list-disc list-inside mt-1">
+                                <li>Check that the URL is correct and accessible</li>
+                                <li>Make sure it's a product page (not a category or search page)</li>
+                                <li>Try copying the URL directly from the browser address bar</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Parsed Equipment Preview -->
+                <div id="parsed-equipment-preview" class="hidden">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-4">
+                        <h4 class="font-semibold text-green-800 mb-4">✅ Equipment Parsed Successfully!</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h5 class="font-medium text-gray-700 mb-2">Basic Information</h5>
+                                <div class="space-y-2 text-sm">
+                                    <p><strong>Name:</strong> <span id="parsed-name"></span></p>
+                                    <p><strong>Brand:</strong> <span id="parsed-brand"></span></p>
+                                    <p><strong>Model:</strong> <span id="parsed-model"></span></p>
+                                    <p><strong>Category:</strong> <span id="parsed-category"></span></p>
+                                    <p><strong>Price:</strong> $<span id="parsed-price"></span></p>
+                                    <p><strong>Supplier:</strong> <span id="parsed-supplier"></span></p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h5 class="font-medium text-gray-700 mb-2">Specifications</h5>
+                                <div id="parsed-specs" class="text-sm text-gray-600 max-h-32 overflow-y-auto">
+                                    <!-- Specifications will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h5 class="font-medium text-gray-700 mb-2">Description</h5>
+                            <p id="parsed-description" class="text-sm text-gray-600"></p>
+                        </div>
+                        
+                        <div class="mt-6 flex justify-end gap-3">
+                            <button id="edit-parsed-equipment" 
+                                    class="px-4 py-2 bg-[#f39c12] text-white rounded-lg hover:bg-[#e67e22] transition-colors">
+                                ✏️ Edit Before Adding
+                            </button>
+                            <button id="import-parsed-equipment" 
+                                    class="px-6 py-2 bg-[#4a7c2c] text-white rounded-lg hover:bg-[#3d6a25] transition-colors font-semibold">
+                                📥 Add to Equipment
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent URLs -->
+                <div id="recent-urls-section" class="hidden">
+                    <h4 class="font-semibold text-gray-700 mb-3">🕒 Recently Parsed URLs</h4>
+                    <div id="recent-urls-list" class="space-y-2">
+                        <!-- Recent URLs will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+      // Toggle user dropdown menu
+      function toggleUserDropdown() {
+        const dropdown = document.getElementById('user-dropdown');
+        const userTab = document.querySelector('.header-user-tab');
+        
+        if (dropdown && userTab) {
+          dropdown.classList.toggle('active');
+          userTab.classList.toggle('active');
+        }
+      }
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('user-dropdown');
+        const userTab = document.querySelector('.header-user-tab');
+        
+        if (dropdown && userTab && !userTab.contains(event.target) && !dropdown.contains(event.target)) {
+          dropdown.classList.remove('active');
+          userTab.classList.remove('active');
+        }
+      });
+
+      // Toggle mobile navigation
+      function toggleMobileNav() {
+        const mobileNav = document.getElementById('mobile-nav');
+        if (mobileNav) {
+          mobileNav.classList.toggle('active');
+        }
+      }
+
+      // Close mobile nav when clicking outside
+      document.addEventListener('click', function(event) {
+        const mobileNav = document.getElementById('mobile-nav');
+        const mobileToggle = document.querySelector('.header-mobile-toggle');
+        
+        if (mobileNav && mobileToggle && !mobileToggle.contains(event.target) && !mobileNav.contains(event.target)) {
+          mobileNav.classList.remove('active');
+        }
+      });
+    </script>
+
+    <!-- Essential Scripts -->
+    <!-- Load Firebase Configuration -->
+    <script src="assets/js/firebase-config.js"></script>
+    
+    <!-- Load Firebase Authentication -->
+    <script type="module" src="assets/js/firebase-auth.js"></script>
+    <script type="module" src="assets/js/firebase-auth-ui.js"></script>
+    
+    <!-- Load Unified Authentication System -->
+    <script src="assets/js/unified_auth_system.js"></script>
+    
+    <!-- Load Page Protection System -->
+    <script src="assets/js/page-protection.js"></script>
+    
+    <!-- Load Header User Synchronization -->
+    <script src="assets/js/header_user_sync.js"></script>
+    
+    <!-- Load Header Sync Loader (ensures sync on all pages) -->
+    <script src="assets/js/header_sync_loader.js"></script>
+    
+    <!-- Enhanced User Management now handled by Firebase Auth -->
+    <script src="assets/js/project-management-system.js"></script>
+    <!-- Project management now handled by new system -->
+    <script src="assets/js/error_handler.js"></script>
+    
+    <!-- Equipment Management Functions -->
+    <script>
+      // Equipment Management Functions
+      function openAddEquipmentModal() {
+        const modal = document.getElementById('add-equipment-modal');
+        if (modal) {
+          modal.classList.remove('hidden');
+        }
+      }
+
+      function closeAddEquipmentModal() {
+        const modal = document.getElementById('add-equipment-modal');
+        if (modal) {
+          modal.classList.add('hidden');
+        }
+        // Reset form
+        const form = document.getElementById('add-equipment-form');
+        if (form) form.reset();
+      }
+      
+      // Handle equipment form submission
+      document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('add-equipment-form');
+        if (form) {
+          form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const currentUser = window.authManager?.currentUser || window.currentUser;
+            const userId = currentUser?.userId || currentUser?.id || 'guest';
+            
+            const equipment = {
+              id: 'equip_' + Date.now(),
+              name: document.getElementById('equipment-name').value,
+              category: document.getElementById('equipment-category').value,
+              quantity: parseInt(document.getElementById('equipment-quantity').value) || 1,
+              brand: document.getElementById('equipment-brand').value,
+              serialNumber: document.getElementById('equipment-serial').value,
+              purchaseDate: document.getElementById('equipment-purchase-date').value,
+              purchasePrice: parseFloat(document.getElementById('equipment-purchase-price')?.value) || 0,
+              purchaseUrl: document.getElementById('equipment-purchase-url')?.value || '',
+              warrantyExpiry: document.getElementById('equipment-warranty').value,
+              status: document.getElementById('equipment-status').value,
+              location: document.getElementById('equipment-location')?.value || '',
+              lastMaintenance: document.getElementById('equipment-last-maintenance')?.value,
+              nextMaintenance: document.getElementById('equipment-next-maintenance')?.value,
+              maintenanceNotes: document.getElementById('equipment-maintenance-notes')?.value,
+              description: document.getElementById('equipment-description')?.value,
+              createdAt: new Date().toISOString(),
+              userId: userId
+            };
+            
+            // Save to localStorage with both keys
+            const key = `equipment_${userId}`;
+            let equipmentList = JSON.parse(localStorage.getItem(key) || '[]');
+            equipmentList.push(equipment);
+            localStorage.setItem(key, JSON.stringify(equipmentList));
+            localStorage.setItem('equipment_list', JSON.stringify(equipmentList)); // Compatibility
+            
+            alert(`✅ Equipment "${equipment.name}" added successfully!`);
+            closeAddEquipmentModal();
+            loadEquipment();
+          });
+        }
+        
+        // Close button handler
+        document.getElementById('close-add-equipment-modal')?.addEventListener('click', closeAddEquipmentModal);
+        document.getElementById('cancel-add-equipment')?.addEventListener('click', closeAddEquipmentModal);
+      });
+      
+      function openEquipmentDatabaseModal() {
+        alert('Equipment Database feature coming soon!');
+      }
+      
+      function openWebstaurantModal() {
+        alert('WebstaurantStore integration coming soon!');
+      }
+      
+      // Vendor management now handled by dedicated vendor-management.html page
+      function openVendorEquipmentModal() {
+        window.location.href = 'vendor-management.html';
+      }
+      
+      function exportEquipmentData() {
+        alert('Export feature coming soon!');
+      }
+      
+      function importEquipmentData() {
+        alert('Import feature coming soon!');
+      }
+      
+      // Close modal functions
+      function closeAddEquipmentModal() {
+        const modal = document.getElementById('add-equipment-modal');
+        if (modal) {
+          modal.classList.add('hidden');
+        }
+      }
+      
+      // Initialize equipment management
+      document.addEventListener('DOMContentLoaded', function() {
+        // Close modal when clicking close button
+        const closeBtn = document.getElementById('close-add-equipment-modal');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', closeAddEquipmentModal);
+        }
+        
+        // Close modal when clicking outside
+        const modal = document.getElementById('add-equipment-modal');
+        if (modal) {
+          modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+              closeAddEquipmentModal();
+            }
+          });
+        }
+        
+        // Handle form submission
+        const form = document.getElementById('add-equipment-form');
+        if (form) {
+          form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Equipment added successfully! (Demo mode)');
+            closeAddEquipmentModal();
+            form.reset();
+          });
+        }
+      });
+    </script>
+    
+    <script>
+      // Initialize user system and project manager
+      document.addEventListener('DOMContentLoaded', function() {
+        // User system now initializes automatically
+        console.log('🔍 User system auto-initialization enabled');
+        
+        // Initialize project manager if available
+        if (window.projectManager) {
+          console.log('✅ Project manager ready');
+        } else {
+          console.log('⏳ Waiting for project manager...');
+        }
+      });
+    </script>
+
+    <!-- Initialize Unified Authentication System -->
+    <script>
+      // Initialize authentication system when DOM is ready
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 DOM loaded, initializing authentication system...');
+        
+        // Wait a moment for all scripts to load
+        setTimeout(() => {
+          if (typeof UnifiedAuthSystem !== 'undefined') {
+            console.log('✅ UnifiedAuthSystem class found, creating instance...');
+            window.unifiedAuthSystem = new UnifiedAuthSystem();
+            window.unifiedAuth = window.unifiedAuthSystem; // Alias for onclick handlers
+            console.log('✅ Authentication system initialized');
+          } else {
+            console.error('❌ UnifiedAuthSystem class not found');
+          }
+          
+          // Initialize page protection if available
+          if (typeof PageProtection !== 'undefined') {
+            console.log('✅ PageProtection class found, creating instance...');
+            window.pageProtection = new PageProtection();
+            console.log('✅ Page protection system initialized');
+          } else {
+            console.warn('⚠️ PageProtection class not found');
+          }
+        }, 100);
+      });
+    </script>
+    
+    <!-- WebstaurantStore Integration -->
+    <script src="assets/js/webstaurant-integration.js"></script>
+    <!-- Excel parser (SheetJS) for Excel imports -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script defer src="assets/js/import-service.js"></script>
+    <script>
+      // WebstaurantStore Modal Implementation
+      function openWebstaurantModal() {
+        const modal = document.getElementById('webstaurant-modal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          // Load all items on open
+          performWebstaurantSearch('');
+        }
+      }
+      
+      function closeWebstaurantModal() {
+        const modal = document.getElementById('webstaurant-modal');
+        if (modal) {
+          modal.classList.add('hidden');
+        }
+      }
+      
+      // Perform search
+      async function performWebstaurantSearch(query) {
+        const loading = document.getElementById('webstaurant-loading');
+        const results = document.getElementById('webstaurant-results');
+        const noResults = document.getElementById('webstaurant-no-results');
+        const error = document.getElementById('webstaurant-error');
+        const productsContainer = document.getElementById('webstaurant-products');
+        
+        // Show loading
+        loading.classList.remove('hidden');
+        results.classList.add('hidden');
+        noResults.classList.add('hidden');
+        error.classList.add('hidden');
+        
+        try {
+          // Search using integration
+          const products = await window.webstaurantIntegration.searchEquipment(query);
+          
+          // Hide loading
+          loading.classList.add('hidden');
+          
+          if (products.length === 0) {
+            noResults.classList.remove('hidden');
+            return;
+          }
+          
+          // Show results
+          results.classList.remove('hidden');
+          document.getElementById('webstaurant-result-count').textContent = products.length;
+          
+          // Clear and populate products
+          productsContainer.innerHTML = '';
+          products.forEach(product => {
+            const card = createProductCard(product);
+            productsContainer.appendChild(card);
+          });
+          
+        } catch (err) {
+          console.error('Search error:', err);
+          loading.classList.add('hidden');
+          error.classList.remove('hidden');
+          document.getElementById('webstaurant-error-message').textContent = err.message;
+        }
+      }
+      
+      // Create product card
+      function createProductCard(product) {
+        const card = document.createElement('div');
+        card.className = 'border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow bg-white';
+        
+        card.innerHTML = `
+          <div class="flex flex-col h-full">
+            <div class="flex-1">
+              <h5 class="font-semibold text-gray-800 mb-1">${product.name}</h5>
+              <p class="text-xs text-gray-500 mb-2">${product.category} › ${product.subcategory}</p>
+              <p class="text-sm text-gray-600 mb-2 line-clamp-2">${product.description}</p>
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-700">Brand: ${product.brand}</span>
+                <span class="text-lg font-bold text-[#4a7c2c]">$${product.price.toFixed(2)}</span>
+              </div>
+              <div class="text-xs ${product.inStock ? 'text-green-600' : 'text-red-600'}">
+                ${product.inStock ? '✓ In Stock' : '✗ Out of Stock'}
+              </div>
+            </div>
+            <button onclick="importEquipmentFromWebstaurant(${product.id})" 
+                    class="mt-3 w-full px-4 py-2 bg-[#4a7c2c] text-white rounded hover:bg-[#3d6a25] transition-colors text-sm font-semibold">
+              ➕ Add to Equipment
+            </button>
+          </div>
+        `;
+        
+        return card;
+      }
+      
+      // Store current product for import
+      let currentImportProduct = null;
+      
+      // Open import modal with product details
+      function importEquipmentFromWebstaurant(productId) {
+        const catalog = window.webstaurantIntegration.getDefaultCatalog();
+        const product = catalog.find(p => p.id === productId);
+        
+        if (!product) {
+          alert('Product not found');
+          return;
+        }
+        
+        // Store product
+        currentImportProduct = product;
+        
+        // Populate modal with product details
+        document.getElementById('import-product-name').textContent = product.name;
+        document.getElementById('import-product-category').textContent = `${product.category} › ${product.subcategory}`;
+        document.getElementById('import-product-brand').textContent = `Brand: ${product.brand}`;
+        document.getElementById('import-product-price').textContent = `$${product.price.toFixed(2)}`;
+        document.getElementById('import-product-description').textContent = product.description;
+        
+        // Pre-fill form fields
+        document.getElementById('import-equipment-name').value = product.name;
+        document.getElementById('import-equipment-brand').value = product.brand;
+        document.getElementById('import-equipment-price').value = product.price.toFixed(2);
+        document.getElementById('import-equipment-status').value = 'Active';
+        document.getElementById('import-equipment-quantity').value = 1;
+        document.getElementById('import-equipment-purchase-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('import-equipment-notes').value = `${product.description}\n\nImported from WebstaurantStore catalog`;
+        
+        // Show import modal
+        document.getElementById('equipment-import-modal').classList.remove('hidden');
+      }
+      
+      // Close import modal
+      function closeImportModal() {
+        document.getElementById('equipment-import-modal').classList.add('hidden');
+        currentImportProduct = null;
+      }
+      
+      // Handle import form submission
+      function handleImportSubmit(e) {
+        e.preventDefault();
+        
+        if (!currentImportProduct) {
+          alert('No product selected');
+          return;
+        }
+        
+        // Get form values
+        const equipment = {
+          id: Date.now(),
+          name: document.getElementById('import-equipment-name').value,
+          category: currentImportProduct.category,
+          subcategory: currentImportProduct.subcategory,
+          brand: document.getElementById('import-equipment-brand').value,
+          location: document.getElementById('import-equipment-location').value,
+          status: document.getElementById('import-equipment-status').value,
+          price: parseFloat(document.getElementById('import-equipment-price').value) || 0,
+          purchaseDate: document.getElementById('import-equipment-purchase-date').value,
+          quantity: parseInt(document.getElementById('import-equipment-quantity').value) || 1,
+          warranty: document.getElementById('import-equipment-warranty').value,
+          notes: document.getElementById('import-equipment-notes').value,
+          description: currentImportProduct.description,
+          createdAt: new Date().toISOString(),
+          source: 'webstaurant',
+          sourceProductId: currentImportProduct.id
+        };
+        
+        // Get current user
+        const currentUser = window.authLite?.getCurrentUser();
+        const userId = currentUser?.id;
+        
+        // Save to localStorage
+        const key = userId ? `equipment_${userId}` : 'equipment';
+        const existing = JSON.parse(localStorage.getItem(key) || '[]');
+        existing.push(equipment);
+        localStorage.setItem(key, JSON.stringify(existing));
+        
+        // Show success message with details
+        const successMsg = `✅ Equipment Added Successfully!\n\n` +
+                          `${equipment.name}\n` +
+                          `Location: ${equipment.location || 'Not specified'}\n` +
+                          `Status: ${equipment.status}\n` +
+                          `Quantity: ${equipment.quantity}`;
+        
+        alert(successMsg);
+        
+        // Close both modals
+        closeImportModal();
+        closeWebstaurantModal();
+        
+        // Reload equipment list if function exists
+        if (typeof loadEquipment === 'function') {
+          loadEquipment();
+        }
+      }
+      
+      // Event listeners
+      document.addEventListener('DOMContentLoaded', () => {
+        // Import modal event listeners
+        const importForm = document.getElementById('equipment-import-form');
+        if (importForm) {
+          importForm.addEventListener('submit', handleImportSubmit);
+        }
+        
+        const closeImportBtn = document.getElementById('close-import-modal');
+        if (closeImportBtn) {
+          closeImportBtn.addEventListener('click', closeImportModal);
+        }
+        
+        const cancelImportBtn = document.getElementById('cancel-import-modal');
+        if (cancelImportBtn) {
+          cancelImportBtn.addEventListener('click', closeImportModal);
+        }
+        
+        const importModal = document.getElementById('equipment-import-modal');
+        if (importModal) {
+          importModal.addEventListener('click', (e) => {
+            if (e.target === importModal) {
+              closeImportModal();
+            }
+          });
+        }
+        
+        // Webstaurant modal event listeners
+        const closeBtn = document.getElementById('close-webstaurant-modal');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', closeWebstaurantModal);
+        }
+        
+        // Click outside to close
+        const modal = document.getElementById('webstaurant-modal');
+        if (modal) {
+          modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+              closeWebstaurantModal();
+            }
+          });
+        }
+        
+        // Search button
+        const searchBtn = document.getElementById('webstaurant-search-btn');
+        const searchInput = document.getElementById('webstaurant-search');
+        if (searchBtn && searchInput) {
+          searchBtn.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            performWebstaurantSearch(query);
+          });
+          
+          // Enter key in search
+          searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+              const query = searchInput.value.trim();
+              performWebstaurantSearch(query);
+            }
+          });
+        }
+        
+        // Category buttons
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        categoryBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const category = btn.dataset.category;
+            searchInput.value = category;
+            performWebstaurantSearch(category);
+          });
+        });
+        
+        // Browse button - show all
+        const browseBtn = document.getElementById('webstaurant-browse-btn');
+        if (browseBtn) {
+          browseBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            performWebstaurantSearch('');
+          });
+        }
+        
+        // Retry button
+        const retryBtn = document.getElementById('webstaurant-retry-btn');
+        if (retryBtn) {
+          retryBtn.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            performWebstaurantSearch(query);
+          });
+        }
+      });
+    </script>
+    
+    <!-- User Dropdown Handler -->
+    <script>
+      function toggleUserDropdown() {
+        const dropdown = document.getElementById('user-dropdown');
+        if (dropdown) {
+          dropdown.classList.toggle('show');
+        }
+      }
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(event) {
+        const dropdown = document.getElementById('user-dropdown');
+        const userTab = document.getElementById('header-user-tab');
+        
+        if (dropdown && userTab && 
+            !dropdown.contains(event.target) && 
+            !userTab.contains(event.target)) {
+          dropdown.classList.remove('show');
+        }
+      });
+
+      // Handle sign out
+      async function handleSignOut() {
+        if (confirm('Are you sure you want to sign out?')) {
+          if (window.authManager) {
+            await window.authManager.signOut();
+            window.location.href = 'launch.html';
+          }
+        }
+      }
+
+      // Tab switching
+      function switchEquipmentTab(tabName) {
+        // Update tab buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+        
+        // Update tab content
+        document.querySelectorAll('.equipment-tab').forEach(tab => tab.classList.add('hidden'));
+        document.getElementById(`equipment-tab-${tabName}`).classList.remove('hidden');
+        
+        // Load appropriate content
+        if (tabName === 'current') {
+          loadEquipment();
+        } else if (tabName === 'plates') {
+          if (window.servingWareManager) {
+            window.servingWareManager.displayServingWareInventory('plates');
+          }
+          renderServingWareCatalog('plates');
+        } else if (tabName === 'silverware') {
+          if (window.servingWareManager) {
+            window.servingWareManager.displayServingWareInventory('silverware');
+          }
+          renderServingWareCatalog('silverware');
+        } else if (tabName === 'glassware') {
+          if (window.servingWareManager) {
+            window.servingWareManager.displayServingWareInventory('glassware');
+          }
+          renderServingWareCatalog('glassware');
+        } else if (tabName === 'wishlist') {
+          loadWishlist();
+        } else if (tabName === 'inventory') {
+          loadInventoryView();
+        }
+      }
+      
+      // Function to open add serving ware modal
+      function openAddServingWare(category) {
+        // Use the existing add equipment modal but pre-select the category
+        openAddEquipmentModal();
+        
+        // Wait for modal to be created, then set category
+        setTimeout(() => {
+          const categorySelect = document.getElementById('equipment-category');
+          if (categorySelect) {
+            categorySelect.value = category;
+          }
+        }, 100);
+      }
+
+      // Load and display equipment
+      function loadEquipment() {
+        console.log('🔧 Loading equipment...');
+        
+        if (window.equipmentManager) {
+          window.equipmentManager.loadEquipment();
+          const equipmentList = window.equipmentManager.equipment;
+          displayEquipment(equipmentList);
+          updateStats(equipmentList);
+          renderEquipmentCatalogList();
+        } else {
+          // Fallback to direct localStorage
+          const currentUser = window.authManager?.currentUser || window.currentUser;
+          const userId = currentUser?.userId || currentUser?.id || 'guest';
+          
+          const key = `equipment_${userId}`;
+          const equipmentList = JSON.parse(localStorage.getItem(key) || '[]');
+          const generalEquipment = JSON.parse(localStorage.getItem('equipment_list') || '[]');
+          
+          const allEquipment = [...equipmentList, ...generalEquipment];
+          const uniqueEquipment = allEquipment.filter((item, index, self) =>
+            index === self.findIndex((t) => t.id === item.id)
+          );
+          
+          renderEquipmentCatalogList();
+          displayEquipment(uniqueEquipment);
+          updateStats(uniqueEquipment);
+        }
+      }
+      window.refreshEquipmentView = loadEquipment;
+
+      // Load wishlist
+      function loadWishlist() {
+        console.log('⭐ Loading wishlist...');
+        
+        if (window.equipmentManager) {
+          window.equipmentManager.loadWishlist();
+          displayWishlist(window.equipmentManager.wishlist);
+        }
+      }
+
+      // Load inventory view
+      function loadInventoryView() {
+        console.log('📦 Loading inventory view...');
+        
+        if (window.equipmentManager) {
+          const stats = window.equipmentManager.getStatistics();
+          displayInventoryView(window.equipmentManager.equipment, stats);
+        }
+      }
+
+      // Display equipment in grid
+      function displayEquipment(equipmentList) {
+        const listContainer = document.getElementById('equipment-list');
+        
+        if (!listContainer) return;
+        
+        if (!equipmentList || equipmentList.length === 0) {
+          listContainer.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">🔧</div>
+              <div class="empty-state-title">No Equipment Yet</div>
+              <div class="empty-state-description">Start building your inventory by adding your first piece of equipment.</div>
+              <button onclick="openAddEquipmentModal()" class="btn btn-primary mt-4">
+                ➕ Add Equipment
+              </button>
+            </div>
+          `;
+          return;
+        }
+        
+        listContainer.innerHTML = equipmentList
+          .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+          .map(equipment => {
+            const inStock = typeof equipment.inStock === 'number' ? equipment.inStock :
+              (typeof equipment.quantity === 'number' ? equipment.quantity : 0);
+            const total = typeof equipment.quantity === 'number' ? equipment.quantity : inStock;
+            const statusClass = getStatusBadgeClass(equipment.status || 'Active');
+            return `
+              <div class="equipment-list-item">
+                <div class="equipment-list-header">
+                  <div>
+                    <div style="font-size: 1.05rem; font-weight: 650; color: #111827;">${equipment.name}</div>
+                    <div class="equipment-list-meta">
+                      ${equipment.category ? `<span>📂 ${equipment.category}</span>` : ''}
+                      ${equipment.subcategory ? `<span>🏷️ ${equipment.subcategory}</span>` : ''}
+                      ${equipment.location ? `<span>📍 ${equipment.location}</span>` : ''}
+                    </div>
+                  </div>
+                  <div class="equipment-list-meta" style="justify-content: flex-end;">
+                    <span class="equipment-status-badge ${statusClass}">
+                      ${getStatusIcon(equipment.status)} ${equipment.status || 'Active'}
+                    </span>
+                    <span style="font-weight: 600; color: #2563eb;">${inStock}/${total}</span>
+                  </div>
+                </div>
+                <div class="equipment-list-meta">
+                  ${equipment.brand ? `<span>🏷️ ${equipment.brand}</span>` : ''}
+                  ${equipment.purchaseDate ? `<span>🗓️ Purchased ${new Date(equipment.purchaseDate).toLocaleDateString()}</span>` : ''}
+                  ${equipment.purchasePrice ? `<span>💰 $${equipment.purchasePrice.toFixed(2)}</span>` : ''}
+                  ${equipment.purchaseUrl ? `<span><a href="${equipment.purchaseUrl}" target="_blank" rel="noopener noreferrer" style="color: #2563eb; text-decoration: underline;">🔗 Purchase Link</a></span>` : ''}
+                  ${equipment.nextMaintenance ? `<span>🛠️ Next maintenance ${new Date(equipment.nextMaintenance).toLocaleDateString()}</span>` : ''}
+                </div>
+                <div class="equipment-list-actions">
+                  <button class="btn btn-sm btn-secondary" onclick="editEquipment('${equipment.id}')">✏️ Edit</button>
+                  <button class="btn btn-sm btn-secondary" onclick="viewEquipment('${equipment.id}')">👁️ View</button>
+                  <button class="btn btn-sm btn-warning" onclick="adjustInventory('${equipment.id}', 1)">➕ Stock</button>
+                  <button class="btn btn-sm btn-warning" onclick="adjustInventory('${equipment.id}', -1)">➖ Stock</button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteEquipment('${equipment.id}')">🗑️ Delete</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+      }
+
+      function getStatusBadgeClass(status) {
+        switch ((status || 'Active').toLowerCase()) {
+          case 'maintenance':
+            return 'status-maintenance';
+          case 'repair':
+          case 'needs repair':
+            return 'status-repair';
+          case 'retired':
+            return 'status-retired';
+          default:
+            return 'status-active';
+        }
+      }
+
+      function getStatusIcon(status) {
+        switch ((status || 'Active').toLowerCase()) {
+          case 'maintenance':
+            return '🟡';
+          case 'repair':
+          case 'needs repair':
+            return '🔴';
+          case 'retired':
+            return '⚫';
+          default:
+            return '🟢';
+        }
+      }
+
+      function matchesServingCategory(item, category) {
+        const normalized = (item.category || '').toLowerCase();
+        if (category === 'plates') {
+          return normalized.includes('plate');
+        }
+        if (category === 'silverware') {
+          return normalized.includes('silverware') || normalized.includes('flatware') || normalized.includes('fork') || normalized.includes('knife') || normalized.includes('spoon');
+        }
+        if (category === 'glassware') {
+          return normalized.includes('glass');
+        }
+        return false;
+      }
+
+      let equipmentCatalogManifest = null;
+      const equipmentCatalogCache = {};
+
+      async function loadEquipmentCatalogManifest() {
+        if (equipmentCatalogManifest) return equipmentCatalogManifest;
+        try {
+          const response = await fetch('data/catalogs/equipment-manifest.json');
+          if (!response.ok) throw new Error('Manifest not found');
+          equipmentCatalogManifest = await response.json();
+          return equipmentCatalogManifest;
+        } catch (error) {
+          console.error('Failed to load equipment catalog manifest:', error);
+          return { packs: [] };
+        }
+      }
+
+      async function fetchEquipmentCatalogPack(packId) {
+        if (equipmentCatalogCache[packId]) return equipmentCatalogCache[packId];
+        const manifest = await loadEquipmentCatalogManifest();
+        const packMeta = manifest.packs.find(pack => pack.id === packId);
+        if (!packMeta) {
+          console.warn('Catalog pack not found:', packId);
+          return null;
+        }
+        try {
+          const response = await fetch(`data/catalogs/${packMeta.file}`);
+          if (!response.ok) throw new Error(`Pack file missing: ${packMeta.file}`);
+          const pack = await response.json();
+          equipmentCatalogCache[packId] = { meta: packMeta, data: pack };
+          return equipmentCatalogCache[packId];
+        } catch (error) {
+          console.error('Failed to load catalog pack:', error);
+          return null;
+        }
+      }
+
+      async function renderEquipmentCatalogList() {
+        const container = document.getElementById('equipment-catalog-list');
+        if (!container) return;
+
+        const manifest = await loadEquipmentCatalogManifest();
+        if (!manifest.packs.length) {
+          container.innerHTML = `<div style="color:#64748b;">No catalog packs available yet.</div>`;
+          return;
+        }
+
+        const cards = await Promise.all(manifest.packs.map(async pack => {
+          const packData = await fetchEquipmentCatalogPack(pack.id);
+          const itemCount = packData?.data?.items?.length || 0;
+          return `
+            <div class="catalog-card">
+              <div>
+                <h4>${pack.name}</h4>
+                <p>${pack.description}</p>
+                <div class="catalog-meta">
+                  <span>📦 ${itemCount} items</span>
+                  ${pack.tags?.map(tag => `<span>#${tag}</span>`).join('') || ''}
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="openEquipmentCatalogModal('${pack.id}')">
+                Review Pack
+              </button>
+            </div>
+          `;
+        }));
+
+        container.innerHTML = cards.join('');
+      }
+
+      async function renderServingWareCatalog(category) {
+        const container = document.getElementById(`${category}-catalog`);
+        if (!container) return;
+
+        const manifest = await loadEquipmentCatalogManifest();
+        const matchingCards = [];
+
+        for (const pack of manifest.packs) {
+          const packBundle = await fetchEquipmentCatalogPack(pack.id);
+          if (!packBundle) continue;
+          const filteredItems = packBundle.data.items.filter(item => matchesServingCategory(item, category));
+          if (!filteredItems.length) continue;
+
+          matchingCards.push(`
+            <div class="catalog-card">
+              <div>
+                <h4>${pack.name}</h4>
+                <p>${pack.description}</p>
+                <div class="catalog-meta">
+                  <span>📦 ${filteredItems.length} ${category} items</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="openEquipmentCatalogModal('${pack.id}', { category: '${category}' })">
+                Review ${category.charAt(0).toUpperCase() + category.slice(1)}
+              </button>
+            </div>
+          `);
+        }
+
+        if (!matchingCards.length) {
+          container.innerHTML = `<div style="color:#64748b;">No curated ${category} packs yet.</div>`;
+          return;
+        }
+
+        container.innerHTML = matchingCards.join('');
+      }
+
+      async function openEquipmentCatalogModal(packId, options = {}) {
+        const packBundle = await fetchEquipmentCatalogPack(packId);
+        if (!packBundle) {
+          alert('Could not load catalog pack.');
+          return;
+        }
+        const { meta, data } = packBundle;
+        let items = data.items || [];
+        if (options.category) {
+          items = items.filter(item => matchesServingCategory(item, options.category));
+        }
+        if (!items.length) {
+          alert('No matching items found in this pack.');
+          return;
+        }
+
+        const modal = document.createElement('div');
+        modal.className = 'modal-backdrop';
+        modal.id = 'equipment-catalog-modal';
+        modal.style.background = 'rgba(15, 23, 42, 0.55)';
+
+        modal.innerHTML = `
+          <div class="modal" style="max-width: 700px;">
+            <div class="modal-header">
+              <h2>Import from ${meta.name}</h2>
+            </div>
+            <div class="modal-body" style="max-height:60vh; overflow-y:auto;">
+              <p style="color:#475569; font-size:0.9rem; margin-bottom:16px;">
+                Select the items you want to import into your equipment inventory. You can edit details after import.
+              </p>
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                ${items.map((item, index) => `
+                  <label style="display:flex; align-items:flex-start; gap:12px; padding:12px; border:1px solid #e2e8f0; border-radius:12px;">
+                    <input type="checkbox" class="catalog-item-checkbox" data-pack="${packId}" data-index="${index}" checked>
+                    <div>
+                      <div style="font-weight:600; color:#1f2937;">${item.name}</div>
+                      <div style="font-size:0.85rem; color:#475569; margin-top:4px;">
+                        ${item.category || 'Uncategorized'}${item.subcategory ? ' • ' + item.subcategory : ''}
+                      </div>
+                      <div style="font-size:0.8rem; color:#64748b; margin-top:6px;">
+                        Qty: ${item.quantity || 1} • Status: ${item.status || 'Active'}${item.location ? ' • Location: ' + item.location : ''}
+                      </div>
+                    </div>
+                  </label>
+                `).join('')}
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" onclick="closeModal('equipment-catalog-modal')">Cancel</button>
+              <button class="btn btn-primary" onclick="confirmEquipmentCatalogImport('${packId}', ${JSON.stringify(options)})">
+                Import Selected
+              </button>
+            </div>
+          </div>
+        `;
+
+        modal.addEventListener('click', (event) => {
+          if (event.target === modal) {
+            closeModal('equipment-catalog-modal');
+          }
+        });
+
+        document.body.appendChild(modal);
+      }
+
+      function addEquipmentFromCatalog(item) {
+        if (!window.equipmentManager) {
+          alert('Equipment manager is not ready.');
+          return false;
+        }
+        const exists = window.equipmentManager.equipment.some(eq => eq.name === item.name);
+        if (exists) {
+          console.log('Skipping duplicate equipment:', item.name);
+          return false;
+        }
+        window.equipmentManager.addEquipment({
+          name: item.name,
+          category: item.category || 'Uncategorized',
+          subcategory: item.subcategory || '',
+          location: item.location || '',
+          quantity: item.quantity || 1,
+          brand: item.brand || '',
+          status: item.status || 'Active'
+        });
+        return true;
+      }
+
+      async function confirmEquipmentCatalogImport(packId, options = {}) {
+        const modal = document.getElementById('equipment-catalog-modal');
+        if (!modal) return;
+        const checkboxes = modal.querySelectorAll('.catalog-item-checkbox:checked');
+        if (!checkboxes.length) {
+          alert('Select at least one item to import.');
+          return;
+        }
+
+        const packBundle = await fetchEquipmentCatalogPack(packId);
+        if (!packBundle) {
+          alert('Failed to load catalog data.');
+          return;
+        }
+
+        const imported = [];
+        checkboxes.forEach(cb => {
+          const index = parseInt(cb.dataset.index, 10);
+          const item = packBundle.data.items[index];
+          if (!item) return;
+          if (options.category && !matchesServingCategory(item, options.category)) return;
+          const success = addEquipmentFromCatalog(item);
+          if (success) imported.push(item.name);
+        });
+
+        closeModal('equipment-catalog-modal');
+        if (imported.length) {
+          loadEquipment();
+          alert(`✅ Imported ${imported.length} catalog item(s) into inventory.`);
+        } else {
+          alert('No new items were imported (duplicates may have been skipped).');
+        }
+      }
+
+      // Display wishlist
+      function displayWishlist(wishlist) {
+        const grid = document.getElementById('wishlist-grid');
+        
+        if (!grid) return;
+        
+        if (wishlist.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1;">
+              <div class="empty-state-icon">⭐</div>
+              <div class="empty-state-title">No Wishlist Items</div>
+              <div class="empty-state-description">Add equipment you plan to purchase in the future</div>
+              <button onclick="openAddWishlistModal()" class="btn btn-primary mt-4">
+                ⭐ Add to Wishlist
+              </button>
+            </div>
+          `;
+          return;
+        }
+        
+        grid.innerHTML = wishlist.map(item => `
+          <div class="card card-hover">
+            <div class="card-header-gradient">
+              <div class="card-title">${item.name}</div>
+              <div class="card-subtitle">${item.category || 'Uncategorized'}</div>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold ${getPriorityColor(item.priority)}">
+                  ${item.priority || 'Medium'} Priority
+                </span>
+              </div>
+              ${item.reason ? `<p class="text-sm text-gray-600 mb-2"><em>"${item.reason}"</em></p>` : ''}
+              <div class="stats-row mb-4">
+                <div class="stat-item-centered">
+                  <div class="stat-value text-primary">$${(item.estimatedCost || 0).toFixed(2)}</div>
+                  <div class="stat-label">Est. Cost</div>
+                </div>
+                <div class="stat-item-centered">
+                  <div class="stat-value text-primary">${item.targetDate ? new Date(item.targetDate).toLocaleDateString() : 'TBD'}</div>
+                  <div class="stat-label">Target Date</div>
+                </div>
+              </div>
+              <div class="button-group">
+                <button class="btn btn-sm btn-success" onclick="purchaseWishlistItem('${item.id}')">✅ Purchased</button>
+                <button class="btn btn-sm btn-secondary" onclick="editWishlistItem('${item.id}')">✏️ Edit</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteWishlistItem('${item.id}')">🗑️ Delete</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Display inventory view
+      function displayInventoryView(equipmentList, stats) {
+        // Update stats
+        document.getElementById('total-items-in-stock').textContent = 
+          equipmentList.reduce((sum, e) => sum + (e.inStock || e.quantity || 0), 0);
+        document.getElementById('low-stock-count').textContent = stats.lowStock.length;
+        document.getElementById('total-equipment-value').textContent = 
+          '$' + stats.totalValue.toFixed(2);
+        
+        const grid = document.getElementById('inventory-grid');
+        if (!grid) return;
+        
+        grid.innerHTML = equipmentList.map(equipment => `
+          <div class="card">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <div class="font-semibold text-lg">${equipment.name}</div>
+                <div class="text-sm text-gray-600">${equipment.category}</div>
+              </div>
+              <div class="text-right">
+                <div class="text-lg font-bold ${equipment.inStock < equipment.quantity * 0.25 ? 'text-error' : 'text-success'}">
+                  ${equipment.inStock || equipment.quantity}/${equipment.quantity}
+                </div>
+                <div class="text-xs text-gray-500">In Stock</div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all" 
+                     style="width: ${((equipment.inStock || equipment.quantity) / equipment.quantity) * 100}%"></div>
+              </div>
+            </div>
+            
+            ${equipment.purchaseDate ? `<p class="text-xs text-gray-600 mb-2">Purchased: ${new Date(equipment.purchaseDate).toLocaleDateString()}</p>` : ''}
+            ${equipment.purchasePrice ? `<p class="text-xs text-gray-600 mb-3">Value: $${equipment.purchasePrice.toFixed(2)}</p>` : ''}
+            
+            <div class="button-group">
+              <button class="btn btn-sm btn-success" onclick="adjustInventory('${equipment.id}', 1)">➕ Add</button>
+              <button class="btn btn-sm btn-warning" onclick="adjustInventory('${equipment.id}', -1)">➖ Remove</button>
+              <button class="btn btn-sm btn-secondary" onclick="viewInventoryHistory('${equipment.id}')">📜 History</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Get status color
+      function getStatusColor(status) {
+        switch(status) {
+          case 'Active': return 'text-success';
+          case 'Maintenance': return 'text-warning';
+          case 'Repair': return 'text-error';
+          case 'Retired': return 'text-gray-500';
+          default: return 'text-primary';
+        }
+      }
+
+      // Get priority color
+      function getPriorityColor(priority) {
+        switch(priority) {
+          case 'High': return 'bg-red-100 text-red-800';
+          case 'Medium': return 'bg-yellow-100 text-yellow-800';
+          case 'Low': return 'bg-green-100 text-green-800';
+          default: return 'bg-gray-100 text-gray-800';
+        }
+      }
+
+      // Wishlist modal functions
+      function openAddWishlistModal() {
+        const modal = document.getElementById('add-wishlist-modal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          populateWishlistCategoryDropdown();
+        }
+      }
+
+      function closeWishlistModal() {
+        const modal = document.getElementById('add-wishlist-modal');
+        if (modal) {
+          modal.classList.add('hidden');
+          const form = document.getElementById('add-wishlist-form');
+          if (form) form.reset();
+        }
+      }
+
+      // Populate wishlist category dropdown
+      function populateWishlistCategoryDropdown() {
+        const select = document.getElementById('wishlist-category');
+        if (!select || !window.equipmentManager) return;
+        
+        const categories = window.equipmentManager.categories;
+        select.innerHTML = '<option value="">Select Category</option>' +
+          categories.map(cat => `<option value="${cat.name}">${cat.icon} ${cat.name}</option>`).join('');
+      }
+
+      // Handle wishlist form submission
+      document.addEventListener('DOMContentLoaded', function() {
+        const wishlistForm = document.getElementById('add-wishlist-form');
+        if (wishlistForm) {
+          wishlistForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const wishlistItem = {
+              name: document.getElementById('wishlist-name').value,
+              category: document.getElementById('wishlist-category').value,
+              estimatedCost: document.getElementById('wishlist-cost').value,
+              priority: document.getElementById('wishlist-priority').value,
+              targetDate: document.getElementById('wishlist-target-date').value,
+              vendor: document.getElementById('wishlist-vendor').value,
+              reason: document.getElementById('wishlist-reason').value,
+              url: document.getElementById('wishlist-url').value
+            };
+            
+            if (window.equipmentManager) {
+              window.equipmentManager.addToWishlist(wishlistItem);
+              alert(`✅ "${wishlistItem.name}" added to wishlist!`);
+              closeWishlistModal();
+              loadWishlist();
+            }
+          });
+        }
+        
+        // Wishlist modal close handlers
+        document.getElementById('close-wishlist-modal')?.addEventListener('click', closeWishlistModal);
+        document.getElementById('cancel-wishlist')?.addEventListener('click', closeWishlistModal);
+      });
+
+      // Purchase wishlist item (convert to equipment)
+      function purchaseWishlistItem(wishlistId) {
+        if (confirm('Mark this item as purchased and add to equipment?')) {
+          if (window.equipmentManager) {
+            const equipment = window.equipmentManager.convertWishlistToEquipment(wishlistId);
+            if (equipment) {
+              alert(`✅ Equipment "${equipment.name}" added! Removed from wishlist.`);
+              loadWishlist();
+              switchEquipmentTab('current');
+            }
+          }
+        }
+      }
+
+      // Edit wishlist item
+      function editWishlistItem(id) {
+        alert('Edit wishlist feature coming soon!');
+      }
+
+      // Delete wishlist item
+      function deleteWishlistItem(id) {
+        if (confirm('Remove this item from wishlist?')) {
+          if (window.equipmentManager) {
+            window.equipmentManager.wishlist = window.equipmentManager.wishlist.filter(w => w.id !== id);
+            window.equipmentManager.saveWishlist();
+            loadWishlist();
+          }
+        }
+      }
+
+      // Adjust inventory
+      function adjustInventory(equipmentId, change) {
+        const equipment = window.equipmentManager?.getById(equipmentId);
+        if (!equipment) return;
+        
+        const reason = prompt(`${change > 0 ? 'Adding' : 'Removing'} ${Math.abs(change)} ${equipment.name}.\n\nReason (optional):`);
+        
+        if (reason !== null) { // User didn't cancel
+          if (window.equipmentManager) {
+            window.equipmentManager.updateInventory(equipmentId, change, reason || '');
+            alert(`✅ Inventory updated: ${equipment.name} (${equipment.inStock}/${equipment.quantity})`);
+            loadInventoryView();
+          }
+        }
+      }
+
+      // View inventory history
+      function viewInventoryHistory(equipmentId) {
+        if (!window.equipmentManager) return;
+        
+        const transactions = window.equipmentManager.getTransactions(equipmentId, 10);
+        const equipment = window.equipmentManager.getById(equipmentId);
+        
+        if (transactions.length === 0) {
+          alert(`No transaction history for ${equipment.name}`);
+          return;
+        }
+        
+        const historyText = transactions.map(t => 
+          `${new Date(t.timestamp).toLocaleString()}: ${t.change > 0 ? '+' : ''}${t.change} ${t.reason ? '(' + t.reason + ')' : ''}`
+        ).join('\n');
+        
+        alert(`📜 Inventory History for ${equipment.name}:\n\n${historyText}`);
+      }
+
+      // Update statistics
+      function updateStats(equipmentList) {
+        document.getElementById('total-equipment').textContent = equipmentList.length;
+        document.getElementById('maintenance-due').textContent = 
+          equipmentList.filter(e => e.status === 'Maintenance').length;
+        document.getElementById('repair-needed').textContent = 
+          equipmentList.filter(e => e.status === 'Repair').length;
+        
+        // Count unique vendors
+        const uniqueVendors = new Set(equipmentList.map(e => e.vendor).filter(Boolean));
+        document.getElementById('active-vendors').textContent = uniqueVendors.size;
+      }
+
+      // Edit equipment function
+      function editEquipment(id) {
+        console.log('✏️ Edit equipment:', id);
+        
+        const currentUser = window.authManager?.currentUser || window.currentUser;
+        const userId = currentUser?.userId || currentUser?.id || 'guest';
+        const key = `equipment_${userId}`;
+        let equipmentList = JSON.parse(localStorage.getItem(key) || '[]');
+        
+        const equipment = equipmentList.find(e => e.id === id);
+        if (!equipment) {
+          alert('Equipment not found!');
+          return;
+        }
+        
+        // Populate edit form
+        document.getElementById('edit-equipment-id').value = equipment.id;
+        document.getElementById('edit-equipment-name').value = equipment.name || '';
+        document.getElementById('edit-equipment-category').value = equipment.category || '';
+        document.getElementById('edit-equipment-quantity').value = equipment.quantity || 1;
+        document.getElementById('edit-equipment-brand').value = equipment.brand || '';
+        document.getElementById('edit-equipment-serial').value = equipment.serialNumber || equipment.serial || '';
+        document.getElementById('edit-equipment-purchase-date').value = equipment.purchaseDate || '';
+        document.getElementById('edit-equipment-purchase-price').value = equipment.purchasePrice || '';
+        document.getElementById('edit-equipment-purchase-url').value = equipment.purchaseUrl || '';
+        document.getElementById('edit-equipment-warranty').value = equipment.warrantyExpiry || equipment.warranty || '';
+        document.getElementById('edit-equipment-status').value = equipment.status || 'Active';
+        document.getElementById('edit-equipment-location').value = equipment.location || '';
+        document.getElementById('edit-equipment-last-maintenance').value = equipment.lastMaintenance || '';
+        document.getElementById('edit-equipment-next-maintenance').value = equipment.nextMaintenance || '';
+        document.getElementById('edit-equipment-maintenance-notes').value = equipment.maintenanceNotes || '';
+        document.getElementById('edit-equipment-description').value = equipment.description || '';
+        
+        // Show edit modal
+        document.getElementById('edit-equipment-modal').classList.remove('hidden');
+      }
+      
+      // Handle edit form submission
+      document.addEventListener('DOMContentLoaded', function() {
+        const editForm = document.getElementById('edit-equipment-form');
+        if (editForm) {
+          editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const currentUser = window.authManager?.currentUser || window.currentUser;
+            const userId = currentUser?.userId || currentUser?.id || 'guest';
+            const key = `equipment_${userId}`;
+            let equipmentList = JSON.parse(localStorage.getItem(key) || '[]');
+            
+            const equipmentId = document.getElementById('edit-equipment-id').value;
+            const index = equipmentList.findIndex(e => e.id === equipmentId);
+            
+            if (index === -1) {
+              alert('Equipment not found!');
+              return;
+            }
+            
+            // Update equipment
+            equipmentList[index] = {
+              ...equipmentList[index],
+              name: document.getElementById('edit-equipment-name').value,
+              category: document.getElementById('edit-equipment-category').value,
+              quantity: parseInt(document.getElementById('edit-equipment-quantity').value) || 1,
+              brand: document.getElementById('edit-equipment-brand').value,
+              serialNumber: document.getElementById('edit-equipment-serial').value,
+              purchaseDate: document.getElementById('edit-equipment-purchase-date').value,
+              purchasePrice: parseFloat(document.getElementById('edit-equipment-purchase-price')?.value) || 0,
+              purchaseUrl: document.getElementById('edit-equipment-purchase-url')?.value || '',
+              warrantyExpiry: document.getElementById('edit-equipment-warranty').value,
+              status: document.getElementById('edit-equipment-status').value,
+              location: document.getElementById('edit-equipment-location').value,
+              lastMaintenance: document.getElementById('edit-equipment-last-maintenance').value,
+              nextMaintenance: document.getElementById('edit-equipment-next-maintenance').value,
+              maintenanceNotes: document.getElementById('edit-equipment-maintenance-notes').value,
+              description: document.getElementById('edit-equipment-description').value,
+              updatedAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem(key, JSON.stringify(equipmentList));
+            localStorage.setItem('equipment_list', JSON.stringify(equipmentList));
+            
+            alert(`✅ Equipment "${equipmentList[index].name}" updated successfully!`);
+            document.getElementById('edit-equipment-modal').classList.add('hidden');
+            loadEquipment();
+          });
+        }
+        
+        // Close edit modal handlers
+        document.getElementById('close-edit-equipment-modal')?.addEventListener('click', function() {
+          document.getElementById('edit-equipment-modal').classList.add('hidden');
+        });
+        
+        document.getElementById('cancel-edit-equipment')?.addEventListener('click', function() {
+          document.getElementById('edit-equipment-modal').classList.add('hidden');
+        });
+      });
+
+      function viewEquipment(id) {
+        console.log('👁️ View equipment:', id);
+        alert('View equipment details coming soon!');
+      }
+
+      function deleteEquipment(id) {
+        if (confirm('Are you sure you want to delete this equipment?')) {
+          const currentUser = window.authManager?.currentUser || window.currentUser;
+          const userId = currentUser?.userId || currentUser?.id || 'guest';
+          
+          const key = `equipment_${userId}`;
+          let equipmentList = JSON.parse(localStorage.getItem(key) || '[]');
+          equipmentList = equipmentList.filter(e => e.id !== id);
+          localStorage.setItem(key, JSON.stringify(equipmentList));
+          
+          loadEquipment();
+          console.log('🗑️ Equipment deleted');
+        }
+      }
+
+      // Initialize equipment on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        loadEquipment();
+      });
+
+      // Reload when data changes
+      window.addEventListener('iterumAppReady', function() {
+        loadEquipment();
+      });
+    </script>
+    
+    <!-- Load Auth System Scripts at End -->
+    <script type="module" defer src="assets/js/firebase-auth.js"></script>
+    <script type="module" defer src="assets/js/firestore-sync.js"></script>
+    <script defer src="assets/js/header-user-display.js"></script>
+    <script defer src="assets/js/profile-editor.js"></script>
+    <script defer src="assets/js/project-ui-manager.js"></script>
+    
+    <!-- Central Data Loader -->
+    <script src="assets/js/central-data-loader.js"></script>
+    
+    <!-- State Persistence Manager - Ensures user and project persist across pages -->
+    <script src="assets/js/state-persistence-manager.js"></script>
+    
+    <!-- Secure Storage Manager - Fast & Secure IndexedDB storage -->
+    <script src="assets/js/secure-storage-manager.js"></script>
+    
+    <!-- Equipment Manager - Comprehensive equipment management -->
+    <script src="assets/js/equipment-manager.js"></script>
+    
+    <!-- Serving Ware Manager - Specialized serving ware inventory -->
+    <script src="assets/js/serving-ware-manager.js"></script>
+    
+    <script defer src="assets/js/auth_guard.js"></script>
+</body>
+</html>

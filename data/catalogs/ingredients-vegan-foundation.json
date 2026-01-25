@@ -1,0 +1,63 @@
+{
+  "id": "ingredients_vegan_foundation",
+  "name": "Plant-Based Foundation",
+  "version": "1.0.0",
+  "items": [
+    {
+      "name": "Organic Firm Tofu",
+      "category": "Proteins",
+      "unit": "kg",
+      "defaultUnit": "g",
+      "cost": 5.6,
+      "costPer": "kg",
+      "supplier": "Plant Provisions",
+      "storage": "refrigerated",
+      "shelfLifeDays": 12
+    },
+    {
+      "name": "Textured Vegetable Protein",
+      "category": "Proteins",
+      "unit": "kg",
+      "defaultUnit": "g",
+      "cost": 3.4,
+      "costPer": "kg",
+      "supplier": "Plant Provisions",
+      "storage": "dry",
+      "shelfLifeDays": 365
+    },
+    {
+      "name": "Nutritional Yeast",
+      "category": "Spices & Herbs",
+      "unit": "kg",
+      "defaultUnit": "g",
+      "cost": 9.2,
+      "costPer": "kg",
+      "supplier": "Vegan Pantry Co.",
+      "storage": "dry",
+      "shelfLifeDays": 365
+    },
+    {
+      "name": "Cashew Cream Base",
+      "category": "Dairy Alternatives",
+      "unit": "kg",
+      "defaultUnit": "g",
+      "cost": 11.8,
+      "costPer": "kg",
+      "supplier": "Vegan Pantry Co.",
+      "storage": "refrigerated",
+      "shelfLifeDays": 21
+    },
+    {
+      "name": "Oat Milk Barista Blend",
+      "category": "Dairy Alternatives",
+      "unit": "l",
+      "defaultUnit": "ml",
+      "cost": 3.2,
+      "costPer": "l",
+      "supplier": "Plant Provisions",
+      "storage": "refrigerated",
+      "shelfLifeDays": 14
+    }
+  ]
+}
+

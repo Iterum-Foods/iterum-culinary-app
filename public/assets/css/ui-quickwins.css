@@ -1,0 +1,8 @@
+/* Sticky table headers */
+.table-sticky thead th{position:sticky;top:0;background:#0b1220;color:#e2e8f0;z-index:2;box-shadow:0 2px 0 rgba(51,65,85,.6)}
+/* Higher contrast muted text */
+.text-muted{color:#94a3b8}
+.text-strong{color:#e5e7eb}
+/* Inputs better focus */
+input,select,textarea{outline:none}
+input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(59,130,246,.25);border-color:#3b82f6}

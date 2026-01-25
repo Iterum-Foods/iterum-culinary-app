@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Management - Iterum Culinary</title>
+    
+    <!-- Load Auth System BEFORE Guard -->
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    <script src="assets/js/auth-api-helper.js"></script>
+    <script src="assets/js/auth-diagnostics.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Shadows+Into+Light&display=swap" rel="stylesheet">
+    <!-- UNIFIED COLOR SYSTEM - MUST LOAD FIRST -->
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
+    <!-- Tailwind CSS - Built from source -->
+    <link rel="stylesheet" href="assets/css/tailwind-output.css">
+    <link rel="stylesheet" href="assets/css/iterum-design-system.css">
+    <link rel="stylesheet" href="assets/css/premium-ui-system.css">
+    <link rel="stylesheet" href="assets/css/unified-cards.css">
+    <link rel="stylesheet" href="assets/css/page-layouts.css">
+    <link rel="stylesheet" href="assets/css/high-contrast-universal.css">
+    <link rel="stylesheet" href="assets/css/nordic-design-system.css">
+    
+    <!-- Unified Navigation -->
+    <script src="assets/js/unified-nav-header.js" defer></script>
+    <script src="assets/js/unified-project-selector.js" defer></script>
+    
+    <link rel="stylesheet" href="assets/css/modern-nordic-vintage.css">
+    <link rel="stylesheet" href="assets/css/dark-mode-enhancements.css">
+    <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
+    <link rel="stylesheet" href="assets/css/header-universal.css">
+    <style>
+        .vendor-dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 20px 96px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+        .vendor-hero {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #243c5a 0%, #3b2c67 50%, #141a2b 95%);
+            color: #f8fafc;
+            border-radius: 28px;
+            padding: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 36px;
+            box-shadow: 0 32px 80px rgba(15, 23, 42, 0.4);
+        }
+        .vendor-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 45%),
+                        radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.12), transparent 55%);
+            pointer-events: none;
+        }
+        .vendor-hero-main {
+            flex: 1;
+            min-width: 260px;
+            position: relative;
+            z-index: 1;
+        }
+        .vendor-eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 0.28em;
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-bottom: 12px;
+        }
+        .vendor-hero h1 {
+            margin: 0;
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .vendor-hero p {
+            margin: 16px 0 0;
+            max-width: 520px;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: rgba(248, 250, 252, 0.85);
+        }
+        .vendor-hero-actions {
+            margin-top: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .vendor-hero-actions .btn {
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            background: rgba(15, 23, 42, 0.28);
+            color: #f8fafc;
+            font-weight: 600;
+            padding: 12px 18px;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.35);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+        }
+        .vendor-hero-actions .btn:hover {
+            transform: translateY(-2px);
+            background: rgba(15, 23, 42, 0.45);
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.45);
+        }
+        .vendor-hero-actions .btn.btn-primary {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.18));
+            color: #0f172a;
+            border: none;
+        }
+        .vendor-hero-side {
+            position: relative;
+            z-index: 1;
+            min-width: 260px;
+            max-width: 320px;
+            background: rgba(15, 23, 42, 0.55);
+            border-radius: 20px;
+            padding: 24px;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            backdrop-filter: blur(12px);
+        }
+        .vendor-hero-side h3 {
+            margin: 0 0 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+        .vendor-checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .vendor-checklist-item {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            font-size: 0.92rem;
+            color: rgba(248, 250, 252, 0.78);
+            line-height: 1.5;
+        }
+        .vendor-checklist-item span:first-child {
+            font-size: 1.4rem;
+        }
+        .vendor-surface {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 28px 70px rgba(15, 23, 42, 0.18);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+        }
+        .vendor-section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 20px 0;
+        }
+        .vendor-surface .filters-section {
+            margin-top: 28px;
+        }
+        .vendor-surface #bulk-actions {
+            margin-top: 24px;
+        }
+        .vendor-surface #vendors-container {
+            margin-top: 32px;
+        }
+        @media (max-width: 900px) {
+            .vendor-hero {
+                flex-direction: column;
+                padding: 32px 28px;
+            }
+            .vendor-hero-side {
+                max-width: none;
+            }
+        }
+        @media (max-width: 640px) {
+            .vendor-dashboard {
+                padding: 24px 16px 80px;
+            }
+            .vendor-surface {
+                padding: 24px;
+            }
+        }
+        .vendor-quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+        }
+        .quick-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .quick-card.primary {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.16), rgba(37, 99, 235, 0.08));
+            border-color: rgba(37, 99, 235, 0.38);
+        }
+        .quick-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 24px 56px rgba(37, 99, 235, 0.18);
+            border-color: rgba(37, 99, 235, 0.42);
+        }
+        .quick-icon {
+            font-size: 1.8rem;
+            color: #2563eb;
+            display: inline-flex;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            align-items: center;
+            justify-content: center;
+            background: rgba(37, 99, 235, 0.12);
+        }
+        .quick-card.primary .quick-icon {
+            background: rgba(37, 99, 235, 0.22);
+            color: #1d4ed8;
+        }
+        .quick-content h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .quick-content p {
+            margin: 4px 0 0;
+            color: #475569;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        .quick-cta {
+            margin-top: auto;
+            font-weight: 600;
+            color: #2563eb;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+        .quick-card.primary .quick-cta {
+            color: #1d4ed8;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header injected by unified-nav-header.js -->
+
+    <!-- Main Content -->
+    <main class="vendor-dashboard">
+        <header class="vendor-hero">
+            <div class="vendor-hero-main">
+                <div class="vendor-eyebrow">Iterum Kitchen OS · Sourcing</div>
+                <h1>Vendor &amp; Purchasing Hub</h1>
+                <p>Keep supplier profiles, signature products, and invoice evidence aligned with your culinary workflow so the team always has sourcing answers.</p>
+                <div class="vendor-hero-actions">
+                    <button onclick="window.location.href='price-list-upload.html'" class="btn btn-primary" style="background: linear-gradient(135deg, rgba(255,255,255,0.45), rgba(255,255,255,0.2));">
+                        <span>💰</span>
+                        <span>Upload Price List</span>
+                    </button>
+                    <button onclick="window.vendorManager?.showAddVendorModal?.() || window.vendorImporter?.showAddVendorModal?.()" class="btn btn-primary">
+                        <span>➕</span>
+                        <span>Add Vendor</span>
+                    </button>
+                    <button id="import-vendors-btn" class="btn btn-secondary">
+                        <span>📥</span>
+                        <span>Import</span>
+                    </button>
+                    <button id="export-vendors-btn" class="btn btn-secondary">
+                        <span>📤</span>
+                        <span>Export</span>
+                    </button>
+                </div>
+            </div>
+            <div class="vendor-hero-side">
+                <h3>Workflow Highlights</h3>
+                <div class="vendor-checklist">
+                    <div class="vendor-checklist-item">
+                        <span>✅</span>
+                        <span>Capture catalogue items, pack sizes, and pricing while you add vendors.</span>
+                    </div>
+                    <div class="vendor-checklist-item">
+                        <span>🧾</span>
+                        <span>Attach invoice snapshots or quotes for instant reference during costing.</span>
+                    </div>
+                    <div class="vendor-checklist-item">
+                        <span>📦</span>
+                        <span>Link vendor intelligence back to menu workflows and prep briefs automatically.</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="vendor-quick-actions">
+            <article class="quick-card primary" onclick="window.vendorManager?.showAddVendorModal?.() || window.vendorImporter?.showAddVendorModal?.()">
+                <div class="quick-icon">➕</div>
+                <div class="quick-content">
+                    <h3>Add New Vendor</h3>
+                    <p>Capture contact details, signature products, and invoice evidence in one step.</p>
+                </div>
+                <div class="quick-cta">Start</div>
+            </article>
+            <article class="quick-card" onclick="window.vendorManager?.showImportModal?.() || document.getElementById('import-vendors-btn')?.click()">
+                <div class="quick-icon">📥</div>
+                <div class="quick-content">
+                    <h3>Import Vendor List</h3>
+                    <p>Pull supplier catalogs from CSV/price sheets to seed your sourcing hub.</p>
+                </div>
+                <div class="quick-cta">Upload</div>
+            </article>
+            <article class="quick-card" onclick="window.vendorManager?.exportVendors?.() || document.getElementById('export-vendors-btn')?.click()">
+                <div class="quick-icon">📤</div>
+                <div class="quick-content">
+                    <h3>Share Vendor Data</h3>
+                    <p>Export sourcing intel to collaborators or archive snapshots for audits.</p>
+                </div>
+                <div class="quick-cta">Export</div>
+            </article>
+        </section>
+
+        <section class="vendor-surface">
+            <div class="vendor-section-title">At a glance</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🏪</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="vendor-count">0</div>
+                        <div class="stat-label">Total Vendors</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="active-vendors">0</div>
+                        <div class="stat-label">Active Vendors</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🌍</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="vendor-locations">0</div>
+                        <div class="stat-label">Locations</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="vendor-specialties">0</div>
+                        <div class="stat-label">Specialties</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="vendor-section-title" style="margin-top: 36px;">Search &amp; filters</div>
+            <div class="filters-section">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="vendor-search" class="filter-label">Search</label>
+                        <input type="text" id="vendor-search" class="filter-input" placeholder="Search vendors, companies, or locations...">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="company-filter" class="filter-label">Company</label>
+                        <select id="company-filter" class="filter-select">
+                            <option value="">All Companies</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="city-filter" class="filter-label">City</label>
+                        <select id="city-filter" class="filter-select">
+                            <option value="">All Cities</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="state-filter" class="filter-label">State</label>
+                        <select id="state-filter" class="filter-select">
+                            <option value="">All States</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="status-filter" class="filter-label">Status</label>
+                        <select id="status-filter" class="filter-select">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bulk-actions" class="bulk-actions" style="display: none;">
+                <div class="bulk-actions-content">
+                    <span class="bulk-actions-text">
+                        <span id="selected-count">0</span> vendors selected
+                    </span>
+                    <div class="bulk-actions-buttons">
+                        <button id="bulk-edit-btn" class="btn btn-sm btn-secondary">
+                            ✏️ Edit Selected
+                        </button>
+                        <button id="bulk-delete-btn" class="btn btn-sm btn-danger">
+                            🗑️ Delete Selected
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="vendors-container" class="vendors-container">
+                <!-- Vendors will be loaded here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <!-- Load Firebase Configuration -->
+    <script src="assets/js/firebase-config.js"></script>
+    
+    <!-- Load Firebase Authentication -->
+    <script type="module" src="assets/js/firebase-auth.js"></script>
+    <script type="module" src="assets/js/firebase-auth-ui.js"></script>
+    
+    <!-- Load Unified Authentication System -->
+    <script src="assets/js/unified_auth_system.js"></script>
+    
+    <!-- Load Page Protection System -->
+    <script src="assets/js/page-protection.js"></script>
+    
+    <!-- Load Header User Synchronization -->
+    <script src="assets/js/header_user_sync.js"></script>
+    
+    <!-- Load Header Sync Loader (ensures sync on all pages) -->
+    <script src="assets/js/header_sync_loader.js"></script>
+    
+    <!-- Load Enhanced User Management System -->
+    <!-- Enhanced User Management now handled by Firebase Auth -->
+    
+    <!-- Project management now handled by new system -->
+    <script src="assets/js/error_handler.js"></script>
+    <script src="assets/js/vendorManager.js"></script>
+    <script src="assets/js/project-management-system.js"></script>
+    
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Initializing Vendor Management Page');
+            
+            // Wait for authentication system to be ready
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Ensure unified auth system is initialized and user state is maintained
+            if (window.unifiedAuth) {
+                console.log('🔐 Unified auth system found, checking user state...');
+                
+                // Check if there's a current user session
+                const currentUser = localStorage.getItem('current_user');
+                const sessionActive = localStorage.getItem('session_active');
+                
+                if (currentUser && sessionActive === 'true') {
+                    try {
+                        const user = JSON.parse(currentUser);
+                        console.log('✅ User session found:', user.name);
+                        
+                        // Update the header display with current user
+                        updateHeaderUserDisplay(user);
+                        
+                        // Ensure unified auth system has the current user
+                        window.unifiedAuth.currentUser = user;
+                        
+                    } catch (error) {
+                        console.warn('⚠️ Error parsing current user:', error);
+                    }
+                } else {
+                    console.log('⚠️ No active user session found');
+                }
+            } else {
+                console.warn('⚠️ Unified auth system not available');
+            }
+            
+            // Initialize header user synchronization
+            if (window.HeaderUserSync) {
+                try {
+                    const headerSync = new window.HeaderUserSync();
+                    headerSync.initialize();
+                    console.log('✅ Header user synchronization initialized');
+                } catch (error) {
+                    console.warn('⚠️ Header user sync initialization failed:', error);
+                }
+            }
+            
+            // User system now initializes automatically
+            console.log('🔍 User system auto-initialization enabled');
+            
+            // Vendor manager will initialize automatically
+            console.log('🔍 Vendor manager auto-initialization enabled');
+            
+            // Initialize project management system
+            if (window.projectManager) {
+                try {
+                    // Ensure project manager is ready
+                    if (!window.projectManager.initialized) {
+                        window.projectManager.init();
+                    }
+                    
+                    // Update project UI to reflect current selection
+                    window.projectManager.updateProjectUI();
+                    
+                    // Synchronize project selection across the page
+                    if (window.syncProjectSelection) {
+                        window.syncProjectSelection();
+                    }
+                    
+                    console.log('✅ Project management system initialized');
+                } catch (error) {
+                    console.warn('⚠️ Project management system initialization failed:', error);
+                }
+            } else {
+                console.warn('⚠️ Project management system not available');
+            }
+            
+            console.log('✅ Vendor Management Page initialized');
+        });
+
+        // Function to update header user display
+        function updateHeaderUserDisplay(user) {
+            if (!user) return;
+            
+            // Update user avatar initial
+            const avatarInitial = document.getElementById('user-avatar-initial');
+            if (avatarInitial) {
+                avatarInitial.textContent = user.name.charAt(0).toUpperCase();
+            }
+            
+            // Update current user name
+            const currentUserName = document.getElementById('current-user');
+            if (currentUserName) {
+                currentUserName.textContent = user.name;
+            }
+            
+            // Update dropdown user name
+            const dropdownUserName = document.getElementById('dropdown-user-name');
+            if (dropdownUserName) {
+                dropdownUserName.textContent = user.name;
+            }
+            
+            // Update dropdown user role
+            const dropdownUserRole = document.getElementById('dropdown-user-role');
+            if (dropdownUserRole) {
+                dropdownUserRole.textContent = user.role || 'Chef';
+            }
+            
+            console.log('✅ Header user display updated for:', user.name);
+        }
+
+        // User dropdown toggle
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('user-dropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+
+        // Mobile navigation toggle
+        function toggleMobileNav() {
+            const mobileNav = document.getElementById('mobile-nav');
+            if (mobileNav) {
+                mobileNav.classList.toggle('show');
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('user-dropdown');
+            const userTab = document.querySelector('.header-user-tab');
+            
+            if (dropdown && !userTab.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Listen for user authentication events to keep header synchronized
+        document.addEventListener('userLoggedIn', function(event) {
+            console.log('🔐 User logged in event received on vendor page');
+            if (event.detail && event.detail.user) {
+                updateHeaderUserDisplay(event.detail.user);
+            }
+        });
+
+        document.addEventListener('userSwitched', function(event) {
+            console.log('🔄 User switched event received on vendor page');
+            if (event.detail && event.detail.user) {
+                updateHeaderUserDisplay(event.detail.user);
+            }
+        });
+
+        document.addEventListener('userLoggedOut', function(event) {
+            console.log('🚪 User logged out event received on vendor page');
+            // Reset header to guest state
+            updateHeaderUserDisplay({
+                name: 'Guest User',
+                role: 'Guest'
+            });
+        });
+
+        document.addEventListener('iterumUserDataLoaded', function(event) {
+            console.log('📥 User data loaded event received on vendor page');
+            if (event.detail && event.detail.user) {
+                updateHeaderUserDisplay(event.detail.user);
+            }
+        });
+    </script>
+    
+    <!-- Load Vendor URL Importer -->
+    <script defer src="assets/js/vendor-url-importer.js"></script>
+    
+    <!-- Load Auth System at End -->
+    <script type="module" defer src="assets/js/firebase-auth.js"></script>
+    <script type="module" defer src="assets/js/firestore-sync.js"></script>
+    <script defer src="assets/js/header-user-display.js"></script>
+    <script defer src="assets/js/profile-editor.js"></script>
+    
+    <!-- Central Data Loader -->
+    <script src="assets/js/central-data-loader.js"></script>
+    
+    <!-- State Persistence Manager - Ensures user and project persist across pages -->
+    <script src="assets/js/state-persistence-manager.js"></script>
+    
+    <!-- Secure Storage Manager - Fast & Secure IndexedDB storage -->
+    <script src="assets/js/secure-storage-manager.js"></script>
+    
+    <script defer src="assets/js/auth_guard.js"></script>
+</body>
+</html> 

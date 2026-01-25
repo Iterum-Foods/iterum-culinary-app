@@ -1,0 +1,427 @@
+/**
+ * Chef Dashboard UI & Color Enhancements
+ * Modern dark rustic theme with better contrast and visual hierarchy
+ */
+
+/* Main Body & Container */
+body {
+    background: var(--bg-primary) !important;
+    color: var(--text-secondary) !important;
+}
+
+.chef-container {
+    color: var(--text-secondary);
+}
+
+/* Quick Access Buttons */
+.quick-btn {
+    background: linear-gradient(135deg, var(--accent-main) 0%, var(--accent-hover) 100%) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 4px 15px rgba(212, 165, 116, 0.3) !important;
+    border: 2px solid var(--accent-main) !important;
+}
+
+.quick-btn:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 25px rgba(212, 165, 116, 0.5) !important;
+    background: linear-gradient(135deg, var(--accent-hover) 0%, var(--accent-active) 100%) !important;
+}
+
+.quick-btn:active {
+    transform: scale(0.95) translateY(0) !important;
+}
+
+/* Floating Note Button */
+.floating-note-btn {
+    background: linear-gradient(135deg, var(--accent-main) 0%, var(--accent-hover) 100%) !important;
+    box-shadow: 0 8px 30px rgba(212, 165, 116, 0.5) !important;
+    border: 3px solid var(--accent-main) !important;
+}
+
+.floating-note-btn:hover {
+    box-shadow: 0 12px 40px rgba(212, 165, 116, 0.7) !important;
+    border-color: var(--accent-hover) !important;
+}
+
+/* Quick Note Popup */
+.quick-note-popup {
+    background: var(--bg-base) !important;
+    border: 2px solid var(--border-medium) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
+    color: var(--text-secondary) !important;
+}
+
+.quick-note-popup h3 {
+    color: var(--text-primary) !important;
+}
+
+.quick-note-popup input,
+.quick-note-popup textarea {
+    background: var(--bg-elevated) !important;
+    border-color: var(--border-medium) !important;
+    color: var(--text-primary) !important;
+}
+
+.quick-note-popup input:focus,
+.quick-note-popup textarea:focus {
+    border-color: var(--accent-main) !important;
+    box-shadow: 0 0 0 3px var(--accent-fade) !important;
+    background: var(--bg-base) !important;
+}
+
+/* Today's Prep List */
+.prep-list {
+    background: var(--bg-base) !important;
+    border: 2px solid var(--border-light) !important;
+    box-shadow: var(--shadow-lg) !important;
+    color: var(--text-secondary) !important;
+}
+
+.prep-list h3 {
+    color: var(--text-primary) !important;
+}
+
+.prep-item {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-light) !important;
+}
+
+.prep-item:hover {
+    background: var(--bg-base) !important;
+    border-color: var(--accent-main) !important;
+    transform: translateX(5px) !important;
+    box-shadow: 0 4px 12px rgba(212, 165, 116, 0.2) !important;
+}
+
+.prep-item-name {
+    color: var(--text-primary) !important;
+}
+
+.prep-item-time {
+    color: var(--text-tertiary) !important;
+}
+
+/* Prep Checkbox */
+.prep-checkbox {
+    border-color: var(--border-medium) !important;
+    background: var(--bg-elevated) !important;
+}
+
+.prep-checkbox.checked {
+    background: var(--success) !important;
+    border-color: var(--success) !important;
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.4) !important;
+}
+
+/* Quick Stats Cards */
+.stats-row {
+    margin-bottom: 25px;
+}
+
+.stat-card-mini {
+    background: var(--bg-base) !important;
+    border: 2px solid var(--border-light) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.stat-card-mini:hover {
+    border-color: var(--accent-main) !important;
+    box-shadow: var(--shadow-lg) !important;
+    transform: translateY(-3px) !important;
+}
+
+.stat-number-mini {
+    background: linear-gradient(135deg, var(--accent-main) 0%, var(--accent-hover) 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    color: var(--accent-main) !important;
+}
+
+.stat-label-mini {
+    color: var(--text-tertiary) !important;
+}
+
+/* Feature Cards */
+.feature-section {
+    background: var(--bg-base) !important;
+    border: 2px solid var(--border-light) !important;
+    border-radius: 16px !important;
+    box-shadow: var(--shadow-lg) !important;
+    padding: 25px !important;
+    margin-bottom: 30px !important;
+}
+
+.feature-section h2 {
+    color: var(--text-primary) !important;
+    border-bottom-color: var(--border-medium) !important;
+}
+
+.feature-section p {
+    color: var(--text-secondary) !important;
+}
+
+/* Ingredient Highlight Cards */
+.ingredient-card {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-light) !important;
+    color: var(--text-secondary) !important;
+}
+
+.ingredient-card:hover {
+    background: var(--bg-base) !important;
+    border-color: var(--accent-main) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 20px rgba(212, 165, 116, 0.2) !important;
+}
+
+.ingredient-card h4 {
+    color: var(--text-primary) !important;
+}
+
+.ingredient-card p {
+    color: var(--text-tertiary) !important;
+}
+
+/* Recipe Preview Cards */
+.recipe-card-preview {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-light) !important;
+}
+
+.recipe-card-preview:hover {
+    background: var(--bg-base) !important;
+    border-color: var(--accent-main) !important;
+    box-shadow: 0 8px 25px rgba(212, 165, 116, 0.3) !important;
+}
+
+.recipe-card-preview h4 {
+    color: var(--text-primary) !important;
+}
+
+.recipe-card-preview p {
+    color: var(--text-tertiary) !important;
+}
+
+/* Empty State Messages */
+.empty-state {
+    color: var(--text-tertiary) !important;
+}
+
+.empty-state h3 {
+    color: var(--text-secondary) !important;
+}
+
+/* Quick Actions Grid */
+.quick-actions {
+    background: var(--bg-base) !important;
+    border: 2px solid var(--border-light) !important;
+    border-radius: 16px !important;
+    padding: 25px !important;
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.quick-actions h3 {
+    color: var(--text-primary) !important;
+    border-bottom-color: var(--border-medium) !important;
+}
+
+/* Stats Summary Section */
+.stats-summary {
+    background: var(--bg-base) !important;
+    border: 2px solid var(--border-light) !important;
+    border-radius: 16px !important;
+    padding: 25px !important;
+    box-shadow: var(--shadow-lg) !important;
+    margin-bottom: 25px !important;
+}
+
+.stats-summary h3 {
+    color: var(--text-primary) !important;
+}
+
+.stats-summary p {
+    color: var(--text-secondary) !important;
+}
+
+/* Section Headers */
+.section-header {
+    color: var(--text-primary) !important;
+    border-bottom-color: var(--border-medium) !important;
+}
+
+/* All Cards General Override */
+.card,
+[class*="card"],
+[class*="Card"] {
+    background: var(--bg-base) !important;
+    border-color: var(--border-light) !important;
+    color: var(--text-secondary) !important;
+}
+
+.card h3,
+.card h4,
+[class*="card"] h3,
+[class*="card"] h4 {
+    color: var(--text-primary) !important;
+}
+
+.card p,
+[class*="card"] p {
+    color: var(--text-tertiary) !important;
+}
+
+/* Links and Buttons */
+a,
+button[class*="btn"] {
+    transition: all 0.3s ease !important;
+}
+
+a:hover,
+button[class*="btn"]:hover {
+    color: var(--accent-main) !important;
+}
+
+/* Form Elements */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="time"],
+textarea,
+select {
+    background: var(--bg-elevated) !important;
+    border-color: var(--border-medium) !important;
+    color: var(--text-primary) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--accent-main) !important;
+    box-shadow: 0 0 0 3px var(--accent-fade) !important;
+    background: var(--bg-base) !important;
+    outline: none !important;
+}
+
+/* Badges and Tags */
+.badge,
+.tag,
+[class*="badge"],
+[class*="tag"] {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-light) !important;
+    color: var(--text-secondary) !important;
+}
+
+.badge.active,
+.tag.active {
+    background: var(--accent-main) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--accent-main) !important;
+}
+
+/* Loading Spinners */
+.loader,
+.spinner {
+    border-color: var(--border-light) !important;
+    border-top-color: var(--accent-main) !important;
+}
+
+/* Overlay Modals */
+.modal,
+.overlay,
+[class*="modal"],
+[class*="overlay"] {
+    background: rgba(0, 0, 0, 0.8) !important;
+}
+
+.modal-content,
+[class*="modal"] [class*="content"] {
+    background: var(--bg-base) !important;
+    border: 2px solid var(--border-medium) !important;
+    color: var(--text-secondary) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.modal-content h3,
+[class*="modal"] h3 {
+    color: var(--text-primary) !important;
+}
+
+/* Status Indicators */
+.status-indicator {
+    border-color: var(--border-light) !important;
+}
+
+.status-indicator.success,
+.status-success {
+    background: var(--success) !important;
+    border-color: var(--success) !important;
+}
+
+.status-indicator.warning,
+.status-warning {
+    background: var(--warning) !important;
+    border-color: var(--warning) !important;
+}
+
+.status-indicator.error,
+.status-error {
+    background: var(--error) !important;
+    border-color: var(--error) !important;
+}
+
+.status-indicator.info,
+.status-info {
+    background: var(--info) !important;
+    border-color: var(--info) !important;
+}
+
+/* Icons */
+.icon,
+[class*="icon"] {
+    color: var(--accent-main) !important;
+}
+
+/* Gradient Overlays */
+.gradient-overlay {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.4), transparent) !important;
+}
+
+/* Enhanced Shadows */
+.card-shadow,
+[class*="shadow"] {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+.card-shadow:hover,
+[class*="shadow"]:hover {
+    box-shadow: 0 12px 40px rgba(212, 165, 116, 0.3) !important;
+}
+
+/* Responsive Improvements */
+@media (max-width: 768px) {
+    .quick-btn {
+        padding: 20px 15px !important;
+        min-height: 100px !important;
+    }
+    
+    .quick-btn-icon {
+        font-size: 2rem !important;
+    }
+    
+    .stat-card-mini {
+        padding: 15px !important;
+    }
+    
+    .feature-section {
+        padding: 20px !important;
+    }
+}
+
+/* Smooth Transitions */
+* {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease !important;
+}
+

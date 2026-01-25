@@ -1,0 +1,63 @@
+{
+  "id": "ingredients_pastry_suite",
+  "name": "Pastry Production Suite",
+  "version": "1.0.0",
+  "items": [
+    {
+      "name": "Pastry Cream Mix",
+      "category": "Pastry",
+      "unit": "kg",
+      "defaultUnit": "g",
+      "cost": 7.5,
+      "costPer": "kg",
+      "supplier": "Pastry Partners",
+      "storage": "dry",
+      "shelfLifeDays": 180
+    },
+    {
+      "name": "Gelatin Sheets Silver",
+      "category": "Pastry",
+      "unit": "pkg",
+      "defaultUnit": "sheet",
+      "cost": 12.0,
+      "costPer": "pkg",
+      "supplier": "Pastry Partners",
+      "storage": "dry",
+      "shelfLifeDays": 365
+    },
+    {
+      "name": "Vanilla Bean Paste",
+      "category": "Pastry",
+      "unit": "kg",
+      "defaultUnit": "g",
+      "cost": 36.0,
+      "costPer": "kg",
+      "supplier": "Sweet Harvest",
+      "storage": "dry",
+      "shelfLifeDays": 365
+    },
+    {
+      "name": "Paillete Feuilletine",
+      "category": "Pastry",
+      "unit": "kg",
+      "defaultUnit": "g",
+      "cost": 18.2,
+      "costPer": "kg",
+      "supplier": "Pastry Partners",
+      "storage": "dry",
+      "shelfLifeDays": 270
+    },
+    {
+      "name": "Callebaut 54% Dark Couverture",
+      "category": "Pastry",
+      "unit": "kg",
+      "defaultUnit": "g",
+      "cost": 9.85,
+      "costPer": "kg",
+      "supplier": "Sweet Harvest",
+      "storage": "dry",
+      "shelfLifeDays": 365
+    }
+  ]
+}
+

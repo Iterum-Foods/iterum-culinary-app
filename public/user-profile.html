@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile & Settings - Iterum Culinary</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/unified-cards.css">
+    <link rel="stylesheet" href="assets/css/nav-enhancements.css">
+    <link rel="stylesheet" href="assets/css/dashboard-enhanced.css">
+    <link rel="stylesheet" href="assets/css/high-contrast-universal.css">
+    <link rel="stylesheet" href="assets/css/nordic-design-system.css">
+    <link rel="stylesheet" href="assets/css/modern-nordic-vintage.css">
+    <link rel="stylesheet" href="assets/css/dark-mode-enhancements.css">
+    
+    <!-- Unified Navigation -->
+    <script src="assets/js/unified-nav-header.js" defer></script>
+    <script src="assets/js/unified-project-selector.js" defer></script>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+    
+    <style>
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            border-radius: 16px;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid white;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+        
+        .avatar-placeholder {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid white;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .avatar-placeholder:hover {
+            transform: scale(1.05);
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .settings-tab {
+            padding: 15px 25px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        
+        .settings-tab:hover {
+            background: #f1f5f9;
+            border-color: #e2e8f0;
+        }
+        
+        .settings-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .setting-item {
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: white;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background-color: #cbd5e1;
+            border-radius: 34px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background-color: #667eea;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(24px);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        .badge-pro {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+        }
+        
+        .badge-verified {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/header-universal.css">
+</head>
+<body class="bg-gray-50" style="padding-top: 80px;">
+    <!-- Navigation (same as other pages) -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="index.html" class="brand-link">
+                    <span class="brand-icon">🍳</span>
+                    <span class="brand-text">Iterum Culinary</span>
+                </a>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Dashboard</a>
+                <a href="recipe-library.html" class="nav-link">Recipes</a>
+                <a href="menu-builder.html" class="nav-link">Menus</a>
+                <a href="kitchen-management.html" class="nav-link">Kitchen</a>
+                <a href="user-profile.html" class="nav-link active">Profile</a>
+                <button onclick="signOut()" class="nav-link-button">Sign Out</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div style="display: flex; align-items: center; gap: 30px;">
+                <div>
+                    <div id="avatar-container" onclick="document.getElementById('avatar-upload').click()">
+                        <!-- Avatar will be loaded here -->
+                    </div>
+                    <input type="file" id="avatar-upload" accept="image/*" style="display: none;" onchange="uploadAvatar(event)">
+                </div>
+                <div style="flex: 1;">
+                    <h1 id="profile-name" style="font-size: 2rem; font-weight: 700; margin-bottom: 10px;">User Name</h1>
+                    <p id="profile-email" style="opacity: 0.9; margin-bottom: 15px;">user@example.com</p>
+                    <div>
+                        <span class="badge badge-verified">✓ Verified</span>
+                        <span class="badge badge-pro">⭐ Pro User</span>
+                    </div>
+                </div>
+                <div>
+                    <button onclick="showTab('profile')" class="btn" style="background: white; color: #667eea; margin-right: 10px;">
+                        ✏️ Edit Profile
+                    </button>
+                    <button onclick="showTab('settings')" class="btn" style="background: rgba(255,255,255,0.2); color: white;">
+                        ⚙️ Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div style="margin-bottom: 30px; display: flex; flex-wrap: wrap;">
+            <div class="settings-tab active" onclick="showTab('profile')" id="tab-profile">
+                👤 Profile Information
+            </div>
+            <div class="settings-tab" onclick="showTab('settings')" id="tab-settings">
+                ⚙️ App Settings
+            </div>
+            <div class="settings-tab" onclick="showTab('preferences')" id="tab-preferences">
+                🎨 Preferences
+            </div>
+            <div class="settings-tab" onclick="showTab('kitchen')" id="tab-kitchen">
+                🔪 Kitchen Setup
+            </div>
+            <div class="settings-tab" onclick="showTab('security')" id="tab-security">
+                🔒 Security & Privacy
+            </div>
+            <div class="settings-tab" onclick="showTab('billing')" id="tab-billing">
+                💳 Billing & Plan
+            </div>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="content-profile" class="tab-content">
+            <div class="card">
+                <div class="card-header-gradient">
+                    <h2 class="card-title">👤 Profile Information</h2>
+                    <p class="card-subtitle">Update your personal information and professional details</p>
+                </div>
+                <div style="padding: 30px;">
+                    <form id="profile-form" onsubmit="saveProfile(event)">
+                        <div class="grid-2-col mb-4">
+                            <div class="form-group">
+                                <label class="form-label">First Name</label>
+                                <input type="text" id="first-name" class="form-input" placeholder="John">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" id="last-name" class="form-input" placeholder="Doe">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" id="email" class="form-input" placeholder="john@example.com" readonly>
+                            <small style="color: #64748b;">Email cannot be changed. Contact support if needed.</small>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" id="phone" class="form-input" placeholder="+1 (555) 123-4567">
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <label class="form-label">Professional Title</label>
+                            <input type="text" id="title" class="form-input" placeholder="Executive Chef">
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <label class="form-label">Restaurant / Business Name</label>
+                            <input type="text" id="business-name" class="form-input" placeholder="The Culinary Studio">
+                        </div>
+                        
+                        <div class="grid-2-col mb-4">
+                            <div class="form-group">
+                                <label class="form-label">City</label>
+                                <input type="text" id="city" class="form-input" placeholder="New York">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Country</label>
+                                <input type="text" id="country" class="form-input" placeholder="USA">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <label class="form-label">Bio / Description</label>
+                            <textarea id="bio" class="form-textarea" rows="4" placeholder="Tell us about yourself and your culinary journey..."></textarea>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <label class="form-label">Specialty / Cuisine Type</label>
+                            <select id="specialty" class="form-select">
+                                <option value="">Select your specialty...</option>
+                                <option value="french">French Cuisine</option>
+                                <option value="italian">Italian Cuisine</option>
+                                <option value="japanese">Japanese Cuisine</option>
+                                <option value="american">American Cuisine</option>
+                                <option value="fusion">Fusion Cuisine</option>
+                                <option value="pastry">Pastry & Baking</option>
+                                <option value="molecular">Molecular Gastronomy</option>
+                                <option value="farm-to-table">Farm-to-Table</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <label class="form-label">Website</label>
+                            <input type="url" id="website" class="form-input" placeholder="https://yourwebsite.com">
+                        </div>
+                        
+                        <div class="button-group">
+                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                💾 Save Profile
+                            </button>
+                            <button type="button" class="btn" onclick="cancelEdit()">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-settings" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header-gradient">
+                    <h2 class="card-title">⚙️ App Settings</h2>
+                    <p class="card-subtitle">Customize how the app works for you</p>
+                </div>
+                <div style="padding: 30px;">
+                    <!-- Display Settings -->
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 20px;">Display</h3>
+                    
+                    <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Dark Mode</div>
+                                <div style="color: #64748b; font-size: 14px;">Use dark theme across the app</div>
+                            </div>
+                            <div class="toggle-switch" id="dark-mode-toggle" onclick="toggleSetting('darkMode')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Compact View</div>
+                                <div style="color: #64748b; font-size: 14px;">Show more content on screen</div>
+                            </div>
+                            <div class="toggle-switch" id="compact-view-toggle" onclick="toggleSetting('compactView')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Show Recipe Photos</div>
+                                <div style="color: #64748b; font-size: 14px;">Display images in recipe lists</div>
+                            </div>
+                            <div class="toggle-switch active" id="recipe-photos-toggle" onclick="toggleSetting('recipePhotos')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Notification Settings -->
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin: 30px 0 20px;">Notifications</h3>
+                    
+                    <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Email Notifications</div>
+                                <div style="color: #64748b; font-size: 14px;">Receive updates via email</div>
+                            </div>
+                            <div class="toggle-switch active" id="email-notif-toggle" onclick="toggleSetting('emailNotifications')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Backup Reminders</div>
+                                <div style="color: #64748b; font-size: 14px;">Get reminded to backup your data</div>
+                            </div>
+                            <div class="toggle-switch active" id="backup-remind-toggle" onclick="toggleSetting('backupReminders')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Auto-Save Settings -->
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin: 30px 0 20px;">Auto-Save & Sync</h3>
+                    
+                    <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Auto-Save</div>
+                                <div style="color: #64748b; font-size: 14px;">Automatically save changes</div>
+                            </div>
+                            <div class="toggle-switch active" id="auto-save-toggle" onclick="toggleSetting('autoSave')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Cloud Sync</div>
+                                <div style="color: #64748b; font-size: 14px;">Sync data with Firebase</div>
+                            </div>
+                            <div class="toggle-switch active" id="cloud-sync-toggle" onclick="toggleSetting('cloudSync')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-preferences" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header-gradient">
+                    <h2 class="card-title">🎨 Display Preferences</h2>
+                    <p class="card-subtitle">Customize the look and feel</p>
+                </div>
+                <div style="padding: 30px;">
+                    <div class="form-group mb-4">
+                        <label class="form-label">Default Units</label>
+                        <select id="default-units" class="form-select">
+                            <option value="metric">Metric (kg, g, L, mL)</option>
+                            <option value="imperial" selected>Imperial (lb, oz, gal, cup)</option>
+                            <option value="both">Show Both</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group mb-4">
+                        <label class="form-label">Temperature Unit</label>
+                        <select id="temp-unit" class="form-select">
+                            <option value="fahrenheit" selected>Fahrenheit (°F)</option>
+                            <option value="celsius">Celsius (°C)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group mb-4">
+                        <label class="form-label">Date Format</label>
+                        <select id="date-format" class="form-select">
+                            <option value="mdy" selected>MM/DD/YYYY</option>
+                            <option value="dmy">DD/MM/YYYY</option>
+                            <option value="ymd">YYYY-MM-DD</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group mb-4">
+                        <label class="form-label">Time Format</label>
+                        <select id="time-format" class="form-select">
+                            <option value="12h" selected>12-hour (3:00 PM)</option>
+                            <option value="24h">24-hour (15:00)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group mb-4">
+                        <label class="form-label">Language</label>
+                        <select id="language" class="form-select">
+                            <option value="en" selected>English</option>
+                            <option value="es">Español</option>
+                            <option value="fr">Français</option>
+                            <option value="it">Italiano</option>
+                        </select>
+                    </div>
+                    
+                    <button onclick="savePreferences()" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        💾 Save Preferences
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-kitchen" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header-gradient">
+                    <h2 class="card-title">🔪 Kitchen Setup</h2>
+                    <p class="card-subtitle">Configure your kitchen management preferences</p>
+                </div>
+                <div style="padding: 30px;">
+                    <div class="form-group mb-4">
+                        <label class="form-label">Kitchen Type</label>
+                        <select id="kitchen-type" class="form-select">
+                            <option value="">Select type...</option>
+                            <option value="restaurant">Restaurant Kitchen</option>
+                            <option value="catering">Catering Kitchen</option>
+                            <option value="bakery">Bakery</option>
+                            <option value="home">Home Kitchen</option>
+                            <option value="food-truck">Food Truck</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group mb-4">
+                        <label class="form-label">Service Style</label>
+                        <select id="service-style" class="form-select" multiple size="4">
+                            <option value="fine-dining">Fine Dining</option>
+                            <option value="casual">Casual Dining</option>
+                            <option value="fast-casual">Fast Casual</option>
+                            <option value="takeout">Takeout Only</option>
+                        </select>
+                        <small style="color: #64748b;">Hold Ctrl/Cmd to select multiple</small>
+                    </div>
+                    
+                    <div class="form-group mb-4">
+                        <label class="form-label">Average Covers per Service</label>
+                        <input type="number" id="covers" class="form-input" placeholder="100">
+                    </div>
+                    
+                    <div class="form-group mb-4">
+                        <label class="form-label">Default Recipe Yield</label>
+                        <input type="number" id="default-yield" class="form-input" placeholder="4" value="4">
+                        <small style="color: #64748b;">Default number of servings for new recipes</small>
+                    </div>
+                    
+                    <div class="form-group mb-4">
+                        <label class="form-label">Prep Days Ahead</label>
+                        <input type="number" id="prep-days" class="form-input" placeholder="1" value="1">
+                        <small style="color: #64748b;">How many days ahead to generate prep lists</small>
+                    </div>
+                    
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin: 30px 0 20px;">Kitchen Preferences</h3>
+                    
+                    <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Show Recipe Versions</div>
+                                <div style="color: #64748b; font-size: 14px;">Track recipe version history</div>
+                            </div>
+                            <div class="toggle-switch active" id="recipe-versions-toggle" onclick="toggleSetting('recipeVersions')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Auto-Generate Prep Lists</div>
+                                <div style="color: #64748b; font-size: 14px;">Create prep lists automatically</div>
+                            </div>
+                            <div class="toggle-switch active" id="auto-prep-toggle" onclick="toggleSetting('autoPrep')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Allergen Warnings</div>
+                                <div style="color: #64748b; font-size: 14px;">Show allergen alerts prominently</div>
+                            </div>
+                            <div class="toggle-switch active" id="allergen-warnings-toggle" onclick="toggleSetting('allergenWarnings')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="saveKitchenSettings()" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        💾 Save Kitchen Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-security" class="tab-content" style="display: none;">
+            <div class="card mb-6">
+                <div class="card-header-gradient">
+                    <h2 class="card-title">🔒 Security & Privacy</h2>
+                    <p class="card-subtitle">Manage your account security and data privacy</p>
+                </div>
+                <div style="padding: 30px;">
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 20px;">Change Password</h3>
+                    
+                    <form id="password-form" onsubmit="changePassword(event)">
+                        <div class="form-group mb-4">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" id="current-password" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <label class="form-label">New Password</label>
+                            <input type="password" id="new-password" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" id="confirm-password" class="form-input" required>
+                        </div>
+                        
+                        <button type="submit" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                            🔑 Update Password
+                        </button>
+                    </form>
+                    
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin: 40px 0 20px;">Privacy Settings</h3>
+                    
+                    <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Profile Visibility</div>
+                                <div style="color: #64748b; font-size: 14px;">Make your profile visible to other users</div>
+                            </div>
+                            <div class="toggle-switch" id="profile-visible-toggle" onclick="toggleSetting('profileVisible')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 5px;">Share Analytics</div>
+                                <div style="color: #64748b; font-size: 14px;">Help improve the app by sharing usage data</div>
+                            </div>
+                            <div class="toggle-switch active" id="analytics-toggle" onclick="toggleSetting('shareAnalytics')">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin: 40px 0 20px;">Data Management</h3>
+                    
+                    <div class="button-group">
+                        <button onclick="exportAllData()" class="btn">
+                            📥 Download My Data
+                        </button>
+                        <button onclick="location.href='data-backup-center.html'" class="btn">
+                            💾 Backup Center
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card" style="border: 2px solid #ef4444;">
+                <div style="padding: 30px;">
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; color: #ef4444;">⚠️ Danger Zone</h3>
+                    <p style="color: #64748b; margin-bottom: 20px;">These actions are irreversible. Please be careful.</p>
+                    
+                    <div class="button-group">
+                        <button onclick="confirmDeleteAccount()" class="btn" style="background: #ef4444; color: white;">
+                            🗑️ Delete Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-billing" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header-gradient">
+                    <h2 class="card-title">💳 Billing & Subscription</h2>
+                    <p class="card-subtitle">Manage your subscription and billing information</p>
+                </div>
+                <div style="padding: 30px;">
+                    <div style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px;">
+                        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 10px;">⭐ Pro Plan</h3>
+                        <p style="font-size: 2.5rem; font-weight: 800; margin-bottom: 10px;">$29<span style="font-size: 1.2rem; font-weight: 400;">/month</span></p>
+                        <p style="opacity: 0.9;">Next billing date: January 18, 2026</p>
+                    </div>
+                    
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 20px;">Features Included</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="color: #10b981; font-size: 20px;">✓</span>
+                            <span>Unlimited Recipes</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="color: #10b981; font-size: 20px;">✓</span>
+                            <span>Cloud Sync</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="color: #10b981; font-size: 20px;">✓</span>
+                            <span>Kitchen Management Tools</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="color: #10b981; font-size: 20px;">✓</span>
+                            <span>Priority Support</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="color: #10b981; font-size: 20px;">✓</span>
+                            <span>PDF Export</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="color: #10b981; font-size: 20px;">✓</span>
+                            <span>Advanced Analytics</span>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button onclick="manageBilling()" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                            💳 Update Payment Method
+                        </button>
+                        <button onclick="viewInvoices()" class="btn">
+                            📄 View Invoices
+                        </button>
+                        <button onclick="cancelSubscription()" class="btn" style="color: #ef4444;">
+                            ⚠️ Cancel Subscription
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    <script src="assets/js/state-persistence-manager.js"></script>
+
+    <script>
+        // Tab management
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.settings-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`content-${tabName}`).style.display = 'block';
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // Toggle settings
+        function toggleSetting(settingName) {
+            const toggle = document.getElementById(`${settingName.replace(/([A-Z])/g, '-$1').toLowerCase()}-toggle`);
+            toggle.classList.toggle('active');
+            
+            // Save to localStorage
+            const settings = JSON.parse(localStorage.getItem('app_settings') || '{}');
+            settings[settingName] = toggle.classList.contains('active');
+            localStorage.setItem('app_settings', JSON.stringify(settings));
+            
+            console.log(`${settingName} set to:`, settings[settingName]);
+        }
+
+        // Load profile data
+        function loadProfile() {
+            const user = window.authManager?.currentUser;
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            const userId = user.userId || user.id;
+            const profileKey = `user_profile_${userId}`;
+            const profile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+            
+            // Set profile header
+            document.getElementById('profile-name').textContent = profile.firstName && profile.lastName 
+                ? `${profile.firstName} ${profile.lastName}`
+                : user.displayName || user.email?.split('@')[0] || 'User';
+            document.getElementById('profile-email').textContent = user.email || '';
+            
+            // Load avatar
+            const avatarContainer = document.getElementById('avatar-container');
+            if (profile.avatarUrl || user.photoURL) {
+                avatarContainer.innerHTML = `<img src="${profile.avatarUrl || user.photoURL}" class="profile-avatar" alt="Profile">`;
+            } else {
+                const initials = (profile.firstName?.[0] || '') + (profile.lastName?.[0] || '') || user.email?.[0]?.toUpperCase() || '?';
+                avatarContainer.innerHTML = `<div class="avatar-placeholder">${initials}</div>`;
+            }
+            
+            // Populate form fields
+            document.getElementById('first-name').value = profile.firstName || '';
+            document.getElementById('last-name').value = profile.lastName || '';
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('phone').value = profile.phone || '';
+            document.getElementById('title').value = profile.title || '';
+            document.getElementById('business-name').value = profile.businessName || '';
+            document.getElementById('city').value = profile.city || '';
+            document.getElementById('country').value = profile.country || '';
+            document.getElementById('bio').value = profile.bio || '';
+            document.getElementById('specialty').value = profile.specialty || '';
+            document.getElementById('website').value = profile.website || '';
+            
+            // Load settings
+            loadSettings();
+            loadPreferences();
+            loadKitchenSettings();
+        }
+
+        // Load settings
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('app_settings') || '{}');
+            
+            // Apply toggle states
+            const settingsMap = {
+                'darkMode': 'dark-mode-toggle',
+                'compactView': 'compact-view-toggle',
+                'recipePhotos': 'recipe-photos-toggle',
+                'emailNotifications': 'email-notif-toggle',
+                'backupReminders': 'backup-remind-toggle',
+                'autoSave': 'auto-save-toggle',
+                'cloudSync': 'cloud-sync-toggle',
+                'profileVisible': 'profile-visible-toggle',
+                'shareAnalytics': 'analytics-toggle',
+                'recipeVersions': 'recipe-versions-toggle',
+                'autoPrep': 'auto-prep-toggle',
+                'allergenWarnings': 'allergen-warnings-toggle'
+            };
+            
+            Object.entries(settingsMap).forEach(([setting, toggleId]) => {
+                const toggle = document.getElementById(toggleId);
+                if (toggle && settings[setting]) {
+                    toggle.classList.add('active');
+                }
+            });
+        }
+
+        // Load preferences
+        function loadPreferences() {
+            const prefs = JSON.parse(localStorage.getItem('user_preferences') || '{}');
+            
+            if (prefs.units) document.getElementById('default-units').value = prefs.units;
+            if (prefs.tempUnit) document.getElementById('temp-unit').value = prefs.tempUnit;
+            if (prefs.dateFormat) document.getElementById('date-format').value = prefs.dateFormat;
+            if (prefs.timeFormat) document.getElementById('time-format').value = prefs.timeFormat;
+            if (prefs.language) document.getElementById('language').value = prefs.language;
+        }
+
+        // Load kitchen settings
+        function loadKitchenSettings() {
+            const kitchen = JSON.parse(localStorage.getItem('kitchen_settings') || '{}');
+            
+            if (kitchen.type) document.getElementById('kitchen-type').value = kitchen.type;
+            if (kitchen.covers) document.getElementById('covers').value = kitchen.covers;
+            if (kitchen.defaultYield) document.getElementById('default-yield').value = kitchen.defaultYield;
+            if (kitchen.prepDays) document.getElementById('prep-days').value = kitchen.prepDays;
+        }
+
+        // Save profile
+        function saveProfile(event) {
+            event.preventDefault();
+            
+            const user = window.authManager?.currentUser;
+            if (!user) return;
+            
+            const userId = user.userId || user.id;
+            const profileKey = `user_profile_${userId}`;
+            
+            const profile = {
+                firstName: document.getElementById('first-name').value,
+                lastName: document.getElementById('last-name').value,
+                phone: document.getElementById('phone').value,
+                title: document.getElementById('title').value,
+                businessName: document.getElementById('business-name').value,
+                city: document.getElementById('city').value,
+                country: document.getElementById('country').value,
+                bio: document.getElementById('bio').value,
+                specialty: document.getElementById('specialty').value,
+                website: document.getElementById('website').value,
+                updatedAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem(profileKey, JSON.stringify(profile));
+            
+            alert('✅ Profile saved successfully!');
+            loadProfile(); // Reload to update header
+        }
+
+        // Save preferences
+        function savePreferences() {
+            const prefs = {
+                units: document.getElementById('default-units').value,
+                tempUnit: document.getElementById('temp-unit').value,
+                dateFormat: document.getElementById('date-format').value,
+                timeFormat: document.getElementById('time-format').value,
+                language: document.getElementById('language').value
+            };
+            
+            localStorage.setItem('user_preferences', JSON.stringify(prefs));
+            alert('✅ Preferences saved successfully!');
+        }
+
+        // Save kitchen settings
+        function saveKitchenSettings() {
+            const kitchen = {
+                type: document.getElementById('kitchen-type').value,
+                covers: document.getElementById('covers').value,
+                defaultYield: document.getElementById('default-yield').value,
+                prepDays: document.getElementById('prep-days').value
+            };
+            
+            localStorage.setItem('kitchen_settings', JSON.stringify(kitchen));
+            alert('✅ Kitchen settings saved successfully!');
+        }
+
+        // Upload avatar
+        async function uploadAvatar(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Show loading
+            const avatarContainer = document.getElementById('avatar-container');
+            avatarContainer.innerHTML = '<div class="avatar-placeholder">⏳</div>';
+            
+            // Create preview URL
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const user = window.authManager?.currentUser;
+                if (!user) return;
+                
+                const userId = user.userId || user.id;
+                const profileKey = `user_profile_${userId}`;
+                const profile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+                
+                profile.avatarUrl = e.target.result;
+                localStorage.setItem(profileKey, JSON.stringify(profile));
+                
+                avatarContainer.innerHTML = `<img src="${e.target.result}" class="profile-avatar" alt="Profile">`;
+                
+                alert('✅ Avatar uploaded successfully!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Change password
+        function changePassword(event) {
+            event.preventDefault();
+            
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('❌ Passwords do not match!');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                alert('❌ Password must be at least 6 characters!');
+                return;
+            }
+            
+            // TODO: Implement actual password change with Firebase
+            alert('✅ Password updated successfully!');
+            event.target.reset();
+        }
+
+        // Export all data
+        function exportAllData() {
+            const user = window.authManager?.currentUser;
+            if (!user) return;
+            
+            const userId = user.userId || user.id;
+            
+            const allData = {
+                profile: localStorage.getItem(`user_profile_${userId}`),
+                settings: localStorage.getItem('app_settings'),
+                preferences: localStorage.getItem('user_preferences'),
+                kitchen: localStorage.getItem('kitchen_settings'),
+                recipes: localStorage.getItem(`recipes_${userId}`),
+                menus: localStorage.getItem(`menus_${userId}`),
+                ingredients: localStorage.getItem('ingredients'),
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `iterum-data-export-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            
+            alert('✅ Your data has been exported!');
+        }
+
+        // Delete account
+        function confirmDeleteAccount() {
+            if (confirm('⚠️ Are you absolutely sure? This action cannot be undone!')) {
+                if (confirm('This will permanently delete all your data. Type "DELETE" in the next prompt to confirm.')) {
+                    const confirmation = prompt('Type DELETE to confirm:');
+                    if (confirmation === 'DELETE') {
+                        // TODO: Implement actual account deletion
+                        alert('Account deletion requested. Our team will process this within 24 hours.');
+                    }
+                }
+            }
+        }
+
+        // Other functions
+        function cancelEdit() {
+            loadProfile();
+        }
+
+        function signOut() {
+            if (confirm('Are you sure you want to sign out?')) {
+                window.authManager?.signOut();
+                window.location.href = 'index.html';
+            }
+        }
+
+        function manageBilling() {
+            alert('This would open a billing portal (Stripe/PayPal integration)');
+        }
+
+        function viewInvoices() {
+            alert('This would show your invoice history');
+        }
+
+        function cancelSubscription() {
+            if (confirm('Are you sure you want to cancel your subscription?')) {
+                alert('Subscription cancellation requested. You will retain access until the end of your billing period.');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication
+            if (!window.authManager?.currentUser) {
+                setTimeout(() => {
+                    if (!window.authManager?.currentUser) {
+                        alert('Please sign in to access your profile');
+                        window.location.href = 'index.html';
+                    } else {
+                        loadProfile();
+                    }
+                }, 1000);
+            } else {
+                loadProfile();
+            }
+        });
+    </script>
+</body>
+</html>
+

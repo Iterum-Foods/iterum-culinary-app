@@ -1,0 +1,26 @@
+{
+  "packs": [
+    {
+      "id": "ingredients_classic_pantry",
+      "name": "Classic Pantry Staples",
+      "description": "High-velocity pantry ingredients for most menus.",
+      "tags": ["pantry", "core"],
+      "file": "ingredients-classic-pantry.json"
+    },
+    {
+      "id": "ingredients_vegan_foundation",
+      "name": "Plant-Based Foundation",
+      "description": "Essential vegan proteins, dairy substitutes, and pantry goods.",
+      "tags": ["plant-based", "vegan"],
+      "file": "ingredients-vegan-foundation.json"
+    },
+    {
+      "id": "ingredients_pastry_suite",
+      "name": "Pastry Production Suite",
+      "description": "Pastry and dessert-focused ingredients with default costing.",
+      "tags": ["pastry", "dessert"],
+      "file": "ingredients-pastry-suite.json"
+    }
+  ]
+}
+

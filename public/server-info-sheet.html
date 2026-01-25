@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Information Sheet - Iterum Culinary App</title>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/css/unified-cards.css">
+    <link rel="stylesheet" href="assets/css/high-contrast-universal.css">
+    <link rel="stylesheet" href="assets/css/nordic-design-system.css">
+    
+    <!-- PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Navigation & Auth -->
+    <script src="assets/js/auth-manager.js"></script>
+    <script src="assets/js/unified-nav-header.js" defer></script>
+    <script src="assets/js/unified-project-selector.js" defer></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            padding: 90px 20px 20px 20px;
+        }
+        
+        .server-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .menu-selector {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .dish-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+        
+        .dish-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .dish-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .dish-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #8b5cf6;
+        }
+        
+        .dish-category {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #ede9fe;
+            color: #6b21a8;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        .dish-description {
+            font-size: 1.1rem;
+            color: #64748b;
+            font-style: italic;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+        
+        .talking-points {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #0284c7;
+            margin: 15px 0;
+        }
+        
+        .talking-points h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0c4a6e;
+            margin-bottom: 10px;
+        }
+        
+        .talking-points ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .talking-points li {
+            color: #1e293b;
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+        
+        .allergen-warning {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .allergen-warning h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .allergen-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .allergen-tag {
+            padding: 6px 12px;
+            background: #fed7aa;
+            color: #92400e;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .pairing-section {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .pairing-section h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #78350f;
+            margin-bottom: 8px;
+        }
+        
+        .dietary-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        .dietary-tag {
+            padding: 4px 10px;
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .upsell-tip {
+            background: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 0.95rem;
+        }
+        
+        .upsell-tip strong {
+            color: #166534;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .page-header, .menu-selector, .button-group {
+                display: none;
+            }
+            
+            .dish-card {
+                box-shadow: none;
+                border: 1px solid #e2e8f0;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/header-universal.css">
+    <link rel="stylesheet" href="assets/css/modern-nordic-vintage.css">
+    <link rel="stylesheet" href="assets/css/dark-mode-enhancements.css">
+</head>
+<body style="padding-top: 80px;">
+    <div class="server-container">
+        <div class="page-header">
+            <h1>📋 Server Information Sheet</h1>
+            <p>Talking points, allergens, and guest service reference</p>
+        </div>
+
+        <!-- Menu Selector -->
+        <div class="menu-selector">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Select Menu</label>
+                    <select class="form-select" id="menu-select" onchange="loadServerInfo()">
+                        <option value="">-- Select Menu --</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="button-group mb-6">
+            <button class="btn" onclick="generatePDF()">📥 Download PDF</button>
+            <button class="btn" onclick="printSheet()">🖨️ Print</button>
+            <button class="btn" onclick="emailToStaff()">📧 Email to Staff</button>
+            <button class="btn" onclick="addTalkingPoint()">➕ Add Talking Point</button>
+            <button class="btn" onclick="location.href='index.html'">🏠 Dashboard</button>
+        </div>
+
+        <!-- Server Info Content -->
+        <div id="server-info-content">
+            <!-- Empty State -->
+            <div id="empty-state" class="card" style="text-align: center; padding: 60px;">
+                <div style="font-size: 4rem; margin-bottom: 20px;">📋</div>
+                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 10px;">Select a Menu</h2>
+                <p style="color: #64748b;">Choose a menu from the dropdown above to generate the server information sheet.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/auth-manager.js"></script>
+    <script src="assets/js/state-persistence-manager.js"></script>
+    <script src="assets/js/user-data-isolator.js"></script>
+    
+    <script>
+        let currentMenu = null;
+        let currentUserId = null;
+        let currentUserEmail = null;
+        let serverNotes = {}; // Custom talking points per dish
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            if (!window.authManager || !window.authManager.isAuthenticated) {
+                alert('Please sign in to access Server Info');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const user = window.authManager.currentUser;
+            currentUserId = user.userId || user.id;
+            currentUserEmail = user.email;
+            
+            loadMenus();
+            loadServerNotes();
+        });
+
+        function loadMenus() {
+            // Load user's menus
+            const menusKey = `menus_${currentUserId}`;
+            const menus = JSON.parse(localStorage.getItem(menusKey) || '[]');
+            
+            const select = document.getElementById('menu-select');
+            
+            if (menus.length === 0) {
+                select.innerHTML = '<option value="">No menus available</option>';
+                return;
+            }
+            
+            select.innerHTML = '<option value="">-- Select Menu --</option>' +
+                menus.map(menu => `<option value="${menu.id}">${menu.name}</option>`).join('');
+        }
+
+        function loadServerNotes() {
+            const notesKey = `server_notes_${currentUserId}`;
+            serverNotes = JSON.parse(localStorage.getItem(notesKey) || '{}');
+        }
+
+        function saveServerNotes() {
+            const notesKey = `server_notes_${currentUserId}`;
+            localStorage.setItem(notesKey, JSON.stringify(serverNotes));
+        }
+
+        function loadServerInfo() {
+            const menuId = document.getElementById('menu-select').value;
+            
+            if (!menuId) {
+                document.getElementById('server-info-content').innerHTML = `
+                    <div id="empty-state" class="card" style="text-align: center; padding: 60px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">📋</div>
+                        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 10px;">Select a Menu</h2>
+                        <p style="color: #64748b;">Choose a menu from the dropdown above.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Load menu
+            const menusKey = `menus_${currentUserId}`;
+            const menus = JSON.parse(localStorage.getItem(menusKey) || '[]');
+            currentMenu = menus.find(m => m.id === menuId);
+            
+            if (!currentMenu) {
+                alert('Menu not found');
+                return;
+            }
+            
+            displayServerInfo();
+        }
+
+        function displayServerInfo() {
+            const content = document.getElementById('server-info-content');
+            
+            // Group items by category
+            const itemsByCategory = {};
+            currentMenu.items.forEach(item => {
+                if (!itemsByCategory[item.category]) {
+                    itemsByCategory[item.category] = [];
+                }
+                itemsByCategory[item.category].push(item);
+            });
+            
+            let html = `
+                <div class="card mb-6">
+                    <div class="card-header-gradient">
+                        <h2 class="card-title">${currentMenu.name}</h2>
+                        <p class="card-subtitle">Server Reference - ${new Date().toLocaleDateString()}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Display each category
+            Object.entries(itemsByCategory).forEach(([category, items]) => {
+                html += `
+                    <h2 style="font-size: 1.8rem; font-weight: 700; color: #8b5cf6; margin: 30px 0 20px;">
+                        ${category}
+                    </h2>
+                `;
+                
+                items.forEach(item => {
+                    const notes = serverNotes[item.id] || {};
+                    
+                    html += `
+                        <div class="dish-card">
+                            <div class="dish-header">
+                                <div>
+                                    <div class="dish-name">${item.name}</div>
+                                    <div class="dish-category">${item.category}</div>
+                                </div>
+                                <div class="dish-price">$${item.price.toFixed(2)}</div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="dish-description">
+                                ${item.description}
+                            </div>
+
+                            <!-- Talking Points -->
+                            <div class="talking-points">
+                                <h3>💬 Server Talking Points</h3>
+                                <ul id="talking-points-${item.id}">
+                                    ${generateTalkingPoints(item).map(point => `<li>${point}</li>`).join('')}
+                                    ${notes.customPoints ? notes.customPoints.map(point => `<li>${point} <button onclick="removeCustomPoint('${item.id}', '${point}')" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.85rem;">×</button></li>`).join('') : ''}
+                                </ul>
+                                <button class="btn" onclick="addCustomTalkingPoint('${item.id}')" style="margin-top: 10px; font-size: 0.85rem; padding: 6px 12px;">
+                                    ➕ Add Custom Point
+                                </button>
+                            </div>
+
+                            <!-- Allergens -->
+                            ${item.allergens && item.allergens.length > 0 ? `
+                                <div class="allergen-warning">
+                                    <h3>⚠️ ALLERGEN ALERT</h3>
+                                    <div class="allergen-list">
+                                        ${item.allergens.map(allergen => `
+                                            <span class="allergen-tag">${allergen.toUpperCase()}</span>
+                                        `).join('')}
+                                    </div>
+                                    <p style="margin-top: 10px; color: #92400e; font-weight: 500; font-size: 0.9rem;">
+                                        ⚠️ Always inform guests and verify no cross-contamination
+                                    </p>
+                                </div>
+                            ` : `
+                                <div style="background: #dcfce7; padding: 12px; border-radius: 8px; margin: 15px 0;">
+                                    <p style="color: #166534; font-weight: 600; margin: 0;">✓ No major allergens</p>
+                                </div>
+                            `}
+
+                            <!-- Dietary -->
+                            ${item.dietary && item.dietary.length > 0 ? `
+                                <div style="margin: 15px 0;">
+                                    <div style="font-weight: 600; color: #64748b; font-size: 0.9rem; margin-bottom: 8px;">
+                                        DIETARY FRIENDLY:
+                                    </div>
+                                    <div class="dietary-tags">
+                                        ${item.dietary.map(diet => `
+                                            <span class="dietary-tag">${diet}</span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <!-- Pairing Suggestions -->
+                            <div class="pairing-section">
+                                <h3>🍷 Pairing Suggestions</h3>
+                                <div id="pairing-${item.id}">
+                                    ${notes.pairings || generateDefaultPairings(item)}
+                                </div>
+                                <button class="btn" onclick="editPairings('${item.id}')" style="margin-top: 8px; font-size: 0.85rem; padding: 4px 10px;">
+                                    ✏️ Edit
+                                </button>
+                            </div>
+
+                            <!-- Upsell Tips -->
+                            <div class="upsell-tip">
+                                <strong>💡 Upsell Tip:</strong> ${notes.upsell || generateUpsellTip(item)}
+                                <button onclick="editUpsell('${item.id}')" style="background: none; border: none; color: #22c55e; cursor: pointer; margin-left: 10px;">✏️</button>
+                            </div>
+
+                            <!-- Preparation Notes -->
+                            ${item.prepTime ? `
+                                <div style="color: #64748b; font-size: 0.9rem; margin-top: 15px;">
+                                    ⏱️ <strong>Prep Time:</strong> ${item.prepTime} minutes
+                                    ${notes.prepNote ? ` | <em>${notes.prepNote}</em>` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+            });
+            
+            content.innerHTML = html;
+        }
+
+        function generateTalkingPoints(item) {
+            const points = [];
+            
+            // Extract key ingredients from description
+            if (item.description) {
+                const desc = item.description.toLowerCase();
+                
+                if (desc.includes('truffle')) {
+                    points.push('Features premium black truffle for an earthy, luxurious flavor');
+                }
+                if (desc.includes('wagyu')) {
+                    points.push('Made with authentic Wagyu beef, known for exceptional marbling and tenderness');
+                }
+                if (desc.includes('caviar')) {
+                    points.push('Served with premium Kaluga caviar, sustainably sourced');
+                }
+                if (desc.includes('burrata')) {
+                    points.push('Fresh burrata cheese, creamy center with delicate flavor');
+                }
+                if (desc.includes('hamachi')) {
+                    points.push('Fresh Hamachi (yellowtail), flown in daily for peak freshness');
+                }
+            }
+            
+            // Add preparation method highlights
+            if (item.name.includes('Roasted') || item.name.includes('Grilled')) {
+                points.push('Prepared to order for maximum flavor and freshness');
+            }
+            
+            // Add general points
+            points.push(`Perfect for guests looking for ${item.category.toLowerCase()}`);
+            
+            // Price positioning
+            if (item.price < 15) {
+                points.push('Great value for the quality and portion size');
+            } else if (item.price > 50) {
+                points.push('Premium dish, perfect for special occasions');
+            }
+            
+            return points;
+        }
+
+        function generateDefaultPairings(item) {
+            const category = item.category.toLowerCase();
+            const name = item.name.toLowerCase();
+            
+            if (name.includes('caviar')) {
+                return 'Champagne (Brut or Blanc de Blancs), Vodka, or Dry White Wine';
+            } else if (name.includes('hamachi') || category.includes('seafood')) {
+                return 'Crisp White Wine (Sauvignon Blanc, Albariño), Sake, or Light Beer';
+            } else if (name.includes('beef') || name.includes('wagyu')) {
+                return 'Bold Red Wine (Cabernet, Malbec), Bourbon, or Dark Beer';
+            } else if (category.includes('salad')) {
+                return 'Light White Wine (Pinot Grigio, Prosecco) or Rosé';
+            } else if (category.includes('dessert')) {
+                return 'Dessert Wine (Port, Sauternes), Coffee, or Brandy';
+            } else {
+                return 'Ask sommelier for daily pairing recommendation';
+            }
+        }
+
+        function generateUpsellTip(item) {
+            if (item.price < 15) {
+                return 'Great starter to share while browsing the menu';
+            } else if (item.category.includes('Dessert')) {
+                return 'Perfect ending to the meal - pairs beautifully with coffee or dessert wine';
+            } else if (item.name.includes('Caviar')) {
+                return 'Upgrade to larger portion for special celebrations';
+            } else {
+                return 'Suggest wine pairing to enhance the flavors';
+            }
+        }
+
+        function addCustomTalkingPoint(itemId) {
+            const point = prompt('Enter custom talking point:');
+            if (!point) return;
+            
+            if (!serverNotes[itemId]) {
+                serverNotes[itemId] = { customPoints: [] };
+            }
+            if (!serverNotes[itemId].customPoints) {
+                serverNotes[itemId].customPoints = [];
+            }
+            
+            serverNotes[itemId].customPoints.push(point);
+            saveServerNotes();
+            displayServerInfo();
+        }
+
+        function removeCustomPoint(itemId, point) {
+            if (!serverNotes[itemId] || !serverNotes[itemId].customPoints) return;
+            
+            serverNotes[itemId].customPoints = serverNotes[itemId].customPoints.filter(p => p !== point);
+            saveServerNotes();
+            displayServerInfo();
+        }
+
+        function editPairings(itemId) {
+            const current = serverNotes[itemId]?.pairings || '';
+            const newPairings = prompt('Enter wine/beverage pairings:', current);
+            
+            if (newPairings !== null) {
+                if (!serverNotes[itemId]) serverNotes[itemId] = {};
+                serverNotes[itemId].pairings = newPairings;
+                saveServerNotes();
+                displayServerInfo();
+            }
+        }
+
+        function editUpsell(itemId) {
+            const current = serverNotes[itemId]?.upsell || '';
+            const newUpsell = prompt('Enter upsell tip:', current);
+            
+            if (newUpsell !== null) {
+                if (!serverNotes[itemId]) serverNotes[itemId] = {};
+                serverNotes[itemId].upsell = newUpsell;
+                saveServerNotes();
+                displayServerInfo();
+            }
+        }
+
+        function addTalkingPoint() {
+            alert('Select a dish above and click "Add Custom Point" to add talking points.');
+        }
+
+        async function generatePDF() {
+            if (!currentMenu) {
+                alert('Please select a menu first');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Title page
+            doc.setFontSize(24);
+            doc.text('Server Information Sheet', 20, 30);
+            doc.setFontSize(16);
+            doc.text(currentMenu.name, 20, 45);
+            doc.setFontSize(10);
+            doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 55);
+            doc.text('For: Front of House Staff', 20, 62);
+            
+            let y = 80;
+            
+            // Group by category
+            const itemsByCategory = {};
+            currentMenu.items.forEach(item => {
+                if (!itemsByCategory[item.category]) {
+                    itemsByCategory[item.category] = [];
+                }
+                itemsByCategory[item.category].push(item);
+            });
+            
+            Object.entries(itemsByCategory).forEach(([category, items]) => {
+                // Category header
+                if (y > 250) {
+                    doc.addPage();
+                    y = 20;
+                }
+                
+                doc.setFontSize(14);
+                doc.setTextColor(139, 92, 246);
+                doc.text(category, 20, y);
+                y += 10;
+                doc.setTextColor(0, 0, 0);
+                
+                items.forEach(item => {
+                    if (y > 250) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    
+                    // Dish name and price
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(`${item.name} - $${item.price.toFixed(2)}`, 25, y);
+                    y += 7;
+                    
+                    // Description
+                    doc.setFont(undefined, 'italic');
+                    doc.setFontSize(9);
+                    const descLines = doc.splitTextToSize(item.description, 165);
+                    descLines.forEach(line => {
+                        doc.text(line, 25, y);
+                        y += 5;
+                    });
+                    y += 3;
+                    
+                    // Allergens
+                    doc.setFont(undefined, 'bold');
+                    if (item.allergens && item.allergens.length > 0) {
+                        doc.setTextColor(217, 119, 6);
+                        doc.text(`ALLERGENS: ${item.allergens.join(', ').toUpperCase()}`, 25, y);
+                        doc.setTextColor(0, 0, 0);
+                        y += 6;
+                    } else {
+                        doc.setTextColor(22, 163, 74);
+                        doc.text('No major allergens', 25, y);
+                        doc.setTextColor(0, 0, 0);
+                        y += 6;
+                    }
+                    
+                    doc.setFont(undefined, 'normal');
+                    y += 5;
+                });
+            });
+            
+            // Download
+            doc.save(`${currentMenu.name.replace(/[^a-z0-9]/gi, '_')}_ServerSheet.pdf`);
+            alert('✅ Server information sheet downloaded!');
+        }
+
+        function printSheet() {
+            window.print();
+        }
+
+        function emailToStaff() {
+            if (!currentMenu) {
+                alert('Please select a menu first');
+                return;
+            }
+            
+            const subject = encodeURIComponent(`Server Info: ${currentMenu.name}`);
+            const body = encodeURIComponent(`Please review the attached server information sheet for ${currentMenu.name}.\n\nImportant:\n- Review allergen information\n- Memorize talking points\n- Know wine pairings\n- Practice upselling techniques`);
+            
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+    </script>
+</body>
+</html>
+

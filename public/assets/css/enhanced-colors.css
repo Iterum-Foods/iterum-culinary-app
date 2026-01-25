@@ -1,0 +1,184 @@
+/**
+ * Enhanced Color System
+ * Better color combinations and visual harmony
+ */
+
+:root {
+    /* Enhanced Primary Colors with better saturation */
+    --color-cream-bright: #FFF9F0;
+    --color-cream-light: #F5F2EB;
+    --color-cream-medium: #E8E4DC;
+    --color-cream-subtle: #D8D4CC;
+    
+    /* Enhanced Brown Tones - Modern Charcoal */
+    --color-brown-light: #8B7355;
+    --color-brown-medium: #6B5747;
+    --color-brown-dark: #4A3F35;
+    --color-brown-deep: #24201E;
+    --color-brown-darker: #1A1614;
+    --color-brown-darkest: #0F0D0C;
+    
+    /* Enhanced Accent Colors */
+    --color-gold-bright: #E8B584;
+    --color-gold-medium: #D4A574;
+    --color-gold-dark: #B8906A;
+    
+    --color-terracotta-light: #C47B5F;
+    --color-terracotta-medium: #A85D3A;
+    --color-terracotta-dark: #8B4D2D;
+    
+    --color-forest-light: #7A9A7E;
+    --color-forest-medium: #5B7A5F;
+    --color-forest-dark: #384D3D;
+    
+    /* Semantic Colors - More Vibrant */
+    --color-success-light: #4ADE80;
+    --color-success-medium: #22C55E;
+    --color-success-dark: #16A34A;
+    
+    --color-warning-light: #FB923C;
+    --color-warning-medium: #F97316;
+    --color-warning-dark: #EA580C;
+    
+    --color-error-light: #FCA5A5;
+    --color-error-medium: #EF4444;
+    --color-error-dark: #DC2626;
+    
+    --color-info-light: #22D3EE;
+    --color-info-medium: #06B6D4;
+    --color-info-dark: #0891B2;
+    
+    /* Gradient Presets */
+    --gradient-primary: linear-gradient(135deg, 
+        var(--color-forest-medium) 0%, 
+        var(--color-forest-dark) 100%);
+    
+    --gradient-secondary: linear-gradient(135deg, 
+        var(--color-gold-medium) 0%, 
+        var(--color-terracotta-medium) 100%);
+    
+    --gradient-accent: linear-gradient(135deg, 
+        var(--color-warning-light) 0%, 
+        var(--color-warning-medium) 100%);
+    
+    --gradient-success: linear-gradient(135deg, 
+        var(--color-success-light) 0%, 
+        var(--color-success-medium) 100%);
+    
+    --gradient-warm: linear-gradient(135deg, 
+        var(--color-gold-bright) 0%, 
+        var(--color-terracotta-light) 100%);
+    
+    --gradient-cool: linear-gradient(135deg, 
+        var(--color-forest-light) 0%, 
+        var(--color-info-medium) 100%);
+}
+
+/* Color Utility Classes */
+.text-cream-bright { color: var(--color-cream-bright); }
+.text-cream-light { color: var(--color-cream-light); }
+.text-gold { color: var(--color-gold-medium); }
+.text-forest { color: var(--color-forest-medium); }
+
+.bg-gradient-primary { background: var(--gradient-primary); }
+.bg-gradient-secondary { background: var(--gradient-secondary); }
+.bg-gradient-accent { background: var(--gradient-accent); }
+.bg-gradient-success { background: var(--gradient-success); }
+.bg-gradient-warm { background: var(--gradient-warm); }
+.bg-gradient-cool { background: var(--gradient-cool); }
+
+/* Enhanced Background Combinations */
+.bg-section-primary {
+    background: linear-gradient(135deg, 
+        var(--color-brown-deep) 0%, 
+        var(--color-brown-dark) 50%, 
+        var(--color-brown-darker) 100%);
+}
+
+.bg-section-secondary {
+    background: linear-gradient(135deg, 
+        var(--color-brown-darker) 0%, 
+        var(--color-brown-darkest) 100%);
+}
+
+.bg-card-elevated {
+    background: linear-gradient(145deg, 
+        var(--color-brown-medium) 0%, 
+        var(--color-brown-deep) 100%);
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.bg-card-subtle {
+    background: linear-gradient(145deg, 
+        var(--color-brown-deep) 0%, 
+        var(--color-brown-darker) 100%);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced Border Colors */
+.border-gold { border-color: var(--color-gold-medium); }
+.border-forest { border-color: var(--color-forest-medium); }
+.border-terracotta { border-color: var(--color-terracotta-medium); }
+
+.border-gradient {
+    border-image: linear-gradient(135deg, 
+        var(--color-gold-medium) 0%, 
+        var(--color-terracotta-medium) 100%) 1;
+}
+
+/* Enhanced Hover States */
+.hover-glow:hover {
+    box-shadow: 0 0 20px rgba(201, 149, 75, 0.3);
+}
+
+.hover-glow-strong:hover {
+    box-shadow: 0 0 30px rgba(201, 149, 75, 0.5);
+}
+
+/* Text Shadow Utilities */
+.text-shadow-subtle {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.text-shadow-medium {
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+.text-shadow-strong {
+    text-shadow: 0 3px 9px rgba(0, 0, 0, 0.9);
+}
+
+/* Glow Effects */
+.glow-gold {
+    box-shadow: 0 0 10px rgba(201, 149, 75, 0.5);
+}
+
+.glow-forest {
+    box-shadow: 0 0 10px rgba(91, 122, 95, 0.5);
+}
+
+.glow-success {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+/* Dark Mode Optimizations */
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Slightly brighter for dark mode */
+        --color-cream-bright: #FFFEFA;
+        --color-cream-light: #FAF8F3;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    :root {
+        --color-cream-bright: #FFFFFF;
+        --color-brown-darkest: #000000;
+        --color-gold-medium: #FFD700;
+        --color-forest-medium: #90EE90;
+    }
+}
+

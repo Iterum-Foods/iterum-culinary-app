@@ -1,0 +1,325 @@
+/**
+ * UNIFIED COLOR SYSTEM
+ * Simplified, cohesive color palette for maximum readability
+ */
+
+:root {
+    /* ==========================================
+       BASE COLORS - Clean & Unified
+       ========================================== */
+    
+    /* Background - Single deep charcoal family */
+    --bg-base: #141312;
+    --bg-surface: #1C1A19;
+    --bg-elevated: #242220;
+    --bg-header: #0F0E0D;
+    
+    /* Text - Clean cream family */
+    --text-primary: #F5F1EB;
+    --text-secondary: #E5DFD7;
+    --text-tertiary: #D0C9BF;
+    --text-muted: #9B9388;
+    
+    /* Borders - Unified taupe */
+    --border-light: #6B6054;
+    --border-medium: #554D45;
+    --border-dark: #3D3831;
+    
+    /* Accents - Single warm gold */
+    --accent-main: #D4A574;
+    --accent-hover: #E8B584;
+    --accent-active: #B8906A;
+    
+    /* States - Unified & clear */
+    --success: #4ADE80;
+    --warning: #FB923C;
+    --error: #F87171;
+    --info: #60A5FA;
+    
+    /* Shadows - Consistent depth */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.7);
+    
+    /* Focus - Clear indication */
+    --focus-ring: 0 0 0 3px rgba(212, 165, 116, 0.3);
+}
+
+/* ==========================================
+   UNIVERSAL OVERRIDES
+   ========================================== */
+
+/* Force consistent backgrounds */
+body,
+html {
+    background: var(--bg-base) !important;
+    color: var(--text-secondary) !important;
+}
+
+/* Force consistent cards */
+.card,
+.card-container,
+[class*="card"] {
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-light) !important;
+    color: var(--text-secondary) !important;
+}
+
+/* Force consistent headings */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary) !important;
+}
+
+/* Force consistent inputs */
+input,
+textarea,
+select {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-light) !important;
+    color: var(--text-secondary) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--accent-main) !important;
+    box-shadow: var(--focus-ring) !important;
+}
+
+/* Force consistent buttons */
+.btn,
+button:not(.icon-btn) {
+    background: var(--accent-main) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid transparent !important;
+}
+
+.btn:hover,
+button:not(.icon-btn):hover {
+    background: var(--accent-hover) !important;
+}
+
+.btn:active,
+button:not(.icon-btn):active {
+    background: var(--accent-active) !important;
+}
+
+/* Force consistent links */
+a {
+    color: var(--accent-main) !important;
+}
+
+a:hover {
+    color: var(--accent-hover) !important;
+}
+
+/* Force consistent tables */
+thead {
+    background: var(--bg-header) !important;
+}
+
+thead th {
+    color: var(--text-primary) !important;
+    border-bottom: 2px solid var(--border-light) !important;
+}
+
+tbody tr {
+    background: var(--bg-surface) !important;
+}
+
+tbody tr:nth-child(even) {
+    background: var(--bg-base) !important;
+}
+
+tbody td {
+    color: var(--text-secondary) !important;
+}
+
+/* Force consistent modals */
+.modal,
+[class*="modal"] {
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-light) !important;
+}
+
+.modal-header,
+[class*="modal-header"] {
+    background: var(--bg-header) !important;
+    border-bottom: 1px solid var(--border-light) !important;
+}
+
+/* Force consistent headers */
+header,
+[class*="header"] {
+    background: var(--bg-header) !important;
+    border-bottom: 1px solid var(--border-light) !important;
+}
+
+/* Force consistent navigation */
+nav,
+[class*="nav"] {
+    background: var(--bg-header) !important;
+}
+
+nav a {
+    color: var(--text-secondary) !important;
+}
+
+nav a:hover,
+nav a.active {
+    color: var(--accent-main) !important;
+    background: rgba(212, 165, 116, 0.1) !important;
+}
+
+/* Force consistent badges and labels */
+.badge,
+.label,
+[class*="badge"],
+[class*="label"] {
+    background: var(--bg-elevated) !important;
+    color: var(--text-secondary) !important;
+    border: 1px solid var(--border-light) !important;
+}
+
+/* Force consistent alerts */
+.alert-success,
+[class*="success"] {
+    background: rgba(74, 222, 128, 0.1) !important;
+    border: 1px solid var(--success) !important;
+    color: var(--success) !important;
+}
+
+.alert-warning,
+[class*="warning"] {
+    background: rgba(251, 146, 60, 0.1) !important;
+    border: 1px solid var(--warning) !important;
+    color: var(--warning) !important;
+}
+
+.alert-error,
+[class*="error"] {
+    background: rgba(248, 113, 113, 0.1) !important;
+    border: 1px solid var(--error) !important;
+    color: var(--error) !important;
+}
+
+.alert-info,
+[class*="info"] {
+    background: rgba(96, 165, 250, 0.1) !important;
+    border: 1px solid var(--info) !important;
+    color: var(--info) !important;
+}
+
+/* ==========================================
+   UTILITY CLASSES
+   ========================================== */
+
+/* Text colors */
+.text-primary { color: var(--text-primary) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-tertiary { color: var(--text-tertiary) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.text-accent { color: var(--accent-main) !important; }
+
+/* Background colors */
+.bg-base { background: var(--bg-base) !important; }
+.bg-surface { background: var(--bg-surface) !important; }
+.bg-elevated { background: var(--bg-elevated) !important; }
+.bg-header { background: var(--bg-header) !important; }
+
+/* Border utilities */
+.border-light { border-color: var(--border-light) !important; }
+.border-medium { border-color: var(--border-medium) !important; }
+.border-dark { border-color: var(--border-dark) !important; }
+
+/* Remove all harsh whites */
+.text-white,
+[class*="text-white"],
+.bg-white,
+[class*="bg-white"],
+[class*="bg-gray-50"],
+[class*="bg-gray-100"] {
+    background: var(--bg-surface) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ==========================================
+   READABILITY ENHANCEMENTS
+   ========================================== */
+
+/* Increase contrast on all text */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Better line spacing */
+p, li, td, label {
+    line-height: 1.6;
+}
+
+/* Better heading weights */
+h1, h2, h3 {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* Better focus visibility */
+*:focus {
+    outline: 2px solid var(--accent-main);
+    outline-offset: 2px;
+}
+
+button:focus,
+.btn:focus,
+input:focus,
+select:focus,
+textarea:focus,
+a:focus {
+    outline: 2px solid var(--accent-main);
+    outline-offset: 2px;
+}
+
+/* ==========================================
+   HOVER STATES - Subtle & Unified
+   ========================================== */
+
+.card:hover,
+.feature-card:hover,
+.recipe-card:hover {
+    background: var(--bg-elevated) !important;
+    border-color: var(--accent-main) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md) !important;
+}
+
+/* ==========================================
+   REMOVE ALL COLOR CLASHES
+   ========================================== */
+
+/* Override any old brand colors */
+[class*="brand-"],
+[class*="nordic-"],
+[class*="vintage-"],
+[class*="earth-"],
+[class*="forest-"],
+[class*="terracotta-"] {
+    /* Forces use of unified system */
+}
+
+/* ==========================================
+   SIMPLIFIED GRADIENTS
+   ========================================== */
+
+.gradient-primary {
+    background: linear-gradient(135deg, var(--accent-main), var(--accent-active)) !important;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, var(--bg-base), var(--bg-header)) !important;
+}
+
+.gradient-surface {
+    background: linear-gradient(135deg, var(--bg-surface), var(--bg-base)) !important;
+}
+

@@ -1,0 +1,446 @@
+/**
+ * UI Polish - Minor improvements for consistency
+ * Buttons, hover effects, and micro-interactions
+ */
+
+/* ===== BUTTON ENHANCEMENTS ===== */
+
+/* Ensure all buttons have consistent styling */
+button, .btn, input[type="button"], input[type="submit"] {
+    transition: all 0.2s ease !important;
+    cursor: pointer;
+}
+
+/* Smooth hover lift effect on all buttons */
+button:hover:not(:disabled), 
+.btn:hover:not(:disabled),
+input[type="button"]:hover:not(:disabled),
+input[type="submit"]:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Active state (click) */
+button:active:not(:disabled),
+.btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* Disabled button styling */
+button:disabled,
+.btn:disabled,
+input[type="button"]:disabled,
+input[type="submit"]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Button groups - consistent spacing */
+.button-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.button-group-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Icon buttons - consistent sizing */
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn-icon-only {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== CARD ENHANCEMENTS ===== */
+
+/* Consistent card hover effects */
+.card:hover,
+[class*="card"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Interactive cards (clickable) */
+.card-interactive {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-interactive::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.card-interactive:hover::after {
+    opacity: 1;
+}
+
+/* ===== TABLE ENHANCEMENTS ===== */
+
+/* Smooth row hover */
+table tbody tr {
+    transition: all 0.2s ease;
+}
+
+table tbody tr:hover {
+    background: rgba(102, 126, 234, 0.05) !important;
+    transform: scale(1.01);
+}
+
+/* Zebra striping for better readability */
+table tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+/* Sticky table headers */
+.table-sticky thead th {
+    position: sticky;
+    top: 80px;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== FORM ENHANCEMENTS ===== */
+
+/* Better focus states */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15) !important;
+    transform: translateY(-1px);
+    transition: all 0.2s ease !important;
+}
+
+/* Input group styling */
+.input-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.input-group input,
+.input-group select {
+    flex: 1;
+}
+
+/* Required field indicator */
+.required::after {
+    content: '*';
+    color: #ef4444;
+    margin-left: 4px;
+    font-weight: 700;
+}
+
+/* Help text */
+.help-text {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 6px;
+    font-style: italic;
+}
+
+/* ===== LINK ENHANCEMENTS ===== */
+
+/* Smooth link transitions */
+a {
+    transition: all 0.2s ease;
+}
+
+a:hover {
+    transform: translateX(2px);
+}
+
+/* ===== BADGE ENHANCEMENTS ===== */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.badge-error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+.badge-info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+}
+
+/* ===== TOOLTIP ENHANCEMENTS ===== */
+
+[data-tooltip] {
+    position: relative;
+    cursor: help;
+}
+
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    background: #1e293b;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+[data-tooltip]::before {
+    content: '';
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #1e293b;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+[data-tooltip]:hover::after,
+[data-tooltip]:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ===== SEARCH BAR ENHANCEMENTS ===== */
+
+.search-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-bar input {
+    padding-left: 40px;
+}
+
+.search-bar::before {
+    content: '🔍';
+    position: absolute;
+    left: 14px;
+    font-size: 18px;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Active filter indicator */
+.filter-active {
+    position: relative;
+}
+
+.filter-active::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 8px;
+    height: 8px;
+    background: #ef4444;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+/* ===== ANIMATION UTILITIES ===== */
+
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.3s ease;
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.3s ease;
+}
+
+.scale-in {
+    animation: scaleIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Pulse animation for attention */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* ===== RESPONSIVE IMPROVEMENTS ===== */
+
+@media (max-width: 768px) {
+    /* Stack buttons on mobile */
+    .button-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .button-group button,
+    .button-group .btn {
+        width: 100%;
+    }
+    
+    /* Larger touch targets */
+    button, .btn, input[type="button"], input[type="submit"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Disable hover effects on mobile (prevents sticky hover) */
+    *:hover {
+        transform: none !important;
+    }
+}
+
+/* ===== ACCESSIBILITY ===== */
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+    outline: 3px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Skip to content link */
+.skip-to-content {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #667eea;
+    color: white;
+    padding: 8px 16px;
+    text-decoration: none;
+    z-index: 10000;
+}
+
+.skip-to-content:focus {
+    top: 0;
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===== PRINT STYLES ===== */
+
+@media print {
+    /* Hide non-essential elements when printing */
+    header, nav, .btn, button, .no-print {
+        display: none !important;
+    }
+    
+    /* Optimize for print */
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}
+
+

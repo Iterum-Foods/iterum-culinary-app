@@ -1,0 +1,63 @@
+{
+  "name": "iterum-culinary-app",
+  "version": "1.0.0",
+  "description": "A comprehensive culinary research and development application for chefs and food service professionals",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server public -p 8080 -o",
+    "dev": "http-server public -p 8080 -o -c-1",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "lint": "eslint \"public/assets/js/**/*.js\"",
+    "lint:fix": "eslint \"public/assets/js/**/*.js\" --fix",
+    "format": "prettier --write \"public/assets/js/**/*.js\" \"public/assets/css/**/*.css\"",
+    "format:check": "prettier --check \"public/assets/js/**/*.js\" \"public/assets/css/**/*.css\"",
+    "build": "echo 'No build step required for static app'",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "culinary",
+    "recipe",
+    "chef",
+    "food-service",
+    "research",
+    "development",
+    "project-management"
+  ],
+  "author": "Iterum Culinary Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.0"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,html,md}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Iterum-Foods/iterum-culinary-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Iterum-Foods/iterum-culinary-app/issues"
+  },
+  "homepage": "https://github.com/Iterum-Foods/iterum-culinary-app#readme"
+}

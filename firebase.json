@@ -1,0 +1,40 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "hosting": {
+    "site": "iterum-culinary-app2",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "!**/.nojekyll",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/dashboard.html",
+        "destination": "/dashboard.html"
+      },
+      {
+        "source": "/signin.html",
+        "destination": "/signin.html"
+      },
+      {
+        "source": "/app/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

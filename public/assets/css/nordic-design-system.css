@@ -1,0 +1,762 @@
+/**
+ * Nordic-Inspired Design System
+ * Clean, minimal, functional design with Scandinavian aesthetics
+ */
+
+/* ==================== Color Palette ==================== */
+:root {
+    /* Nordic Blues - Calm and professional */
+    --nordic-ice: #E8F4F8;
+    --nordic-sky: #D1E7F0;
+    --nordic-blue: #5B9BAD;
+    --nordic-deep-blue: #4A7C8C;
+    --nordic-navy: #2C4A52;
+    
+    /* Nordic Grays - Clean and minimal */
+    --nordic-snow: #FAFBFC;
+    --nordic-frost: #F5F7F9;
+    --nordic-silver: #E5E9EC;
+    --nordic-stone: #D0D5D9;
+    --nordic-slate: #8A9299;
+    --nordic-charcoal: #3E4C54;
+    --nordic-night: #1F2D35;
+    
+    /* Nordic Earth Tones */
+    --nordic-sage: #A4B8A6;
+    --nordic-moss: #6B8E6F;
+    --nordic-wood: #A38B7B;
+    --nordic-sand: #E8DED2;
+    
+    /* Accent Colors - Muted and sophisticated */
+    --nordic-coral: #D88B8B;
+    --nordic-amber: #D4A574;
+    --nordic-mint: #9CC5B0;
+    
+    /* Functional Colors */
+    --nordic-success: #6B8E6F;
+    --nordic-warning: #D4A574;
+    --nordic-error: #C97676;
+    --nordic-info: #5B9BAD;
+    
+    /* Typography */
+    --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    
+    /* Borders */
+    --border-width: 1px;
+    --border-radius-sm: 6px;
+    --border-radius: 8px;
+    --border-radius-lg: 12px;
+    
+    /* Shadows - Minimal */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+/* ==================== Base Styles ==================== */
+body {
+    background: var(--nordic-snow) !important;
+    color: var(--nordic-night) !important;
+    font-family: var(--font-body);
+    line-height: 1.6;
+}
+
+/* ==================== Typography ==================== */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: var(--nordic-night) !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.02em;
+}
+
+h1 { font-size: 2.25rem; line-height: 1.2; margin-bottom: var(--space-lg); }
+h2 { font-size: 1.875rem; line-height: 1.3; margin-bottom: var(--space-md); }
+h3 { font-size: 1.5rem; line-height: 1.4; margin-bottom: var(--space-md); }
+h4 { font-size: 1.25rem; line-height: 1.5; }
+
+p {
+    color: var(--nordic-charcoal) !important;
+    line-height: 1.7;
+    margin-bottom: var(--space-md);
+}
+
+.text-muted {
+    color: var(--nordic-slate) !important;
+}
+
+/* ==================== Cards - Nordic Style ==================== */
+.card, .stat-card, .action-card,
+.card-enhanced, .stat-card-enhanced, .action-card-enhanced,
+.recipe-card, .ingredient-card, .vendor-card, .equipment-card {
+    background: white !important;
+    border: var(--border-width) solid var(--nordic-silver) !important;
+    box-shadow: var(--shadow-sm) !important;
+    border-radius: var(--border-radius-lg);
+    transition: all 0.3s ease;
+}
+
+.card:hover, .action-card:hover, .recipe-card:hover {
+    box-shadow: var(--shadow) !important;
+    border-color: var(--nordic-stone) !important;
+    transform: translateY(-1px);
+}
+
+/* Card Headers - Clean Lines */
+.card-header, .card-header-gradient {
+    background: var(--nordic-frost) !important;
+    border-bottom: var(--border-width) solid var(--nordic-silver);
+    color: var(--nordic-night) !important;
+    padding: var(--space-lg);
+    font-weight: 600;
+}
+
+.card-body {
+    padding: var(--space-lg);
+}
+
+/* ==================== Buttons - Nordic Style ==================== */
+.btn, button:not(.nav-link):not(.header-nav-item) {
+    font-weight: 500 !important;
+    border-radius: var(--border-radius);
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    border: var(--border-width) solid transparent;
+    cursor: pointer;
+    font-family: var(--font-body);
+}
+
+.btn-primary, .button-primary {
+    background: var(--nordic-blue) !important;
+    color: white !important;
+    border-color: var(--nordic-deep-blue) !important;
+}
+
+.btn-primary:hover {
+    background: var(--nordic-deep-blue) !important;
+    box-shadow: var(--shadow) !important;
+}
+
+.btn-secondary {
+    background: white !important;
+    color: var(--nordic-charcoal) !important;
+    border: var(--border-width) solid var(--nordic-stone) !important;
+}
+
+.btn-secondary:hover {
+    background: var(--nordic-frost) !important;
+    border-color: var(--nordic-slate) !important;
+}
+
+.btn-success {
+    background: var(--nordic-moss) !important;
+    color: white !important;
+    border-color: var(--nordic-sage) !important;
+}
+
+.btn-warning {
+    background: var(--nordic-amber) !important;
+    color: white !important;
+}
+
+.btn-danger, .btn.danger {
+    background: var(--nordic-error) !important;
+    color: white !important;
+}
+
+/* Small Buttons */
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+}
+
+/* ==================== Forms - Clean & Minimal ==================== */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+textarea,
+select {
+    background: white !important;
+    border: var(--border-width) solid var(--nordic-stone) !important;
+    color: var(--nordic-night) !important;
+    padding: 12px 16px;
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    font-family: var(--font-body);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none !important;
+    border-color: var(--nordic-blue) !important;
+    box-shadow: 0 0 0 3px rgba(91, 155, 173, 0.1) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--nordic-slate) !important;
+}
+
+label, .form-label {
+    color: var(--nordic-charcoal) !important;
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: var(--space-sm);
+    display: block;
+    letter-spacing: 0.01em;
+}
+
+/* ==================== Tables - Nordic Clean ==================== */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    background: white;
+    border: var(--border-width) solid var(--nordic-silver);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+thead {
+    background: var(--nordic-frost);
+    border-bottom: 2px solid var(--nordic-silver);
+}
+
+th {
+    color: var(--nordic-night) !important;
+    font-weight: 600;
+    padding: 16px;
+    text-align: left;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+td {
+    color: var(--nordic-charcoal) !important;
+    padding: 14px 16px;
+    border-bottom: var(--border-width) solid var(--nordic-frost);
+}
+
+tr:hover {
+    background: var(--nordic-snow);
+}
+
+/* ==================== Badges & Tags - Muted ==================== */
+.badge, .tag, .recipe-tag {
+    padding: 6px 14px !important;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.badge-primary {
+    background: var(--nordic-ice) !important;
+    color: var(--nordic-deep-blue) !important;
+}
+
+.badge-success {
+    background: #E8F5E9 !important;
+    color: var(--nordic-moss) !important;
+}
+
+.badge-warning {
+    background: #FFF3E0 !important;
+    color: var(--nordic-amber) !important;
+}
+
+.badge-danger {
+    background: #FFEBEE !important;
+    color: var(--nordic-error) !important;
+}
+
+/* ==================== Stats - Nordic Minimal ==================== */
+.stat-card-enhanced, .stat-card {
+    background: white !important;
+    border: var(--border-width) solid var(--nordic-silver) !important;
+    border-left: 3px solid var(--nordic-blue) !important;
+    box-shadow: var(--shadow-sm) !important;
+    padding: var(--space-xl);
+    border-radius: var(--border-radius);
+}
+
+.stat-card:hover {
+    box-shadow: var(--shadow) !important;
+    border-left-color: var(--nordic-deep-blue) !important;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--nordic-night) !important;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--nordic-slate) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: var(--space-sm);
+}
+
+/* ==================== Action Cards - Minimal ==================== */
+.action-card-enhanced, .action-card {
+    background: white !important;
+    border: var(--border-width) solid var(--nordic-silver) !important;
+    padding: var(--space-xl);
+    border-radius: var(--border-radius-lg);
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.action-card-enhanced:hover {
+    border-color: var(--nordic-blue) !important;
+    box-shadow: var(--shadow) !important;
+}
+
+.action-icon-enhanced {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+    filter: grayscale(0.2);
+}
+
+.action-title-enhanced {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--nordic-night) !important;
+    margin-bottom: var(--space-sm);
+}
+
+.action-desc-enhanced {
+    font-size: 0.9rem;
+    color: var(--nordic-slate) !important;
+    line-height: 1.6;
+}
+
+/* ==================== Hero Sections - Nordic Style ==================== */
+.dashboard-hero, .page-header {
+    background: white !important;
+    color: var(--nordic-night) !important;
+    padding: var(--space-2xl) var(--space-xl);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--space-xl);
+    border-left: 4px solid var(--nordic-blue);
+    box-shadow: var(--shadow-sm);
+}
+
+.hero-greeting {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: var(--space-md);
+    color: var(--nordic-night) !important;
+    letter-spacing: -0.03em;
+}
+
+.hero-subtitle {
+    font-size: 1.125rem;
+    color: var(--nordic-charcoal) !important;
+    margin-bottom: var(--space-lg);
+    font-weight: 400;
+}
+
+/* ==================== Navigation - Nordic Clean ==================== */
+.unified-nav-header {
+    background: white !important;
+    border-bottom: var(--border-width) solid var(--nordic-silver) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.nav-link {
+    color: var(--nordic-charcoal) !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    color: var(--nordic-blue) !important;
+    background: var(--nordic-frost) !important;
+}
+
+.nav-link.active {
+    color: var(--nordic-blue) !important;
+    background: var(--nordic-ice) !important;
+    font-weight: 600;
+}
+
+/* ==================== Modals - Nordic Minimal ==================== */
+.modal-backdrop {
+    background: rgba(31, 45, 53, 0.75) !important;
+}
+
+.modal-content {
+    background: white !important;
+    border: var(--border-width) solid var(--nordic-silver);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+}
+
+.modal-header {
+    background: var(--nordic-frost) !important;
+    color: var(--nordic-night) !important;
+    padding: var(--space-lg);
+    border-bottom: var(--border-width) solid var(--nordic-silver);
+}
+
+.modal-title {
+    color: var(--nordic-night) !important;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.modal-body {
+    padding: var(--space-lg);
+    color: var(--nordic-charcoal);
+}
+
+/* ==================== Alerts - Nordic Muted ==================== */
+.alert {
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--border-radius);
+    border-left: 3px solid;
+    font-weight: 400;
+    background: white;
+}
+
+.alert-info {
+    background: var(--nordic-ice);
+    border-color: var(--nordic-blue);
+    color: var(--nordic-deep-blue);
+}
+
+.alert-success {
+    background: #E8F5E9;
+    border-color: var(--nordic-moss);
+    color: #2E5C31;
+}
+
+.alert-warning {
+    background: #FFF8E1;
+    border-color: var(--nordic-amber);
+    color: #7A5E3A;
+}
+
+.alert-danger {
+    background: #FFEBEE;
+    border-color: var(--nordic-error);
+    color: #8B3A3A;
+}
+
+/* ==================== Borders & Dividers ==================== */
+.border {
+    border-color: var(--nordic-silver) !important;
+}
+
+hr {
+    border-color: var(--nordic-silver);
+    border-width: var(--border-width);
+    margin: var(--space-lg) 0;
+}
+
+/* ==================== Shadows - Subtle ==================== */
+.shadow-sm {
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.shadow {
+    box-shadow: var(--shadow) !important;
+}
+
+.shadow-lg {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+/* ==================== Links ==================== */
+a {
+    color: var(--nordic-blue) !important;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+a:hover {
+    color: var(--nordic-deep-blue) !important;
+    text-decoration: underline;
+}
+
+/* ==================== Loading States ==================== */
+.loading-spinner {
+    border-color: var(--nordic-frost);
+    border-top-color: var(--nordic-blue);
+}
+
+/* ==================== Empty States ==================== */
+.empty-state {
+    text-align: center;
+    padding: var(--space-2xl) var(--space-lg);
+    color: var(--nordic-slate);
+}
+
+.empty-state-icon {
+    font-size: 3.5rem;
+    margin-bottom: var(--space-lg);
+    opacity: 0.4;
+}
+
+.empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--nordic-charcoal) !important;
+    margin-bottom: var(--space-sm);
+}
+
+.empty-state-description {
+    color: var(--nordic-slate) !important;
+    margin-bottom: var(--space-lg);
+}
+
+/* ==================== Recipe-Specific Nordic ==================== */
+.recipe-card-header {
+    background: var(--nordic-frost) !important;
+    border-bottom: 2px solid var(--nordic-silver);
+}
+
+.recipe-info .info-value {
+    color: var(--nordic-night) !important;
+}
+
+.recipe-info .info-label {
+    color: var(--nordic-slate) !important;
+}
+
+/* ==================== Status Indicators - Nordic ==================== */
+.status-active {
+    background: #E8F5E9 !important;
+    color: var(--nordic-moss) !important;
+    border: var(--border-width) solid var(--nordic-sage);
+}
+
+.status-inactive {
+    background: var(--nordic-frost) !important;
+    color: var(--nordic-slate) !important;
+    border: var(--border-width) solid var(--nordic-stone);
+}
+
+/* ==================== Gradients - Subtle Nordic ==================== */
+.gradient-primary {
+    background: linear-gradient(135deg, var(--nordic-blue) 0%, var(--nordic-deep-blue) 100%);
+}
+
+.gradient-success {
+    background: linear-gradient(135deg, var(--nordic-sage) 0%, var(--nordic-moss) 100%);
+}
+
+.gradient-header {
+    background: linear-gradient(135deg, var(--nordic-frost) 0%, var(--nordic-ice) 100%);
+}
+
+/* ==================== Nordic-Specific Components ==================== */
+
+/* Divider Lines - Minimal */
+.divider {
+    height: 1px;
+    background: var(--nordic-silver);
+    margin: var(--space-lg) 0;
+}
+
+/* Section Headers */
+.section-header {
+    border-bottom: 2px solid var(--nordic-silver);
+    padding-bottom: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.section-title {
+    color: var(--nordic-night) !important;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Grid Layouts - Spacious */
+.grid {
+    display: grid;
+    gap: var(--space-lg);
+}
+
+/* ==================== Spacing Utilities ==================== */
+.p-sm { padding: var(--space-sm) !important; }
+.p-md { padding: var(--space-md) !important; }
+.p-lg { padding: var(--space-lg) !important; }
+.p-xl { padding: var(--space-xl) !important; }
+
+.m-sm { margin: var(--space-sm) !important; }
+.m-md { margin: var(--space-md) !important; }
+.m-lg { margin: var(--space-lg) !important; }
+.m-xl { margin: var(--space-xl) !important; }
+
+.mb-sm { margin-bottom: var(--space-sm) !important; }
+.mb-md { margin-bottom: var(--space-md) !important; }
+.mb-lg { margin-bottom: var(--space-lg) !important; }
+.mb-xl { margin-bottom: var(--space-xl) !important; }
+
+/* ==================== Responsive - Mobile First ==================== */
+@media (max-width: 768px) {
+    h1 { font-size: 1.875rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+    
+    .stat-value {
+        font-size: 2rem;
+    }
+    
+    .card, .stat-card {
+        padding: var(--space-md);
+    }
+    
+    :root {
+        --space-2xl: 32px;
+    }
+}
+
+/* ==================== Print Styles ==================== */
+@media print {
+    body {
+        background: white !important;
+    }
+    
+    .card, .stat-card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+}
+
+/* ==================== Accessibility ==================== */
+*:focus-visible {
+    outline: 2px solid var(--nordic-blue);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --nordic-night: #000000;
+        --nordic-charcoal: #1a1a1a;
+    }
+    
+    .card, .btn {
+        border-width: 2px !important;
+    }
+}
+
+/* ==================== Selection ==================== */
+::selection {
+    background: var(--nordic-ice);
+    color: var(--nordic-deep-blue);
+}
+
+/* ==================== Scrollbars - Nordic */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--nordic-frost);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--nordic-stone);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--nordic-slate);
+}
+
+/* ==================== Utility Classes ==================== */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-medium { font-weight: 500; }
+
+.rounded { border-radius: var(--border-radius); }
+.rounded-lg { border-radius: var(--border-radius-lg); }
+
+/* ==================== Nordic Accents ==================== */
+.accent-line {
+    width: 60px;
+    height: 3px;
+    background: var(--nordic-blue);
+    margin: var(--space-md) 0;
+}
+
+.accent-line-vertical {
+    width: 3px;
+    height: 60px;
+    background: var(--nordic-blue);
+    margin: 0 var(--space-md);
+}
+
+/* ==================== Chef Dashboard Nordic ==================== */
+.quick-btn {
+    background: white !important;
+    color: var(--nordic-night) !important;
+    border: 2px solid var(--nordic-silver) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.quick-btn:hover {
+    border-color: var(--nordic-blue) !important;
+    box-shadow: var(--shadow) !important;
+    background: var(--nordic-frost) !important;
+}
+
+.quick-btn:active {
+    transform: scale(0.98);
+}
+
+/* ==================== Floating Elements ==================== */
+.floating-note-btn {
+    background: var(--nordic-blue) !important;
+    box-shadow: 0 4px 20px rgba(91, 155, 173, 0.3) !important;
+}
+
+.floating-note-btn:hover {
+    background: var(--nordic-deep-blue) !important;
+    box-shadow: 0 6px 30px rgba(91, 155, 173, 0.4) !important;
+}
+
+/* ==================== Nordic Special Elements ==================== */
+.nordic-card-accent {
+    border-left: 4px solid var(--nordic-blue);
+}
+
+.nordic-card-success {
+    border-left: 4px solid var(--nordic-moss);
+}
+
+.nordic-card-warning {
+    border-left: 4px solid var(--nordic-amber);
+}
+
+.nordic-card-error {
+    border-left: 4px solid var(--nordic-error);
+}
+

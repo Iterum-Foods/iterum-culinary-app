@@ -1,0 +1,588 @@
+/**
+ * App-Wide UI Overhaul
+ * Makes the entire app easier to see and cleaner using the brand kit
+ * This file ensures consistency across all pages
+ */
+
+/* ============================================
+   UNIVERSAL BACKGROUND FIXES
+   ============================================ */
+
+/* Remove all white backgrounds */
+body,
+.bg-white,
+.bg-gray-50,
+.bg-gray-100,
+[style*="background: white"],
+[style*="background:#fff"],
+[style*="background: #fff"],
+[style*="background:#ffffff"],
+[style*="background: #ffffff"],
+[style*="background:#f8fafc"],
+[style*="background: #f8fafc"],
+[style*="background:#f1f5f9"],
+[style*="background: #f1f5f9"] {
+    background: var(--bg-primary) !important;
+    color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   CARD & CONTAINER FIXES
+   ============================================ */
+
+.card,
+.container-card,
+.content-card,
+.panel,
+.section,
+[class*="card"],
+[class*="Card"] {
+    background: var(--bg-base) !important;
+    border: 1px solid var(--border-light) !important;
+    color: var(--text-secondary) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.card:hover,
+.container-card:hover,
+[class*="card"]:hover {
+    border-color: var(--accent-main) !important;
+    box-shadow: var(--shadow-lg) !important;
+    transform: translateY(-2px) !important;
+}
+
+.card-header,
+.card-header-gradient,
+[class*="header"] {
+    background: var(--bg-elevated) !important;
+    border-bottom: 1px solid var(--border-medium) !important;
+}
+
+.card-title,
+.card-header h1,
+.card-header h2,
+.card-header h3 {
+    color: var(--text-primary) !important;
+}
+
+.card-subtitle,
+.card-header p {
+    color: var(--text-tertiary) !important;
+}
+
+/* ============================================
+   STAT CARDS & DASHBOARD ELEMENTS
+   ============================================ */
+
+.stat-card,
+.stat-card-mini,
+.stats-card,
+.dashboard-card {
+    background: var(--bg-base) !important;
+    border: 2px solid var(--border-light) !important;
+    color: var(--text-secondary) !important;
+}
+
+.stat-value,
+.stat-number,
+.stat-number-mini {
+    color: var(--accent-main) !important;
+    background: linear-gradient(135deg, var(--accent-main) 0%, var(--accent-hover) 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.stat-label,
+.stat-label-mini {
+    color: var(--text-tertiary) !important;
+}
+
+/* ============================================
+   FORM ELEMENTS
+   ============================================ */
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="time"],
+input[type="url"],
+input[type="search"],
+textarea,
+select {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-medium) !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-md) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.7 !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    background: var(--bg-base) !important;
+    border-color: var(--accent-main) !important;
+    box-shadow: 0 0 0 3px var(--accent-fade) !important;
+    outline: none !important;
+}
+
+.form-group label,
+.form-label,
+label {
+    color: var(--text-tertiary) !important;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+.btn,
+button,
+[class*="btn"],
+[class*="button"] {
+    background: var(--bg-elevated) !important;
+    border: 2px solid var(--border-medium) !important;
+    color: var(--text-primary) !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-primary,
+.btn.primary,
+[class*="btn-primary"] {
+    background: linear-gradient(135deg, var(--accent-main) 0%, var(--accent-hover) 100%) !important;
+    border-color: var(--accent-main) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 4px 15px rgba(212, 165, 116, 0.3) !important;
+}
+
+.btn-primary:hover,
+.btn.primary:hover {
+    background: linear-gradient(135deg, var(--accent-hover) 0%, var(--accent-active) 100%) !important;
+    box-shadow: 0 6px 20px rgba(212, 165, 116, 0.5) !important;
+    transform: translateY(-2px) !important;
+}
+
+.btn-secondary,
+.btn.secondary {
+    background: var(--bg-elevated) !important;
+    border-color: var(--border-medium) !important;
+    color: var(--text-secondary) !important;
+}
+
+.btn-secondary:hover {
+    border-color: var(--accent-main) !important;
+    background: var(--bg-base) !important;
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+
+table,
+.table,
+.inventory-table,
+.data-table {
+    background: var(--bg-base) !important;
+    border: 1px solid var(--border-light) !important;
+    color: var(--text-secondary) !important;
+}
+
+thead,
+.table-header {
+    background: var(--bg-elevated) !important;
+    border-bottom: 2px solid var(--border-medium) !important;
+}
+
+th,
+.table-header th {
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+}
+
+td,
+.table-body td {
+    color: var(--text-secondary) !important;
+    border-bottom: 1px solid var(--border-light) !important;
+}
+
+tr:hover,
+tbody tr:hover {
+    background: var(--bg-elevated) !important;
+}
+
+/* ============================================
+   MODALS & OVERLAYS
+   ============================================ */
+
+.modal,
+.overlay,
+.modal-backdrop,
+[class*="modal"],
+[class*="overlay"] {
+    background: rgba(0, 0, 0, 0.85) !important;
+}
+
+.modal-content,
+.modal-dialog,
+[class*="modal-content"] {
+    background: var(--bg-base) !important;
+    border: 2px solid var(--border-medium) !important;
+    color: var(--text-secondary) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6) !important;
+}
+
+.modal-header,
+.modal-title {
+    background: var(--bg-elevated) !important;
+    border-bottom: 1px solid var(--border-medium) !important;
+    color: var(--text-primary) !important;
+}
+
+.modal-body {
+    color: var(--text-secondary) !important;
+}
+
+.modal-footer {
+    background: var(--bg-elevated) !important;
+    border-top: 1px solid var(--border-medium) !important;
+}
+
+/* ============================================
+   LISTS & GRIDS
+   ============================================ */
+
+.list-item,
+.grid-item,
+[class*="list-item"],
+[class*="grid-item"] {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-light) !important;
+    color: var(--text-secondary) !important;
+}
+
+.list-item:hover,
+.grid-item:hover {
+    background: var(--bg-base) !important;
+    border-color: var(--accent-main) !important;
+}
+
+/* ============================================
+   BADGES & TAGS
+   ============================================ */
+
+.badge,
+.tag,
+.label,
+[class*="badge"],
+[class*="tag"] {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-light) !important;
+    color: var(--text-secondary) !important;
+}
+
+.badge.active,
+.tag.active,
+.badge-primary {
+    background: var(--accent-main) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--accent-main) !important;
+}
+
+/* ============================================
+   TABS & NAVIGATION
+   ============================================ */
+
+.tabs,
+.nav-tabs,
+.tab-list {
+    background: var(--bg-elevated) !important;
+    border-bottom: 2px solid var(--border-medium) !important;
+}
+
+.tab,
+.nav-tab,
+.tab-item {
+    color: var(--text-tertiary) !important;
+    border-bottom: 2px solid transparent !important;
+}
+
+.tab.active,
+.nav-tab.active,
+.tab-item.active {
+    color: var(--accent-main) !important;
+    border-bottom-color: var(--accent-main) !important;
+}
+
+.tab:hover {
+    color: var(--text-primary) !important;
+}
+
+/* ============================================
+   TEXT & TYPOGRAPHY
+   ============================================ */
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary) !important;
+}
+
+p,
+span,
+div,
+li,
+td {
+    color: var(--text-secondary) !important;
+}
+
+.text-muted,
+.muted-text,
+[class*="muted"] {
+    color: var(--text-muted) !important;
+}
+
+.text-secondary,
+.secondary-text {
+    color: var(--text-tertiary) !important;
+}
+
+a {
+    color: var(--accent-main) !important;
+    transition: color 0.3s ease !important;
+}
+
+a:hover {
+    color: var(--accent-hover) !important;
+}
+
+/* ============================================
+   DROPDOWNS & SELECTS
+   ============================================ */
+
+.dropdown,
+.dropdown-menu,
+.select-menu {
+    background: var(--bg-base) !important;
+    border: 1px solid var(--border-medium) !important;
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.dropdown-item,
+.select-item {
+    color: var(--text-secondary) !important;
+}
+
+.dropdown-item:hover,
+.select-item:hover {
+    background: var(--bg-elevated) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ============================================
+   ALERTS & NOTIFICATIONS
+   ============================================ */
+
+.alert,
+.notification,
+.toast {
+    background: var(--bg-base) !important;
+    border: 2px solid var(--border-medium) !important;
+    color: var(--text-secondary) !important;
+}
+
+.alert-success {
+    border-color: var(--success) !important;
+    background: rgba(34, 197, 94, 0.1) !important;
+}
+
+.alert-warning {
+    border-color: var(--warning) !important;
+    background: rgba(249, 115, 22, 0.1) !important;
+}
+
+.alert-error,
+.alert-danger {
+    border-color: var(--error) !important;
+    background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.alert-info {
+    border-color: var(--info) !important;
+    background: rgba(6, 182, 212, 0.1) !important;
+}
+
+/* ============================================
+   CHECKBOXES & RADIOS
+   ============================================ */
+
+input[type="checkbox"],
+input[type="radio"] {
+    accent-color: var(--accent-main) !important;
+}
+
+/* ============================================
+   SCROLLBARS
+   ============================================ */
+
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary) !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-medium) !important;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-main) !important;
+}
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+
+.loader,
+.spinner,
+.loading {
+    border-color: var(--border-light) !important;
+    border-top-color: var(--accent-main) !important;
+}
+
+/* ============================================
+   EMPTY STATES
+   ============================================ */
+
+.empty-state,
+.empty-state-message {
+    color: var(--text-tertiary) !important;
+}
+
+.empty-state h3,
+.empty-state-title {
+    color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   SPECIFIC PAGE FIXES
+   ============================================ */
+
+/* Inventory Page */
+.inventory-table,
+.stats-grid .stat-card {
+    background: var(--bg-base) !important;
+}
+
+/* Recipe Library */
+.recipe-card,
+.recipe-grid-item {
+    background: var(--bg-base) !important;
+    border: 1px solid var(--border-light) !important;
+}
+
+/* Menu Builder */
+.menu-item,
+.menu-section {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-light) !important;
+}
+
+/* Project Hub */
+.project-card {
+    background: var(--bg-base) !important;
+    border: 2px solid var(--border-light) !important;
+}
+
+/* ============================================
+   UTILITY OVERRIDES
+   ============================================ */
+
+/* Remove any remaining white backgrounds from utility classes */
+.bg-white,
+.bg-gray-50,
+.bg-gray-100,
+.text-gray-900,
+.text-gray-600,
+.text-gray-500 {
+    background: var(--bg-base) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Ensure all containers use brand colors */
+.container,
+.main-container,
+.content-container {
+    background: transparent !important;
+    color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   SMOOTH TRANSITIONS
+   ============================================ */
+
+* {
+    transition: background-color 0.3s ease, 
+                border-color 0.3s ease, 
+                color 0.3s ease,
+                box-shadow 0.3s ease !important;
+}
+
+/* Disable transitions for performance-critical elements */
+input,
+textarea,
+select {
+    transition: border-color 0.2s ease, 
+                box-shadow 0.2s ease !important;
+}
+
+/* ============================================
+   RESPONSIVE IMPROVEMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    .card,
+    .stat-card {
+        padding: 16px !important;
+    }
+    
+    .btn {
+        padding: 12px 20px !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY IMPROVEMENTS
+   ============================================ */
+
+/* Focus states for keyboard navigation */
+*:focus-visible {
+    outline: 2px solid var(--accent-main) !important;
+    outline-offset: 2px !important;
+    border-radius: 4px !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --border-light: #A09080;
+        --border-medium: #B8A890;
+    }
+    
+    .card,
+    .btn,
+    input,
+    textarea,
+    select {
+        border-width: 2px !important;
+    }
+}
+

@@ -1,0 +1,26 @@
+{
+  "packs": [
+    {
+      "id": "equipment_core_boh",
+      "name": "Back of House Essentials",
+      "description": "Core hot-line equipment for a modern kitchen.",
+      "tags": ["back-of-house", "hot-line", "core"],
+      "file": "equipment-core-boh.json"
+    },
+    {
+      "id": "equipment_prep_pastry",
+      "name": "Pastry & Prep Lab",
+      "description": "Mixers, sheeters, and tools for pastry production.",
+      "tags": ["pastry", "prep"],
+      "file": "equipment-pastry-prep.json"
+    },
+    {
+      "id": "equipment_bar_service",
+      "name": "Bar & Beverage Setup",
+      "description": "Foundational bar equipment and service ware.",
+      "tags": ["bar", "beverage", "front-of-house"],
+      "file": "equipment-bar-foh.json"
+    }
+  ]
+}
+

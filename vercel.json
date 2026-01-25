@@ -1,0 +1,25 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/dashboard.html",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/signin.html",
+      "destination": "/signin.html"
+    },
+    {
+      "source": "/app/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
+    }
+  ]
+}
+

@@ -1,0 +1,579 @@
+/**
+ * UI Smooth Polish
+ * Makes the entire app feel smoother, faster, and more professional
+ */
+
+/* ==========================================
+   SMOOTH TRANSITIONS EVERYWHERE
+   ========================================== */
+
+* {
+    transition: 
+        background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        margin 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        padding 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* But no transition on position or layout-critical properties */
+.no-transition,
+.no-transition * {
+    transition: none !important;
+}
+
+/* ==========================================
+   SMOOTH HOVER EFFECTS
+   ========================================== */
+
+/* Cards */
+.card,
+.card-hover,
+.feature-card,
+.recipe-card,
+.ingredient-card,
+.menu-card {
+    cursor: pointer;
+    will-change: transform, box-shadow;
+}
+
+.card:hover,
+.card-hover:hover,
+.feature-card:hover,
+.recipe-card:hover,
+.ingredient-card:hover,
+.menu-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Buttons */
+.btn,
+button,
+.button {
+    will-change: transform, box-shadow;
+}
+
+.btn:hover,
+button:hover:not(:disabled),
+.button:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn:active,
+button:active:not(:disabled),
+.button:active:not(:disabled) {
+    transform: translateY(0) scale(0.98) !important;
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Links */
+a:not(.btn) {
+    transition: color 0.2s ease !important;
+}
+
+a:not(.btn):hover {
+    color: var(--iterum-primary) !important;
+}
+
+/* Inputs */
+input,
+textarea,
+select {
+    will-change: border-color, box-shadow;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--iterum-primary) !important;
+    box-shadow: 0 0 0 3px rgba(201, 149, 75, 0.1) !important;
+    transform: translateY(-1px) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ==========================================
+   SMOOTH LOADING STATES
+   ========================================== */
+
+/* Loading Spinner */
+.loading,
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Skeleton Loading */
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.1) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Fade In */
+.fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Stagger fade in for lists */
+.fade-in-stagger {
+    animation: fadeIn 0.4s ease-out forwards;
+    opacity: 0;
+}
+
+.fade-in-stagger:nth-child(1) { animation-delay: 0.05s; }
+.fade-in-stagger:nth-child(2) { animation-delay: 0.1s; }
+.fade-in-stagger:nth-child(3) { animation-delay: 0.15s; }
+.fade-in-stagger:nth-child(4) { animation-delay: 0.2s; }
+.fade-in-stagger:nth-child(5) { animation-delay: 0.25s; }
+.fade-in-stagger:nth-child(6) { animation-delay: 0.3s; }
+.fade-in-stagger:nth-child(7) { animation-delay: 0.35s; }
+.fade-in-stagger:nth-child(8) { animation-delay: 0.4s; }
+
+/* ==========================================
+   SMOOTH SCROLLING
+   ========================================== */
+
+html {
+    scroll-behavior: smooth !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(201, 149, 75, 0.3);
+    border-radius: 10px;
+    transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(201, 149, 75, 0.5);
+}
+
+/* ==========================================
+   SMOOTH MODAL TRANSITIONS
+   ========================================== */
+
+.modal-overlay {
+    animation: fadeIn 0.2s ease-out forwards;
+}
+
+.modal {
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-closing {
+    animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+}
+
+/* ==========================================
+   SMOOTH TOAST NOTIFICATIONS
+   ========================================== */
+
+.toast {
+    animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.toast-exiting {
+    animation: slideOutRight 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* ==========================================
+   SMOOTH TAB TRANSITIONS
+   ========================================== */
+
+.tab-content {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+.tab {
+    position: relative;
+}
+
+.tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--iterum-primary);
+    animation: slideIn 0.3s ease-out forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: scaleX(0);
+    }
+    to {
+        transform: scaleX(1);
+    }
+}
+
+/* ==========================================
+   SMOOTH NAVIGATION
+   ========================================== */
+
+nav a {
+    position: relative;
+    overflow: hidden;
+}
+
+nav a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--iterum-primary);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+nav a:hover::before,
+nav a.active::before {
+    width: 100%;
+}
+
+/* ==========================================
+   SMOOTH TABLE INTERACTIONS
+   ========================================== */
+
+tbody tr {
+    cursor: pointer;
+}
+
+tbody tr:hover {
+    background: rgba(201, 149, 75, 0.05) !important;
+    transform: scale(1.01);
+}
+
+/* ==========================================
+   SMOOTH FORM INTERACTIONS
+   ========================================== */
+
+.form-group {
+    position: relative;
+}
+
+.form-group label {
+    transition: color 0.2s ease, transform 0.2s ease !important;
+}
+
+.form-group:focus-within label {
+    color: var(--iterum-primary) !important;
+}
+
+/* Floating label effect */
+.input-group {
+    position: relative;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+    transform: translateY(-20px) scale(0.85);
+    color: var(--iterum-primary);
+}
+
+/* ==========================================
+   SMOOTH ACCORDION
+   ========================================== */
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+}
+
+.accordion-item.active .accordion-content {
+    max-height: 1000px;
+}
+
+/* ==========================================
+   SMOOTH PROGRESS BARS
+   ========================================== */
+
+.progress-bar {
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================
+   SMOOTH IMAGE LOADING
+   ========================================== */
+
+img {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+img.loaded {
+    opacity: 1;
+}
+
+/* ==========================================
+   MICRO-INTERACTIONS
+   ========================================== */
+
+/* Pulse effect for important buttons */
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Bounce for success */
+.bounce-success {
+    animation: bounceSuccess 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes bounceSuccess {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Shake for errors */
+.shake {
+    animation: shake 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-10px);
+    }
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+/* ==========================================
+   PERFORMANCE OPTIMIZATIONS
+   ========================================== */
+
+/* GPU acceleration for transforms */
+.will-transform {
+    will-change: transform;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ==========================================
+   FOCUS STATES FOR ACCESSIBILITY
+   ========================================== */
+
+*:focus {
+    outline: 2px solid var(--iterum-primary);
+    outline-offset: 2px;
+}
+
+button:focus,
+.btn:focus,
+a:focus {
+    outline: 2px solid var(--iterum-primary);
+    outline-offset: 3px;
+}
+
+/* ==========================================
+   SMOOTH DROPDOWN MENUS
+   ========================================== */
+
+.dropdown-menu {
+    animation: slideDownFade 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    transform-origin: top;
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scaleY(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scaleY(1);
+    }
+}
+
+/* ==========================================
+   SMOOTH SWITCH TOGGLES
+   ========================================== */
+
+.switch {
+    position: relative;
+}
+
+.switch input:checked + .switch-slider {
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================
+   LOADING SKELETON FOR CARDS
+   ========================================== */
+
+.card-skeleton {
+    background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.05) 0%,
+        rgba(0, 0, 0, 0.1) 50%,
+        rgba(0, 0, 0, 0.05) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+    border-radius: 12px;
+    height: 200px;
+}
+
+/* ==========================================
+   SMOOTH DRAG AND DROP
+   ========================================== */
+
+.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+    cursor: grabbing !important;
+}
+
+.drag-over {
+    background: rgba(201, 149, 75, 0.1);
+    border: 2px dashed var(--iterum-primary);
+}
+
+/* ==========================================
+   SMOOTH SEARCH BAR
+   ========================================== */
+
+.search-bar:focus {
+    transform: scale(1.02);
+    box-shadow: 0 4px 16px rgba(201, 149, 75, 0.2) !important;
+}
+
+/* ==========================================
+   SMOOTH NOTIFICATION BADGE
+   ========================================== */
+
+.notification-badge {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.notification-badge.new {
+    animation: bounceSuccess 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+

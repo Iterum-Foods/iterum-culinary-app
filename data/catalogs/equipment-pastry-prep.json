@@ -1,0 +1,72 @@
+{
+  "id": "equipment_prep_pastry",
+  "name": "Pastry & Prep Lab",
+  "version": "1.0.0",
+  "items": [
+    {
+      "name": "Planetary Mixer 60qt",
+      "category": "Large Equipment",
+      "subcategory": "Mixers",
+      "location": "Pastry Room",
+      "quantity": 1,
+      "status": "Active"
+    },
+    {
+      "name": "Sheeter",
+      "category": "Large Equipment",
+      "subcategory": "Sheeters",
+      "location": "Pastry Room",
+      "quantity": 1,
+      "status": "Active"
+    },
+    {
+      "name": "Proofing Cabinet",
+      "category": "Refrigeration",
+      "subcategory": "Proofers",
+      "location": "Pastry Room",
+      "quantity": 1,
+      "status": "Active"
+    },
+    {
+      "name": "Reach-in Freezer",
+      "category": "Refrigeration",
+      "subcategory": "Freezers",
+      "location": "Pastry Room",
+      "quantity": 1,
+      "status": "Active"
+    },
+    {
+      "name": "Induction Burner",
+      "category": "Small Kitchenware",
+      "subcategory": "Cooktops",
+      "location": "Pastry Room",
+      "quantity": 2,
+      "status": "Active"
+    },
+    {
+      "name": "Silicone Baking Mats (Half Sheet)",
+      "category": "Small Kitchenware",
+      "subcategory": "Bakeware",
+      "location": "Pastry Room",
+      "quantity": 24,
+      "status": "Active"
+    },
+    {
+      "name": "Digital Scales (5kg)",
+      "category": "Small Kitchenware",
+      "subcategory": "Measuring Tools",
+      "location": "Pastry Room",
+      "quantity": 3,
+      "status": "Active"
+    },
+    {
+      "name": "Sheet Pans (Full)",
+      "category": "Storage",
+      "subcategory": "Sheet Pans",
+      "location": "Pastry Room",
+      "quantity": 40,
+      "status": "Active"
+    }
+  ]
+}
+

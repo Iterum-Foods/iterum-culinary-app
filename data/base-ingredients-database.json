@@ -1,0 +1,5294 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-10-18",
+  "categories": [
+    "Proteins",
+    "Vegetables",
+    "Fruits",
+    "Grains & Pasta",
+    "Dairy & Eggs",
+    "Oils & Fats",
+    "Herbs & Spices",
+    "Baking & Sweeteners",
+    "Condiments & Sauces",
+    "Nuts & Seeds",
+    "Legumes",
+    "Seafood",
+    "Pantry Staples",
+    "Beverages",
+    "Specialty Items"
+  ],
+  "ingredients": [
+    {
+      "id": "ing_001",
+      "name": "Chicken Breast",
+      "category": "Proteins",
+      "common_units": [
+        "lb",
+        "oz",
+        "piece",
+        "kg"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 4.99,
+      "storage": "Refrigerate 1-2 days, freeze up to 9 months",
+      "shelf_life_days": 2,
+      "nutritional_info": {
+        "calories_per_100g": 165,
+        "protein_g": 31,
+        "fat_g": 3.6,
+        "carbs_g": 0
+      },
+      "substitutes": [
+        "Turkey breast",
+        "Pork tenderloin",
+        "Firm tofu"
+      ],
+      "allergens": [],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_002",
+      "name": "Beef Chuck Roast",
+      "category": "Proteins",
+      "common_units": [
+        "lb",
+        "oz",
+        "kg"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 7.99,
+      "storage": "Refrigerate 3-5 days, freeze up to 12 months",
+      "shelf_life_days": 4,
+      "nutritional_info": {
+        "calories_per_100g": 250,
+        "protein_g": 26,
+        "fat_g": 16,
+        "carbs_g": 0
+      },
+      "substitutes": [
+        "Pork shoulder",
+        "Lamb shoulder"
+      ],
+      "allergens": [],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_003",
+      "name": "Ground Beef (80/20)",
+      "category": "Proteins",
+      "common_units": [
+        "lb",
+        "oz",
+        "kg"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 5.99,
+      "storage": "Refrigerate 1-2 days, freeze up to 4 months",
+      "shelf_life_days": 2,
+      "nutritional_info": {
+        "calories_per_100g": 254,
+        "protein_g": 17,
+        "fat_g": 20,
+        "carbs_g": 0
+      },
+      "substitutes": [
+        "Ground turkey",
+        "Ground pork",
+        "Plant-based ground"
+      ],
+      "allergens": [],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_004",
+      "name": "Pork Tenderloin",
+      "category": "Proteins",
+      "common_units": [
+        "lb",
+        "oz",
+        "piece",
+        "kg"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 6.99,
+      "storage": "Refrigerate 3-5 days, freeze up to 6 months",
+      "shelf_life_days": 4,
+      "nutritional_info": {
+        "calories_per_100g": 143,
+        "protein_g": 26,
+        "fat_g": 3.5,
+        "carbs_g": 0
+      },
+      "substitutes": [
+        "Chicken breast",
+        "Turkey tenderloin"
+      ],
+      "allergens": [],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_005",
+      "name": "Bacon",
+      "category": "Proteins",
+      "common_units": [
+        "lb",
+        "slice",
+        "oz",
+        "package"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 7.99,
+      "storage": "Refrigerate 7 days unopened, freeze up to 1 month",
+      "shelf_life_days": 7,
+      "nutritional_info": {
+        "calories_per_100g": 541,
+        "protein_g": 37,
+        "fat_g": 42,
+        "carbs_g": 1.4
+      },
+      "substitutes": [
+        "Turkey bacon",
+        "Prosciutto",
+        "Pancetta"
+      ],
+      "allergens": [],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto"
+      ]
+    },
+    {
+      "id": "ing_101",
+      "name": "Yellow Onion",
+      "category": "Vegetables",
+      "common_units": [
+        "each",
+        "lb",
+        "cup",
+        "oz"
+      ],
+      "default_unit": "each",
+      "avg_price_per_lb": 1.29,
+      "storage": "Cool, dry place for 2-3 months",
+      "shelf_life_days": 60,
+      "nutritional_info": {
+        "calories_per_100g": 40,
+        "protein_g": 1.1,
+        "fat_g": 0.1,
+        "carbs_g": 9.3
+      },
+      "substitutes": [
+        "Red onion",
+        "White onion",
+        "Shallots"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_102",
+      "name": "Garlic",
+      "category": "Vegetables",
+      "common_units": [
+        "clove",
+        "head",
+        "tsp",
+        "tbsp"
+      ],
+      "default_unit": "clove",
+      "avg_price_per_lb": 4.99,
+      "storage": "Cool, dry place for 3-5 months",
+      "shelf_life_days": 90,
+      "nutritional_info": {
+        "calories_per_100g": 149,
+        "protein_g": 6.4,
+        "fat_g": 0.5,
+        "carbs_g": 33
+      },
+      "substitutes": [
+        "Garlic powder",
+        "Shallots",
+        "Garlic paste"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_103",
+      "name": "Carrots",
+      "category": "Vegetables",
+      "common_units": [
+        "each",
+        "lb",
+        "cup",
+        "oz"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 1.49,
+      "storage": "Refrigerate for 3-4 weeks",
+      "shelf_life_days": 21,
+      "nutritional_info": {
+        "calories_per_100g": 41,
+        "protein_g": 0.9,
+        "fat_g": 0.2,
+        "carbs_g": 9.6
+      },
+      "substitutes": [
+        "Parsnips",
+        "Sweet potato"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_104",
+      "name": "Celery",
+      "category": "Vegetables",
+      "common_units": [
+        "stalk",
+        "bunch",
+        "cup",
+        "oz"
+      ],
+      "default_unit": "bunch",
+      "avg_price_per_lb": 1.99,
+      "storage": "Refrigerate for 1-2 weeks",
+      "shelf_life_days": 10,
+      "nutritional_info": {
+        "calories_per_100g": 16,
+        "protein_g": 0.7,
+        "fat_g": 0.2,
+        "carbs_g": 3
+      },
+      "substitutes": [
+        "Fennel",
+        "Bok choy stalks"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_105",
+      "name": "Bell Pepper (Red)",
+      "category": "Vegetables",
+      "common_units": [
+        "each",
+        "cup",
+        "oz",
+        "lb"
+      ],
+      "default_unit": "each",
+      "avg_price_per_lb": 2.99,
+      "storage": "Refrigerate for 1-2 weeks",
+      "shelf_life_days": 10,
+      "nutritional_info": {
+        "calories_per_100g": 31,
+        "protein_g": 1,
+        "fat_g": 0.3,
+        "carbs_g": 6
+      },
+      "substitutes": [
+        "Yellow pepper",
+        "Orange pepper",
+        "Green pepper"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_106",
+      "name": "Tomatoes (Roma)",
+      "category": "Vegetables",
+      "common_units": [
+        "each",
+        "lb",
+        "cup",
+        "can"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 2.49,
+      "storage": "Room temperature until ripe, then refrigerate",
+      "shelf_life_days": 7,
+      "nutritional_info": {
+        "calories_per_100g": 18,
+        "protein_g": 0.9,
+        "fat_g": 0.2,
+        "carbs_g": 3.9
+      },
+      "substitutes": [
+        "Cherry tomatoes",
+        "Canned tomatoes",
+        "Grape tomatoes"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_107",
+      "name": "Spinach (Fresh)",
+      "category": "Vegetables",
+      "common_units": [
+        "oz",
+        "bunch",
+        "cup",
+        "lb"
+      ],
+      "default_unit": "oz",
+      "avg_price_per_lb": 3.99,
+      "storage": "Refrigerate for 5-7 days",
+      "shelf_life_days": 6,
+      "nutritional_info": {
+        "calories_per_100g": 23,
+        "protein_g": 2.9,
+        "fat_g": 0.4,
+        "carbs_g": 3.6
+      },
+      "substitutes": [
+        "Kale",
+        "Swiss chard",
+        "Arugula"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_108",
+      "name": "Broccoli",
+      "category": "Vegetables",
+      "common_units": [
+        "head",
+        "lb",
+        "cup",
+        "oz"
+      ],
+      "default_unit": "head",
+      "avg_price_per_lb": 2.49,
+      "storage": "Refrigerate for 7-14 days",
+      "shelf_life_days": 10,
+      "nutritional_info": {
+        "calories_per_100g": 34,
+        "protein_g": 2.8,
+        "fat_g": 0.4,
+        "carbs_g": 7
+      },
+      "substitutes": [
+        "Cauliflower",
+        "Broccolini",
+        "Brussels sprouts"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_109",
+      "name": "Mushrooms (Button)",
+      "category": "Vegetables",
+      "common_units": [
+        "oz",
+        "lb",
+        "cup",
+        "container"
+      ],
+      "default_unit": "oz",
+      "avg_price_per_lb": 4.99,
+      "storage": "Refrigerate for 5-7 days",
+      "shelf_life_days": 6,
+      "nutritional_info": {
+        "calories_per_100g": 22,
+        "protein_g": 3.1,
+        "fat_g": 0.3,
+        "carbs_g": 3.3
+      },
+      "substitutes": [
+        "Cremini mushrooms",
+        "Shiitake",
+        "Portobello"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_110",
+      "name": "Potatoes (Russet)",
+      "category": "Vegetables",
+      "common_units": [
+        "each",
+        "lb",
+        "cup",
+        "oz"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 0.99,
+      "storage": "Cool, dark place for 2-3 months",
+      "shelf_life_days": 60,
+      "nutritional_info": {
+        "calories_per_100g": 77,
+        "protein_g": 2,
+        "fat_g": 0.1,
+        "carbs_g": 17
+      },
+      "substitutes": [
+        "Yukon gold potatoes",
+        "Sweet potatoes",
+        "Cauliflower (low-carb)"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_201",
+      "name": "Lemon",
+      "category": "Fruits",
+      "common_units": [
+        "each",
+        "juice",
+        "zest",
+        "cup"
+      ],
+      "default_unit": "each",
+      "avg_price_per_lb": 1.99,
+      "storage": "Room temperature for 1 week, refrigerate for 3-4 weeks",
+      "shelf_life_days": 21,
+      "nutritional_info": {
+        "calories_per_100g": 29,
+        "protein_g": 1.1,
+        "fat_g": 0.3,
+        "carbs_g": 9.3
+      },
+      "substitutes": [
+        "Lime",
+        "Lemon juice",
+        "Vinegar"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_202",
+      "name": "Lime",
+      "category": "Fruits",
+      "common_units": [
+        "each",
+        "juice",
+        "zest",
+        "cup"
+      ],
+      "default_unit": "each",
+      "avg_price_per_lb": 1.99,
+      "storage": "Room temperature for 1 week, refrigerate for 3-4 weeks",
+      "shelf_life_days": 21,
+      "nutritional_info": {
+        "calories_per_100g": 30,
+        "protein_g": 0.7,
+        "fat_g": 0.2,
+        "carbs_g": 11
+      },
+      "substitutes": [
+        "Lemon",
+        "Lime juice",
+        "Vinegar"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_203",
+      "name": "Apple (Granny Smith)",
+      "category": "Fruits",
+      "common_units": [
+        "each",
+        "lb",
+        "cup",
+        "oz"
+      ],
+      "default_unit": "each",
+      "avg_price_per_lb": 1.99,
+      "storage": "Refrigerate for 4-6 weeks",
+      "shelf_life_days": 35,
+      "nutritional_info": {
+        "calories_per_100g": 52,
+        "protein_g": 0.3,
+        "fat_g": 0.2,
+        "carbs_g": 14
+      },
+      "substitutes": [
+        "Honeycrisp apple",
+        "Fuji apple",
+        "Pear"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_204",
+      "name": "Banana",
+      "category": "Fruits",
+      "common_units": [
+        "each",
+        "cup",
+        "lb"
+      ],
+      "default_unit": "each",
+      "avg_price_per_lb": 0.59,
+      "storage": "Room temperature until ripe, refrigerate to slow ripening",
+      "shelf_life_days": 5,
+      "nutritional_info": {
+        "calories_per_100g": 89,
+        "protein_g": 1.1,
+        "fat_g": 0.3,
+        "carbs_g": 23
+      },
+      "substitutes": [
+        "Plantain",
+        "Applesauce"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_205",
+      "name": "Avocado",
+      "category": "Fruits",
+      "common_units": [
+        "each",
+        "cup",
+        "oz"
+      ],
+      "default_unit": "each",
+      "avg_price_per_lb": 2.49,
+      "storage": "Room temperature until ripe, then refrigerate for 3-5 days",
+      "shelf_life_days": 7,
+      "nutritional_info": {
+        "calories_per_100g": 160,
+        "protein_g": 2,
+        "fat_g": 15,
+        "carbs_g": 9
+      },
+      "substitutes": [
+        "Greek yogurt (texture)",
+        "Mashed peas"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_301",
+      "name": "All-Purpose Flour",
+      "category": "Grains & Pasta",
+      "common_units": [
+        "cup",
+        "lb",
+        "oz",
+        "tsp",
+        "tbsp"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 0.59,
+      "storage": "Cool, dry place for 6-8 months",
+      "shelf_life_days": 180,
+      "nutritional_info": {
+        "calories_per_100g": 364,
+        "protein_g": 10,
+        "fat_g": 1,
+        "carbs_g": 76
+      },
+      "substitutes": [
+        "Bread flour",
+        "Cake flour",
+        "Gluten-free flour blend"
+      ],
+      "allergens": [
+        "gluten",
+        "wheat"
+      ],
+      "dietary": []
+    },
+    {
+      "id": "ing_302",
+      "name": "White Rice (Long Grain)",
+      "category": "Grains & Pasta",
+      "common_units": [
+        "cup",
+        "lb",
+        "oz"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 1.29,
+      "storage": "Cool, dry place indefinitely",
+      "shelf_life_days": 1825,
+      "nutritional_info": {
+        "calories_per_100g": 130,
+        "protein_g": 2.7,
+        "fat_g": 0.3,
+        "carbs_g": 28
+      },
+      "substitutes": [
+        "Brown rice",
+        "Cauliflower rice",
+        "Quinoa"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_303",
+      "name": "Pasta (Spaghetti)",
+      "category": "Grains & Pasta",
+      "common_units": [
+        "lb",
+        "oz",
+        "box"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 1.49,
+      "storage": "Cool, dry place for 1-2 years",
+      "shelf_life_days": 548,
+      "nutritional_info": {
+        "calories_per_100g": 371,
+        "protein_g": 13,
+        "fat_g": 1.5,
+        "carbs_g": 75
+      },
+      "substitutes": [
+        "Linguine",
+        "Fettuccine",
+        "Gluten-free pasta"
+      ],
+      "allergens": [
+        "gluten",
+        "wheat"
+      ],
+      "dietary": []
+    },
+    {
+      "id": "ing_304",
+      "name": "Quinoa",
+      "category": "Grains & Pasta",
+      "common_units": [
+        "cup",
+        "lb",
+        "oz"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 4.99,
+      "storage": "Cool, dry place for 2-3 years",
+      "shelf_life_days": 730,
+      "nutritional_info": {
+        "calories_per_100g": 120,
+        "protein_g": 4.4,
+        "fat_g": 1.9,
+        "carbs_g": 21
+      },
+      "substitutes": [
+        "Rice",
+        "Couscous",
+        "Bulgur"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_305",
+      "name": "Bread (Sourdough)",
+      "category": "Grains & Pasta",
+      "common_units": [
+        "loaf",
+        "slice",
+        "oz"
+      ],
+      "default_unit": "loaf",
+      "avg_price_per_lb": 5.99,
+      "storage": "Room temperature for 4-7 days, freeze for 3 months",
+      "shelf_life_days": 5,
+      "nutritional_info": {
+        "calories_per_100g": 289,
+        "protein_g": 11,
+        "fat_g": 3.5,
+        "carbs_g": 51
+      },
+      "substitutes": [
+        "French bread",
+        "Ciabatta",
+        "Gluten-free bread"
+      ],
+      "allergens": [
+        "gluten",
+        "wheat"
+      ],
+      "dietary": []
+    },
+    {
+      "id": "ing_401",
+      "name": "Butter (Unsalted)",
+      "category": "Dairy & Eggs",
+      "common_units": [
+        "stick",
+        "tbsp",
+        "cup",
+        "oz"
+      ],
+      "default_unit": "stick",
+      "avg_price_per_lb": 4.99,
+      "storage": "Refrigerate for 1-3 months, freeze for 6-9 months",
+      "shelf_life_days": 60,
+      "nutritional_info": {
+        "calories_per_100g": 717,
+        "protein_g": 0.9,
+        "fat_g": 81,
+        "carbs_g": 0.1
+      },
+      "substitutes": [
+        "Margarine",
+        "Coconut oil",
+        "Ghee"
+      ],
+      "allergens": [
+        "dairy"
+      ],
+      "dietary": [
+        "vegetarian",
+        "gluten-free",
+        "keto"
+      ]
+    },
+    {
+      "id": "ing_402",
+      "name": "Heavy Cream",
+      "category": "Dairy & Eggs",
+      "common_units": [
+        "cup",
+        "pint",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 4.49,
+      "storage": "Refrigerate for 5-7 days after opening",
+      "shelf_life_days": 14,
+      "nutritional_info": {
+        "calories_per_100g": 340,
+        "protein_g": 2.1,
+        "fat_g": 36,
+        "carbs_g": 2.8
+      },
+      "substitutes": [
+        "Half-and-half",
+        "Coconut cream",
+        "Milk"
+      ],
+      "allergens": [
+        "dairy"
+      ],
+      "dietary": [
+        "vegetarian",
+        "gluten-free",
+        "keto"
+      ]
+    },
+    {
+      "id": "ing_403",
+      "name": "Milk (Whole)",
+      "category": "Dairy & Eggs",
+      "common_units": [
+        "cup",
+        "gallon",
+        "oz",
+        "quart"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 3.99,
+      "storage": "Refrigerate, use by date on carton",
+      "shelf_life_days": 7,
+      "nutritional_info": {
+        "calories_per_100g": 61,
+        "protein_g": 3.2,
+        "fat_g": 3.3,
+        "carbs_g": 4.8
+      },
+      "substitutes": [
+        "Almond milk",
+        "Oat milk",
+        "2% milk"
+      ],
+      "allergens": [
+        "dairy"
+      ],
+      "dietary": [
+        "vegetarian",
+        "gluten-free"
+      ]
+    },
+    {
+      "id": "ing_404",
+      "name": "Eggs (Large)",
+      "category": "Dairy & Eggs",
+      "common_units": [
+        "each",
+        "dozen",
+        "cup"
+      ],
+      "default_unit": "each",
+      "avg_price_per_lb": 3.99,
+      "storage": "Refrigerate for 3-5 weeks",
+      "shelf_life_days": 28,
+      "nutritional_info": {
+        "calories_per_100g": 155,
+        "protein_g": 13,
+        "fat_g": 11,
+        "carbs_g": 1.1
+      },
+      "substitutes": [
+        "Flax eggs",
+        "Chia eggs",
+        "Applesauce"
+      ],
+      "allergens": [
+        "eggs"
+      ],
+      "dietary": [
+        "vegetarian",
+        "gluten-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_405",
+      "name": "Parmesan Cheese",
+      "category": "Dairy & Eggs",
+      "common_units": [
+        "oz",
+        "cup",
+        "tbsp",
+        "lb"
+      ],
+      "default_unit": "oz",
+      "avg_price_per_lb": 14.99,
+      "storage": "Refrigerate wrapped tightly for 4-6 weeks",
+      "shelf_life_days": 35,
+      "nutritional_info": {
+        "calories_per_100g": 431,
+        "protein_g": 38,
+        "fat_g": 29,
+        "carbs_g": 4.1
+      },
+      "substitutes": [
+        "Pecorino Romano",
+        "Grana Padano",
+        "Nutritional yeast"
+      ],
+      "allergens": [
+        "dairy"
+      ],
+      "dietary": [
+        "vegetarian",
+        "gluten-free",
+        "keto"
+      ]
+    },
+    {
+      "id": "ing_406",
+      "name": "Cheddar Cheese",
+      "category": "Dairy & Eggs",
+      "common_units": [
+        "oz",
+        "cup",
+        "slice",
+        "lb"
+      ],
+      "default_unit": "oz",
+      "avg_price_per_lb": 6.99,
+      "storage": "Refrigerate wrapped for 3-4 weeks",
+      "shelf_life_days": 21,
+      "nutritional_info": {
+        "calories_per_100g": 403,
+        "protein_g": 23,
+        "fat_g": 33,
+        "carbs_g": 3.1
+      },
+      "substitutes": [
+        "Colby cheese",
+        "Gruyère",
+        "Vegan cheddar"
+      ],
+      "allergens": [
+        "dairy"
+      ],
+      "dietary": [
+        "vegetarian",
+        "gluten-free",
+        "keto"
+      ]
+    },
+    {
+      "id": "ing_407",
+      "name": "Greek Yogurt (Plain)",
+      "category": "Dairy & Eggs",
+      "common_units": [
+        "cup",
+        "oz",
+        "container"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 5.99,
+      "storage": "Refrigerate, use by date on container",
+      "shelf_life_days": 14,
+      "nutritional_info": {
+        "calories_per_100g": 97,
+        "protein_g": 9,
+        "fat_g": 5,
+        "carbs_g": 3.6
+      },
+      "substitutes": [
+        "Regular yogurt",
+        "Sour cream",
+        "Coconut yogurt"
+      ],
+      "allergens": [
+        "dairy"
+      ],
+      "dietary": [
+        "vegetarian",
+        "gluten-free",
+        "keto"
+      ]
+    },
+    {
+      "id": "ing_501",
+      "name": "Olive Oil (Extra Virgin)",
+      "category": "Oils & Fats",
+      "common_units": [
+        "cup",
+        "tbsp",
+        "oz",
+        "bottle"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 12.99,
+      "storage": "Cool, dark place for 12-18 months",
+      "shelf_life_days": 365,
+      "nutritional_info": {
+        "calories_per_100g": 884,
+        "protein_g": 0,
+        "fat_g": 100,
+        "carbs_g": 0
+      },
+      "substitutes": [
+        "Canola oil",
+        "Grapeseed oil",
+        "Avocado oil"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_502",
+      "name": "Vegetable Oil",
+      "category": "Oils & Fats",
+      "common_units": [
+        "cup",
+        "tbsp",
+        "oz",
+        "bottle"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 4.99,
+      "storage": "Cool, dark place for 6-12 months",
+      "shelf_life_days": 270,
+      "nutritional_info": {
+        "calories_per_100g": 884,
+        "protein_g": 0,
+        "fat_g": 100,
+        "carbs_g": 0
+      },
+      "substitutes": [
+        "Canola oil",
+        "Olive oil",
+        "Avocado oil"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto"
+      ]
+    },
+    {
+      "id": "ing_503",
+      "name": "Coconut Oil",
+      "category": "Oils & Fats",
+      "common_units": [
+        "cup",
+        "tbsp",
+        "oz",
+        "jar"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 8.99,
+      "storage": "Room temperature for 2+ years",
+      "shelf_life_days": 730,
+      "nutritional_info": {
+        "calories_per_100g": 862,
+        "protein_g": 0,
+        "fat_g": 100,
+        "carbs_g": 0
+      },
+      "substitutes": [
+        "Butter",
+        "Ghee",
+        "Vegetable oil"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_601",
+      "name": "Salt (Kosher)",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "pinch",
+        "cup"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 2.99,
+      "storage": "Cool, dry place indefinitely",
+      "shelf_life_days": 3650,
+      "nutritional_info": {
+        "calories_per_100g": 0,
+        "protein_g": 0,
+        "fat_g": 0,
+        "carbs_g": 0
+      },
+      "substitutes": [
+        "Sea salt",
+        "Table salt",
+        "Himalayan salt"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_602",
+      "name": "Black Pepper (Ground)",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 14.99,
+      "storage": "Cool, dark place for 2-3 years",
+      "shelf_life_days": 730,
+      "nutritional_info": {
+        "calories_per_100g": 251,
+        "protein_g": 10,
+        "fat_g": 3.3,
+        "carbs_g": 64
+      },
+      "substitutes": [
+        "White pepper",
+        "Cayenne pepper"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_603",
+      "name": "Basil (Fresh)",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "bunch",
+        "cup",
+        "leaf",
+        "oz"
+      ],
+      "default_unit": "bunch",
+      "avg_price_per_lb": 7.99,
+      "storage": "Refrigerate stems in water for 3-5 days",
+      "shelf_life_days": 4,
+      "nutritional_info": {
+        "calories_per_100g": 23,
+        "protein_g": 3.2,
+        "fat_g": 0.6,
+        "carbs_g": 2.7
+      },
+      "substitutes": [
+        "Dried basil",
+        "Oregano",
+        "Thyme"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_604",
+      "name": "Oregano (Dried)",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 9.99,
+      "storage": "Cool, dark place for 2-3 years",
+      "shelf_life_days": 730,
+      "nutritional_info": {
+        "calories_per_100g": 265,
+        "protein_g": 9,
+        "fat_g": 4.3,
+        "carbs_g": 69
+      },
+      "substitutes": [
+        "Marjoram",
+        "Thyme",
+        "Italian seasoning"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_605",
+      "name": "Cumin (Ground)",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 11.99,
+      "storage": "Cool, dark place for 2-3 years",
+      "shelf_life_days": 730,
+      "nutritional_info": {
+        "calories_per_100g": 375,
+        "protein_g": 18,
+        "fat_g": 22,
+        "carbs_g": 44
+      },
+      "substitutes": [
+        "Coriander",
+        "Caraway seeds",
+        "Chili powder"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_606",
+      "name": "Paprika",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 10.99,
+      "storage": "Cool, dark place for 2-3 years",
+      "shelf_life_days": 730,
+      "nutritional_info": {
+        "calories_per_100g": 282,
+        "protein_g": 14,
+        "fat_g": 13,
+        "carbs_g": 54
+      },
+      "substitutes": [
+        "Smoked paprika",
+        "Cayenne pepper",
+        "Chili powder"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_607",
+      "name": "Thyme (Fresh)",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "sprig",
+        "tsp",
+        "bunch"
+      ],
+      "default_unit": "sprig",
+      "avg_price_per_lb": 8.99,
+      "storage": "Refrigerate for 1-2 weeks",
+      "shelf_life_days": 10,
+      "nutritional_info": {
+        "calories_per_100g": 101,
+        "protein_g": 5.6,
+        "fat_g": 1.7,
+        "carbs_g": 24
+      },
+      "substitutes": [
+        "Dried thyme",
+        "Oregano",
+        "Marjoram"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_608",
+      "name": "Rosemary (Fresh)",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "sprig",
+        "tsp",
+        "bunch"
+      ],
+      "default_unit": "sprig",
+      "avg_price_per_lb": 8.99,
+      "storage": "Refrigerate for 1-2 weeks",
+      "shelf_life_days": 10,
+      "nutritional_info": {
+        "calories_per_100g": 131,
+        "protein_g": 3.3,
+        "fat_g": 5.9,
+        "carbs_g": 20
+      },
+      "substitutes": [
+        "Dried rosemary",
+        "Thyme",
+        "Sage"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_609",
+      "name": "Cilantro (Fresh)",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "bunch",
+        "cup",
+        "leaf"
+      ],
+      "default_unit": "bunch",
+      "avg_price_per_lb": 2.99,
+      "storage": "Refrigerate stems in water for 3-5 days",
+      "shelf_life_days": 4,
+      "nutritional_info": {
+        "calories_per_100g": 23,
+        "protein_g": 2.1,
+        "fat_g": 0.5,
+        "carbs_g": 3.7
+      },
+      "substitutes": [
+        "Parsley",
+        "Culantro",
+        "Basil"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_610",
+      "name": "Cayenne Pepper",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "tsp",
+        "pinch",
+        "tbsp"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 12.99,
+      "storage": "Cool, dark place for 2-3 years",
+      "shelf_life_days": 730,
+      "nutritional_info": {
+        "calories_per_100g": 318,
+        "protein_g": 12,
+        "fat_g": 17,
+        "carbs_g": 57
+      },
+      "substitutes": [
+        "Red pepper flakes",
+        "Chili powder",
+        "Hot sauce"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_701",
+      "name": "Sugar (Granulated White)",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "cup",
+        "tbsp",
+        "tsp",
+        "lb"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 0.79,
+      "storage": "Cool, dry place indefinitely",
+      "shelf_life_days": 3650,
+      "nutritional_info": {
+        "calories_per_100g": 387,
+        "protein_g": 0,
+        "fat_g": 0,
+        "carbs_g": 100
+      },
+      "substitutes": [
+        "Honey",
+        "Maple syrup",
+        "Stevia"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_702",
+      "name": "Brown Sugar",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "cup",
+        "tbsp",
+        "lb"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 1.29,
+      "storage": "Airtight container in cool place for 6 months",
+      "shelf_life_days": 180,
+      "nutritional_info": {
+        "calories_per_100g": 380,
+        "protein_g": 0,
+        "fat_g": 0,
+        "carbs_g": 98
+      },
+      "substitutes": [
+        "White sugar + molasses",
+        "Coconut sugar",
+        "Maple sugar"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_703",
+      "name": "Honey",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "oz",
+        "jar"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 8.99,
+      "storage": "Room temperature indefinitely",
+      "shelf_life_days": 3650,
+      "nutritional_info": {
+        "calories_per_100g": 304,
+        "protein_g": 0.3,
+        "fat_g": 0,
+        "carbs_g": 82
+      },
+      "substitutes": [
+        "Maple syrup",
+        "Agave nectar",
+        "Sugar"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_704",
+      "name": "Baking Powder",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 2.99,
+      "storage": "Cool, dry place for 6-12 months",
+      "shelf_life_days": 270,
+      "nutritional_info": {
+        "calories_per_100g": 53,
+        "protein_g": 0,
+        "fat_g": 0,
+        "carbs_g": 28
+      },
+      "substitutes": [
+        "Baking soda + cream of tartar",
+        "Self-rising flour"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_705",
+      "name": "Baking Soda",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 1.99,
+      "storage": "Cool, dry place for 2+ years",
+      "shelf_life_days": 730,
+      "nutritional_info": {
+        "calories_per_100g": 0,
+        "protein_g": 0,
+        "fat_g": 0,
+        "carbs_g": 0
+      },
+      "substitutes": [
+        "Baking powder (use 3x amount)"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_706",
+      "name": "Vanilla Extract",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz",
+        "bottle"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 24.99,
+      "storage": "Cool, dark place for 3-4 years",
+      "shelf_life_days": 1095,
+      "nutritional_info": {
+        "calories_per_100g": 288,
+        "protein_g": 0.1,
+        "fat_g": 0.1,
+        "carbs_g": 13
+      },
+      "substitutes": [
+        "Vanilla bean",
+        "Almond extract",
+        "Maple syrup"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_801",
+      "name": "Soy Sauce",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "oz",
+        "bottle"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 3.99,
+      "storage": "Refrigerate after opening for 2-3 years",
+      "shelf_life_days": 730,
+      "nutritional_info": {
+        "calories_per_100g": 53,
+        "protein_g": 5.6,
+        "fat_g": 0.1,
+        "carbs_g": 4.9
+      },
+      "substitutes": [
+        "Tamari",
+        "Coconut aminos",
+        "Worcestershire sauce"
+      ],
+      "allergens": [
+        "soy",
+        "wheat"
+      ],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_802",
+      "name": "Worcestershire Sauce",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "tbsp",
+        "tsp",
+        "oz",
+        "bottle"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 4.99,
+      "storage": "Refrigerate after opening for 1-2 years",
+      "shelf_life_days": 365,
+      "nutritional_info": {
+        "calories_per_100g": 78,
+        "protein_g": 0,
+        "fat_g": 0,
+        "carbs_g": 19
+      },
+      "substitutes": [
+        "Soy sauce",
+        "Balsamic vinegar",
+        "Fish sauce"
+      ],
+      "allergens": [
+        "fish"
+      ],
+      "dietary": [
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_803",
+      "name": "Dijon Mustard",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "tbsp",
+        "tsp",
+        "jar"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 5.99,
+      "storage": "Refrigerate after opening for 1 year",
+      "shelf_life_days": 365,
+      "nutritional_info": {
+        "calories_per_100g": 66,
+        "protein_g": 3.7,
+        "fat_g": 3,
+        "carbs_g": 5.6
+      },
+      "substitutes": [
+        "Yellow mustard",
+        "Whole grain mustard",
+        "Horseradish"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_804",
+      "name": "Ketchup",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "bottle"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 3.49,
+      "storage": "Refrigerate after opening for 6 months",
+      "shelf_life_days": 180,
+      "nutritional_info": {
+        "calories_per_100g": 101,
+        "protein_g": 1.2,
+        "fat_g": 0.1,
+        "carbs_g": 27
+      },
+      "substitutes": [
+        "Tomato paste + vinegar",
+        "BBQ sauce"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_805",
+      "name": "Mayonnaise",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "jar"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 4.99,
+      "storage": "Refrigerate after opening for 2-3 months",
+      "shelf_life_days": 75,
+      "nutritional_info": {
+        "calories_per_100g": 680,
+        "protein_g": 1.1,
+        "fat_g": 75,
+        "carbs_g": 0.6
+      },
+      "substitutes": [
+        "Greek yogurt",
+        "Aioli",
+        "Vegan mayo"
+      ],
+      "allergens": [
+        "eggs"
+      ],
+      "dietary": [
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_806",
+      "name": "Hot Sauce (Tabasco)",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "bottle"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 6.99,
+      "storage": "Refrigerate after opening for 3 years",
+      "shelf_life_days": 1095,
+      "nutritional_info": {
+        "calories_per_100g": 12,
+        "protein_g": 1.3,
+        "fat_g": 0.8,
+        "carbs_g": 0.8
+      },
+      "substitutes": [
+        "Sriracha",
+        "Cayenne pepper",
+        "Red pepper flakes"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_901",
+      "name": "Almonds (Raw)",
+      "category": "Nuts & Seeds",
+      "common_units": [
+        "cup",
+        "oz",
+        "lb"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 9.99,
+      "storage": "Cool, dry place for 6 months, freeze for 1 year",
+      "shelf_life_days": 180,
+      "nutritional_info": {
+        "calories_per_100g": 579,
+        "protein_g": 21,
+        "fat_g": 50,
+        "carbs_g": 22
+      },
+      "substitutes": [
+        "Cashews",
+        "Pecans",
+        "Walnuts"
+      ],
+      "allergens": [
+        "tree nuts"
+      ],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_902",
+      "name": "Walnuts",
+      "category": "Nuts & Seeds",
+      "common_units": [
+        "cup",
+        "oz",
+        "lb"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 12.99,
+      "storage": "Refrigerate for 6 months, freeze for 1 year",
+      "shelf_life_days": 180,
+      "nutritional_info": {
+        "calories_per_100g": 654,
+        "protein_g": 15,
+        "fat_g": 65,
+        "carbs_g": 14
+      },
+      "substitutes": [
+        "Pecans",
+        "Almonds",
+        "Hazelnuts"
+      ],
+      "allergens": [
+        "tree nuts"
+      ],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_903",
+      "name": "Peanut Butter (Smooth)",
+      "category": "Nuts & Seeds",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "jar"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 5.99,
+      "storage": "Cool, dry place for 6-9 months",
+      "shelf_life_days": 210,
+      "nutritional_info": {
+        "calories_per_100g": 588,
+        "protein_g": 25,
+        "fat_g": 50,
+        "carbs_g": 20
+      },
+      "substitutes": [
+        "Almond butter",
+        "Sunflower seed butter",
+        "Tahini"
+      ],
+      "allergens": [
+        "peanuts"
+      ],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_904",
+      "name": "Sesame Seeds",
+      "category": "Nuts & Seeds",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "oz"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 6.99,
+      "storage": "Cool, dry place for 6 months",
+      "shelf_life_days": 180,
+      "nutritional_info": {
+        "calories_per_100g": 573,
+        "protein_g": 18,
+        "fat_g": 50,
+        "carbs_g": 23
+      },
+      "substitutes": [
+        "Chia seeds",
+        "Flax seeds",
+        "Poppy seeds"
+      ],
+      "allergens": [
+        "sesame"
+      ],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_1001",
+      "name": "Black Beans (Canned)",
+      "category": "Legumes",
+      "common_units": [
+        "can",
+        "cup",
+        "oz"
+      ],
+      "default_unit": "can",
+      "avg_price_per_lb": 1.49,
+      "storage": "Pantry for 2-3 years, refrigerate after opening",
+      "shelf_life_days": 730,
+      "nutritional_info": {
+        "calories_per_100g": 132,
+        "protein_g": 8.9,
+        "fat_g": 0.5,
+        "carbs_g": 24
+      },
+      "substitutes": [
+        "Pinto beans",
+        "Kidney beans",
+        "Chickpeas"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_1002",
+      "name": "Chickpeas (Garbanzo Beans)",
+      "category": "Legumes",
+      "common_units": [
+        "can",
+        "cup",
+        "oz"
+      ],
+      "default_unit": "can",
+      "avg_price_per_lb": 1.49,
+      "storage": "Pantry for 2-3 years, refrigerate after opening",
+      "shelf_life_days": 730,
+      "nutritional_info": {
+        "calories_per_100g": 164,
+        "protein_g": 8.9,
+        "fat_g": 2.6,
+        "carbs_g": 27
+      },
+      "substitutes": [
+        "Cannellini beans",
+        "Black beans",
+        "Lentils"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_1003",
+      "name": "Lentils (Green)",
+      "category": "Legumes",
+      "common_units": [
+        "cup",
+        "lb",
+        "oz"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 2.49,
+      "storage": "Cool, dry place for 2-3 years",
+      "shelf_life_days": 730,
+      "nutritional_info": {
+        "calories_per_100g": 116,
+        "protein_g": 9,
+        "fat_g": 0.4,
+        "carbs_g": 20
+      },
+      "substitutes": [
+        "Red lentils",
+        "Split peas",
+        "Chickpeas"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_1101",
+      "name": "Salmon Fillet (Fresh)",
+      "category": "Seafood",
+      "common_units": [
+        "lb",
+        "oz",
+        "fillet"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 12.99,
+      "storage": "Refrigerate 1-2 days, freeze up to 3 months",
+      "shelf_life_days": 2,
+      "nutritional_info": {
+        "calories_per_100g": 208,
+        "protein_g": 20,
+        "fat_g": 13,
+        "carbs_g": 0
+      },
+      "substitutes": [
+        "Trout",
+        "Arctic char",
+        "Tuna"
+      ],
+      "allergens": [
+        "fish"
+      ],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_1102",
+      "name": "Shrimp (Raw, Peeled)",
+      "category": "Seafood",
+      "common_units": [
+        "lb",
+        "oz",
+        "piece"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 14.99,
+      "storage": "Refrigerate 1-2 days, freeze up to 6 months",
+      "shelf_life_days": 2,
+      "nutritional_info": {
+        "calories_per_100g": 99,
+        "protein_g": 24,
+        "fat_g": 0.3,
+        "carbs_g": 0.2
+      },
+      "substitutes": [
+        "Scallops",
+        "Prawns",
+        "Crab"
+      ],
+      "allergens": [
+        "shellfish"
+      ],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_1103",
+      "name": "Tuna (Canned in Water)",
+      "category": "Seafood",
+      "common_units": [
+        "can",
+        "oz",
+        "cup"
+      ],
+      "default_unit": "can",
+      "avg_price_per_lb": 4.99,
+      "storage": "Pantry for 3-5 years, refrigerate after opening",
+      "shelf_life_days": 1095,
+      "nutritional_info": {
+        "calories_per_100g": 116,
+        "protein_g": 26,
+        "fat_g": 0.8,
+        "carbs_g": 0
+      },
+      "substitutes": [
+        "Canned salmon",
+        "Canned chicken",
+        "Canned sardines"
+      ],
+      "allergens": [
+        "fish"
+      ],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_1201",
+      "name": "Chicken Stock",
+      "category": "Pantry Staples",
+      "common_units": [
+        "cup",
+        "quart",
+        "carton",
+        "can"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 2.99,
+      "storage": "Pantry until opened, then refrigerate for 4-5 days",
+      "shelf_life_days": 730,
+      "nutritional_info": {
+        "calories_per_100g": 15,
+        "protein_g": 1.6,
+        "fat_g": 0.5,
+        "carbs_g": 1.1
+      },
+      "substitutes": [
+        "Vegetable stock",
+        "Beef stock",
+        "Water + bouillon"
+      ],
+      "allergens": [],
+      "dietary": [
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_1202",
+      "name": "Tomato Paste",
+      "category": "Pantry Staples",
+      "common_units": [
+        "tbsp",
+        "can",
+        "oz"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 1.99,
+      "storage": "Pantry for 18 months, refrigerate after opening",
+      "shelf_life_days": 548,
+      "nutritional_info": {
+        "calories_per_100g": 82,
+        "protein_g": 4.3,
+        "fat_g": 0.5,
+        "carbs_g": 19
+      },
+      "substitutes": [
+        "Tomato sauce",
+        "Ketchup",
+        "Fresh tomatoes (reduced)"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_1203",
+      "name": "Balsamic Vinegar",
+      "category": "Pantry Staples",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "bottle"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 9.99,
+      "storage": "Cool, dark place for 3-5 years",
+      "shelf_life_days": 1095,
+      "nutritional_info": {
+        "calories_per_100g": 88,
+        "protein_g": 0.5,
+        "fat_g": 0,
+        "carbs_g": 17
+      },
+      "substitutes": [
+        "Red wine vinegar",
+        "Apple cider vinegar",
+        "Sherry vinegar"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_1204",
+      "name": "Apple Cider Vinegar",
+      "category": "Pantry Staples",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "bottle"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 4.99,
+      "storage": "Cool, dark place for 5+ years",
+      "shelf_life_days": 1825,
+      "nutritional_info": {
+        "calories_per_100g": 21,
+        "protein_g": 0,
+        "fat_g": 0,
+        "carbs_g": 0.9
+      },
+      "substitutes": [
+        "White vinegar",
+        "Lemon juice",
+        "Red wine vinegar"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ]
+    },
+    {
+      "id": "ing_1205",
+      "name": "Red Wine",
+      "category": "Beverages",
+      "common_units": [
+        "cup",
+        "bottle",
+        "oz"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 12.99,
+      "storage": "Cool, dark place; refrigerate after opening",
+      "shelf_life_days": 730,
+      "nutritional_info": {
+        "calories_per_100g": 85,
+        "protein_g": 0.1,
+        "fat_g": 0,
+        "carbs_g": 2.6
+      },
+      "substitutes": [
+        "Grape juice",
+        "Beef stock",
+        "Balsamic vinegar"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ]
+    },
+    {
+      "id": "ing_1206",
+      "name": "Anise Hyssop Leaves",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "bunch",
+        "oz",
+        "handful"
+      ],
+      "default_unit": "bunch",
+      "avg_price_per_lb": 12.99,
+      "storage": "Refrigerate wrapped in damp towel for 3-5 days",
+      "shelf_life_days": 4,
+      "substitutes": [
+        "Mint",
+        "Basil",
+        "Thai basil"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 35,
+        "protein_g": 2.5,
+        "fat_g": 0.5,
+        "carbs_g": 7
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1206",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1207",
+      "name": "Thai Bird Chiles",
+      "category": "Vegetables",
+      "common_units": [
+        "lb",
+        "oz",
+        "piece"
+      ],
+      "default_unit": "oz",
+      "avg_price_per_lb": 8.99,
+      "storage": "Refrigerate for 1-2 weeks, freeze for 6 months",
+      "shelf_life_days": 10,
+      "substitutes": [
+        "Serrano peppers",
+        "Jalapeño",
+        "Red pepper flakes"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 40,
+        "protein_g": 2,
+        "fat_g": 0.4,
+        "carbs_g": 9
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1207",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1208",
+      "name": "Micro Cilantro",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "oz",
+        "container",
+        "handful"
+      ],
+      "default_unit": "oz",
+      "avg_price_per_lb": 32.99,
+      "storage": "Refrigerate in container for 3-5 days",
+      "shelf_life_days": 4,
+      "substitutes": [
+        "Regular cilantro",
+        "Parsley",
+        "Micro parsley"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 23,
+        "protein_g": 2.1,
+        "fat_g": 0.5,
+        "carbs_g": 3.7
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1208",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1209",
+      "name": "Russet Potatoes",
+      "category": "Vegetables",
+      "common_units": [
+        "lb",
+        "piece",
+        "bag"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 0.89,
+      "storage": "Cool, dark place for 2-3 months",
+      "shelf_life_days": 60,
+      "substitutes": [
+        "Yukon gold potatoes",
+        "Red potatoes"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 77,
+        "protein_g": 2,
+        "fat_g": 0.1,
+        "carbs_g": 18
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1209",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1210",
+      "name": "Apple Blossoms",
+      "category": "Specialty Items",
+      "common_units": [
+        "piece",
+        "oz",
+        "handful"
+      ],
+      "default_unit": "piece",
+      "avg_price_per_lb": 24.99,
+      "storage": "Refrigerate gently for 1-2 days",
+      "shelf_life_days": 2,
+      "substitutes": [
+        "Edible flowers",
+        "Microgreens"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 25,
+        "protein_g": 0.3,
+        "fat_g": 0.2,
+        "carbs_g": 6
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1210",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1211",
+      "name": "Samphire",
+      "category": "Vegetables",
+      "common_units": [
+        "oz",
+        "lb",
+        "bunch"
+      ],
+      "default_unit": "oz",
+      "avg_price_per_lb": 18.99,
+      "storage": "Refrigerate wrapped for 2-3 days",
+      "shelf_life_days": 3,
+      "substitutes": [
+        "Asparagus",
+        "Green beans",
+        "Sea beans"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 20,
+        "protein_g": 2,
+        "fat_g": 0.5,
+        "carbs_g": 2
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1211",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1212",
+      "name": "Shishito Peppers",
+      "category": "Vegetables",
+      "common_units": [
+        "lb",
+        "oz",
+        "container"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 6.99,
+      "storage": "Refrigerate for 5-7 days",
+      "shelf_life_days": 6,
+      "substitutes": [
+        "Padrón peppers",
+        "Bell peppers"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 27,
+        "protein_g": 1.5,
+        "fat_g": 0.4,
+        "carbs_g": 6
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1212",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1213",
+      "name": "Baby Golden Beets",
+      "category": "Vegetables",
+      "common_units": [
+        "lb",
+        "bunch",
+        "piece"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 4.99,
+      "storage": "Refrigerate for 2-3 weeks",
+      "shelf_life_days": 14,
+      "substitutes": [
+        "Regular beets",
+        "Red beets",
+        "Carrots"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 43,
+        "protein_g": 1.6,
+        "fat_g": 0.2,
+        "carbs_g": 10
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1213",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1214",
+      "name": "Mustard Frills",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "oz",
+        "container",
+        "handful"
+      ],
+      "default_unit": "oz",
+      "avg_price_per_lb": 28.99,
+      "storage": "Refrigerate in container for 3-5 days",
+      "shelf_life_days": 4,
+      "substitutes": [
+        "Microgreens",
+        "Arugula",
+        "Watercress"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 27,
+        "protein_g": 2.9,
+        "fat_g": 0.4,
+        "carbs_g": 4.7
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1214",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1215",
+      "name": "Hamachi",
+      "category": "Seafood",
+      "common_units": [
+        "lb",
+        "oz",
+        "fillet"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 28.99,
+      "storage": "Refrigerate for 1-2 days, freeze for 2-3 months",
+      "shelf_life_days": 2,
+      "substitutes": [
+        "Yellowtail",
+        "Tuna",
+        "Salmon"
+      ],
+      "allergens": [
+        "fish"
+      ],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 146,
+        "protein_g": 23,
+        "fat_g": 5.2,
+        "carbs_g": 0
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1215",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1216",
+      "name": "Kaluga Caviar",
+      "category": "Seafood",
+      "common_units": [
+        "gram",
+        "oz"
+      ],
+      "default_unit": "gram",
+      "avg_price_per_lb": 2400,
+      "storage": "Refrigerate unopened for 4-6 weeks, opened for 3 days",
+      "shelf_life_days": 3,
+      "substitutes": [
+        "Osetra caviar",
+        "Sevruga caviar"
+      ],
+      "allergens": [
+        "fish"
+      ],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 264,
+        "protein_g": 24.6,
+        "fat_g": 17.9,
+        "carbs_g": 4
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1216",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1217",
+      "name": "Wild Alaskan King Salmon",
+      "category": "Seafood",
+      "common_units": [
+        "lb",
+        "oz",
+        "fillet"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 34.99,
+      "storage": "Refrigerate for 1-2 days, freeze for 2-3 months",
+      "shelf_life_days": 2,
+      "substitutes": [
+        "Sockeye salmon",
+        "Coho salmon",
+        "Atlantic salmon"
+      ],
+      "allergens": [
+        "fish"
+      ],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 182,
+        "protein_g": 25,
+        "fat_g": 8.6,
+        "carbs_g": 0
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1217",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1218",
+      "name": "Smoked Bluefish",
+      "category": "Seafood",
+      "common_units": [
+        "lb",
+        "oz"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 18.99,
+      "storage": "Refrigerate for 5-7 days",
+      "shelf_life_days": 6,
+      "substitutes": [
+        "Smoked trout",
+        "Smoked mackerel",
+        "Smoked salmon"
+      ],
+      "allergens": [
+        "fish"
+      ],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 159,
+        "protein_g": 22,
+        "fat_g": 7.5,
+        "carbs_g": 0
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1218",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1219",
+      "name": "Bonito Flakes (Katsuobushi)",
+      "category": "Pantry Staples",
+      "common_units": [
+        "oz",
+        "cup",
+        "package"
+      ],
+      "default_unit": "oz",
+      "avg_price_per_lb": 24.99,
+      "storage": "Cool, dry place for 6-12 months",
+      "shelf_life_days": 180,
+      "substitutes": [
+        "Dried shrimp",
+        "Anchovy powder"
+      ],
+      "allergens": [
+        "fish"
+      ],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 336,
+        "protein_g": 77,
+        "fat_g": 4.3,
+        "carbs_g": 0
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1219",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1220",
+      "name": "N'duja",
+      "category": "Proteins",
+      "common_units": [
+        "oz",
+        "lb",
+        "jar"
+      ],
+      "default_unit": "oz",
+      "avg_price_per_lb": 19.99,
+      "storage": "Refrigerate for 2-3 weeks",
+      "shelf_life_days": 14,
+      "substitutes": [
+        "Chorizo",
+        "Spicy Italian sausage",
+        "Red pepper paste"
+      ],
+      "allergens": [
+        "pork"
+      ],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 420,
+        "protein_g": 18,
+        "fat_g": 38,
+        "carbs_g": 2
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1220",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1221",
+      "name": "Wagyu Hot Dog",
+      "category": "Proteins",
+      "common_units": [
+        "piece",
+        "lb",
+        "package"
+      ],
+      "default_unit": "piece",
+      "avg_price_per_lb": 24.99,
+      "storage": "Refrigerate for 7-10 days, freeze for 2 months",
+      "shelf_life_days": 8,
+      "substitutes": [
+        "Beef hot dog",
+        "Bratwurst"
+      ],
+      "allergens": [],
+      "dietary": [
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 295,
+        "protein_g": 12,
+        "fat_g": 27,
+        "carbs_g": 2
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1221",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1222",
+      "name": "Foie Gras Bratwurst",
+      "category": "Proteins",
+      "common_units": [
+        "piece",
+        "lb"
+      ],
+      "default_unit": "piece",
+      "avg_price_per_lb": 32.99,
+      "storage": "Refrigerate for 3-5 days",
+      "shelf_life_days": 4,
+      "substitutes": [
+        "Regular bratwurst",
+        "Chicken sausage"
+      ],
+      "allergens": [],
+      "dietary": [],
+      "nutritional_info": {
+        "calories_per_100g": 385,
+        "protein_g": 14,
+        "fat_g": 36,
+        "carbs_g": 3
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1222",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1223",
+      "name": "Eye Round Beef",
+      "category": "Proteins",
+      "common_units": [
+        "lb",
+        "oz",
+        "roast"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 8.99,
+      "storage": "Refrigerate for 3-5 days, freeze for 6-12 months",
+      "shelf_life_days": 4,
+      "substitutes": [
+        "Top round",
+        "Bottom round",
+        "Chuck roast"
+      ],
+      "allergens": [],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 145,
+        "protein_g": 25,
+        "fat_g": 4.2,
+        "carbs_g": 0
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1223",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1224",
+      "name": "Beef Marrow Bones",
+      "category": "Proteins",
+      "common_units": [
+        "lb",
+        "piece"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 5.99,
+      "storage": "Refrigerate for 3-5 days, freeze for 6-12 months",
+      "shelf_life_days": 4,
+      "substitutes": [
+        "Beef knuckle bones",
+        "Oxtail"
+      ],
+      "allergens": [],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 786,
+        "protein_g": 7,
+        "fat_g": 84,
+        "carbs_g": 0
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1224",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1225",
+      "name": "Veal Demi-Glace",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "lb",
+        "cup",
+        "jar"
+      ],
+      "default_unit": "lb",
+      "avg_price_per_lb": 28.99,
+      "storage": "Refrigerate for 1 week, freeze for 6 months",
+      "shelf_life_days": 7,
+      "substitutes": [
+        "Beef demi-glace",
+        "Beef stock reduction"
+      ],
+      "allergens": [],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 40,
+        "protein_g": 4,
+        "fat_g": 1.5,
+        "carbs_g": 3
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1225",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1226",
+      "name": "Crème Fraîche",
+      "category": "Dairy & Eggs",
+      "common_units": [
+        "lb",
+        "cup",
+        "oz"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 8.99,
+      "storage": "Refrigerate for 2-3 weeks",
+      "shelf_life_days": 14,
+      "substitutes": [
+        "Sour cream",
+        "Greek yogurt",
+        "Heavy cream"
+      ],
+      "allergens": [
+        "dairy"
+      ],
+      "dietary": [
+        "vegetarian",
+        "gluten-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 292,
+        "protein_g": 2.4,
+        "fat_g": 30,
+        "carbs_g": 3.3
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1226",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1227",
+      "name": "Burrata Cheese",
+      "category": "Dairy & Eggs",
+      "common_units": [
+        "ball",
+        "oz",
+        "lb"
+      ],
+      "default_unit": "ball",
+      "avg_price_per_lb": 12.99,
+      "storage": "Refrigerate for 2-3 days",
+      "shelf_life_days": 3,
+      "substitutes": [
+        "Fresh mozzarella",
+        "Buffalo mozzarella"
+      ],
+      "allergens": [
+        "dairy"
+      ],
+      "dietary": [
+        "vegetarian",
+        "gluten-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 300,
+        "protein_g": 17,
+        "fat_g": 25,
+        "carbs_g": 3
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1227",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1228",
+      "name": "Kewpie Mayo",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "bottle",
+        "tbsp",
+        "cup"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 6.99,
+      "storage": "Refrigerate after opening for 2-3 months",
+      "shelf_life_days": 60,
+      "substitutes": [
+        "Regular mayonnaise",
+        "Japanese mayo"
+      ],
+      "allergens": [
+        "eggs"
+      ],
+      "dietary": [
+        "gluten-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 700,
+        "protein_g": 1.5,
+        "fat_g": 75,
+        "carbs_g": 4
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1228",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1229",
+      "name": "Aged Cheddar Cheese",
+      "category": "Dairy & Eggs",
+      "common_units": [
+        "lb",
+        "oz",
+        "cup"
+      ],
+      "default_unit": "oz",
+      "avg_price_per_lb": 9.99,
+      "storage": "Refrigerate wrapped for 3-4 weeks",
+      "shelf_life_days": 21,
+      "substitutes": [
+        "Sharp cheddar",
+        "Gruyere",
+        "Gouda"
+      ],
+      "allergens": [
+        "dairy"
+      ],
+      "dietary": [
+        "vegetarian",
+        "gluten-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 403,
+        "protein_g": 25,
+        "fat_g": 33,
+        "carbs_g": 1.3
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1229",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1230",
+      "name": "Activated Charcoal",
+      "category": "Specialty Items",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "lb"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 18.99,
+      "storage": "Cool, dry place for 2+ years",
+      "shelf_life_days": 730,
+      "substitutes": [
+        "Black sesame powder",
+        "Squid ink"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 0,
+        "protein_g": 0,
+        "fat_g": 0,
+        "carbs_g": 0
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1230",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1231",
+      "name": "Mirin",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "cup",
+        "tbsp",
+        "bottle"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 4.99,
+      "storage": "Cool, dry place for 3+ months after opening",
+      "shelf_life_days": 90,
+      "substitutes": [
+        "Sake + sugar",
+        "White wine + sugar",
+        "Rice vinegar + sugar"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 226,
+        "protein_g": 0.3,
+        "fat_g": 0,
+        "carbs_g": 43
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1231",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1232",
+      "name": "Sherry Vinegar (Pedro Ximénez)",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "bottle"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 12.99,
+      "storage": "Cool, dark place for 2+ years",
+      "shelf_life_days": 730,
+      "substitutes": [
+        "Regular sherry vinegar",
+        "Balsamic vinegar",
+        "Red wine vinegar"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 95,
+        "protein_g": 0.5,
+        "fat_g": 0,
+        "carbs_g": 18
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1232",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1233",
+      "name": "Fish Sauce",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "bottle"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 3.99,
+      "storage": "Cool place for 2+ years",
+      "shelf_life_days": 730,
+      "substitutes": [
+        "Soy sauce",
+        "Worcestershire sauce",
+        "Anchovy paste"
+      ],
+      "allergens": [
+        "fish"
+      ],
+      "dietary": [
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 35,
+        "protein_g": 5.6,
+        "fat_g": 0,
+        "carbs_g": 3.5
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1233",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1234",
+      "name": "Ras el Hanout",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 16.99,
+      "storage": "Cool, dry place for 1-2 years",
+      "shelf_life_days": 365,
+      "substitutes": [
+        "Garam masala",
+        "Baharat",
+        "Curry powder"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 325,
+        "protein_g": 11,
+        "fat_g": 15,
+        "carbs_g": 43
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1234",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1235",
+      "name": "Matzo Meal",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "cup",
+        "lb",
+        "box"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 4.99,
+      "storage": "Cool, dry place for 6-12 months",
+      "shelf_life_days": 180,
+      "substitutes": [
+        "Breadcrumbs",
+        "Panko",
+        "Crushed crackers"
+      ],
+      "allergens": [
+        "wheat",
+        "gluten"
+      ],
+      "dietary": [
+        "vegetarian"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 365,
+        "protein_g": 10,
+        "fat_g": 1.5,
+        "carbs_g": 75
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1235",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1236",
+      "name": "Potato Starch",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "cup",
+        "tbsp",
+        "lb"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 3.99,
+      "storage": "Cool, dry place for 1-2 years",
+      "shelf_life_days": 365,
+      "substitutes": [
+        "Cornstarch",
+        "Arrowroot powder",
+        "Tapioca starch"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 357,
+        "protein_g": 0.1,
+        "fat_g": 0,
+        "carbs_g": 88
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1236",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1237",
+      "name": "White Miso",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "container"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 5.99,
+      "storage": "Refrigerate for 12+ months",
+      "shelf_life_days": 365,
+      "substitutes": [
+        "Yellow miso",
+        "Red miso",
+        "Soy sauce"
+      ],
+      "allergens": [
+        "soy"
+      ],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 199,
+        "protein_g": 12,
+        "fat_g": 6,
+        "carbs_g": 26
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1237",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1238",
+      "name": "Tapioca Maltodextrin",
+      "category": "Specialty Items",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "lb"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 12.99,
+      "storage": "Cool, dry place for 2+ years",
+      "shelf_life_days": 730,
+      "substitutes": [
+        "Cornstarch",
+        "Xanthan gum"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 380,
+        "protein_g": 0,
+        "fat_g": 0,
+        "carbs_g": 95
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1238",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1239",
+      "name": "Beef Tallow",
+      "category": "Oils & Fats",
+      "common_units": [
+        "cup",
+        "tbsp",
+        "lb"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 6.99,
+      "storage": "Cool place for 6 months, refrigerate for 1 year",
+      "shelf_life_days": 180,
+      "substitutes": [
+        "Lard",
+        "Butter",
+        "Ghee"
+      ],
+      "allergens": [],
+      "dietary": [
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 902,
+        "protein_g": 0,
+        "fat_g": 100,
+        "carbs_g": 0
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1239",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1240",
+      "name": "Dried Tarragon",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 14.99,
+      "storage": "Cool, dry place for 1-3 years",
+      "shelf_life_days": 365,
+      "substitutes": [
+        "Fresh tarragon",
+        "Dried dill",
+        "Dried basil"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 295,
+        "protein_g": 23,
+        "fat_g": 7.2,
+        "carbs_g": 50
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1240",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1241",
+      "name": "Black Garlic (Peeled)",
+      "category": "Vegetables",
+      "common_units": [
+        "clove",
+        "oz",
+        "bulb"
+      ],
+      "default_unit": "clove",
+      "avg_price_per_lb": 24.99,
+      "storage": "Cool, dry place for 3-6 months",
+      "shelf_life_days": 90,
+      "substitutes": [
+        "Roasted garlic",
+        "Regular garlic",
+        "Garlic paste"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 143,
+        "protein_g": 4.3,
+        "fat_g": 0.5,
+        "carbs_g": 33
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1241",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1242",
+      "name": "Cornichons",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "piece",
+        "jar",
+        "oz"
+      ],
+      "default_unit": "piece",
+      "avg_price_per_lb": 7.99,
+      "storage": "Refrigerate after opening for 6+ months",
+      "shelf_life_days": 180,
+      "substitutes": [
+        "Dill pickles",
+        "Gherkins",
+        "Capers"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 11,
+        "protein_g": 0.3,
+        "fat_g": 0.1,
+        "carbs_g": 2.3
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1242",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1243",
+      "name": "Ultratex 3",
+      "category": "Specialty Items",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "lb"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 16.99,
+      "storage": "Cool, dry place for 2+ years",
+      "shelf_life_days": 730,
+      "substitutes": [
+        "Cornstarch",
+        "Xanthan gum",
+        "Instant ClearJel"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 357,
+        "protein_g": 0.1,
+        "fat_g": 0,
+        "carbs_g": 88
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1243",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1244",
+      "name": "Almond Flour",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "cup",
+        "lb",
+        "bag"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 9.99,
+      "storage": "Refrigerate or freeze for 6-12 months",
+      "shelf_life_days": 180,
+      "substitutes": [
+        "Coconut flour",
+        "Hazelnut flour",
+        "All-purpose flour"
+      ],
+      "allergens": [
+        "tree nuts"
+      ],
+      "dietary": [
+        "vegetarian",
+        "gluten-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 571,
+        "protein_g": 21,
+        "fat_g": 50,
+        "carbs_g": 21
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1244",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1245",
+      "name": "Cocoa Powder",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "cup",
+        "tbsp",
+        "lb"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 8.99,
+      "storage": "Cool, dry place for 2+ years",
+      "shelf_life_days": 730,
+      "substitutes": [
+        "Cacao powder",
+        "Carob powder"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 228,
+        "protein_g": 20,
+        "fat_g": 14,
+        "carbs_g": 58
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1245",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1246",
+      "name": "Baking Powder",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "container"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 4.99,
+      "storage": "Cool, dry place for 6-12 months",
+      "shelf_life_days": 180,
+      "substitutes": [
+        "Baking soda + acid",
+        "Self-rising flour"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 53,
+        "protein_g": 0,
+        "fat_g": 0,
+        "carbs_g": 28
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1246",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1247",
+      "name": "Malt Vinegar Powder",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 12.99,
+      "storage": "Cool, dry place for 1-2 years",
+      "shelf_life_days": 365,
+      "substitutes": [
+        "Liquid malt vinegar",
+        "White vinegar powder"
+      ],
+      "allergens": [
+        "gluten"
+      ],
+      "dietary": [
+        "vegan",
+        "vegetarian"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 88,
+        "protein_g": 0.5,
+        "fat_g": 0,
+        "carbs_g": 17
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1247",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1248",
+      "name": "00 Flour",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "cup",
+        "lb",
+        "kg"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 4.99,
+      "storage": "Cool, dry place for 6-8 months",
+      "shelf_life_days": 180,
+      "substitutes": [
+        "All-purpose flour",
+        "Bread flour"
+      ],
+      "allergens": [
+        "wheat",
+        "gluten"
+      ],
+      "dietary": [
+        "vegetarian"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 364,
+        "protein_g": 12,
+        "fat_g": 1.2,
+        "carbs_g": 74
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1248",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1249",
+      "name": "Instant Dry Yeast",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "tsp",
+        "packet",
+        "jar"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 12.99,
+      "storage": "Refrigerate or freeze for 1-2 years",
+      "shelf_life_days": 365,
+      "substitutes": [
+        "Active dry yeast",
+        "Fresh yeast"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 325,
+        "protein_g": 40,
+        "fat_g": 7,
+        "carbs_g": 41
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1249",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1250",
+      "name": "Dried Oregano",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 8.99,
+      "storage": "Cool, dry place for 1-3 years",
+      "shelf_life_days": 365,
+      "substitutes": [
+        "Fresh oregano",
+        "Marjoram",
+        "Basil"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 265,
+        "protein_g": 9,
+        "fat_g": 4.3,
+        "carbs_g": 69
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1250",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1251",
+      "name": "Yellow Mustard Seeds",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 6.99,
+      "storage": "Cool, dry place for 2-3 years",
+      "shelf_life_days": 730,
+      "substitutes": [
+        "Brown mustard seeds",
+        "Mustard powder"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 508,
+        "protein_g": 26,
+        "fat_g": 36,
+        "carbs_g": 28
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1251",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1252",
+      "name": "Brown Mustard Seeds",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 7.99,
+      "storage": "Cool, dry place for 2-3 years",
+      "shelf_life_days": 730,
+      "substitutes": [
+        "Yellow mustard seeds",
+        "Black mustard seeds"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 508,
+        "protein_g": 26,
+        "fat_g": 36,
+        "carbs_g": 28
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1252",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1253",
+      "name": "Sriracha Hot Sauce",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "tbsp",
+        "bottle",
+        "tsp"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 4.99,
+      "storage": "Refrigerate after opening for 6+ months",
+      "shelf_life_days": 180,
+      "substitutes": [
+        "Tabasco",
+        "Chili garlic sauce",
+        "Hot sauce"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 93,
+        "protein_g": 2,
+        "fat_g": 0.8,
+        "carbs_g": 20
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1253",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1254",
+      "name": "Port Wine",
+      "category": "Beverages",
+      "common_units": [
+        "cup",
+        "bottle",
+        "oz"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 18.99,
+      "storage": "Cool, dark place; refrigerate after opening",
+      "shelf_life_days": 730,
+      "substitutes": [
+        "Red wine",
+        "Balsamic vinegar + red wine"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 157,
+        "protein_g": 0.1,
+        "fat_g": 0,
+        "carbs_g": 12
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1254",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1255",
+      "name": "Whole Black Peppercorns",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 12.99,
+      "storage": "Cool, dry place for 3-4 years",
+      "shelf_life_days": 1095,
+      "substitutes": [
+        "Pre-ground black pepper",
+        "White peppercorns"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 251,
+        "protein_g": 10,
+        "fat_g": 3.3,
+        "carbs_g": 64
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1255",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1256",
+      "name": "Prepared Horseradish",
+      "category": "Condiments & Sauces",
+      "common_units": [
+        "tbsp",
+        "jar",
+        "tsp"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 6.99,
+      "storage": "Refrigerate for 3-4 months",
+      "shelf_life_days": 90,
+      "substitutes": [
+        "Fresh horseradish",
+        "Wasabi",
+        "Dijon mustard"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 48,
+        "protein_g": 1.2,
+        "fat_g": 0.7,
+        "carbs_g": 11
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1256",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1257",
+      "name": "Dark Chocolate Chips (66% Valrhona)",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "cup",
+        "oz",
+        "lb"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 18.99,
+      "storage": "Cool, dry place for 1-2 years",
+      "shelf_life_days": 365,
+      "substitutes": [
+        "Regular dark chocolate chips",
+        "Semi-sweet chocolate chips"
+      ],
+      "allergens": [
+        "dairy"
+      ],
+      "dietary": [
+        "vegetarian"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 598,
+        "protein_g": 7.8,
+        "fat_g": 43,
+        "carbs_g": 46
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1257",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1258",
+      "name": "Fleur de Sel",
+      "category": "Pantry Staples",
+      "common_units": [
+        "tsp",
+        "oz",
+        "pinch"
+      ],
+      "default_unit": "pinch",
+      "avg_price_per_lb": 24.99,
+      "storage": "Cool, dry place indefinitely",
+      "shelf_life_days": 3650,
+      "substitutes": [
+        "Sea salt",
+        "Maldon salt",
+        "Kosher salt"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 0,
+        "protein_g": 0,
+        "fat_g": 0,
+        "carbs_g": 0
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1258",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1259",
+      "name": "Chanterelle Mushrooms",
+      "category": "Vegetables",
+      "common_units": [
+        "oz",
+        "lb",
+        "handful"
+      ],
+      "default_unit": "oz",
+      "avg_price_per_lb": 32.99,
+      "storage": "Refrigerate in paper bag for 3-5 days",
+      "shelf_life_days": 4,
+      "substitutes": [
+        "Oyster mushrooms",
+        "Shiitake mushrooms",
+        "Cremini mushrooms"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 38,
+        "protein_g": 3.8,
+        "fat_g": 0.5,
+        "carbs_g": 6.9
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1259",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1260",
+      "name": "Black Burgundy Autumn Truffles",
+      "category": "Specialty Items",
+      "common_units": [
+        "oz",
+        "gram",
+        "lb"
+      ],
+      "default_unit": "oz",
+      "avg_price_per_lb": 420,
+      "storage": "Refrigerate wrapped in paper towel for 3-7 days",
+      "shelf_life_days": 5,
+      "substitutes": [
+        "Truffle oil",
+        "Porcini mushrooms",
+        "Other truffle varieties"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 284,
+        "protein_g": 9,
+        "fat_g": 0.5,
+        "carbs_g": 73
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1260",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1261",
+      "name": "Grapefruit, Fresh",
+      "category": "Fruits",
+      "common_units": [
+        "piece",
+        "lb",
+        "segment"
+      ],
+      "default_unit": "piece",
+      "avg_price_per_lb": 1.49,
+      "storage": "Room temperature for 1 week, refrigerate for 2-3 weeks",
+      "shelf_life_days": 14,
+      "substitutes": [
+        "Orange",
+        "Pomelo",
+        "Tangerine"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 42,
+        "protein_g": 0.8,
+        "fat_g": 0.1,
+        "carbs_g": 11
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1261",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1262",
+      "name": "Demerara Sugar",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "cup",
+        "tbsp",
+        "lb"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 5.99,
+      "storage": "Cool, dry place for 2+ years",
+      "shelf_life_days": 730,
+      "substitutes": [
+        "Turbinado sugar",
+        "Brown sugar",
+        "White sugar"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 387,
+        "protein_g": 0,
+        "fat_g": 0,
+        "carbs_g": 100
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1262",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1263",
+      "name": "Dehydrated Raspberries",
+      "category": "Fruits",
+      "common_units": [
+        "oz",
+        "cup",
+        "handful"
+      ],
+      "default_unit": "oz",
+      "avg_price_per_lb": 28.99,
+      "storage": "Cool, dry place for 6-12 months",
+      "shelf_life_days": 180,
+      "substitutes": [
+        "Fresh raspberries",
+        "Freeze-dried raspberries",
+        "Dehydrated strawberries"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 325,
+        "protein_g": 5.9,
+        "fat_g": 3.3,
+        "carbs_g": 75
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1263",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1264",
+      "name": "Dehydrated Limes",
+      "category": "Fruits",
+      "common_units": [
+        "piece",
+        "oz",
+        "slice"
+      ],
+      "default_unit": "piece",
+      "avg_price_per_lb": 18.99,
+      "storage": "Cool, dry place for 6-12 months",
+      "shelf_life_days": 180,
+      "substitutes": [
+        "Fresh limes",
+        "Dehydrated lemons",
+        "Lime zest"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 251,
+        "protein_g": 1.5,
+        "fat_g": 0.4,
+        "carbs_g": 66
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1264",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1265",
+      "name": "Dehydrated Oranges",
+      "category": "Fruits",
+      "common_units": [
+        "piece",
+        "oz",
+        "slice"
+      ],
+      "default_unit": "piece",
+      "avg_price_per_lb": 16.99,
+      "storage": "Cool, dry place for 6-12 months",
+      "shelf_life_days": 180,
+      "substitutes": [
+        "Fresh oranges",
+        "Orange zest",
+        "Dehydrated tangerines"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 239,
+        "protein_g": 1.9,
+        "fat_g": 0.3,
+        "carbs_g": 61
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1265",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1266",
+      "name": "Full-Fat Coconut Milk",
+      "category": "Dairy & Eggs",
+      "common_units": [
+        "can",
+        "cup",
+        "oz"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 3.99,
+      "storage": "Pantry for 2-5 years, refrigerate after opening for 7-10 days",
+      "shelf_life_days": 730,
+      "substitutes": [
+        "Lite coconut milk",
+        "Heavy cream",
+        "Cashew cream"
+      ],
+      "allergens": [
+        "tree nuts"
+      ],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 230,
+        "protein_g": 2.3,
+        "fat_g": 24,
+        "carbs_g": 6
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1266",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1267",
+      "name": "Agar Agar Powder",
+      "category": "Specialty Items",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 24.99,
+      "storage": "Cool, dry place for 2+ years",
+      "shelf_life_days": 730,
+      "substitutes": [
+        "Gelatin",
+        "Pectin",
+        "Carrageenan"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 26,
+        "protein_g": 0.5,
+        "fat_g": 0,
+        "carbs_g": 7
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1267",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1268",
+      "name": "Coconut Oil",
+      "category": "Oils & Fats",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "jar"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 8.99,
+      "storage": "Cool, dry place for 2-3 years",
+      "shelf_life_days": 730,
+      "substitutes": [
+        "Vegetable oil",
+        "Butter",
+        "Avocado oil"
+      ],
+      "allergens": [
+        "tree nuts"
+      ],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 862,
+        "protein_g": 0,
+        "fat_g": 100,
+        "carbs_g": 0
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1268",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1269",
+      "name": "Vanilla Beans (Whole)",
+      "category": "Baking & Sweeteners",
+      "common_units": [
+        "bean",
+        "oz",
+        "pod"
+      ],
+      "default_unit": "bean",
+      "avg_price_per_lb": 180,
+      "storage": "Cool, dark place in airtight container for 6-12 months",
+      "shelf_life_days": 180,
+      "substitutes": [
+        "Vanilla extract",
+        "Vanilla bean paste",
+        "Vanilla powder"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 288,
+        "protein_g": 0.1,
+        "fat_g": 0.1,
+        "carbs_g": 13
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1269",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1270",
+      "name": "Passionfruit Puree",
+      "category": "Fruits",
+      "common_units": [
+        "cup",
+        "oz",
+        "container"
+      ],
+      "default_unit": "cup",
+      "avg_price_per_lb": 12.99,
+      "storage": "Freeze for 6-12 months, refrigerate after thawing for 3-5 days",
+      "shelf_life_days": 4,
+      "substitutes": [
+        "Fresh passionfruit",
+        "Mango puree",
+        "Pineapple juice"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 97,
+        "protein_g": 2.2,
+        "fat_g": 0.7,
+        "carbs_g": 23
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1270",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1271",
+      "name": "MSG (Monosodium Glutamate)",
+      "category": "Pantry Staples",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 4.99,
+      "storage": "Cool, dry place indefinitely",
+      "shelf_life_days": 3650,
+      "substitutes": [
+        "Mushroom powder",
+        "Soy sauce",
+        "Parmesan cheese"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 0,
+        "protein_g": 0,
+        "fat_g": 0,
+        "carbs_g": 0
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1271",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1272",
+      "name": "Red Bell Pepper",
+      "category": "Vegetables",
+      "common_units": [
+        "piece",
+        "lb",
+        "cup"
+      ],
+      "default_unit": "piece",
+      "avg_price_per_lb": 3.99,
+      "storage": "Refrigerate for 1-2 weeks",
+      "shelf_life_days": 10,
+      "substitutes": [
+        "Yellow bell pepper",
+        "Orange bell pepper",
+        "Green bell pepper"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 31,
+        "protein_g": 1,
+        "fat_g": 0.3,
+        "carbs_g": 6
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1272",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1273",
+      "name": "Sake (Cooking)",
+      "category": "Beverages",
+      "common_units": [
+        "cup",
+        "tbsp",
+        "bottle"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 8.99,
+      "storage": "Cool place for 1-2 years; refrigerate after opening",
+      "shelf_life_days": 365,
+      "substitutes": [
+        "Dry sherry",
+        "White wine",
+        "Mirin"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 134,
+        "protein_g": 0.5,
+        "fat_g": 0,
+        "carbs_g": 5
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1273",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1274",
+      "name": "Grapeseed Oil",
+      "category": "Oils & Fats",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "bottle"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 6.99,
+      "storage": "Cool, dark place for 6-12 months",
+      "shelf_life_days": 180,
+      "substitutes": [
+        "Canola oil",
+        "Vegetable oil",
+        "Avocado oil"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 884,
+        "protein_g": 0,
+        "fat_g": 100,
+        "carbs_g": 0
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1274",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1275",
+      "name": "Avocado Oil",
+      "category": "Oils & Fats",
+      "common_units": [
+        "tbsp",
+        "cup",
+        "bottle"
+      ],
+      "default_unit": "tbsp",
+      "avg_price_per_lb": 9.99,
+      "storage": "Cool, dark place for 6-12 months",
+      "shelf_life_days": 180,
+      "substitutes": [
+        "Olive oil",
+        "Grapeseed oil",
+        "Coconut oil"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 884,
+        "protein_g": 0,
+        "fat_g": 100,
+        "carbs_g": 0
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1275",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1276",
+      "name": "Dried Rosemary",
+      "category": "Herbs & Spices",
+      "common_units": [
+        "tsp",
+        "tbsp",
+        "oz"
+      ],
+      "default_unit": "tsp",
+      "avg_price_per_lb": 12.99,
+      "storage": "Cool, dry place for 1-3 years",
+      "shelf_life_days": 365,
+      "substitutes": [
+        "Fresh rosemary",
+        "Dried thyme",
+        "Dried oregano"
+      ],
+      "allergens": [],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free",
+        "keto",
+        "paleo"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 331,
+        "protein_g": 4.9,
+        "fat_g": 15,
+        "carbs_g": 64
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1276",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1277",
+      "name": "Split Top Hot Dog Buns",
+      "category": "Grains & Pasta",
+      "common_units": [
+        "piece",
+        "package",
+        "bun"
+      ],
+      "default_unit": "piece",
+      "avg_price_per_lb": 4.99,
+      "storage": "Room temperature for 5-7 days, freeze for 3 months",
+      "shelf_life_days": 6,
+      "substitutes": [
+        "Regular hot dog buns",
+        "Hoagie rolls"
+      ],
+      "allergens": [
+        "wheat",
+        "gluten",
+        "dairy"
+      ],
+      "dietary": [
+        "vegetarian"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 270,
+        "protein_g": 9,
+        "fat_g": 4,
+        "carbs_g": 49
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1277",
+        "available": true
+      }
+    },
+    {
+      "id": "ing_1278",
+      "name": "French Rolls (5 inch)",
+      "category": "Grains & Pasta",
+      "common_units": [
+        "piece",
+        "roll"
+      ],
+      "default_unit": "piece",
+      "avg_price_per_lb": 5.99,
+      "storage": "Room temperature for 2-3 days, freeze for 3 months",
+      "shelf_life_days": 3,
+      "substitutes": [
+        "Hoagie rolls",
+        "Sub rolls",
+        "Baguette"
+      ],
+      "allergens": [
+        "wheat",
+        "gluten"
+      ],
+      "dietary": [
+        "vegetarian"
+      ],
+      "nutritional_info": {
+        "calories_per_100g": 266,
+        "protein_g": 9,
+        "fat_g": 3.2,
+        "carbs_g": 51
+      },
+      "preferred_vendor": "Chef's Warehouse",
+      "vendor_info": {
+        "vendor_name": "Chef's Warehouse",
+        "vendor_id": "vendor_chefswarehouse",
+        "supplier_sku": "CW-1278",
+        "available": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingredient Highlights - Iterum Culinary App</title>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/css/unified-cards.css">
+    <link rel="stylesheet" href="assets/css/high-contrast-universal.css">
+    <link rel="stylesheet" href="assets/css/nordic-design-system.css">
+    
+    <!-- Navigation & Auth -->
+    <script src="assets/js/auth-manager.js"></script>
+    <script src="assets/js/unified-nav-header.js" defer></script>
+    <script src="assets/js/unified-project-selector.js" defer></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(79, 70, 229, 0.2) 0%, transparent 45%),
+                radial-gradient(circle at top right, rgba(56, 189, 248, 0.18) 0%, transparent 40%),
+                linear-gradient(135deg, #f4f5f7 0%, #f7f8fb 100%);
+            min-height: 100vh;
+            padding: 96px 0 48px;
+            color: #0f172a;
+        }
+        
+        .highlights-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 28px;
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, #1e293b 0%, #2563eb 45%, #38bdf8 100%);
+            color: #f8fafc;
+            padding: 44px 48px;
+            border-radius: 28px;
+            margin-bottom: 36px;
+            box-shadow: 0 32px 70px rgba(37, 99, 235, 0.25);
+            text-align: center;
+        }
+        
+        .page-header h1 {
+            font-size: 2.55rem;
+            font-weight: 800;
+            margin: 0 0 12px;
+        }
+        
+        .page-header p {
+            font-size: 1.05rem;
+            margin: 6px 0 0;
+            color: rgba(248, 250, 252, 0.9);
+        }
+
+        .content-shell {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
+        }
+        
+        .highlight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        
+        .highlight-card {
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+        }
+        
+        .highlight-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 26px 45px rgba(59, 130, 246, 0.22);
+            border-color: rgba(37, 99, 235, 0.45);
+        }
+        
+        .highlight-header {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.92) 0%, rgba(37, 99, 235, 0.78) 100%);
+            color: #f8fafc;
+            padding: 22px;
+        }
+        
+        .highlight-name {
+            font-size: 1.45rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+        
+        .highlight-pronunciation {
+            font-size: 0.9rem;
+            opacity: 0.82;
+            font-style: italic;
+        }
+        
+        .highlight-body {
+            padding: 22px;
+        }
+        
+        .highlight-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(226, 232, 240, 0.6);
+            color: #1e293b;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin: 4px;
+        }
+        
+        .highlight-section {
+            margin: 18px 0;
+        }
+        
+        .highlight-label {
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+        
+        .highlight-text {
+            color: #0f172a;
+            line-height: 1.7;
+        }
+        
+        .dishes-using {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .dish-badge {
+            padding: 6px 12px;
+            background: rgba(226, 232, 240, 0.6);
+            color: #1e293b;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #ffffff;
+            border-radius: 24px;
+            max-width: 620px;
+            width: 90%;
+            max-height: 82vh;
+            overflow-y: auto;
+            padding: 32px;
+            box-shadow: 0 32px 60px rgba(15, 23, 42, 0.25);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+        }
+    </style>
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/header-universal.css">
+    <link rel="stylesheet" href="assets/css/modern-nordic-vintage.css">
+    <link rel="stylesheet" href="assets/css/dark-mode-enhancements.css">
+</head>
+<body>
+    <div class="highlights-container">
+        <div class="page-header">
+            <h1>✨ Ingredient Highlights</h1>
+            <p>Showcase unique and specialty ingredients with detailed stories</p>
+        </div>
+
+        <div class="content-shell">
+        <!-- Stats -->
+        <div class="card mb-6">
+            <div class="stats-row">
+                <div class="stat-item-centered">
+                    <div class="stat-value" id="total-highlights">0</div>
+                    <div class="stat-label">Highlighted Ingredients</div>
+                </div>
+                <div class="stat-item-centered">
+                    <div class="stat-value" id="total-dishes">0</div>
+                    <div class="stat-label">Dishes Using Highlights</div>
+                </div>
+                <div class="stat-item-centered">
+                    <div class="stat-value" id="total-categories">0</div>
+                    <div class="stat-label">Categories</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="button-group mb-6">
+            <button class="btn" onclick="openAddHighlightModal()">➕ Add Ingredient Highlight</button>
+            <button class="btn" onclick="exportHighlights()">📥 Export List</button>
+            <button class="btn" onclick="printHighlights()">🖨️ Print</button>
+            <button class="btn" onclick="location.href='index.html'">🏠 Dashboard</button>
+        </div>
+
+        <!-- Highlights Grid -->
+        <div id="highlights-grid" class="highlight-grid"></div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="card" style="text-align: center; padding: 60px; display: none;">
+            <div style="font-size: 4rem; margin-bottom: 20px;">✨</div>
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 10px;">No Highlights Yet</h2>
+            <p style="color: #64748b; margin-bottom: 25px;">
+                Create ingredient highlights to showcase your unique, specialty ingredients with detailed stories and sourcing information.
+            </p>
+            <button class="btn" onclick="openAddHighlightModal()">➕ Add First Highlight</button>
+        </div>
+        </div> <!-- /.content-shell -->
+    </div>
+
+    <!-- Add/Edit Highlight Modal -->
+    <div id="highlight-modal" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 style="font-size: 1.8rem; font-weight: 700;">Add Ingredient Highlight</h2>
+                <button onclick="closeHighlightModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+            </div>
+
+            <form id="highlight-form" onsubmit="saveHighlight(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Ingredient Name *</label>
+                        <input type="text" class="form-input" id="highlight-name" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Pronunciation</label>
+                        <input type="text" class="form-input" id="highlight-pronunciation" placeholder="e.g., ha-MAH-chee">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Category *</label>
+                        <select class="form-select" id="highlight-category" required>
+                            <option value="">-- Select Category --</option>
+                            <option value="Seafood">Seafood</option>
+                            <option value="Proteins">Proteins</option>
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Herbs & Spices">Herbs & Spices</option>
+                            <option value="Specialty Items">Specialty Items</option>
+                            <option value="Dairy & Eggs">Dairy & Eggs</option>
+                            <option value="Pantry Staples">Pantry Staples</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Origin / Source *</label>
+                        <input type="text" class="form-input" id="highlight-origin" placeholder="e.g., Wild-caught from Alaskan waters">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Vendor / Supplier</label>
+                        <input type="text" class="form-input" id="highlight-vendor" placeholder="e.g., Chef's Warehouse">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Description / Story *</label>
+                        <textarea class="form-input" id="highlight-description" rows="4" required 
+                            placeholder="Tell the story of this ingredient - what makes it special, unique characteristics, flavor profile..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Flavor Profile</label>
+                        <input type="text" class="form-input" id="highlight-flavor" placeholder="e.g., Rich, buttery, slightly sweet">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Why It's Special</label>
+                        <textarea class="form-input" id="highlight-special" rows="3" 
+                            placeholder="What makes this ingredient unique? Premium quality, rare, artisanal, sustainable..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Used In (Dishes)</label>
+                        <input type="text" class="form-input" id="highlight-dishes" placeholder="Comma-separated: Hamachi Crudo, Wagyu Dog">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Tags</label>
+                        <input type="text" class="form-input" id="highlight-tags" placeholder="premium, sustainable, imported, organic">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="closeHighlightModal()" style="background: #e2e8f0; color: #1e293b;">Cancel</button>
+                    <button type="submit" class="btn">💾 Save Highlight</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/auth-manager.js"></script>
+    <script src="assets/js/state-persistence-manager.js"></script>
+    <script src="assets/js/user-data-isolator.js"></script>
+    
+    <script>
+        let highlights = [];
+        let currentUserId = null;
+        let currentUserEmail = null;
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            if (!window.authManager || !window.authManager.isAuthenticated) {
+                alert('Please sign in to access Ingredient Highlights');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const user = window.authManager.currentUser;
+            currentUserId = user.userId || user.id;
+            currentUserEmail = user.email;
+            
+            loadHighlights();
+        });
+
+        function loadHighlights() {
+            const storageKey = `ingredient_highlights_${currentUserId}`;
+            highlights = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            
+            displayHighlights();
+            updateStats();
+        }
+
+        function displayHighlights() {
+            const grid = document.getElementById('highlights-grid');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (highlights.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
+            
+            grid.innerHTML = highlights.map(highlight => `
+                <div class="highlight-card">
+                    <div class="highlight-header">
+                        <div class="highlight-name">${highlight.name}</div>
+                        ${highlight.pronunciation ? `<div class="highlight-pronunciation">${highlight.pronunciation}</div>` : ''}
+                    </div>
+                    
+                    <div class="highlight-body">
+                        <!-- Tags -->
+                        <div style="margin-bottom: 15px;">
+                            <span class="highlight-tag">${highlight.category}</span>
+                            ${highlight.tags.map(tag => `<span class="highlight-tag">${tag}</span>`).join('')}
+                        </div>
+
+                        <!-- Origin -->
+                        <div class="highlight-section">
+                            <div class="highlight-label">Origin / Source</div>
+                            <div class="highlight-text">${highlight.origin}</div>
+                        </div>
+
+                        <!-- Vendor -->
+                        ${highlight.vendor ? `
+                            <div class="highlight-section">
+                                <div class="highlight-label">Supplier</div>
+                                <div class="highlight-text">${highlight.vendor}</div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Description -->
+                        <div class="highlight-section">
+                            <div class="highlight-label">Description</div>
+                            <div class="highlight-text">${highlight.description}</div>
+                        </div>
+
+                        <!-- Flavor -->
+                        ${highlight.flavor ? `
+                            <div class="highlight-section">
+                                <div class="highlight-label">Flavor Profile</div>
+                                <div class="highlight-text">${highlight.flavor}</div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Why Special -->
+                        ${highlight.special ? `
+                            <div class="highlight-section">
+                                <div class="highlight-label">Why It's Special</div>
+                                <div class="highlight-text">${highlight.special}</div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Dishes -->
+                        ${highlight.dishes.length > 0 ? `
+                            <div class="highlight-section">
+                                <div class="highlight-label">Featured In</div>
+                                <div class="dishes-using">
+                                    ${highlight.dishes.map(dish => `<span class="dish-badge">${dish}</span>`).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Actions -->
+                        <div class="button-group" style="margin-top: 20px;">
+                            <button class="btn" onclick="editHighlight('${highlight.id}')" style="flex: 1;">✏️ Edit</button>
+                            <button class="btn" onclick="deleteHighlight('${highlight.id}')" style="flex: 1;">🗑️ Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('total-highlights').textContent = highlights.length;
+            
+            const dishesSet = new Set();
+            highlights.forEach(h => h.dishes.forEach(d => dishesSet.add(d)));
+            document.getElementById('total-dishes').textContent = dishesSet.size;
+            
+            const categoriesSet = new Set(highlights.map(h => h.category));
+            document.getElementById('total-categories').textContent = categoriesSet.size;
+        }
+
+        function openAddHighlightModal() {
+            document.getElementById('highlight-form').reset();
+            document.getElementById('highlight-modal').classList.add('active');
+        }
+
+        function closeHighlightModal() {
+            document.getElementById('highlight-modal').classList.remove('active');
+        }
+
+        function saveHighlight(event) {
+            event.preventDefault();
+            
+            const highlight = {
+                id: 'highlight_' + Date.now(),
+                name: document.getElementById('highlight-name').value,
+                pronunciation: document.getElementById('highlight-pronunciation').value,
+                category: document.getElementById('highlight-category').value,
+                origin: document.getElementById('highlight-origin').value,
+                vendor: document.getElementById('highlight-vendor').value,
+                description: document.getElementById('highlight-description').value,
+                flavor: document.getElementById('highlight-flavor').value,
+                special: document.getElementById('highlight-special').value,
+                dishes: document.getElementById('highlight-dishes').value.split(',').map(d => d.trim()).filter(d => d),
+                tags: document.getElementById('highlight-tags').value.split(',').map(t => t.trim()).filter(t => t),
+                userId: currentUserId,
+                userEmail: currentUserEmail,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            highlights.push(highlight);
+            
+            const storageKey = `ingredient_highlights_${currentUserId}`;
+            localStorage.setItem(storageKey, JSON.stringify(highlights));
+            
+            closeHighlightModal();
+            displayHighlights();
+            updateStats();
+            
+            alert(`✅ "${highlight.name}" added to highlights!`);
+        }
+
+        function editHighlight(highlightId) {
+            const highlight = highlights.find(h => h.id === highlightId);
+            if (!highlight) return;
+            
+            // Populate form
+            document.getElementById('highlight-name').value = highlight.name;
+            document.getElementById('highlight-pronunciation').value = highlight.pronunciation || '';
+            document.getElementById('highlight-category').value = highlight.category;
+            document.getElementById('highlight-origin').value = highlight.origin;
+            document.getElementById('highlight-vendor').value = highlight.vendor || '';
+            document.getElementById('highlight-description').value = highlight.description;
+            document.getElementById('highlight-flavor').value = highlight.flavor || '';
+            document.getElementById('highlight-special').value = highlight.special || '';
+            document.getElementById('highlight-dishes').value = highlight.dishes.join(', ');
+            document.getElementById('highlight-tags').value = highlight.tags.join(', ');
+            
+            // Remove old highlight on save
+            document.getElementById('highlight-form').onsubmit = function(e) {
+                e.preventDefault();
+                deleteHighlight(highlightId, false);
+                saveHighlight(e);
+            };
+            
+            openAddHighlightModal();
+        }
+
+        function deleteHighlight(highlightId, confirm = true) {
+            if (confirm && !window.confirm('Delete this highlight?')) {
+                return;
+            }
+            
+            highlights = highlights.filter(h => h.id !== highlightId);
+            
+            const storageKey = `ingredient_highlights_${currentUserId}`;
+            localStorage.setItem(storageKey, JSON.stringify(highlights));
+            
+            displayHighlights();
+            updateStats();
+        }
+
+        function exportHighlights() {
+            const data = JSON.stringify(highlights, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ingredient-highlights-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function printHighlights() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
+

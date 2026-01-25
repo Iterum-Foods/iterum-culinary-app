@@ -1,0 +1,431 @@
+/**
+ * App Improvements & Enhancements
+ * Quick fixes to make the app better overall
+ */
+
+/* ==========================================
+   PERFORMANCE IMPROVEMENTS
+   ========================================== */
+
+/* Reduce repaints with GPU acceleration */
+.card, .stat-card, .action-card {
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* ==========================================
+   UX IMPROVEMENTS
+   ========================================== */
+
+/* Better loading states */
+.loading-skeleton {
+    background: linear-gradient(90deg, 
+        var(--gray-200) 25%, 
+        var(--gray-100) 50%, 
+        var(--gray-200) 75%
+    );
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Better form inputs */
+input, textarea, select {
+    transition: all 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    border-color: var(--iterum-primary);
+}
+
+/* Better buttons */
+.btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+/* ==========================================
+   ACCESSIBILITY IMPROVEMENTS
+   ========================================== */
+
+/* Better focus states */
+*:focus-visible {
+    outline: 2px solid var(--iterum-primary);
+    outline-offset: 2px;
+}
+
+/* Skip to main content */
+.skip-to-main {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    background: var(--iterum-primary);
+    color: white;
+    padding: 1rem 2rem;
+    text-decoration: none;
+    z-index: 9999;
+}
+
+.skip-to-main:focus {
+    top: 0;
+}
+
+/* ==========================================
+   RESPONSIVE IMPROVEMENTS
+   ========================================== */
+
+/* Better mobile touch targets */
+@media (max-width: 768px) {
+    button, a, input, .card {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+
+/* Better mobile spacing */
+@media (max-width: 768px) {
+    .container, section {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* ==========================================
+   VISUAL IMPROVEMENTS
+   ========================================== */
+
+/* Subtle micro-interactions */
+.card:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
+}
+
+/* Better shadows */
+.card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 
+                0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 
+                0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* Better badges */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.badge-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* ==========================================
+   ERROR HANDLING IMPROVEMENTS
+   ========================================== */
+
+.error-message {
+    background: #fee2e2;
+    border: 1px solid #fca5a5;
+    color: #991b1b;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+.success-message {
+    background: #dcfce7;
+    border: 1px solid #86efac;
+    color: #166534;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+
+/* ==========================================
+   TYPOGRAPHY IMPROVEMENTS
+   ========================================== */
+
+/* Better line heights */
+p, li, td, th {
+    line-height: 1.7;
+}
+
+/* Better font rendering */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================
+   NOTIFICATION IMPROVEMENTS
+   ========================================== */
+
+/* Toast notifications */
+.toast {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.toast.success {
+    border-left: 4px solid #22c55e;
+}
+
+.toast.error {
+    border-left: 4px solid #ef4444;
+}
+
+.toast.info {
+    border-left: 4px solid #3b82f6;
+}
+
+/* ==========================================
+   EMPTY STATES IMPROVEMENTS
+   ========================================== */
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: #64748b;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-description {
+    color: #64748b;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state-action {
+    display: inline-block;
+    margin-top: 1rem;
+}
+
+/* ==========================================
+   SEARCH IMPROVEMENTS
+   ========================================== */
+
+.search-input {
+    position: relative;
+}
+
+.search-input input {
+    padding-left: 2.5rem;
+}
+
+.search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+}
+
+/* ==========================================
+   TABLE IMPROVEMENTS
+   ========================================== */
+
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f9fafb;
+}
+
+th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+tr:hover {
+    background: #f9fafb;
+}
+
+/* ==========================================
+   MODAL IMPROVEMENTS
+   ========================================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #94a3b8;
+    padding: 0;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.25rem;
+}
+
+.modal-close:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+/* ==========================================
+   PRINT IMPROVEMENTS
+   ========================================== */
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .card, .section {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
+

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Diagnostic Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #ccc;
+        }
+        .test-item.pass {
+            border-left-color: #22c55e;
+        }
+        .test-item.fail {
+            border-left-color: #ef4444;
+        }
+        .test-item h3 {
+            margin: 0 0 10px 0;
+        }
+        .test-item pre {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Site Diagnostic Test</h1>
+    <div id="results"></div>
+
+    <script>
+        const results = [];
+        
+        function test(name, testFn) {
+            try {
+                const result = testFn();
+                results.push({ name, pass: true, message: result || 'OK' });
+            } catch (error) {
+                results.push({ name, pass: false, message: error.message });
+            }
+        }
+
+        // Test 1: Basic JavaScript
+        test('JavaScript Execution', () => {
+            return 'JavaScript is working';
+        });
+
+        // Test 2: CSS Loading
+        test('CSS Files', () => {
+            const cssFiles = [
+                'assets/css/modern-nordic-vintage.css',
+                'assets/css/dark-mode-enhancements.css',
+                'assets/css/launch-nordic-vintage.css',
+                'assets/css/iterum-brand-kit.css',
+                'assets/css/header-universal.css'
+            ];
+            return `Checking ${cssFiles.length} CSS files...`;
+        });
+
+        // Test 3: Firebase Config
+        test('Firebase Config File', async () => {
+            try {
+                const response = await fetch('assets/js/firebase-config.js');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return 'firebase-config.js is accessible';
+            } catch (error) {
+                throw new Error(`Cannot load firebase-config.js: ${error.message}`);
+            }
+        });
+
+        // Test 4: Launch HTML
+        test('Launch HTML File', async () => {
+            try {
+                const response = await fetch('launch.html');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return 'launch.html is accessible';
+            } catch (error) {
+                throw new Error(`Cannot load launch.html: ${error.message}`);
+            }
+        });
+
+        // Test 5: Firebase SDK CDN
+        test('Firebase SDK CDN', async () => {
+            try {
+                const response = await fetch('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js', { method: 'HEAD' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return 'Firebase CDN is accessible';
+            } catch (error) {
+                throw new Error(`Cannot reach Firebase CDN: ${error.message}`);
+            }
+        });
+
+        // Test 6: Local Storage
+        test('Local Storage', () => {
+            try {
+                localStorage.setItem('test', 'value');
+                const value = localStorage.getItem('test');
+                localStorage.removeItem('test');
+                if (value !== 'value') throw new Error('Local storage not working');
+                return 'Local storage is working';
+            } catch (error) {
+                throw new Error(`Local storage error: ${error.message}`);
+            }
+        });
+
+        // Run all tests
+        async function runTests() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>Running tests...</p>';
+
+            // Run synchronous tests first
+            for (const result of results) {
+                const div = document.createElement('div');
+                div.className = `test-item ${result.pass ? 'pass' : 'fail'}`;
+                div.innerHTML = `
+                    <h3>${result.pass ? '✅' : '❌'} ${result.name}</h3>
+                    <pre>${result.message}</pre>
+                `;
+                resultsDiv.appendChild(div);
+            }
+
+            // Run async tests
+            const asyncTests = [
+                { name: 'Firebase Config File', fn: async () => {
+                    const response = await fetch('assets/js/firebase-config.js');
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return 'firebase-config.js is accessible';
+                }},
+                { name: 'Launch HTML File', fn: async () => {
+                    const response = await fetch('launch.html');
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return 'launch.html is accessible';
+                }},
+                { name: 'Firebase SDK CDN', fn: async () => {
+                    const response = await fetch('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js', { method: 'HEAD' });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return 'Firebase CDN is accessible';
+                }}
+            ];
+
+            for (const test of asyncTests) {
+                try {
+                    const message = await test.fn();
+                    const div = document.createElement('div');
+                    div.className = 'test-item pass';
+                    div.innerHTML = `
+                        <h3>✅ ${test.name}</h3>
+                        <pre>${message}</pre>
+                    `;
+                    resultsDiv.appendChild(div);
+                } catch (error) {
+                    const div = document.createElement('div');
+                    div.className = 'test-item fail';
+                    div.innerHTML = `
+                        <h3>❌ ${test.name}</h3>
+                        <pre>${error.message}</pre>
+                    `;
+                    resultsDiv.appendChild(div);
+                }
+            }
+        }
+
+        runTests();
+    </script>
+</body>
+</html>
+

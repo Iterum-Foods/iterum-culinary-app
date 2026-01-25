@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Photo Studio - Iterum Culinary</title>
+    
+    <!-- Auth System -->
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/tailwind-output.css">
+    <link rel="stylesheet" href="assets/css/iterum-design-system.css">
+    <link rel="stylesheet" href="assets/css/premium-ui-system.css">
+    <link rel="stylesheet" href="assets/css/photo-manager.css">
+    
+    <style>
+        body {
+            background: #f8fafc;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .photo-studio-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 20px;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 48px 32px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+        
+        .hero-subtitle {
+            font-size: 18px;
+            opacity: 0.95;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s ease;
+        }
+        
+        .tab:hover {
+            color: #667eea;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+        
+        .section-subtitle {
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+    </style>
+    
+    <!-- Unified Navigation & Project Selector -->
+    <script src="assets/js/unified-nav-header.js" defer></script>
+    <script src="assets/js/unified-project-selector.js" defer></script>
+    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/header-universal.css">
+    <link rel="stylesheet" href="assets/css/modern-nordic-vintage.css">
+    <link rel="stylesheet" href="assets/css/dark-mode-enhancements.css">
+</head>
+<body style="padding-top: 80px;">
+    <!-- Header -->
+    <!-- Header injected by unified-nav-header.js -->
+
+    <div class="photo-studio-container">
+        <!-- Hero -->
+        <div class="hero">
+            <div class="hero-title">📸 Recipe Photo Studio</div>
+            <div class="hero-subtitle">Add beautiful photos to recipes, ingredients, steps, and equipment</div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('recipe')">📚 Recipe Photos</button>
+            <button class="tab" onclick="switchTab('step')">📝 Step-by-Step</button>
+            <button class="tab" onclick="switchTab('ingredient')">🥬 Ingredients</button>
+            <button class="tab" onclick="switchTab('equipment')">🔧 Equipment</button>
+        </div>
+
+        <!-- Recipe Photos Tab -->
+        <div class="tab-content active" id="recipe-tab">
+            <div class="section-card">
+                <h2 class="section-title">Recipe Photo Gallery</h2>
+                <p class="section-subtitle">Upload main photos for your recipes - hero shots, plated dishes, final presentations</p>
+                
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label class="form-label">Select Recipe</label>
+                    <select id="recipe-selector" class="form-select" onchange="loadRecipePhotos()">
+                        <option value="">Choose a recipe...</option>
+                    </select>
+                </div>
+
+                <div id="recipe-photo-upload"></div>
+                <div id="recipe-photo-gallery"></div>
+            </div>
+        </div>
+
+        <!-- Step Photos Tab -->
+        <div class="tab-content" id="step-tab">
+            <div class="section-card">
+                <h2 class="section-title">Step-by-Step Photo Documentation</h2>
+                <p class="section-subtitle">Add photos to each step of your recipe process for visual guidance</p>
+                
+                <div class="form-group" style="margin-bottom: 24px;">
+                    <label class="form-label">Select Recipe</label>
+                    <select id="step-recipe-selector" class="form-select" onchange="loadRecipeSteps()">
+                        <option value="">Choose a recipe...</option>
+                    </select>
+                </div>
+
+                <div id="recipe-steps-container"></div>
+            </div>
+        </div>
+
+        <!-- Ingredient Photos Tab -->
+        <div class="tab-content" id="ingredient-tab">
+            <div class="section-card">
+                <h2 class="section-title">Ingredient Photo Reference</h2>
+                <p class="section-subtitle">Visual reference library for ingredients - varieties, quality indicators, preparation styles</p>
+                
+                <div id="ingredient-photo-grid"></div>
+            </div>
+        </div>
+
+        <!-- Equipment Photos Tab -->
+        <div class="tab-content" id="equipment-tab">
+            <div class="section-card">
+                <h2 class="section-title">Equipment & Tools Gallery</h2>
+                <p class="section-subtitle">Photo catalog of your kitchen equipment and tools</p>
+                
+                <div id="equipment-photo-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/photo-manager.js"></script>
+    <script>
+        let currentRecipeId = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRecipeList();
+            loadIngredientList();
+            loadEquipmentList();
+        });
+
+        function switchTab(tabName) {
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        function loadRecipeList() {
+            const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
+            const selector = document.getElementById('recipe-selector');
+            const stepSelector = document.getElementById('step-recipe-selector');
+            
+            const options = recipes.map(r => `<option value="${r.id}">${r.name || r.title}</option>`).join('');
+            
+            if (selector) selector.innerHTML = '<option value="">Choose a recipe...</option>' + options;
+            if (stepSelector) stepSelector.innerHTML = '<option value="">Choose a recipe...</option>' + options;
+        }
+
+        function loadRecipePhotos() {
+            const recipeId = document.getElementById('recipe-selector').value;
+            if (!recipeId) return;
+
+            currentRecipeId = recipeId;
+            
+            // Show upload UI
+            document.getElementById('recipe-photo-upload').innerHTML = window.photoManager.createUploadUI({
+                recipeId: recipeId,
+                type: 'recipe',
+                multiple: true,
+                onUpload: (photos) => {
+                    console.log('Photos uploaded:', photos);
+                    loadRecipePhotos(); // Refresh
+                }
+            });
+
+            // Show gallery
+            const photos = window.photoManager.getRecipePhotos(recipeId);
+            document.getElementById('recipe-photo-gallery').innerHTML = window.photoManager.createGallery(photos, {
+                showCaptions: true,
+                allowDelete: true,
+                allowPrimary: true
+            });
+        }
+
+        function loadRecipeSteps() {
+            const recipeId = document.getElementById('step-recipe-selector').value;
+            if (!recipeId) return;
+
+            const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
+            const recipe = recipes.find(r => r.id === recipeId);
+            
+            if (!recipe || !recipe.instructions) {
+                document.getElementById('recipe-steps-container').innerHTML = '<p>No instructions found for this recipe</p>';
+                return;
+            }
+
+            const instructions = Array.isArray(recipe.instructions) ? recipe.instructions : [];
+            
+            let html = '';
+            instructions.forEach((instruction, index) => {
+                const stepNumber = index + 1;
+                const photos = window.photoManager.getStepPhotos(recipeId, stepNumber);
+                
+                html += `
+                    <div class="section-card">
+                        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;">
+                            Step ${stepNumber}
+                        </h3>
+                        <p style="color: #475569; margin-bottom: 16px;">${instruction}</p>
+                        
+                        ${window.photoManager.createStepPhotoUI(recipeId, stepNumber)}
+                    </div>
+                `;
+            });
+
+            document.getElementById('recipe-steps-container').innerHTML = html;
+        }
+
+        function loadIngredientList() {
+            const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
+            const custom = JSON.parse(localStorage.getItem('custom_ingredients') || '[]');
+            const all = [...ingredients, ...custom];
+            
+            let html = '';
+            all.slice(0, 20).forEach(ing => {
+                const photo = window.photoManager.getIngredientPhoto(ing.name);
+                
+                html += `
+                    <div class="section-card" style="display: flex; gap: 20px; align-items: center;">
+                        <div class="ingredient-photo-ref ${photo ? '' : 'empty'}" 
+                             onclick="uploadIngredientPhoto('${ing.name}')">
+                            ${photo ? `<img src="${photo.dataUrl}" alt="${ing.name}">` : '📸'}
+                        </div>
+                        <div style="flex: 1;">
+                            <h3 style="font-size: 18px; font-weight: 700;">${ing.name}</h3>
+                            <p style="color: #64748b; font-size: 14px;">${ing.category || 'Uncategorized'}</p>
+                        </div>
+                        <button class="btn btn-sm btn-primary" onclick="uploadIngredientPhoto('${ing.name}')">
+                            ${photo ? '📸 Change Photo' : '📸 Add Photo'}
+                        </button>
+                    </div>
+                `;
+            });
+
+            document.getElementById('ingredient-photo-grid').innerHTML = html;
+        }
+
+        function uploadIngredientPhoto(ingredientId) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = async (e) => {
+                const files = Array.from(e.target.files);
+                await window.photoManager.uploadPhotos(files, {
+                    ingredientId,
+                    type: 'ingredient'
+                });
+                loadIngredientList(); // Refresh
+            };
+            input.click();
+        }
+
+        function loadEquipmentList() {
+            // Load from localStorage or backend
+            const equipment = [
+                { id: 'stand-mixer', name: 'Stand Mixer', category: 'Mixers' },
+                { id: 'chef-knife', name: "Chef's Knife", category: 'Knives' },
+                { id: 'cast-iron', name: 'Cast Iron Skillet', category: 'Cookware' }
+            ];
+            
+            let html = '';
+            equipment.forEach(equip => {
+                const photo = window.photoManager.getEquipmentPhoto(equip.id);
+                
+                html += `
+                    <div class="section-card" style="display: flex; gap: 20px; align-items: center;">
+                        <div class="ingredient-photo-ref ${photo ? '' : 'empty'}" 
+                             onclick="uploadEquipmentPhoto('${equip.id}')">
+                            ${photo ? `<img src="${photo.dataUrl}" alt="${equip.name}">` : '🔧'}
+                        </div>
+                        <div style="flex: 1;">
+                            <h3 style="font-size: 18px; font-weight: 700;">${equip.name}</h3>
+                            <p style="color: #64748b; font-size: 14px;">${equip.category}</p>
+                        </div>
+                        <button class="btn btn-sm btn-primary" onclick="uploadEquipmentPhoto('${equip.id}')">
+                            ${photo ? '📸 Change Photo' : '📸 Add Photo'}
+                        </button>
+                    </div>
+                `;
+            });
+
+            document.getElementById('equipment-photo-grid').innerHTML = html;
+        }
+
+        function uploadEquipmentPhoto(equipmentId) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = async (e) => {
+                const files = Array.from(e.target.files);
+                await window.photoManager.uploadPhotos(files, {
+                    equipmentId,
+                    type: 'equipment'
+                });
+                loadEquipmentList(); // Refresh
+            };
+            input.click();
+        }
+
+        // Refresh function for step photos
+        window.refreshRecipeView = function() {
+            loadRecipeSteps();
+        };
+    </script>
+</body>
+</html>
+

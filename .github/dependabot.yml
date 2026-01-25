@@ -1,0 +1,91 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "02:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "Iterum-Foods/security-team"
+    assignees:
+      - "Iterum-Foods/maintainers"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "security"
+    ignore:
+      # Ignore major version updates for critical packages
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      # Group security-related packages
+      security-packages:
+        patterns:
+          - "eslint*"
+          - "prettier*"
+          - "husky*"
+          - "lint-staged*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group testing packages
+      testing-packages:
+        patterns:
+          - "@playwright/*"
+          - "playwright*"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group build tools
+      build-tools:
+        patterns:
+          - "http-server*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "02:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "Iterum-Foods/security-team"
+    assignees:
+      - "Iterum-Foods/maintainers"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "github-actions"
+      - "dependencies"
+    groups:
+      # Group security-related actions
+      security-actions:
+        patterns:
+          - "actions/checkout"
+          - "actions/setup-node"
+          - "github/codeql-action/*"
+          - "snyk/actions/*"
+          - "gitleaks/gitleaks-action"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group testing actions
+      testing-actions:
+        patterns:
+          - "browser-actions/setup-playwright"
+          - "actions/upload-artifact"
+          - "actions/download-artifact"
+        update-types:
+          - "minor"
+          - "patch"

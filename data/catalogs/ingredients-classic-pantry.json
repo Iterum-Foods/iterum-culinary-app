@@ -1,0 +1,74 @@
+{
+  "id": "ingredients_classic_pantry",
+  "name": "Classic Pantry Staples",
+  "version": "1.0.0",
+  "items": [
+    {
+      "name": "Extra Virgin Olive Oil",
+      "category": "Oils & Fats",
+      "unit": "l",
+      "defaultUnit": "ml",
+      "cost": 18.5,
+      "costPer": "l",
+      "supplier": "Core Pantry Co.",
+      "storage": "dry",
+      "shelfLifeDays": 180
+    },
+    {
+      "name": "Kosher Salt",
+      "category": "Spices & Herbs",
+      "unit": "kg",
+      "defaultUnit": "g",
+      "cost": 2.3,
+      "costPer": "kg",
+      "supplier": "Core Pantry Co.",
+      "storage": "dry",
+      "shelfLifeDays": 365
+    },
+    {
+      "name": "Black Pepper - Tellicherry",
+      "category": "Spices & Herbs",
+      "unit": "kg",
+      "defaultUnit": "g",
+      "cost": 12.8,
+      "costPer": "kg",
+      "supplier": "Spice Merchants",
+      "storage": "dry",
+      "shelfLifeDays": 365
+    },
+    {
+      "name": "AP Flour",
+      "category": "Grains",
+      "unit": "kg",
+      "defaultUnit": "g",
+      "cost": 1.6,
+      "costPer": "kg",
+      "supplier": "Mill & Co.",
+      "storage": "dry",
+      "shelfLifeDays": 180
+    },
+    {
+      "name": "Granulated Sugar",
+      "category": "Other",
+      "unit": "kg",
+      "defaultUnit": "g",
+      "cost": 1.2,
+      "costPer": "kg",
+      "supplier": "Sweet Harvest",
+      "storage": "dry",
+      "shelfLifeDays": 365
+    },
+    {
+      "name": "Unsalted Butter 82% Fat",
+      "category": "Dairy",
+      "unit": "kg",
+      "defaultUnit": "g",
+      "cost": 8.75,
+      "costPer": "kg",
+      "supplier": "Dairy Collective",
+      "storage": "refrigerated",
+      "shelfLifeDays": 45
+    }
+  ]
+}
+

@@ -1,0 +1,43 @@
+# Global code owners
+* @Iterum-Foods/maintainers
+
+# Security-related files require security team review
+SECURITY.md @Iterum-Foods/security-team
+SECURITY_IMPLEMENTATION_SUMMARY.md @Iterum-Foods/security-team
+.github/workflows/security-scan.yml @Iterum-Foods/security-team
+.github/workflows/test.yml @Iterum-Foods/security-team
+.github/dependabot.yml @Iterum-Foods/security-team
+
+# Authentication and user management
+assets/js/unified_auth_system.js @Iterum-Foods/security-team @Iterum-Foods/maintainers
+assets/js/security-utils.js @Iterum-Foods/security-team
+assets/js/csp-config.js @Iterum-Foods/security-team
+assets/js/input-validation.js @Iterum-Foods/security-team
+assets/js/api-security.js @Iterum-Foods/security-team
+
+# Backend API and database
+app/ @Iterum-Foods/backend-team @Iterum-Foods/security-team
+requirements.txt @Iterum-Foods/backend-team
+
+# Frontend core files
+assets/js/ @Iterum-Foods/frontend-team
+assets/css/ @Iterum-Foods/frontend-team
+*.html @Iterum-Foods/frontend-team
+
+# Configuration files
+package.json @Iterum-Foods/maintainers
+package-lock.json @Iterum-Foods/maintainers
+playwright.config.js @Iterum-Foods/maintainers
+tailwind.config.js @Iterum-Foods/frontend-team
+
+# Documentation
+README.md @Iterum-Foods/maintainers
+documentation/ @Iterum-Foods/maintainers
+
+# GitHub workflows and CI/CD
+.github/workflows/ @Iterum-Foods/devops-team @Iterum-Foods/security-team
+.github/ISSUE_TEMPLATE/ @Iterum-Foods/maintainers
+
+# Tests
+tests/ @Iterum-Foods/maintainers
+test/ @Iterum-Foods/maintainers
