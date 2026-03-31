@@ -31,16 +31,20 @@
             theme: {
                 extend: {
                     colors: {
-                        // Aligned with Iterum Brand Kit
-                        'iterum-forest': '#2d5016',
-                        'iterum-pine': '#1a3d0a',
-                        'iterum-clay': '#f4f1ee',
-                        'iterum-ink': '#121212',
-                        'iterum-slate': '#575757',
+                        /* Nordic kit–aligned + legacy keys for this page */
+                        'iterum-moss': '#6b8e6f',
+                        'iterum-moss-dark': '#5b7c5f',
+                        'iterum-nordic': '#5b9bad',
+                        'iterum-forest': '#5a7260',
+                        'iterum-pine': '#3d5348',
+                        'iterum-clay': '#eef1ef',
+                        'iterum-canvas': '#f2f5f3',
+                        'iterum-ink': '#1a2e35',
+                        'iterum-slate': '#5a6d75',
                         'iterum-gold': '#c5a358',
                     },
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
                     },
                 }
             }
@@ -48,33 +52,52 @@
     </script>
 
     <style>
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f4f1ee; /* Iterum Clay */
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f2f5f3;
+            color: #1a2e35;
         }
         
-        /* Brand Animation: Deep Forest Gradient */
+        /* Brand panel — moss / Nordic (aligns with iterum-brand-kit accents) */
         .brand-gradient {
-            background: linear-gradient(135deg, #2d5016 0%, #1a3d0a 100%);
+            background: linear-gradient(145deg, #5f7d63 0%, #4d6b55 42%, #3d5a56 100%);
             position: relative;
         }
 
-        /* Subtle scanline texture from Design System */
+        /* Light wash — avoids harsh RGB scanlines */
         .brand-gradient::before {
             content: "";
             position: absolute;
             inset: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-            background-size: 100% 2px, 3px 100%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 40%);
             pointer-events: none;
-            opacity: 0.3;
         }
 
         .input-brand:focus {
             outline: none;
-            border-color: #2d5016;
-            box-shadow: 0 0 0 1px #2d5016;
+            border-color: #6b8e6f;
+            box-shadow: 0 0 0 3px rgba(107, 142, 111, 0.22);
+        }
+
+        .input-brand:focus-visible,
+        button:focus-visible,
+        a:focus-visible {
+            outline: 2px solid #5b7c5f;
+            outline-offset: 2px;
+        }
+
+        #success-message {
+            color: #166534;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        #success-message.show {
+            display: block;
         }
 
         /* Micro-interactions */
@@ -109,8 +132,9 @@
         }
         
         .error-message {
-            color: #dc2626;
-            font-size: 0.75rem;
+            color: #b91c1c;
+            font-size: 0.8125rem;
+            line-height: 1.4;
             margin-top: 0.5rem;
             display: none;
         }
@@ -127,9 +151,9 @@
             transition: all 0.3s ease;
         }
         .auth-tab.active {
-            background: white;
-            color: #2d5016;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: #fff;
+            color: #3d5348;
+            box-shadow: 0 1px 3px rgba(26, 46, 53, 0.08);
         }
         
         .auth-form {
@@ -140,158 +164,167 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center lg:p-6">
+<body class="min-h-screen flex items-center justify-center lg:p-6 text-iterum-ink antialiased">
 
-    <div class="w-full max-w-[1200px] h-full lg:h-[800px] bg-white lg:rounded-3xl overflow-hidden shadow-2xl flex flex-col lg:flex-row border border-black/5">
+    <div class="w-full max-w-[1100px] h-full lg:min-h-[680px] lg:h-[800px] bg-white lg:rounded-2xl overflow-hidden flex flex-col lg:flex-row border border-slate-200/90 shadow-lg">
         
         <!-- Brand Visual Side -->
-        <div class="hidden lg:flex lg:w-5/12 brand-gradient p-12 flex-col justify-between text-white relative">
+        <div class="hidden lg:flex lg:w-[44%] brand-gradient p-10 xl:p-12 flex-col justify-between text-white relative">
             <div class="z-10">
-                <div class="flex items-center space-x-2 mb-12">
-                    <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <div class="flex items-center gap-2 mb-10">
+                    <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="3"/>
                         <path d="M20 10V30M10 20H30" stroke="currentColor" stroke-width="3"/>
                     </svg>
-                    <span class="text-xl font-black tracking-tighter">ITERUM</span>
+                    <span class="text-lg font-semibold tracking-wide">Iterum</span>
                 </div>
                 
-                <h2 class="text-4xl font-extrabold leading-tight mb-6 tracking-tight">
-                    Precision tools for the <span class="text-iterum-gold">culinary elite.</span>
+                <h2 class="text-3xl xl:text-[2rem] font-semibold leading-snug mb-5 tracking-tight text-white">
+                    One place for <span class="text-iterum-gold font-semibold">recipes, menus &amp; costs.</span>
                 </h2>
-                <p class="text-white/70 font-medium text-lg max-w-sm">
-                    Access your master inventory, production schedules, and supplier network in one unified interface.
+                <p class="text-white/85 text-[1.0625rem] max-w-[20rem] leading-relaxed">
+                    For culinary teams who want menus, recipes, and numbers in one clear system.
                 </p>
             </div>
 
-            <div class="z-10 space-y-4">
-                <div class="sidebar-item p-4 rounded-r-lg">
-                    <p class="text-xs font-bold uppercase tracking-widest text-white/40 mb-1">Active Batch</p>
-                    <p class="text-sm font-semibold">Fermentation Lab #04 • Day 12</p>
+            <div class="z-10 space-y-3">
+                <div class="sidebar-item p-4 rounded-xl">
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-white/50 mb-1">Example</p>
+                    <p class="text-sm leading-snug">Production schedules &amp; costing stay tied to live menus.</p>
                 </div>
-                <div class="sidebar-item p-4 rounded-r-lg">
-                    <p class="text-xs font-bold uppercase tracking-widest text-white/40 mb-1">Network Status</p>
-                    <p class="text-sm font-semibold">12 Local Producers Connected</p>
+                <div class="sidebar-item p-4 rounded-xl">
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-white/50 mb-1">Security</p>
+                    <p class="text-sm leading-snug">Your workspace, your data—sign in to continue.</p>
                 </div>
-                <div class="pt-8">
-                    <p class="text-[10px] uppercase tracking-[0.3em] font-bold text-white/30">Iterum Systems v2.4.0</p>
+                <div class="pt-6">
+                    <p class="text-[11px] font-medium text-white/40">Iterum Culinary</p>
                 </div>
             </div>
         </div>
 
         <!-- Form Side -->
-        <div class="w-full lg:w-7/12 p-8 lg:p-20 flex flex-col justify-center bg-white">
-            <div class="max-w-md mx-auto w-full">
+        <div class="auth-form-panel w-full lg:w-[56%] p-6 sm:p-10 lg:py-14 lg:px-12 xl:px-16 flex flex-col justify-center bg-white">
+            <div class="max-w-[18.5rem] sm:max-w-md mx-auto w-full">
                 <!-- Mobile Logo -->
-                <div class="lg:hidden flex items-center space-x-2 mb-12 text-iterum-forest">
-                    <svg width="24" height="24" viewBox="0 0 40 40" fill="none">
-                        <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="4"/>
+                <div class="lg:hidden flex items-center gap-2 mb-7 text-iterum-moss-dark">
+                    <svg width="26" height="26" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                        <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="3"/>
                         <path d="M20 10V30M10 20H30" stroke="currentColor" stroke-width="3"/>
                     </svg>
-                    <span class="text-xl font-black tracking-tighter">ITERUM</span>
+                    <span class="text-lg font-semibold tracking-wide text-iterum-ink">Iterum</span>
                 </div>
 
-                <div class="mb-10">
-                    <h1 class="text-3xl font-black text-iterum-ink tracking-tight mb-2">Operator Login</h1>
-                    <p class="text-iterum-slate font-medium">Verify your credentials to continue.</p>
+                <div class="mb-7 sm:mb-8">
+                    <h1 class="text-[1.75rem] sm:text-[2.125rem] font-semibold leading-snug text-iterum-ink mb-3">Sign in to Iterum</h1>
+                    <p class="text-base sm:text-[1.0625rem] text-iterum-slate leading-relaxed">Use your work email and password.</p>
                 </div>
+
+                <div id="success-message" role="status" aria-live="polite"></div>
 
                 <!-- Auth Tabs -->
-                <div class="flex bg-iterum-clay rounded-lg p-1 mb-6">
-                    <button class="auth-tab active flex-1 py-2 px-4 rounded-md font-semibold text-sm" onclick="switchTab('signin')">Sign In</button>
-                    <button class="auth-tab flex-1 py-2 px-4 rounded-md font-semibold text-sm text-iterum-slate" onclick="switchTab('signup')">Sign Up</button>
+                <div class="flex bg-slate-200/50 rounded-xl p-1 mb-7 gap-1" role="tablist" aria-label="Sign in or create account">
+                    <button type="button" role="tab" aria-selected="true" data-tab="signin" id="tab-signin"
+                        class="auth-tab active flex-1 py-3 min-h-[48px] px-3 sm:px-4 rounded-lg font-semibold text-[0.9375rem] sm:text-base"
+                        onclick="switchTab('signin')">Sign in</button>
+                    <button type="button" role="tab" aria-selected="false" data-tab="signup" id="tab-signup"
+                        class="auth-tab flex-1 py-3 min-h-[48px] px-3 sm:px-4 rounded-lg font-semibold text-[0.9375rem] sm:text-base text-iterum-slate"
+                        onclick="switchTab('signup')">Create account</button>
                 </div>
 
                 <!-- Sign In Form -->
-                <form id="signin-form" class="auth-form active space-y-6" onsubmit="handleSignIn(event)">
+                <form id="signin-form" class="auth-form active space-y-5" onsubmit="handleSignIn(event)" novalidate>
                     <div>
-                        <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-iterum-ink mb-2">Internal ID / Email</label>
-                        <input type="email" id="signin-email" required
-                            class="w-full px-4 py-4 bg-iterum-clay border border-black/5 rounded-none font-medium text-iterum-ink input-brand transition-all"
-                            placeholder="id_operator@iterum.xyz">
-                        <div class="error-message" id="signin-email-error"></div>
+                        <label for="signin-email" class="block text-sm font-semibold text-iterum-ink mb-2">Email</label>
+                        <input type="email" id="signin-email" name="email" required autocomplete="email"
+                            class="form-input w-full px-4 py-3.5 min-h-[48px] bg-white border border-slate-200/90 rounded-xl text-base font-normal text-iterum-ink placeholder:text-slate-400 input-brand transition-all"
+                            placeholder="you@company.com">
+                        <div class="error-message" id="signin-email-error" role="alert"></div>
                     </div>
 
                     <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-iterum-ink">Security Key</label>
-                            <a href="#" class="text-[10px] font-black uppercase tracking-widest text-iterum-forest hover:text-iterum-ink transition">Request Reset</a>
+                        <div class="flex justify-between items-center gap-2 mb-2">
+                            <label for="signin-password" class="text-sm font-semibold text-iterum-ink">Password</label>
+                            <a href="#" class="text-sm font-medium text-iterum-moss-dark hover:text-iterum-pine transition shrink-0">Forgot password?</a>
                         </div>
-                        <input type="password" id="signin-password" required
-                            class="w-full px-4 py-4 bg-iterum-clay border border-black/5 rounded-none font-medium text-iterum-ink input-brand transition-all"
-                            placeholder="••••••••••••">
-                        <div class="error-message" id="signin-password-error"></div>
+                        <input type="password" id="signin-password" name="password" required autocomplete="current-password"
+                            class="form-input w-full px-4 py-3.5 min-h-[48px] bg-white border border-slate-200/90 rounded-xl text-base font-normal text-iterum-ink placeholder:text-slate-400 input-brand transition-all"
+                            placeholder="Enter your password">
+                        <div class="error-message" id="signin-password-error" role="alert"></div>
                     </div>
 
                     <div class="flex items-center">
-                        <input type="checkbox" id="remember" class="w-4 h-4 accent-iterum-forest cursor-pointer">
-                        <label for="remember" class="ml-2 text-sm font-medium text-iterum-slate cursor-pointer select-none">Maintain secure session</label>
+                        <input type="checkbox" id="remember" name="remember" class="w-4 h-4 rounded border-slate-300 text-iterum-moss accent-iterum-moss cursor-pointer">
+                        <label for="remember" class="ml-2.5 text-sm text-iterum-slate cursor-pointer select-none leading-snug">Keep me signed in</label>
                     </div>
 
                     <button type="submit" id="signin-btn"
-                        class="w-full bg-iterum-ink text-white py-5 px-6 font-bold tracking-widest uppercase text-xs hover:bg-iterum-forest transition-all flex items-center justify-center space-x-2">
-                        <span id="signin-btn-text">Initialize Session</span>
-                        <div id="signin-loader" class="hidden space-x-1">
+                        class="w-full bg-iterum-moss text-white py-3.5 min-h-[52px] px-6 font-semibold text-base rounded-xl hover:bg-iterum-moss-dark transition-all flex items-center justify-center gap-2 shadow-md shadow-iterum-moss/25">
+                        <span id="signin-btn-text">Sign in</span>
+                        <span id="signin-spinner" class="hidden flex items-center space-x-1" aria-hidden="true">
                             <span class="loader-dot"></span>
                             <span class="loader-dot"></span>
                             <span class="loader-dot"></span>
-                        </div>
+                        </span>
                     </button>
                 </form>
 
                 <!-- Sign Up Form -->
-                <form id="signup-form" class="auth-form space-y-6" onsubmit="handleSignUp(event)">
+                <form id="signup-form" class="auth-form space-y-5" onsubmit="handleSignUp(event)" novalidate>
                     <div>
-                        <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-iterum-ink mb-2">Full Name</label>
-                        <input type="text" id="signup-name" required
-                            class="w-full px-4 py-4 bg-iterum-clay border border-black/5 rounded-none font-medium text-iterum-ink input-brand transition-all"
-                            placeholder="John Doe">
-                        <div class="error-message" id="signup-name-error"></div>
+                        <label for="signup-name" class="block text-sm font-semibold text-iterum-ink mb-2">Full name</label>
+                        <input type="text" id="signup-name" name="name" required autocomplete="name"
+                            class="form-input w-full px-4 py-3.5 min-h-[48px] bg-white border border-slate-200/90 rounded-xl text-base font-normal text-iterum-ink placeholder:text-slate-400 input-brand transition-all"
+                            placeholder="Your name">
+                        <div class="error-message" id="signup-name-error" role="alert"></div>
                     </div>
 
                     <div>
-                        <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-iterum-ink mb-2">Internal ID / Email</label>
-                        <input type="email" id="signup-email" required
-                            class="w-full px-4 py-4 bg-iterum-clay border border-black/5 rounded-none font-medium text-iterum-ink input-brand transition-all"
-                            placeholder="id_operator@iterum.xyz">
-                        <div class="error-message" id="signup-email-error"></div>
+                        <label for="signup-email" class="block text-sm font-semibold text-iterum-ink mb-2">Email</label>
+                        <input type="email" id="signup-email" name="email" required autocomplete="email"
+                            class="form-input w-full px-4 py-3.5 min-h-[48px] bg-white border border-slate-200/90 rounded-xl text-base font-normal text-iterum-ink placeholder:text-slate-400 input-brand transition-all"
+                            placeholder="you@company.com">
+                        <div class="error-message" id="signup-email-error" role="alert"></div>
                     </div>
 
                     <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="text-[10px] font-black uppercase tracking-[0.2em] text-iterum-ink">Security Key</label>
-                        </div>
-                        <input type="password" id="signup-password" required minlength="6"
-                            class="w-full px-4 py-4 bg-iterum-clay border border-black/5 rounded-none font-medium text-iterum-ink input-brand transition-all"
-                            placeholder="••••••••••••">
-                        <div class="error-message" id="signup-password-error"></div>
+                        <label for="signup-password" class="block text-sm font-semibold text-iterum-ink mb-2">Password</label>
+                        <input type="password" id="signup-password" name="password" required minlength="6" autocomplete="new-password"
+                            class="form-input w-full px-4 py-3.5 min-h-[48px] bg-white border border-slate-200/90 rounded-xl text-base font-normal text-iterum-ink placeholder:text-slate-400 input-brand transition-all"
+                            placeholder="At least 6 characters">
+                        <div class="error-message" id="signup-password-error" role="alert"></div>
+                    </div>
+
+                    <div>
+                        <label for="signup-confirm-password" class="block text-sm font-semibold text-iterum-ink mb-2">Confirm password</label>
+                        <input type="password" id="signup-confirm-password" name="confirm-password" required minlength="6" autocomplete="new-password"
+                            class="form-input w-full px-4 py-3.5 min-h-[48px] bg-white border border-slate-200/90 rounded-xl text-base font-normal text-iterum-ink placeholder:text-slate-400 input-brand transition-all"
+                            placeholder="Re-enter password">
+                        <div class="error-message" id="signup-confirm-error" role="alert"></div>
                     </div>
 
                     <button type="submit" id="signup-btn"
-                        class="w-full bg-iterum-ink text-white py-5 px-6 font-bold tracking-widest uppercase text-xs hover:bg-iterum-forest transition-all flex items-center justify-center space-x-2">
-                        <span id="signup-btn-text">Create Account</span>
-                        <div id="signup-loader" class="hidden space-x-1">
+                        class="w-full bg-iterum-moss text-white py-3.5 min-h-[52px] px-6 font-semibold text-base rounded-xl hover:bg-iterum-moss-dark transition-all flex items-center justify-center gap-2 shadow-md shadow-iterum-moss/25">
+                        <span id="signup-btn-text">Create account</span>
+                        <span id="signup-spinner" class="hidden flex items-center space-x-1" aria-hidden="true">
                             <span class="loader-dot"></span>
                             <span class="loader-dot"></span>
                             <span class="loader-dot"></span>
-                        </div>
+                        </span>
                     </button>
                 </form>
 
                 <!-- Divider -->
-                <div class="mt-8 pt-8 border-t border-iterum-clay flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <button onclick="handleGoogleSignIn()" class="flex items-center space-x-2 text-iterum-slate hover:text-iterum-ink transition">
-                        <i class="fab fa-google"></i>
-                        <span class="text-sm font-medium">Continue with Google</span>
+                <div class="mt-8 pt-8 border-t border-slate-200/90">
+                    <button type="button" onclick="handleGoogleSignIn()"
+                        class="w-full min-h-[48px] flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-slate-200/90 bg-white text-iterum-ink hover:bg-slate-50 hover:border-slate-300 transition font-medium text-base shadow-sm">
+                        <i class="fab fa-google text-lg text-slate-600" aria-hidden="true"></i>
+                        <span>Continue with Google</span>
                     </button>
-                    <div class="flex space-x-4">
-                        <i class="fab fa-apple text-xl text-iterum-ink/20 hover:text-iterum-ink cursor-pointer transition"></i>
-                        <i class="fab fa-google text-xl text-iterum-ink/20 hover:text-iterum-ink cursor-pointer transition"></i>
-                    </div>
                 </div>
 
                 <!-- Back Link -->
-                <div class="mt-6 text-center">
-                    <a href="/" class="text-sm text-iterum-slate font-medium hover:text-iterum-forest transition">← Back to home</a>
+                <div class="mt-7 text-center">
+                    <a href="/" class="text-sm font-medium text-iterum-slate hover:text-iterum-moss-dark transition">← Back to home</a>
                 </div>
             </div>
         </div>
@@ -309,28 +342,30 @@
         window.onload = () => {
             if (typeof gsap !== 'undefined') {
                 gsap.from("body", { opacity: 0, duration: 1 });
-                gsap.from(".lg\\:w-7\\/12", { x: 20, opacity: 0, duration: 0.8, ease: "power2.out", delay: 0.2 });
+                gsap.from('.auth-form-panel', { x: 20, opacity: 0, duration: 0.8, ease: 'power2.out', delay: 0.2 });
             }
         };
 
-        // Tab switching
-        function switchTab(tab) {
-            // Update tabs
-            document.querySelectorAll('.auth-tab').forEach(t => {
-                t.classList.remove('active');
-                t.classList.add('text-iterum-slate');
+        // Tab switching — defined before auth-ui init; auth-ui replaces window.switchTab when ready
+        function switchTabFallback(tab) {
+            document.querySelectorAll('.auth-tab').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('text-iterum-slate');
+                btn.setAttribute('aria-selected', 'false');
             });
-            event.target.classList.add('active');
-            event.target.classList.remove('text-iterum-slate');
-            
-            // Update forms
+            const tabBtn = document.querySelector(`[data-tab="${tab}"]`);
+            if (tabBtn) {
+                tabBtn.classList.add('active');
+                tabBtn.classList.remove('text-iterum-slate');
+                tabBtn.setAttribute('aria-selected', 'true');
+            }
             document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            if (tab === 'signin') {
-                document.getElementById('signin-form').classList.add('active');
-            } else {
-                document.getElementById('signup-form').classList.add('active');
+            const formEl = document.getElementById(`${tab}-form`);
+            if (formEl) {
+                formEl.classList.add('active');
             }
         }
+        window.switchTab = switchTabFallback;
 
         // Sign In Handler
         async function handleSignIn(event) {
@@ -346,13 +381,16 @@
             const password = document.getElementById('signin-password').value;
             const btn = document.getElementById('signin-btn');
             const btnText = document.getElementById('signin-btn-text');
-            const loader = document.getElementById('signin-loader');
+            const loader = document.getElementById('signin-spinner');
             
             // Show loading
             btn.disabled = true;
             btn.classList.add('btn-loading');
             btnText.classList.add('hidden');
-            loader.classList.remove('hidden');
+            if (loader) {
+                loader.classList.remove('hidden');
+                loader.style.display = 'flex';
+            }
             
             // Clear errors
             document.querySelectorAll('.error-message').forEach(el => {
@@ -385,8 +423,8 @@
                 console.log('✅ Sign-in successful:', user.email);
                 
                 // Success feedback
-                btnText.textContent = 'Identity Verified';
-                btn.classList.remove('bg-iterum-ink', 'btn-loading');
+                btnText.textContent = 'Signed in';
+                btn.classList.remove('bg-iterum-forest', 'btn-loading');
                 btn.classList.add('bg-green-700');
                 
                 // Redirect to dashboard after successful sign-in
@@ -416,9 +454,12 @@
                 
                 btn.disabled = false;
                 btn.classList.remove('btn-loading');
-                btnText.textContent = 'Initialize Session';
+                btnText.textContent = 'Sign in';
                 btnText.classList.remove('hidden');
-                loader.classList.add('hidden');
+                if (loader) {
+                    loader.classList.add('hidden');
+                    loader.style.display = 'none';
+                }
             }
         }
         
@@ -429,15 +470,26 @@
             const name = document.getElementById('signup-name').value;
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
             const btn = document.getElementById('signup-btn');
             const btnText = document.getElementById('signup-btn-text');
-            const loader = document.getElementById('signup-loader');
+            const loader = document.getElementById('signup-spinner');
+
+            if (password !== confirmPassword) {
+                document.getElementById('signup-confirm-error').textContent = 'Passwords do not match.';
+                document.getElementById('signup-confirm-error').classList.add('show');
+                document.getElementById('signup-confirm-password').classList.add('error');
+                return;
+            }
             
             // Show loading
             btn.disabled = true;
             btn.classList.add('btn-loading');
             btnText.classList.add('hidden');
-            loader.classList.remove('hidden');
+            if (loader) {
+                loader.classList.remove('hidden');
+                loader.style.display = 'flex';
+            }
             
             // Clear errors
             document.querySelectorAll('.error-message').forEach(el => {
@@ -461,7 +513,7 @@
                 }
                 
                 // Sign up
-                const user = await window.authManager.createUserWithEmail(email, password, { name });
+                const user = await window.authManager.signUpWithEmail(name, email, password);
                 
                 console.log('✅ Sign-up successful:', user.email);
                 
@@ -491,9 +543,12 @@
                 
                 btn.disabled = false;
                 btn.classList.remove('btn-loading');
-                btnText.textContent = 'Create Account';
+                btnText.textContent = 'Create account';
                 btnText.classList.remove('hidden');
-                loader.classList.add('hidden');
+                if (loader) {
+                    loader.classList.add('hidden');
+                    loader.style.display = 'none';
+                }
             }
         }
         

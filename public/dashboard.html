@@ -56,42 +56,38 @@
      * ITERUM BRAND KIT - Heritage Warmth (Terracotta & Olive)
      * Notebook-style dashboard with warm earth tones
      */
+    /* UX: Nordic moss + slate — aligned with sign-in + iterum-brand-kit accents */
     :root {
-      /* Background Layers */
-      --brand-bg-primary: #fffbeb; /* Creamy Beige */
-      --brand-bg-secondary: #fef3c7; /* Light Yellow/Butter */
-      --brand-bg-tertiary: #fde68a; /* Warm Yellow */
+      --brand-bg-primary: #ffffff;
+      --brand-bg-secondary: #f0f4f2;
+      --brand-bg-tertiary: #e2ebe6;
 
-      /* Text Colors */
-      --brand-text-primary: #78350f; /* Dark Brown */
-      --brand-text-secondary: #92400e; /* Medium Brown */
-      --brand-text-muted: #b45309; /* Rust/Muted */
+      --brand-text-primary: #1a2e35;
+      --brand-text-secondary: #3d5a66;
+      --brand-text-muted: #5a6d75;
 
-      /* Accent Colors */
-      --brand-primary-accent: #d97706; /* Terracotta/Rust Orange */
-      --brand-secondary-accent: #4d7c0f; /* Olive Green */
+      --brand-primary-accent: #6b8e6f;
+      --brand-moss-dark: #5b7c5f;
+      --brand-secondary-accent: #5b9bad;
 
-      /* UI Elements */
       --brand-card-bg: #ffffff;
-      --brand-border-light: #fcd34d; /* Yellow/Gold border */
+      --brand-border-light: rgba(26, 46, 53, 0.12);
+      --nav-hover-bg: rgba(107, 142, 111, 0.12);
 
-      /* Spacing & Radius */
       --radius-md: 0.5rem;
-      --radius-lg: 0.75rem;
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-
-      /* Custom Notebook Styling */
-      --notebook-line-color: rgba(217, 119, 6, 0.15); /* Faint Rust line */
+      --radius-lg: 0.875rem;
+      --shadow-md: 0 4px 20px rgba(26, 46, 53, 0.08);
     }
 
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       background-color: var(--brand-bg-secondary);
       color: var(--brand-text-primary);
       overflow: hidden;
       margin: 0;
       padding: 0;
       width: 100vw;
+      -webkit-font-smoothing: antialiased;
     }
 
     .card-style {
@@ -99,23 +95,23 @@
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-md);
       border: 1px solid var(--brand-border-light);
-      padding: 1.25rem;
+      padding: 1.25rem 1.35rem;
     }
 
-    /* Main Content Grid lines (Notebook ruled paper effect) */
+    /* Calm canvas: subtle vertical rhythm, no heavy “notebook” yellow */
     .main-content-area {
       background-color: var(--brand-bg-secondary);
-      background-image: linear-gradient(to bottom, var(--notebook-line-color) 1px, transparent 1px);
-      background-size: 100% 28px;
-      padding-top: 28px;
+      background-image: linear-gradient(to bottom, rgba(107, 142, 111, 0.06) 1px, transparent 1px);
+      background-size: 100% 32px;
+      padding-top: 1.25rem;
       padding-right: 0;
       padding-bottom: 3rem;
       padding-left: 0;
       overflow-y: auto;
       height: 100vh;
       flex: 1;
-      min-width: 0; /* Allows flex item to shrink below content size */
-      max-width: none; /* Remove any max-width constraints */
+      min-width: 0;
+      max-width: none;
     }
 
     .chart-container {
@@ -177,7 +173,11 @@
     textarea:focus, input:focus {
       outline: none;
       border-color: var(--brand-primary-accent);
-      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+      box-shadow: 0 0 0 3px rgba(107, 142, 111, 0.2);
+    }
+
+    aside nav a.nav-dash-link:hover {
+      background-color: var(--nav-hover-bg) !important;
     }
 
     button {
@@ -191,11 +191,11 @@
 
     .btn-primary {
       background-color: var(--brand-primary-accent);
-    color: white;
+      color: white;
     }
 
     .btn-primary:hover {
-      background-color: #b45309;
+      background-color: var(--brand-moss-dark);
     }
 
     .btn-secondary {
@@ -204,7 +204,7 @@
     }
 
     .btn-secondary:hover {
-      background-color: #365314;
+      background-color: #4a8a9e;
     }
 
     .btn-ghost {
@@ -239,55 +239,55 @@
         </a>
         
         <!-- Projects Link -->
-        <a href="project-hub.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+        <a href="project-hub.html" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
           <i class="fa-solid fa-folder-tree" style="width: 18px; font-size: 0.9rem;"></i>
           <span class="ml-2.5">Projects</span>
         </a>
         
         <!-- Menu Builder Link -->
-        <a href="menu-builder.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+        <a href="menu-builder.html" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
           <i class="fa-solid fa-utensils" style="width: 18px; font-size: 0.9rem;"></i>
           <span class="ml-2.5">Menu Builder</span>
         </a>
         
         <!-- Recipe Library Link -->
-        <a href="recipe-library.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+        <a href="recipe-library.html" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
           <i class="fa-solid fa-book-open" style="width: 18px; font-size: 0.9rem;"></i>
           <span class="ml-2.5">Recipe Index</span>
         </a>
         
         <!-- Ingredients Link -->
-        <a href="ingredients.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+        <a href="ingredients.html" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
           <i class="fa-solid fa-carrot" style="width: 18px; font-size: 0.9rem;"></i>
           <span class="ml-2.5">Ingredients</span>
         </a>
         
         <!-- Recipe Developer Link -->
-        <a href="recipe-developer.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+        <a href="recipe-developer.html" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
           <i class="fa-solid fa-flask" style="width: 18px; font-size: 0.9rem;"></i>
           <span class="ml-2.5">Recipe Developer</span>
         </a>
         
         <!-- Calendar Link -->
-        <a href="calendar.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+        <a href="calendar.html" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
           <i class="fa-solid fa-calendar-days" style="width: 18px; font-size: 0.9rem;"></i>
           <span class="ml-2.5">Calendar</span>
         </a>
         
         <!-- Kitchen Management Link -->
-        <a href="kitchen-management.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+        <a href="kitchen-management.html" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
           <i class="fa-solid fa-kitchen-set" style="width: 18px; font-size: 0.9rem;"></i>
           <span class="ml-2.5">Kitchen</span>
         </a>
         
         <!-- Inventory Link -->
-        <a href="inventory.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+        <a href="inventory.html" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
           <i class="fa-solid fa-boxes-stacked" style="width: 18px; font-size: 0.9rem;"></i>
           <span class="ml-2.5">Inventory</span>
         </a>
         
         <!-- Vendors Link -->
-        <a href="vendor-management.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+        <a href="vendor-management.html" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
           <i class="fa-solid fa-store" style="width: 18px; font-size: 0.9rem;"></i>
           <span class="ml-2.5">Vendors</span>
         </a>
@@ -295,13 +295,13 @@
         <div class="text-xs uppercase font-semibold mt-5 mb-2 pt-4 px-2 border-t" style="border-color: var(--brand-border-light); color: var(--brand-text-muted);">Tools</div>
         
         <!-- Recipe Photo Studio Link -->
-        <a href="recipe-photo-studio.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+        <a href="recipe-photo-studio.html" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
           <i class="fa-solid fa-camera" style="width: 18px; font-size: 0.9rem;"></i>
           <span class="ml-2.5">Photo Studio</span>
         </a>
         
         <!-- Recipe Scaling Tool Link -->
-        <a href="recipe-scaling-tool.html" class="flex items-center px-3 py-2.5 rounded-md hover:bg-gray-100 cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
+        <a href="recipe-scaling-tool.html" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
           <i class="fa-solid fa-calculator" style="width: 18px; font-size: 0.9rem;"></i>
           <span class="ml-2.5">Recipe Scaling</span>
         </a>
@@ -328,19 +328,20 @@
     <div class="w-full px-5 py-4" style="max-width: none; width: 100%; margin-right: 0;">
       
       <!-- Header -->
-      <header class="mb-6 flex justify-between items-start sticky top-0 z-10 pb-4" style="background-color: var(--brand-bg-secondary);">
-        <div class="flex-1">
-          <h1 class="text-2xl font-bold mb-2" style="color: var(--brand-text-primary);">Daily Ops Board</h1>
+      <header class="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sticky top-0 z-10 pb-4 pt-1 -mt-1 border-b" style="background-color: var(--brand-bg-secondary); border-color: var(--brand-border-light);">
+        <div class="flex-1 min-w-0">
+          <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight mb-2" style="color: var(--brand-text-primary);">Daily Ops Board</h1>
+          <p class="text-sm mb-3 max-w-2xl" style="color: var(--brand-text-muted);">Today’s priorities, ideas, and compliance checks in one view.</p>
           <div class="flex items-center gap-3 flex-wrap">
-            <div id="header-project-chip" class="text-xs font-semibold px-2.5 py-1 rounded-full" style="background-color: var(--brand-bg-primary); color: var(--brand-text-secondary);">Project: Master Project</div>
+            <div id="header-project-chip" class="text-xs font-semibold px-3 py-1.5 rounded-full border" style="background-color: var(--brand-bg-primary); color: var(--brand-text-secondary); border-color: var(--brand-border-light);">Project: Master Project</div>
             <div class="date-picker">
-              <label for="dashboard-date" class="text-xs block mb-1" style="color: var(--brand-text-muted);">Working date</label>
-              <input type="date" id="dashboard-date" class="text-sm py-1 px-2" style="margin-top: 0;">
+              <label for="dashboard-date" class="text-xs font-medium block mb-1" style="color: var(--brand-text-secondary);">Working date</label>
+              <input type="date" id="dashboard-date" class="text-sm py-2 px-3 rounded-md border" style="margin-top: 0; border-color: var(--brand-border-light); background: var(--brand-card-bg); color: var(--brand-text-primary);">
             </div>
           </div>
         </div>
-        <button onclick="window.location.href='recipe-developer.html'" class="py-2 px-4 rounded-md text-sm shadow-md text-white hover:opacity-90 transition-opacity whitespace-nowrap ml-4" style="background-color: var(--brand-primary-accent);">
-          <i class="fa-solid fa-plus mr-2"></i>New Experiment
+        <button type="button" onclick="window.location.href='recipe-developer.html'" class="py-2.5 px-4 rounded-lg text-sm font-semibold shadow-sm text-white hover:opacity-95 transition-opacity whitespace-nowrap shrink-0 self-start" style="background-color: var(--brand-primary-accent);">
+          <i class="fa-solid fa-plus mr-2" aria-hidden="true"></i>New experiment
         </button>
       </header>
 
@@ -352,10 +353,10 @@
           
           <!-- Card 1.1: Idea Pad (Recipe Ideas - Existing Feature) -->
           <div class="card-style">
-            <h2 class="text-lg font-bold mb-3 flex items-center" style="color: var(--brand-text-primary);">
+            <h2 class="text-base sm:text-lg font-semibold mb-2 flex items-center gap-2" style="color: var(--brand-text-primary);">
               <i class="fa-solid fa-lightbulb mr-2.5" style="color: var(--brand-secondary-accent); font-size: 1rem;"></i>Culinary Idea Pad
             </h2>
-            <p class="text-xs mb-3" style="color: var(--brand-text-muted); line-height: 1.5;">
+            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
               Sketch out concepts for new dishes or menu themes.
             </p>
             
@@ -380,8 +381,8 @@
 
           <!-- Card 1.2: R&D Success Rate (Doughnut Chart) -->
           <div class="card-style">
-            <h2 class="text-lg font-bold mb-3" style="color: var(--brand-text-primary);">R&D Success Rate (Q3)</h2>
-            <p class="text-xs mb-3" style="color: var(--brand-text-muted); line-height: 1.5;">
+            <h2 class="text-base sm:text-lg font-semibold mb-2" style="color: var(--brand-text-primary);">R&D Success Rate (Q3)</h2>
+            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
               Percentage of experiments reaching Final/Approved status.
             </p>
             <div class="chart-container">
@@ -391,8 +392,8 @@
 
           <!-- Card 1.3: Daily Tasks (Existing Feature) -->
           <div class="card-style">
-            <h2 class="text-lg font-bold mb-3" style="color: var(--brand-text-primary);">Daily Tasks</h2>
-            <p class="text-xs mb-3" style="color: var(--brand-text-muted); line-height: 1.5;">
+            <h2 class="text-base sm:text-lg font-semibold mb-2" style="color: var(--brand-text-primary);">Daily Tasks</h2>
+            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
               Capture the must-do items for today and check them off as you go.
             </p>
             
@@ -419,14 +420,14 @@
           <!-- Card 2.1: Dynamic Temperature Log -->
           <div class="card-style">
             <div class="flex justify-between items-center mb-3">
-              <h2 class="text-lg font-bold flex items-center" style="color: var(--brand-text-primary);">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2" style="color: var(--brand-text-primary);">
                 <i class="fa-solid fa-thermometer-three-quarters mr-2.5" style="color: var(--brand-primary-accent); font-size: 1rem;"></i>Critical Temperature Log
               </h2>
               <button onclick="tempLogManager.addUnit()" class="text-xs py-1 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
                 <i class="fa-solid fa-plus mr-1"></i> Add Unit
               </button>
             </div>
-            <p class="text-xs mb-3" style="color: var(--brand-text-muted); line-height: 1.5;">
+            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
               Refrigeration units from your Equipment List. Target ≤ 5°C (≤ 41°F).
             </p>
             <ul id="refrigeration-unit-list" class="space-y-1">
@@ -437,14 +438,14 @@
           <!-- Card 2.2: Dynamic Sanitizer Check Log -->
           <div class="card-style">
             <div class="flex justify-between items-center mb-3">
-              <h2 class="text-lg font-bold flex items-center" style="color: var(--brand-text-primary);">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2" style="color: var(--brand-text-primary);">
                 <i class="fa-solid fa-vial-circle-check mr-2.5" style="color: var(--brand-primary-accent); font-size: 1rem;"></i>Sanitizer Check Log
               </h2>
               <button onclick="sanitizerLogManager.addLocation()" class="text-xs py-1 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
                 <i class="fa-solid fa-plus mr-1"></i> Add Location
               </button>
             </div>
-            <p class="text-xs mb-3" style="color: var(--brand-text-muted); line-height: 1.5;">
+            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
               All required check points. Target typically 150-200 PPM (varies by agent).
             </p>
             <ul id="sanitizer-location-list" class="space-y-1">
@@ -454,7 +455,7 @@
           
           <!-- Card 2.3: Today's Operations Focus & Checklists -->
           <div class="card-style">
-            <h2 class="text-lg font-bold mb-3 flex items-center" style="color: var(--brand-text-primary);">
+            <h2 class="text-base sm:text-lg font-semibold mb-2 flex items-center gap-2" style="color: var(--brand-text-primary);">
               <i class="fa-solid fa-bullseye mr-2.5" style="color: var(--brand-primary-accent); font-size: 1rem;"></i>Daily Operational Focus
             </h2>
             
@@ -477,8 +478,8 @@
 
           <!-- Card 2.4: Notes (Existing Feature) -->
           <div class="card-style">
-            <h2 class="text-lg font-bold mb-3" style="color: var(--brand-text-primary);">Notes</h2>
-            <p class="text-xs mb-3" style="color: var(--brand-text-muted); line-height: 1.5;">
+            <h2 class="text-base sm:text-lg font-semibold mb-2" style="color: var(--brand-text-primary);">Notes</h2>
+            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
               Kitchen pulse, service feedback, or anything the team should remember.
             </p>
             <textarea id="notes-content" class="w-full h-32 resize-none mb-3 text-sm" placeholder="Document today's takeaways, issues to escalate, or wins worth sharing."></textarea>
@@ -491,7 +492,7 @@
 
           <!-- Card 2.5: Quick Stats -->
           <div class="card-style">
-            <h2 class="text-lg font-bold mb-3" style="color: var(--brand-text-primary);">Quick Stats</h2>
+            <h2 class="text-base sm:text-lg font-semibold mb-2" style="color: var(--brand-text-primary);">Quick Stats</h2>
             <div class="grid grid-cols-3 gap-3">
               <div class="text-center">
                 <div class="text-xl font-bold" style="color: var(--brand-primary-accent);" id="quick-stat-tasks">0</div>
