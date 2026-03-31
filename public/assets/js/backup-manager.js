@@ -14,10 +14,10 @@ class BackupManager {
 
   init() {
     console.log('💾 Backup Manager initialized');
-    
+
     // Check if auto-backup is due
     this.checkAutoBackup();
-    
+
     // Setup periodic check
     setInterval(() => this.checkAutoBackup(), 60 * 60 * 1000); // Check hourly
   }
@@ -46,7 +46,6 @@ class BackupManager {
       });
 
       return backup;
-
     } catch (error) {
       console.error('❌ Error creating backup:', error);
       throw error;
@@ -64,31 +63,41 @@ class BackupManager {
       recipes: JSON.parse(localStorage.getItem('recipes') || '[]'),
       recipeIdeas: JSON.parse(localStorage.getItem('recipe_ideas') || '[]'),
       recipeStubs: JSON.parse(localStorage.getItem('recipe_stubs') || '[]'),
-      
+
       // Projects
-      projects: JSON.parse(localStorage.getItem(`iterum_projects_user_${userId}`) || '[]'),
-      currentProject: localStorage.getItem(`iterum_current_project_user_${userId}`) || 'master',
-      
+      projects: JSON.parse(
+        localStorage.getItem(`iterum_projects_user_${userId}`) || '[]'
+      ),
+      currentProject:
+        localStorage.getItem(`iterum_current_project_user_${userId}`) ||
+        'master',
+
       // Menus (collect from all projects)
       menus: this.collectAllMenus(),
-      menuRecipeLinks: JSON.parse(localStorage.getItem('menu_recipe_links') || '{}'),
-      
+      menuRecipeLinks: JSON.parse(
+        localStorage.getItem('menu_recipe_links') || '{}'
+      ),
+
       // Ingredients
-      ingredients: JSON.parse(localStorage.getItem('ingredients_database') || '[]'),
-      customIngredients: JSON.parse(localStorage.getItem('custom_ingredients') || '[]'),
-      
+      ingredients: JSON.parse(
+        localStorage.getItem('ingredients_database') || '[]'
+      ),
+      customIngredients: JSON.parse(
+        localStorage.getItem('custom_ingredients') || '[]'
+      ),
+
       // Vendors
       vendors: JSON.parse(localStorage.getItem('iterum_vendors') || '[]'),
-      
+
       // Equipment
       equipment: JSON.parse(localStorage.getItem('equipment_list') || '[]'),
-      
+
       // Photos
       photos: JSON.parse(localStorage.getItem('recipe_photos') || '[]'),
-      
+
       // Notes
       dailyNotes: JSON.parse(localStorage.getItem('daily_notes') || '{}'),
-      
+
       // User data
       currentUser: localStorage.getItem('current_user') || null
     };
@@ -100,7 +109,7 @@ class BackupManager {
   collectAllMenus() {
     const menus = [];
     const keys = Object.keys(localStorage);
-    
+
     keys.forEach(key => {
       if (key.startsWith('menu_data_')) {
         try {
@@ -114,7 +123,7 @@ class BackupManager {
         }
       }
     });
-    
+
     return menus;
   }
 
@@ -124,11 +133,11 @@ class BackupManager {
   downloadBackup() {
     try {
       const backup = this.createBackup();
-      
-      const blob = new Blob([JSON.stringify(backup, null, 2)], { 
-        type: 'application/json' 
+
+      const blob = new Blob([JSON.stringify(backup, null, 2)], {
+        type: 'application/json'
       });
-      
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -142,7 +151,7 @@ class BackupManager {
       localStorage.setItem(this.lastBackupKey, new Date().toISOString());
 
       this.showNotification('✅ Backup downloaded successfully!', 'success');
-      
+
       // Track analytics
       if (window.analyticsTracker) {
         window.analyticsTracker.trackCustomEvent('backup_created', {
@@ -154,7 +163,6 @@ class BackupManager {
 
       console.log('✅ Backup downloaded');
       return true;
-
     } catch (error) {
       console.error('❌ Error downloading backup:', error);
       this.showNotification('❌ Backup failed: ' + error.message, 'error');
@@ -180,13 +188,13 @@ class BackupManager {
       // Confirm restoration
       const confirm = window.confirm(
         `Restore backup from ${new Date(backup.timestamp).toLocaleDateString()}?\n\n` +
-        `This backup contains:\n` +
-        `• ${backup.data.recipes.length} recipes\n` +
-        `• ${backup.data.projects.length} projects\n` +
-        `• ${backup.data.photos.length} photos\n` +
-        `• ${backup.data.vendors.length} vendors\n` +
-        `• ${backup.data.menus.length} menus\n\n` +
-        `⚠️ This will replace your current data!`
+          `This backup contains:\n` +
+          `• ${backup.data.recipes.length} recipes\n` +
+          `• ${backup.data.projects.length} projects\n` +
+          `• ${backup.data.photos.length} photos\n` +
+          `• ${backup.data.vendors.length} vendors\n` +
+          `• ${backup.data.menus.length} menus\n\n` +
+          `⚠️ This will replace your current data!`
       );
 
       if (!confirm) {
@@ -198,13 +206,12 @@ class BackupManager {
       this.restoreAllData(backup.data);
 
       this.showNotification('✅ Backup restored! Refreshing...', 'success');
-      
+
       // Reload page to show restored data
       setTimeout(() => window.location.reload(), 2000);
 
       console.log('✅ Backup restored successfully');
       return true;
-
     } catch (error) {
       console.error('❌ Error restoring backup:', error);
       this.showNotification('❌ Restore failed: ' + error.message, 'error');
@@ -219,37 +226,79 @@ class BackupManager {
     const userId = this.getCurrentUserId();
 
     // Core data
-    if (data.recipes) localStorage.setItem('recipes', JSON.stringify(data.recipes));
-    if (data.recipeIdeas) localStorage.setItem('recipe_ideas', JSON.stringify(data.recipeIdeas));
-    if (data.recipeStubs) localStorage.setItem('recipe_stubs', JSON.stringify(data.recipeStubs));
-    
+    if (data.recipes) {
+      localStorage.setItem('recipes', JSON.stringify(data.recipes));
+    }
+    if (data.recipeIdeas) {
+      localStorage.setItem('recipe_ideas', JSON.stringify(data.recipeIdeas));
+    }
+    if (data.recipeStubs) {
+      localStorage.setItem('recipe_stubs', JSON.stringify(data.recipeStubs));
+    }
+
     // Projects
-    if (data.projects) localStorage.setItem(`iterum_projects_user_${userId}`, JSON.stringify(data.projects));
-    if (data.currentProject) localStorage.setItem(`iterum_current_project_user_${userId}`, data.currentProject);
-    
+    if (data.projects) {
+      localStorage.setItem(
+        `iterum_projects_user_${userId}`,
+        JSON.stringify(data.projects)
+      );
+    }
+    if (data.currentProject) {
+      localStorage.setItem(
+        `iterum_current_project_user_${userId}`,
+        data.currentProject
+      );
+    }
+
     // Menus
     if (data.menus) {
       data.menus.forEach(menu => {
-        localStorage.setItem(`menu_data_${menu.projectId}`, JSON.stringify(menu.data));
+        localStorage.setItem(
+          `menu_data_${menu.projectId}`,
+          JSON.stringify(menu.data)
+        );
       });
     }
-    if (data.menuRecipeLinks) localStorage.setItem('menu_recipe_links', JSON.stringify(data.menuRecipeLinks));
-    
+    if (data.menuRecipeLinks) {
+      localStorage.setItem(
+        'menu_recipe_links',
+        JSON.stringify(data.menuRecipeLinks)
+      );
+    }
+
     // Ingredients
-    if (data.ingredients) localStorage.setItem('ingredients_database', JSON.stringify(data.ingredients));
-    if (data.customIngredients) localStorage.setItem('custom_ingredients', JSON.stringify(data.customIngredients));
-    
+    if (data.ingredients) {
+      localStorage.setItem(
+        'ingredients_database',
+        JSON.stringify(data.ingredients)
+      );
+    }
+    if (data.customIngredients) {
+      localStorage.setItem(
+        'custom_ingredients',
+        JSON.stringify(data.customIngredients)
+      );
+    }
+
     // Vendors
-    if (data.vendors) localStorage.setItem('iterum_vendors', JSON.stringify(data.vendors));
-    
+    if (data.vendors) {
+      localStorage.setItem('iterum_vendors', JSON.stringify(data.vendors));
+    }
+
     // Equipment
-    if (data.equipment) localStorage.setItem('equipment_list', JSON.stringify(data.equipment));
-    
+    if (data.equipment) {
+      localStorage.setItem('equipment_list', JSON.stringify(data.equipment));
+    }
+
     // Photos
-    if (data.photos) localStorage.setItem('recipe_photos', JSON.stringify(data.photos));
-    
+    if (data.photos) {
+      localStorage.setItem('recipe_photos', JSON.stringify(data.photos));
+    }
+
     // Notes
-    if (data.dailyNotes) localStorage.setItem('daily_notes', JSON.stringify(data.dailyNotes));
+    if (data.dailyNotes) {
+      localStorage.setItem('daily_notes', JSON.stringify(data.dailyNotes));
+    }
 
     console.log('✅ All data restored to localStorage');
   }
@@ -258,10 +307,12 @@ class BackupManager {
    * Check if auto-backup is due
    */
   checkAutoBackup() {
-    if (!this.autoBackupEnabled) return;
+    if (!this.autoBackupEnabled) {
+      return;
+    }
 
     const lastBackup = localStorage.getItem(this.lastBackupKey);
-    
+
     if (!lastBackup) {
       // Never backed up - do it now
       console.log('📅 No previous backup found, creating first backup...');
@@ -274,8 +325,12 @@ class BackupManager {
     const hoursSinceBackup = (now - lastBackupDate) / (1000 * 60 * 60);
 
     if (hoursSinceBackup >= 24) {
-      console.log('📅 Auto-backup due (last backup: ' + hoursSinceBackup.toFixed(1) + ' hours ago)');
-      
+      console.log(
+        '📅 Auto-backup due (last backup: ' +
+          hoursSinceBackup.toFixed(1) +
+          ' hours ago)'
+      );
+
       // Show reminder
       this.showBackupReminder();
     }
@@ -335,11 +390,12 @@ class BackupManager {
     const sizeBytes = new Blob([jsonString]).size;
 
     return {
-      totalItems: backup.data.recipes.length + 
-                  backup.data.projects.length + 
-                  backup.data.photos.length +
-                  backup.data.vendors.length +
-                  backup.data.menus.length,
+      totalItems:
+        backup.data.recipes.length +
+        backup.data.projects.length +
+        backup.data.photos.length +
+        backup.data.vendors.length +
+        backup.data.menus.length,
       recipes: backup.data.recipes.length,
       projects: backup.data.projects.length,
       photos: backup.data.photos.length,
@@ -363,7 +419,10 @@ class BackupManager {
 
   getCurrentUserName() {
     if (window.authManager?.currentUser) {
-      return window.authManager.currentUser.displayName || window.authManager.currentUser.email;
+      return (
+        window.authManager.currentUser.displayName ||
+        window.authManager.currentUser.email
+      );
     }
     return 'Guest User';
   }
@@ -384,7 +443,7 @@ class BackupManager {
       font-weight: 600;
       animation: slideIn 0.3s ease;
     `;
-    
+
     document.body.appendChild(notification);
     setTimeout(() => {
       notification.style.animation = 'slideOut 0.3s ease';
@@ -397,4 +456,3 @@ class BackupManager {
 window.backupManager = new BackupManager();
 
 console.log('💾 Backup Manager loaded');
-

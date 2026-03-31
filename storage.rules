@@ -7,7 +7,13 @@ service firebase.storage {
       allow write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Recipe photos - users can upload photos for their recipes
+    // Legacy first: recipe-photo-manager.js uses recipes/{recipeId}/{fileName} (3 path segments total)
+    match /recipes/{recipeId}/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Canonical tenant path: recipes/{uid}/{recipeId}/…
     match /recipes/{userId}/{recipeId}/{allPaths=**} {
       allow read: if request.auth != null;
       allow write: if request.auth != null && request.auth.uid == userId;

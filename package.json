@@ -6,6 +6,7 @@
   "scripts": {
     "start": "http-server public -p 8080 -o",
     "dev": "http-server public -p 8080 -o -c-1",
+    "serve:test": "http-server public -p 8080 -c-1",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
@@ -49,7 +50,7 @@
     ]
   },
   "engines": {
-    "node": ">=16.0.0",
+    "node": ">=20.0.0",
     "npm": ">=8.0.0"
   },
   "repository": {

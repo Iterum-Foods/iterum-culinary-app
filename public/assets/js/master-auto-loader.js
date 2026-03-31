@@ -21,23 +21,23 @@ class MasterAutoLoader {
    */
   async autoLoadAll() {
     console.log('🚀 Master Auto-Loader starting...');
-    
+
     const user = window.authManager?.currentUser;
-    
+
     if (!user) {
       console.log('⏳ Waiting for user authentication...');
       return;
     }
-    
+
     console.log(`👤 Loading data for: ${user.email}`);
-    
+
     // Load in parallel for speed
     await Promise.all([
       this.autoLoadIngredients(),
       this.autoLoadRecipes(user),
       this.autoLoadMenus(user)
     ]);
-    
+
     console.log('✅ Master Auto-Loader complete!');
     this.showCompletionNotification();
   }
@@ -54,23 +54,25 @@ class MasterAutoLoader {
         this.loaded.ingredients = true;
         return;
       }
-      
+
       console.log('📦 Loading ingredients database...');
-      
+
       const response = await fetch('data/base-ingredients-database.json');
       if (!response.ok) {
         throw new Error('Database not found');
       }
-      
+
       const database = await response.json();
-      
+
       // Save to localStorage
-      localStorage.setItem('ingredients_database', JSON.stringify(database.ingredients));
+      localStorage.setItem(
+        'ingredients_database',
+        JSON.stringify(database.ingredients)
+      );
       localStorage.setItem('ingredients', JSON.stringify(database.ingredients));
-      
+
       console.log(`✅ Loaded ${database.ingredients.length} ingredients`);
       this.loaded.ingredients = true;
-      
     } catch (error) {
       console.error('❌ Error loading ingredients:', error);
     }
@@ -85,18 +87,18 @@ class MasterAutoLoader {
       this.loaded.recipes = true;
       return;
     }
-    
+
     try {
       console.log('📚 Loading 89 Charles recipes...');
-      
+
       const response = await fetch('89-charles-recipes.json');
       if (!response.ok) {
         throw new Error('Recipes file not found');
       }
-      
+
       const recipes = await response.json();
       console.log(`📦 Found ${recipes.length} recipes`);
-      
+
       // Add to universal recipe manager
       if (window.universalRecipeManager) {
         recipes.forEach(recipe => {
@@ -108,19 +110,18 @@ class MasterAutoLoader {
         const userId = user.userId || user.id;
         const recipeKey = `recipes_${userId}`;
         let userRecipes = JSON.parse(localStorage.getItem(recipeKey) || '[]');
-        
+
         recipes.forEach(recipe => {
           if (!userRecipes.find(r => r.id === recipe.id)) {
             userRecipes.push(recipe);
           }
         });
-        
+
         localStorage.setItem(recipeKey, JSON.stringify(userRecipes));
         console.log(`✅ Loaded ${recipes.length} recipes to storage`);
       }
-      
+
       this.loaded.recipes = true;
-      
     } catch (error) {
       console.error('❌ Error loading recipes:', error);
     }
@@ -135,23 +136,23 @@ class MasterAutoLoader {
       this.loaded.menus = true;
       return;
     }
-    
+
     try {
       console.log('🍽️ Loading 89 Charles menu...');
-      
+
       const response = await fetch('89-charles-fall-menu.json');
       if (!response.ok) {
         throw new Error('Menu file not found');
       }
-      
+
       const menu = await response.json();
       console.log(`📦 Found menu with ${menu.items?.length} dishes`);
-      
+
       // Save to user's menus
       const userId = user.userId || user.id;
       const menuKey = `menus_${userId}`;
       let userMenus = JSON.parse(localStorage.getItem(menuKey) || '[]');
-      
+
       // Avoid duplicates
       if (!userMenus.find(m => m.id === menu.id)) {
         userMenus.push(menu);
@@ -160,9 +161,8 @@ class MasterAutoLoader {
       } else {
         console.log('ℹ️ Menu already loaded');
       }
-      
+
       this.loaded.menus = true;
-      
     } catch (error) {
       console.error('❌ Error loading menu:', error);
     }
@@ -174,20 +174,24 @@ class MasterAutoLoader {
   showCompletionNotification() {
     const loaded = Object.values(this.loaded).filter(v => v).length;
     const total = Object.keys(this.loaded).length;
-    
+
     console.log(`\n📊 Auto-Load Summary:`);
-    console.log(`   ✅ Ingredients: ${this.loaded.ingredients ? 'Loaded' : 'Failed'}`);
+    console.log(
+      `   ✅ Ingredients: ${this.loaded.ingredients ? 'Loaded' : 'Failed'}`
+    );
     console.log(`   ✅ Recipes: ${this.loaded.recipes ? 'Loaded' : 'Failed'}`);
     console.log(`   ✅ Menus: ${this.loaded.menus ? 'Loaded' : 'Failed'}`);
     console.log(`   📈 Success: ${loaded}/${total}\n`);
-    
+
     // Dispatch event so pages can refresh their displays
-    window.dispatchEvent(new CustomEvent('masterDataLoaded', {
-      detail: {
-        loaded: this.loaded,
-        successRate: loaded / total
-      }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('masterDataLoaded', {
+        detail: {
+          loaded: this.loaded,
+          successRate: loaded / total
+        }
+      })
+    );
   }
 }
 
@@ -195,19 +199,19 @@ class MasterAutoLoader {
 window.masterAutoLoader = new MasterAutoLoader();
 
 // Run when user authenticates
-window.addEventListener('userAuthenticated', async function(event) {
+window.addEventListener('userAuthenticated', async function (event) {
   console.log('🔐 User authenticated, running Master Auto-Loader...');
-  
+
   // Wait a moment for all dependencies to load
   await new Promise(resolve => setTimeout(resolve, 500));
-  
+
   await window.masterAutoLoader.autoLoadAll();
 });
 
 // Also run on page load if user already authenticated
-window.addEventListener('load', async function() {
+window.addEventListener('load', async function () {
   await new Promise(resolve => setTimeout(resolve, 1000));
-  
+
   if (window.authManager?.isAuthenticated) {
     console.log('👤 User already authenticated, running Master Auto-Loader...');
     await window.masterAutoLoader.autoLoadAll();
@@ -215,4 +219,3 @@ window.addEventListener('load', async function() {
 });
 
 console.log('🚀 Master Auto-Loader ready');
-

@@ -28,7 +28,9 @@ class MenuOpsDashboard {
   init() {
     this.container = document.getElementById(this.containerId);
     if (!this.container) {
-      console.warn(`⚠️ MenuOpsDashboard container #${this.containerId} not found.`);
+      console.warn(
+        `⚠️ MenuOpsDashboard container #${this.containerId} not found.`
+      );
       return;
     }
 
@@ -39,9 +41,15 @@ class MenuOpsDashboard {
   }
 
   bindEvents() {
-    window.addEventListener('storage', (event) => {
-      if (!event.key) return;
-      if (event.key.startsWith('menu_data') || event.key === 'menu_recipe_links' || event.key === 'recipe_stubs') {
+    window.addEventListener('storage', event => {
+      if (!event.key) {
+        return;
+      }
+      if (
+        event.key.startsWith('menu_data') ||
+        event.key === 'menu_recipe_links' ||
+        event.key === 'recipe_stubs'
+      ) {
         this.refresh();
       }
     });
@@ -108,7 +116,8 @@ class MenuOpsDashboard {
   }
 
   loadMenuData(projectId) {
-    const storageKey = (window.enhancedMenuManager?.storageKey || 'menu_data') + '_' + projectId;
+    const storageKey =
+      (window.enhancedMenuManager?.storageKey || 'menu_data') + '_' + projectId;
     const fallbackKey = `menu_${window.authManager?.currentUser?.id || ''}`;
 
     let raw = localStorage.getItem(storageKey);
@@ -123,7 +132,9 @@ class MenuOpsDashboard {
     try {
       const parsed = JSON.parse(raw);
       const menu = parsed?.menu || parsed;
-      const items = Array.isArray(parsed?.items) ? parsed.items : (parsed?.menuItems || []);
+      const items = Array.isArray(parsed?.items)
+        ? parsed.items
+        : parsed?.menuItems || [];
       return { menu, items };
     } catch (error) {
       console.warn('⚠️ Unable to parse menu data:', error);
@@ -187,19 +198,31 @@ class MenuOpsDashboard {
     const foh = this.state.fohBriefing;
 
     const itemCount = items.length;
-    const linkedCount = items.filter((item) => !!links[item.id]).length;
+    const linkedCount = items.filter(item => !!links[item.id]).length;
 
     const recipesMissing = itemCount - linkedCount;
-    const prepTasks = prepPlan ? Object.values(prepPlan.stations || {}).reduce((acc, station) => acc + (station.tasks?.length || 0), 0) : 0;
+    const prepTasks = prepPlan
+      ? Object.values(prepPlan.stations || {}).reduce(
+          (acc, station) => acc + (station.tasks?.length || 0),
+          0
+        )
+      : 0;
     const prepWarnings = prepPlan?.warnings?.length || 0;
-    const fohCourses = foh ? (foh.courses || []).reduce((acc, course) => acc + course.items.length, 0) : 0;
+    const fohCourses = foh
+      ? (foh.courses || []).reduce(
+          (acc, course) => acc + course.items.length,
+          0
+        )
+      : 0;
     const fohWarnings = foh?.warnings?.length || 0;
 
     const statuses = [
       {
         id: 'menu_draft',
         title: 'Draft Menu',
-        description: itemCount ? `${itemCount} dish${itemCount === 1 ? '' : 'es'} on this menu.` : 'Add dishes to your current menu.',
+        description: itemCount
+          ? `${itemCount} dish${itemCount === 1 ? '' : 'es'} on this menu.`
+          : 'Add dishes to your current menu.',
         complete: itemCount > 0,
         metric: `${itemCount} items`,
         action: { label: 'Open Menu Builder', href: 'menu-builder.html' }
@@ -207,7 +230,10 @@ class MenuOpsDashboard {
       {
         id: 'recipes_linked',
         title: 'Recipes Linked',
-        description: recipesMissing === 0 && itemCount ? 'All dishes have recipes linked or drafted.' : `${linkedCount}/${itemCount} dishes linked to recipes.`,
+        description:
+          recipesMissing === 0 && itemCount
+            ? 'All dishes have recipes linked or drafted.'
+            : `${linkedCount}/${itemCount} dishes linked to recipes.`,
         complete: itemCount > 0 && recipesMissing === 0,
         metric: `${linkedCount}/${itemCount}`,
         action: { label: 'Link Recipes', href: 'menu-builder.html#linking' }
@@ -222,7 +248,10 @@ class MenuOpsDashboard {
           : 'Generate a prep plan from the Kitchen Management tools.',
         complete: !!prepPlan && prepTasks > 0 && prepWarnings === 0,
         metric: prepPlan ? `${prepTasks} tasks` : '—',
-        action: { label: 'Review Prep Plan', href: 'kitchen-management.html?tab=prep' }
+        action: {
+          label: 'Review Prep Plan',
+          href: 'kitchen-management.html?tab=prep'
+        }
       },
       {
         id: 'foh_briefing',
@@ -234,7 +263,10 @@ class MenuOpsDashboard {
           : 'Generate a FOH information sheet for service.',
         complete: !!foh && fohCourses > 0 && fohWarnings === 0,
         metric: foh ? `${fohCourses} items` : '—',
-        action: { label: 'Prep FOH Sheet', href: 'kitchen-management.html?tab=foh' }
+        action: {
+          label: 'Prep FOH Sheet',
+          href: 'kitchen-management.html?tab=foh'
+        }
       }
     ];
 
@@ -245,27 +277,40 @@ class MenuOpsDashboard {
     const warnings = [];
 
     if (this.state.prepPlan?.warnings?.length) {
-      warnings.push(...this.state.prepPlan.warnings.map((warning) => ({
-        source: 'Prep Plan',
-        message: warning.message || warning.type || 'Issue detected in prep plan.',
-        itemName: warning.name
-      })));
+      warnings.push(
+        ...this.state.prepPlan.warnings.map(warning => ({
+          source: 'Prep Plan',
+          message:
+            warning.message || warning.type || 'Issue detected in prep plan.',
+          itemName: warning.name
+        }))
+      );
     }
 
     if (this.state.fohBriefing?.warnings?.length) {
-      warnings.push(...this.state.fohBriefing.warnings.map((warning) => ({
-        source: 'FOH Briefing',
-        message: warning.message || warning.type || 'Issue detected in FOH briefing.',
-        itemName: warning.name
-      })));
+      warnings.push(
+        ...this.state.fohBriefing.warnings.map(warning => ({
+          source: 'FOH Briefing',
+          message:
+            warning.message ||
+            warning.type ||
+            'Issue detected in FOH briefing.',
+          itemName: warning.name
+        }))
+      );
     }
 
-    const missingItems = this.state.menuItems.filter((item) => !this.state.links[item.id]);
+    const missingItems = this.state.menuItems.filter(
+      item => !this.state.links[item.id]
+    );
     if (missingItems.length) {
       warnings.push({
         source: 'Recipe Linking',
         message: `${missingItems.length} menu item${missingItems.length === 1 ? '' : 's'} missing linked recipes.`,
-        itemName: missingItems.slice(0, 3).map((item) => item.name).join(', ')
+        itemName: missingItems
+          .slice(0, 3)
+          .map(item => item.name)
+          .join(', ')
       });
     }
 
@@ -273,8 +318,10 @@ class MenuOpsDashboard {
   }
 
   calculateProgress(statuses) {
-    if (!Array.isArray(statuses) || !statuses.length) return 0;
-    const completeCount = statuses.filter((status) => status.complete).length;
+    if (!Array.isArray(statuses) || !statuses.length) {
+      return 0;
+    }
+    const completeCount = statuses.filter(status => status.complete).length;
     return Math.round((completeCount / statuses.length) * 100);
   }
 
@@ -296,10 +343,13 @@ class MenuOpsDashboard {
     const progress = this.state.progress;
     const menuName = this.state.menu?.name || 'Current Menu';
 
-    const statusList = statuses.map((status) => {
-      const icon = status.complete ? '✅' : '⬜️';
-      const statusClass = status.complete ? 'color: #15803d;' : 'color: #0f172a;';
-      return `
+    const statusList = statuses
+      .map(status => {
+        const icon = status.complete ? '✅' : '⬜️';
+        const statusClass = status.complete
+          ? 'color: #15803d;'
+          : 'color: #0f172a;';
+        return `
         <li style="display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #e2e8f0;">
           <div style="font-size: 1.25rem; min-width: 24px;">${icon}</div>
           <div style="flex: 1;">
@@ -312,14 +362,15 @@ class MenuOpsDashboard {
           </div>
         </li>
       `;
-    }).join('');
+      })
+      .join('');
 
     const warningList = warnings.length
       ? `
         <div style="margin-top: 16px; padding: 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px;">
           <div style="font-weight: 600; color: #b91c1c; margin-bottom: 8px;">Needs Attention</div>
           <ul style="margin: 0; padding-left: 18px; font-size: 0.9rem; color: #b91c1c;">
-            ${warnings.map((warning) => `<li>${warning.source}: ${warning.message}${warning.itemName ? ` <em>(${warning.itemName})</em>` : ''}</li>`).join('')}
+            ${warnings.map(warning => `<li>${warning.source}: ${warning.message}${warning.itemName ? ` <em>(${warning.itemName})</em>` : ''}</li>`).join('')}
           </ul>
         </div>
       `

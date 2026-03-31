@@ -1434,8 +1434,8 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="menu-file" class="form-label">Select Menu File</label>
-                            <input type="file" id="menu-file" class="form-input" accept=".txt,.csv,.pdf,.doc,.docx">
-                            <small class="form-help">Supported formats: TXT, CSV, PDF, DOC, DOCX</small>
+                            <input type="file" id="menu-file" class="form-input" accept=".txt,.csv,.xlsx,.xls,.pdf,.doc,.docx">
+                            <small class="form-help">Supported formats: TXT, CSV, Excel (.xlsx, .xls), PDF, DOC, DOCX</small>
                         </div>
                         <div id="menu-file-dropzone">
                             <div class="dropzone-icon">📄</div>
@@ -1448,6 +1448,8 @@
                                 <option value="auto">Auto-detect</option>
                                 <option value="txt">Plain Text</option>
                                 <option value="csv">CSV</option>
+                                <option value="xlsx">Excel (.xlsx)</option>
+                                <option value="xls">Excel (.xls)</option>
                                 <option value="pdf">PDF</option>
                                 <option value="doc">Word Document</option>
                             </select>
@@ -2864,12 +2866,14 @@
                 processTextFile(file, { autoCategorize, extractPrices, detectDescriptions });
             } else if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
                 processCSVFile(file, { autoCategorize, extractPrices, detectDescriptions });
+            } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                processExcelFile(file, { autoCategorize, extractPrices, detectDescriptions });
             } else if (file.name.endsWith('.pdf')) {
                 processPDFFile(file, { autoCategorize, extractPrices, detectDescriptions });
             } else if (file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
                 processWordFile(file, { autoCategorize, extractPrices, detectDescriptions });
             } else {
-                alert('Unsupported file format. Please use TXT, CSV, PDF, or Word documents.');
+                alert('Unsupported file format. Please use TXT, CSV, Excel (.xlsx, .xls), PDF, or Word documents.');
                 hideImportLoading();
             }
         }
@@ -2950,6 +2954,46 @@
                 showImportResults(parsedItems);
             };
             reader.readAsText(file);
+        }
+
+        function processExcelFile(file, options) {
+            // Check if XLSX library is loaded
+            if (typeof XLSX === 'undefined') {
+                hideImportLoading();
+                alert('Excel parser not loaded. Please refresh the page and try again.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    // Get first sheet
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    
+                    // Convert to JSON with headers
+                    const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                    
+                    if (!rawData || rawData.length === 0) {
+                        hideImportLoading();
+                        alert('Excel sheet appears to be empty.');
+                        return;
+                    }
+
+                    // Parse Excel data similar to CSV
+                    const parsedItems = parseExcelContent(rawData, options);
+                    hideImportLoading();
+                    showImportResults(parsedItems);
+                } catch (error) {
+                    console.error('Excel parse error:', error);
+                    hideImportLoading();
+                    alert('Unable to parse Excel file: ' + error.message + '\n\nTry saving as CSV and importing that instead.');
+                }
+            };
+            reader.readAsArrayBuffer(file);
         }
 
         function processPDFFile(file, options) {
@@ -3180,24 +3224,121 @@
         }
 
         function parseCSVContent(content, options) {
-            const lines = content.split('\n').map(line => line.trim()).filter(line => line);
+            // Handle CSV with proper quote handling
+            const lines = [];
+            const rows = content.split('\n');
+            
+            // Simple CSV parser that handles quoted fields
+            for (const row of rows) {
+                const fields = [];
+                let currentField = '';
+                let inQuotes = false;
+                
+                for (let i = 0; i < row.length; i++) {
+                    const char = row[i];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        fields.push(currentField.trim());
+                        currentField = '';
+                    } else {
+                        currentField += char;
+                    }
+                }
+                fields.push(currentField.trim());
+                if (fields.some(f => f)) {
+                    lines.push(fields);
+                }
+            }
+            
+            if (lines.length === 0) return [];
+            
+            return parseTableData(lines, options);
+        }
+
+        function parseExcelContent(rawData, options) {
+            // rawData is already an array of arrays from XLSX
+            if (!rawData || rawData.length === 0) return [];
+            
+            return parseTableData(rawData, options);
+        }
+
+        function parseTableData(rows, options) {
             const items = [];
             
-            // Assume first line is header
-            const headers = lines[0].split(',').map(h => h.trim());
-            const nameIndex = headers.findIndex(h => h.toLowerCase().includes('name') || h.toLowerCase().includes('item'));
-            const priceIndex = headers.findIndex(h => h.toLowerCase().includes('price') || h.toLowerCase().includes('cost'));
-            const categoryIndex = headers.findIndex(h => h.toLowerCase().includes('category') || h.toLowerCase().includes('type'));
-            const descriptionIndex = headers.findIndex(h => h.toLowerCase().includes('description') || h.toLowerCase().includes('desc'));
+            if (rows.length === 0) return items;
+            
+            // First row is headers
+            const headers = rows[0].map(h => String(h || '').trim().toLowerCase());
+            
+            // Find column indices with flexible matching
+            const findColumnIndex = (patterns) => {
+                for (const pattern of patterns) {
+                    const index = headers.findIndex(h => h.includes(pattern));
+                    if (index !== -1) return index;
+                }
+                return -1;
+            };
 
-            for (let i = 1; i < lines.length; i++) {
-                const values = lines[i].split(',').map(v => v.trim());
+            const nameIndex = findColumnIndex(['name', 'item', 'dish', 'menu item', 'title']);
+            const priceIndex = findColumnIndex(['price', 'cost', '$', 'amount']);
+            const categoryIndex = findColumnIndex(['category', 'type', 'section', 'group']);
+            const descriptionIndex = findColumnIndex(['description', 'desc', 'details', 'notes']);
+            const ingredientsIndex = findColumnIndex(['ingredients', 'ingredient', 'components']);
+            const recipeIndex = findColumnIndex(['recipe', 'dish build', 'build']);
+            const allergensIndex = findColumnIndex(['allergen', 'allergy', 'dietary']);
+
+            // Process data rows
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i].map(cell => String(cell || '').trim());
+                
+                // Skip empty rows
+                if (!row.some(cell => cell)) continue;
+                
+                const name = nameIndex !== -1 ? row[nameIndex] : (row[0] || 'Unnamed Item');
+                if (!name || name.length < 2) continue; // Skip rows without a name
+                
+                // Parse price
+                let price = null;
+                if (priceIndex !== -1 && row[priceIndex]) {
+                    price = parsePrice(row[priceIndex]);
+                } else if (options.extractPrices) {
+                    // Try to extract price from name field
+                    const priceMatch = name.match(/\$(\d+(?:\.\d{2})?)/);
+                    if (priceMatch) {
+                        price = parseFloat(priceMatch[1]);
+                    }
+                }
+                
+                // Get category
+                let category = categoryIndex !== -1 ? row[categoryIndex] : 'Uncategorized';
+                if (!category || category === '') {
+                    category = options.autoCategorize ? autoCategorizeItem(name) : 'Uncategorized';
+                }
+                
+                // Get description
+                let description = descriptionIndex !== -1 ? row[descriptionIndex] : null;
+                if (!description && options.detectDescriptions && name.includes(' - ')) {
+                    const parts = name.split(' - ');
+                    description = parts.slice(1).join(' - ').trim();
+                }
+                
+                // Get ingredients/recipe info
+                const ingredients = ingredientsIndex !== -1 ? row[ingredientsIndex] : null;
+                const recipeInfo = recipeIndex !== -1 ? row[recipeIndex] : null;
+                const allergens = allergensIndex !== -1 ? (row[allergensIndex] || '').split(',').map(a => a.trim()).filter(a => a) : [];
+                
                 const item = {
-                    name: values[nameIndex] || 'Unnamed Item',
-                    price: options.extractPrices && values[priceIndex] ? parsePrice(values[priceIndex]) : null,
-                    category: values[categoryIndex] || 'Uncategorized',
-                    description: values[descriptionIndex] || null
+                    name: name.replace(/\$\d+(?:\.\d{2})?/, '').trim(), // Remove price from name if extracted
+                    price: price,
+                    category: category,
+                    description: description,
+                    ingredients: ingredients,
+                    recipeInfo: recipeInfo,
+                    allergens: allergens,
+                    dietaryInfo: []
                 };
+                
                 items.push(item);
             }
 
@@ -4010,6 +4151,9 @@
       };
     </script>
     
+    <!-- Load XLSX library for Excel parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <!-- Load PDF.js for PDF parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     
@@ -4034,6 +4178,7 @@
     <!-- Load Auth System Scripts - DEFERRED to prevent freezing -->
     <script type="module" defer src="assets/js/firebase-auth.js"></script>
     <script type="module" defer src="assets/js/firestore-sync.js"></script>
+    <script type="module" defer src="assets/js/project-data-access.js"></script>
     <script defer src="assets/js/header-user-display.js"></script>
     <script defer src="assets/js/profile-editor.js"></script>
     <script defer src="assets/js/project-ui-manager.js"></script>

@@ -16,7 +16,7 @@ class BaseIngredientsLoader {
   async loadBaseDatabase() {
     try {
       console.log('📦 Loading base ingredients database...');
-      
+
       const response = await fetch(this.databaseUrl);
       if (!response.ok) {
         throw new Error(`Failed to load database: ${response.status}`);
@@ -24,9 +24,8 @@ class BaseIngredientsLoader {
 
       const database = await response.json();
       console.log(`✅ Loaded ${database.ingredients.length} base ingredients`);
-      
-      return database;
 
+      return database;
     } catch (error) {
       console.error('❌ Error loading base ingredients:', error);
       return null;
@@ -45,29 +44,38 @@ class BaseIngredientsLoader {
       }
 
       // Get existing ingredients
-      const existing = JSON.parse(localStorage.getItem(this.localStorageKey) || '[]');
-      
+      const existing = JSON.parse(
+        localStorage.getItem(this.localStorageKey) || '[]'
+      );
+
       let finalIngredients = [];
 
       if (overwrite) {
         // Replace everything
         finalIngredients = database.ingredients;
-        console.log(`🔄 Overwriting with ${finalIngredients.length} base ingredients`);
+        console.log(
+          `🔄 Overwriting with ${finalIngredients.length} base ingredients`
+        );
       } else {
         // Merge - keep custom, add base
         const existingIds = new Set(existing.map(ing => ing.id));
         const newBaseIngredients = database.ingredients.filter(
           ing => !existingIds.has(ing.id)
         );
-        
+
         finalIngredients = [...existing, ...newBaseIngredients];
-        console.log(`✅ Added ${newBaseIngredients.length} new base ingredients`);
+        console.log(
+          `✅ Added ${newBaseIngredients.length} new base ingredients`
+        );
       }
 
       // Save to BOTH storage keys for compatibility
-      localStorage.setItem(this.localStorageKey, JSON.stringify(finalIngredients));
+      localStorage.setItem(
+        this.localStorageKey,
+        JSON.stringify(finalIngredients)
+      );
       localStorage.setItem('ingredients', JSON.stringify(finalIngredients)); // Also save to old key
-      
+
       // Track analytics
       if (window.analyticsTracker) {
         window.analyticsTracker.trackCustomEvent('ingredients_imported', {
@@ -83,7 +91,6 @@ class BaseIngredientsLoader {
         total: finalIngredients.length,
         added: finalIngredients.length - existing.length
       };
-
     } catch (error) {
       console.error('❌ Error importing ingredients:', error);
       return {
@@ -98,7 +105,9 @@ class BaseIngredientsLoader {
    */
   async getByCategory(category) {
     const database = await this.loadBaseDatabase();
-    if (!database) return [];
+    if (!database) {
+      return [];
+    }
 
     return database.ingredients.filter(ing => ing.category === category);
   }
@@ -116,14 +125,17 @@ class BaseIngredientsLoader {
    */
   async searchIngredients(query) {
     const database = await this.loadBaseDatabase();
-    if (!database) return [];
+    if (!database) {
+      return [];
+    }
 
     const lowerQuery = query.toLowerCase();
-    
-    return database.ingredients.filter(ing => 
-      ing.name.toLowerCase().includes(lowerQuery) ||
-      ing.category.toLowerCase().includes(lowerQuery) ||
-      ing.substitutes.some(sub => sub.toLowerCase().includes(lowerQuery))
+
+    return database.ingredients.filter(
+      ing =>
+        ing.name.toLowerCase().includes(lowerQuery) ||
+        ing.category.toLowerCase().includes(lowerQuery) ||
+        ing.substitutes.some(sub => sub.toLowerCase().includes(lowerQuery))
     );
   }
 
@@ -132,7 +144,9 @@ class BaseIngredientsLoader {
    */
   async getById(id) {
     const database = await this.loadBaseDatabase();
-    if (!database) return null;
+    if (!database) {
+      return null;
+    }
 
     return database.ingredients.find(ing => ing.id === id);
   }
@@ -142,7 +156,9 @@ class BaseIngredientsLoader {
    */
   async getStats() {
     const database = await this.loadBaseDatabase();
-    if (!database) return null;
+    if (!database) {
+      return null;
+    }
 
     const stats = {
       total: database.ingredients.length,
@@ -153,7 +169,9 @@ class BaseIngredientsLoader {
 
     // Count by category
     database.categories.forEach(cat => {
-      const count = database.ingredients.filter(ing => ing.category === cat).length;
+      const count = database.ingredients.filter(
+        ing => ing.category === cat
+      ).length;
       stats.categories[cat] = count;
     });
 
@@ -164,7 +182,9 @@ class BaseIngredientsLoader {
    * Check if base database is loaded
    */
   isBaseLoaded() {
-    const ingredients = JSON.parse(localStorage.getItem(this.localStorageKey) || '[]');
+    const ingredients = JSON.parse(
+      localStorage.getItem(this.localStorageKey) || '[]'
+    );
     // Check if any ingredient has an ID starting with "ing_" (base database format)
     return ingredients.some(ing => ing.id && ing.id.startsWith('ing_'));
   }
@@ -253,7 +273,7 @@ class BaseIngredientsLoader {
    */
   async loadImportStats() {
     const stats = await this.getStats();
-    
+
     if (!stats) {
       document.getElementById('import-stats-loading').innerHTML = `
         <div style="font-size: 40px; margin-bottom: 10px;">❌</div>
@@ -287,8 +307,9 @@ class BaseIngredientsLoader {
    * Execute the import
    */
   async executeImport() {
-    const overwrite = document.getElementById('overwrite-existing')?.checked || false;
-    
+    const overwrite =
+      document.getElementById('overwrite-existing')?.checked || false;
+
     // Show loading
     document.getElementById('import-stats').style.display = 'none';
     document.getElementById('import-stats-loading').style.display = 'block';
@@ -306,8 +327,9 @@ class BaseIngredientsLoader {
 
     if (result.success) {
       document.getElementById('result-icon').textContent = '✅';
-      document.getElementById('result-title').textContent = 'Import Successful!';
-      document.getElementById('result-message').textContent = 
+      document.getElementById('result-title').textContent =
+        'Import Successful!';
+      document.getElementById('result-message').textContent =
         `${result.total} total ingredients (${result.added} new)`;
     } else {
       document.getElementById('result-icon').textContent = '❌';
@@ -321,4 +343,3 @@ class BaseIngredientsLoader {
 window.baseIngredientsLoader = new BaseIngredientsLoader();
 
 console.log('📦 Base Ingredients Loader ready');
-

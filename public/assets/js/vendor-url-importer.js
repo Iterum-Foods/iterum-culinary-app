@@ -4,20 +4,20 @@
  */
 
 class VendorURLImporter {
-    constructor() {
-        this.currentModal = null;
-    }
+  constructor() {
+    this.currentModal = null;
+  }
 
-    /**
-     * Show add vendor modal with URL import
-     */
-    showAddVendorModal() {
-        this.closeModal();
+  /**
+   * Show add vendor modal with URL import
+   */
+  showAddVendorModal() {
+    this.closeModal();
 
-        const modal = document.createElement('div');
-        modal.className = 'vendor-modal-overlay';
-        
-        modal.innerHTML = `
+    const modal = document.createElement('div');
+    modal.className = 'vendor-modal-overlay';
+
+    modal.innerHTML = `
             <div class="modal-backdrop" onclick="window.vendorImporter.closeModal()"></div>
             <div class="modal-content">
                 <!-- Header -->
@@ -164,347 +164,365 @@ class VendorURLImporter {
             </div>
         `;
 
-        this.addModalStyles();
-        document.body.appendChild(modal);
-        this.currentModal = modal;
+    this.addModalStyles();
+    document.body.appendChild(modal);
+    this.currentModal = modal;
 
-        // Animate in
-        setTimeout(() => modal.classList.add('show'), 10);
+    // Animate in
+    setTimeout(() => modal.classList.add('show'), 10);
 
-        // Focus URL input
-        setTimeout(() => document.getElementById('vendor-website-url')?.focus(), 100);
+    // Focus URL input
+    setTimeout(
+      () => document.getElementById('vendor-website-url')?.focus(),
+      100
+    );
+  }
+
+  /**
+   * Import vendor info from URL
+   */
+  async importFromURL() {
+    const urlInput = document.getElementById('vendor-website-url');
+    const url = urlInput?.value.trim();
+
+    if (!url) {
+      alert('Please enter a vendor website URL');
+      return;
     }
 
-    /**
-     * Import vendor info from URL
-     */
-    async importFromURL() {
-        const urlInput = document.getElementById('vendor-website-url');
-        const url = urlInput?.value.trim();
-
-        if (!url) {
-            alert('Please enter a vendor website URL');
-            return;
-        }
-
-        // Validate URL
-        try {
-            new URL(url);
-        } catch (e) {
-            alert('Please enter a valid URL (e.g., https://vendorwebsite.com)');
-            return;
-        }
-
-        // Show loading
-        const loadingEl = document.getElementById('url-loading');
-        if (loadingEl) {
-            loadingEl.style.display = 'flex';
-        }
-
-        try {
-            // Fetch vendor information
-            const vendorInfo = await this.fetchVendorInfo(url);
-            
-            // Hide loading
-            if (loadingEl) {
-                loadingEl.style.display = 'none';
-            }
-
-            // Pre-fill form
-            this.prefillForm(vendorInfo);
-
-            // Show success message
-            this.showToast('✅ Vendor information imported! Review and save.', 'success');
-
-            // Track analytics
-            if (window.analyticsTracker) {
-                window.analyticsTracker.trackCustomEvent('vendor_imported_from_url', {
-                    success: true,
-                    url_domain: new URL(url).hostname
-                });
-            }
-
-        } catch (error) {
-            console.error('Error importing vendor:', error);
-            
-            // Hide loading
-            if (loadingEl) {
-                loadingEl.style.display = 'none';
-            }
-
-            // Try to extract at least the domain as vendor name
-            const domain = new URL(url).hostname.replace('www.', '');
-            const vendorName = domain.split('.')[0];
-            
-            document.getElementById('vendor-name').value = vendorName.charAt(0).toUpperCase() + vendorName.slice(1);
-            document.getElementById('vendor-website').value = url;
-
-            this.showToast('⚠️ Could not auto-import all details. Please fill in manually.', 'warning');
-        }
+    // Validate URL
+    try {
+      new URL(url);
+    } catch (e) {
+      alert('Please enter a valid URL (e.g., https://vendorwebsite.com)');
+      return;
     }
 
-    /**
-     * Fetch vendor information from URL
-     */
-    async fetchVendorInfo(url) {
-        // Use CORS proxy for fetching external websites
-        const corsProxy = 'https://api.allorigins.win/get?url=';
-        const proxyUrl = corsProxy + encodeURIComponent(url);
-
-        const response = await fetch(proxyUrl);
-        const data = await response.json();
-        const html = data.contents;
-
-        // Parse HTML
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-
-        // Extract information
-        const vendorInfo = {
-            name: '',
-            description: '',
-            email: '',
-            phone: '',
-            address: '',
-            website: url
-        };
-
-        // Extract title (often company name)
-        const titleTag = doc.querySelector('title');
-        if (titleTag) {
-            vendorInfo.name = titleTag.textContent.split('|')[0].split('-')[0].trim();
-        }
-
-        // Extract meta description
-        const metaDesc = doc.querySelector('meta[name="description"]') || 
-                        doc.querySelector('meta[property="og:description"]');
-        if (metaDesc) {
-            vendorInfo.description = metaDesc.content;
-        }
-
-        // Extract email (look for mailto links or text patterns)
-        const mailtoLink = doc.querySelector('a[href^="mailto:"]');
-        if (mailtoLink) {
-            vendorInfo.email = mailtoLink.href.replace('mailto:', '').split('?')[0];
-        } else {
-            // Try to find email in text
-            const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
-            const bodyText = doc.body?.textContent || '';
-            const emailMatch = bodyText.match(emailPattern);
-            if (emailMatch) {
-                vendorInfo.email = emailMatch[0];
-            }
-        }
-
-        // Extract phone (look for tel links or patterns)
-        const telLink = doc.querySelector('a[href^="tel:"]');
-        if (telLink) {
-            vendorInfo.phone = telLink.textContent.trim();
-        } else {
-            // Try to find phone in text
-            const phonePattern = /(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
-            const bodyText = doc.body?.textContent || '';
-            const phoneMatch = bodyText.match(phonePattern);
-            if (phoneMatch) {
-                vendorInfo.phone = phoneMatch[0];
-            }
-        }
-
-        // Extract address (look for common patterns)
-        const addressSelectors = [
-            '[itemtype*="PostalAddress"]',
-            '.address',
-            '#address',
-            '[class*="contact"] address',
-            '.footer address'
-        ];
-
-        for (const selector of addressSelectors) {
-            const addressEl = doc.querySelector(selector);
-            if (addressEl) {
-                vendorInfo.address = addressEl.textContent.trim().replace(/\s+/g, ' ');
-                break;
-            }
-        }
-
-        // Extract from Open Graph tags
-        const ogTitle = doc.querySelector('meta[property="og:title"]');
-        if (ogTitle && !vendorInfo.name) {
-            vendorInfo.name = ogTitle.content;
-        }
-
-        const ogSiteName = doc.querySelector('meta[property="og:site_name"]');
-        if (ogSiteName && !vendorInfo.name) {
-            vendorInfo.name = ogSiteName.content;
-        }
-
-        // Fallback: Use domain name
-        if (!vendorInfo.name) {
-            const domain = new URL(url).hostname.replace('www.', '');
-            vendorInfo.name = domain.split('.')[0].charAt(0).toUpperCase() + domain.split('.')[0].slice(1);
-        }
-
-        console.log('✅ Extracted vendor info:', vendorInfo);
-        return vendorInfo;
+    // Show loading
+    const loadingEl = document.getElementById('url-loading');
+    if (loadingEl) {
+      loadingEl.style.display = 'flex';
     }
 
-    /**
-     * Pre-fill form with extracted data
-     */
-    prefillForm(vendorInfo) {
-        const fields = {
-            'vendor-name': vendorInfo.name,
-            'vendor-description': vendorInfo.description,
-            'vendor-email': vendorInfo.email,
-            'vendor-phone': vendorInfo.phone,
-            'vendor-address': vendorInfo.address,
-            'vendor-website': vendorInfo.website
-        };
+    try {
+      // Fetch vendor information
+      const vendorInfo = await this.fetchVendorInfo(url);
 
-        for (const [fieldId, value] of Object.entries(fields)) {
-            const field = document.getElementById(fieldId);
-            if (field && value) {
-                field.value = value;
-                // Highlight pre-filled fields
-                field.style.background = '#f0fdf4';
-                setTimeout(() => {
-                    field.style.background = '';
-                }, 2000);
-            }
-        }
+      // Hide loading
+      if (loadingEl) {
+        loadingEl.style.display = 'none';
+      }
+
+      // Pre-fill form
+      this.prefillForm(vendorInfo);
+
+      // Show success message
+      this.showToast(
+        '✅ Vendor information imported! Review and save.',
+        'success'
+      );
+
+      // Track analytics
+      if (window.analyticsTracker) {
+        window.analyticsTracker.trackCustomEvent('vendor_imported_from_url', {
+          success: true,
+          url_domain: new URL(url).hostname
+        });
+      }
+    } catch (error) {
+      console.error('Error importing vendor:', error);
+
+      // Hide loading
+      if (loadingEl) {
+        loadingEl.style.display = 'none';
+      }
+
+      // Try to extract at least the domain as vendor name
+      const domain = new URL(url).hostname.replace('www.', '');
+      const vendorName = domain.split('.')[0];
+
+      document.getElementById('vendor-name').value =
+        vendorName.charAt(0).toUpperCase() + vendorName.slice(1);
+      document.getElementById('vendor-website').value = url;
+
+      this.showToast(
+        '⚠️ Could not auto-import all details. Please fill in manually.',
+        'warning'
+      );
+    }
+  }
+
+  /**
+   * Fetch vendor information from URL
+   */
+  async fetchVendorInfo(url) {
+    // Use CORS proxy for fetching external websites
+    const corsProxy = 'https://api.allorigins.win/get?url=';
+    const proxyUrl = corsProxy + encodeURIComponent(url);
+
+    const response = await fetch(proxyUrl);
+    const data = await response.json();
+    const html = data.contents;
+
+    // Parse HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Extract information
+    const vendorInfo = {
+      name: '',
+      description: '',
+      email: '',
+      phone: '',
+      address: '',
+      website: url
+    };
+
+    // Extract title (often company name)
+    const titleTag = doc.querySelector('title');
+    if (titleTag) {
+      vendorInfo.name = titleTag.textContent.split('|')[0].split('-')[0].trim();
     }
 
-    /**
-     * Handle form submission
-     */
-    handleSubmit(event) {
-        event.preventDefault();
-
-        const vendor = {
-            id: 'vendor_' + Date.now(),
-            name: document.getElementById('vendor-name').value.trim(),
-            category: document.getElementById('vendor-category').value,
-            description: document.getElementById('vendor-description').value.trim(),
-            contactName: document.getElementById('vendor-contact-name').value.trim(),
-            email: document.getElementById('vendor-email').value.trim(),
-            phone: document.getElementById('vendor-phone').value.trim(),
-            website: document.getElementById('vendor-website').value.trim(),
-            address: document.getElementById('vendor-address').value.trim(),
-            minOrder: document.getElementById('vendor-min-order').value.trim(),
-            paymentTerms: document.getElementById('vendor-payment-terms').value,
-            notes: document.getElementById('vendor-notes').value.trim(),
-            status: 'active',
-            createdAt: new Date().toISOString()
-        };
-
-        if (!vendor.name) {
-            alert('Please enter a vendor name');
-            return;
-        }
-
-        // Convert to vendorManager format
-        const vendorForManager = {
-            id: Date.now(),
-            name: vendor.name,
-            company: vendor.name, // Use name as company if not specified
-            email: vendor.email,
-            phone: vendor.phone,
-            mobile: '',
-            fax: '',
-            website: vendor.website,
-            street: vendor.address,
-            city: '',
-            state: '',
-            zip_code: '',
-            specialties: vendor.category ? [vendor.category] : [],
-            notes: `${vendor.description || ''}\n${vendor.notes || ''}`.trim(),
-            is_active: vendor.status === 'active',
-            created_at: vendor.createdAt
-        };
-
-        // Integrate with vendorManager if available
-        if (window.vendorManager) {
-            window.vendorManager.vendors.push(vendorForManager);
-            window.vendorManager.saveVendorsToFile();
-            console.log('✅ Vendor added via URL importer and integrated with vendorManager');
-            
-            // Refresh the display
-            setTimeout(() => {
-                window.vendorManager.updateVendorCount();
-                window.vendorManager.displayVendors();
-                window.vendorManager.updateFilters();
-            }, 100);
-        } else {
-            // Fallback to direct localStorage
-            const vendors = JSON.parse(localStorage.getItem('iterum_vendors') || '[]');
-            vendors.push(vendorForManager);
-            localStorage.setItem('iterum_vendors', JSON.stringify(vendors));
-            console.log('✅ Vendor added directly to localStorage');
-        }
-
-        // Track analytics
-        if (window.analyticsTracker) {
-            window.analyticsTracker.trackCustomEvent('vendor_created', {
-                method: vendor.website ? 'url_import' : 'manual',
-                category: vendor.category
-            });
-        }
-
-        // Show success
-        this.showToast('✅ Vendor added successfully!', 'success');
-        this.closeModal();
-
-        // Refresh vendor list if function exists
-        if (typeof loadVendors === 'function') {
-            loadVendors();
-        }
-
-        // Dispatch event for other components
-        window.dispatchEvent(new CustomEvent('vendorAdded', { detail: vendor }));
+    // Extract meta description
+    const metaDesc =
+      doc.querySelector('meta[name="description"]') ||
+      doc.querySelector('meta[property="og:description"]');
+    if (metaDesc) {
+      vendorInfo.description = metaDesc.content;
     }
 
-    /**
-     * Close modal
-     */
-    closeModal() {
-        if (this.currentModal) {
-            this.currentModal.classList.remove('show');
-            setTimeout(() => {
-                this.currentModal?.remove();
-                this.currentModal = null;
-            }, 200);
-        }
+    // Extract email (look for mailto links or text patterns)
+    const mailtoLink = doc.querySelector('a[href^="mailto:"]');
+    if (mailtoLink) {
+      vendorInfo.email = mailtoLink.href.replace('mailto:', '').split('?')[0];
+    } else {
+      // Try to find email in text
+      const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+      const bodyText = doc.body?.textContent || '';
+      const emailMatch = bodyText.match(emailPattern);
+      if (emailMatch) {
+        vendorInfo.email = emailMatch[0];
+      }
     }
 
-    /**
-     * Show toast notification
-     */
-    showToast(message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.className = `vendor-toast vendor-toast-${type}`;
-        toast.innerHTML = `
+    // Extract phone (look for tel links or patterns)
+    const telLink = doc.querySelector('a[href^="tel:"]');
+    if (telLink) {
+      vendorInfo.phone = telLink.textContent.trim();
+    } else {
+      // Try to find phone in text
+      const phonePattern = /(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
+      const bodyText = doc.body?.textContent || '';
+      const phoneMatch = bodyText.match(phonePattern);
+      if (phoneMatch) {
+        vendorInfo.phone = phoneMatch[0];
+      }
+    }
+
+    // Extract address (look for common patterns)
+    const addressSelectors = [
+      '[itemtype*="PostalAddress"]',
+      '.address',
+      '#address',
+      '[class*="contact"] address',
+      '.footer address'
+    ];
+
+    for (const selector of addressSelectors) {
+      const addressEl = doc.querySelector(selector);
+      if (addressEl) {
+        vendorInfo.address = addressEl.textContent.trim().replace(/\s+/g, ' ');
+        break;
+      }
+    }
+
+    // Extract from Open Graph tags
+    const ogTitle = doc.querySelector('meta[property="og:title"]');
+    if (ogTitle && !vendorInfo.name) {
+      vendorInfo.name = ogTitle.content;
+    }
+
+    const ogSiteName = doc.querySelector('meta[property="og:site_name"]');
+    if (ogSiteName && !vendorInfo.name) {
+      vendorInfo.name = ogSiteName.content;
+    }
+
+    // Fallback: Use domain name
+    if (!vendorInfo.name) {
+      const domain = new URL(url).hostname.replace('www.', '');
+      vendorInfo.name =
+        domain.split('.')[0].charAt(0).toUpperCase() +
+        domain.split('.')[0].slice(1);
+    }
+
+    console.log('✅ Extracted vendor info:', vendorInfo);
+    return vendorInfo;
+  }
+
+  /**
+   * Pre-fill form with extracted data
+   */
+  prefillForm(vendorInfo) {
+    const fields = {
+      'vendor-name': vendorInfo.name,
+      'vendor-description': vendorInfo.description,
+      'vendor-email': vendorInfo.email,
+      'vendor-phone': vendorInfo.phone,
+      'vendor-address': vendorInfo.address,
+      'vendor-website': vendorInfo.website
+    };
+
+    for (const [fieldId, value] of Object.entries(fields)) {
+      const field = document.getElementById(fieldId);
+      if (field && value) {
+        field.value = value;
+        // Highlight pre-filled fields
+        field.style.background = '#f0fdf4';
+        setTimeout(() => {
+          field.style.background = '';
+        }, 2000);
+      }
+    }
+  }
+
+  /**
+   * Handle form submission
+   */
+  handleSubmit(event) {
+    event.preventDefault();
+
+    const vendor = {
+      id: 'vendor_' + Date.now(),
+      name: document.getElementById('vendor-name').value.trim(),
+      category: document.getElementById('vendor-category').value,
+      description: document.getElementById('vendor-description').value.trim(),
+      contactName: document.getElementById('vendor-contact-name').value.trim(),
+      email: document.getElementById('vendor-email').value.trim(),
+      phone: document.getElementById('vendor-phone').value.trim(),
+      website: document.getElementById('vendor-website').value.trim(),
+      address: document.getElementById('vendor-address').value.trim(),
+      minOrder: document.getElementById('vendor-min-order').value.trim(),
+      paymentTerms: document.getElementById('vendor-payment-terms').value,
+      notes: document.getElementById('vendor-notes').value.trim(),
+      status: 'active',
+      createdAt: new Date().toISOString()
+    };
+
+    if (!vendor.name) {
+      alert('Please enter a vendor name');
+      return;
+    }
+
+    // Convert to vendorManager format
+    const vendorForManager = {
+      id: Date.now(),
+      name: vendor.name,
+      company: vendor.name, // Use name as company if not specified
+      email: vendor.email,
+      phone: vendor.phone,
+      mobile: '',
+      fax: '',
+      website: vendor.website,
+      street: vendor.address,
+      city: '',
+      state: '',
+      zip_code: '',
+      specialties: vendor.category ? [vendor.category] : [],
+      notes: `${vendor.description || ''}\n${vendor.notes || ''}`.trim(),
+      is_active: vendor.status === 'active',
+      created_at: vendor.createdAt
+    };
+
+    // Integrate with vendorManager if available
+    if (window.vendorManager) {
+      window.vendorManager.vendors.push(vendorForManager);
+      window.vendorManager.saveVendorsToFile();
+      console.log(
+        '✅ Vendor added via URL importer and integrated with vendorManager'
+      );
+
+      // Refresh the display
+      setTimeout(() => {
+        window.vendorManager.updateVendorCount();
+        window.vendorManager.displayVendors();
+        window.vendorManager.updateFilters();
+      }, 100);
+    } else {
+      // Fallback to direct localStorage
+      const vendors = JSON.parse(
+        localStorage.getItem('iterum_vendors') || '[]'
+      );
+      vendors.push(vendorForManager);
+      localStorage.setItem('iterum_vendors', JSON.stringify(vendors));
+      console.log('✅ Vendor added directly to localStorage');
+    }
+
+    // Track analytics
+    if (window.analyticsTracker) {
+      window.analyticsTracker.trackCustomEvent('vendor_created', {
+        method: vendor.website ? 'url_import' : 'manual',
+        category: vendor.category
+      });
+    }
+
+    // Show success
+    this.showToast('✅ Vendor added successfully!', 'success');
+    this.closeModal();
+
+    // Refresh vendor list if function exists
+    if (typeof loadVendors === 'function') {
+      loadVendors();
+    }
+
+    // Dispatch event for other components
+    window.dispatchEvent(new CustomEvent('vendorAdded', { detail: vendor }));
+  }
+
+  /**
+   * Close modal
+   */
+  closeModal() {
+    if (this.currentModal) {
+      this.currentModal.classList.remove('show');
+      setTimeout(() => {
+        this.currentModal?.remove();
+        this.currentModal = null;
+      }, 200);
+    }
+  }
+
+  /**
+   * Show toast notification
+   */
+  showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `vendor-toast vendor-toast-${type}`;
+    toast.innerHTML = `
             <div class="toast-content">
                 <span class="toast-message">${message}</span>
             </div>
         `;
 
-        document.body.appendChild(toast);
-        setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }, 4000);
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  }
+
+  /**
+   * Add modal styles
+   */
+  addModalStyles() {
+    if (document.getElementById('vendor-modal-styles')) {
+      return;
     }
 
-    /**
-     * Add modal styles
-     */
-    addModalStyles() {
-        if (document.getElementById('vendor-modal-styles')) return;
-
-        const styles = document.createElement('style');
-        styles.id = 'vendor-modal-styles';
-        styles.textContent = `
+    const styles = document.createElement('style');
+    styles.id = 'vendor-modal-styles';
+    styles.textContent = `
             .vendor-modal-overlay {
                 position: fixed;
                 top: 0;
@@ -827,10 +845,9 @@ class VendorURLImporter {
             }
         `;
 
-        document.head.appendChild(styles);
-    }
+    document.head.appendChild(styles);
+  }
 }
 
 // Create global instance
 window.vendorImporter = new VendorURLImporter();
-

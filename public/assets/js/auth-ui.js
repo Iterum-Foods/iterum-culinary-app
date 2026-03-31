@@ -4,338 +4,364 @@
  * Uses AuthManager for all authentication logic
  */
 
-(function() {
-    'use strict';
-    
-    console.log('🎨 Auth UI initializing...');
-    
-    // Wait for AuthManager to be ready
-    function waitForAuthManager() {
-        return new Promise((resolve) => {
-            if (window.authManager) {
-                resolve(window.authManager);
-                return;
-            }
-            
-            const checkInterval = setInterval(() => {
-                if (window.authManager) {
-                    clearInterval(checkInterval);
-                    resolve(window.authManager);
-                }
-            }, 100);
-            
-            // Timeout after 5 seconds
-            setTimeout(() => {
-                clearInterval(checkInterval);
-                resolve(null);
-            }, 5000);
-        });
+(function () {
+  'use strict';
+
+  console.log('🎨 Auth UI initializing...');
+
+  // Wait for AuthManager to be ready
+  function waitForAuthManager() {
+    return new Promise(resolve => {
+      if (window.authManager) {
+        resolve(window.authManager);
+        return;
+      }
+
+      const checkInterval = setInterval(() => {
+        if (window.authManager) {
+          clearInterval(checkInterval);
+          resolve(window.authManager);
+        }
+      }, 100);
+
+      // Timeout after 5 seconds
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        resolve(null);
+      }, 5000);
+    });
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  async function init() {
+    console.log('🎨 Auth UI initializing DOM handlers...');
+
+    // Wait for AuthManager
+    const authManager = await waitForAuthManager();
+    if (!authManager) {
+      console.error('❌ AuthManager not available');
+      return;
     }
-    
-    // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
+
+    console.log('✅ AuthManager available, setting up UI');
+
+    // Set up global functions for inline event handlers
+    window.switchTab = switchTab;
+    window.handleSignIn = handleSignIn;
+    window.handleSignUp = handleSignUp;
+    window.handleGoogleSignIn = handleGoogleSignIn;
+    window.handleTrialAccess = handleTrialAccess;
+    window.scrollToSignUp = scrollToSignUp;
+    window.closeTrialModal = closeTrialModal;
+    window.handleTrialSignUp = handleTrialSignUp;
+
+    // Mark as initialized so inline handlers know to defer
+    window.authUIInitialized = true;
+
+    console.log('✅ Auth UI initialized');
+  }
+
+  // Tab switching
+  function switchTab(tab) {
+    // Update tab buttons
+    document.querySelectorAll('.auth-tab').forEach(btn => {
+      btn.classList.remove('active');
+      btn.classList.add('text-iterum-slate');
+      btn.setAttribute('aria-selected', 'false');
+    });
+    const tabBtn = document.querySelector(`[data-tab="${tab}"]`);
+    if (tabBtn) {
+      tabBtn.classList.add('active');
+      tabBtn.classList.remove('text-iterum-slate');
+      tabBtn.setAttribute('aria-selected', 'true');
     }
-    
-    async function init() {
-        console.log('🎨 Auth UI initializing DOM handlers...');
-        
-        // Wait for AuthManager
-        const authManager = await waitForAuthManager();
-        if (!authManager) {
-            console.error('❌ AuthManager not available');
-            return;
-        }
-        
-        console.log('✅ AuthManager available, setting up UI');
-        
-        // Set up global functions for inline event handlers
-        window.switchTab = switchTab;
-        window.handleSignIn = handleSignIn;
-        window.handleSignUp = handleSignUp;
-        window.handleGoogleSignIn = handleGoogleSignIn;
-        window.handleTrialAccess = handleTrialAccess;
-        window.scrollToSignUp = scrollToSignUp;
-        window.closeTrialModal = closeTrialModal;
-        window.handleTrialSignUp = handleTrialSignUp;
-        
-        // Mark as initialized so inline handlers know to defer
-        window.authUIInitialized = true;
-        
-        console.log('✅ Auth UI initialized');
+
+    // Update forms
+    document.querySelectorAll('.auth-form').forEach(form => {
+      form.classList.remove('active');
+    });
+    const form = document.getElementById(`${tab}-form`);
+    if (form) {
+      form.classList.add('active');
     }
-    
-    // Tab switching
-    function switchTab(tab) {
-        // Update tab buttons
-        document.querySelectorAll('.auth-tab').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        const tabBtn = document.querySelector(`[data-tab="${tab}"]`);
-        if (tabBtn) {
-            tabBtn.classList.add('active');
-        }
-        
-        // Update forms
-        document.querySelectorAll('.auth-form').forEach(form => {
-            form.classList.remove('active');
-        });
-        const form = document.getElementById(`${tab}-form`);
-        if (form) {
-            form.classList.add('active');
-        }
-        
-        // Clear messages
-        clearMessages();
+
+    // Clear messages
+    clearMessages();
+  }
+
+  // Clear all error and success messages
+  function clearMessages() {
+    document.querySelectorAll('.error-message').forEach(el => {
+      el.classList.remove('show');
+      el.textContent = '';
+    });
+    document.querySelectorAll('.form-input').forEach(el => {
+      el.classList.remove('error');
+    });
+    const successMsg = document.getElementById('success-message');
+    if (successMsg) {
+      successMsg.classList.remove('show');
     }
-    
-    // Clear all error and success messages
-    function clearMessages() {
-        document.querySelectorAll('.error-message').forEach(el => {
-            el.classList.remove('show');
-            el.textContent = '';
-        });
-        document.querySelectorAll('.form-input').forEach(el => {
-            el.classList.remove('error');
-        });
-        const successMsg = document.getElementById('success-message');
-        if (successMsg) {
-            successMsg.classList.remove('show');
-        }
-        const errorMsg = document.getElementById('error-message-global');
-        if (errorMsg) {
-            errorMsg.classList.remove('show');
-        }
+    const errorMsg = document.getElementById('error-message-global');
+    if (errorMsg) {
+      errorMsg.classList.remove('show');
     }
-    
-    // Show error message
-    function showError(elementId, message) {
-        const errorEl = document.getElementById(elementId);
-        if (errorEl) {
-            errorEl.textContent = message;
-            errorEl.classList.add('show');
-            
-            // Highlight input
-            const inputId = elementId.replace('-error', '');
-            const input = document.getElementById(inputId);
-            if (input) {
-                input.classList.add('error');
-            }
-        }
+  }
+
+  // Show error message
+  function showError(elementId, message) {
+    const errorEl = document.getElementById(elementId);
+    if (errorEl) {
+      errorEl.textContent = message;
+      errorEl.classList.add('show');
+
+      // Highlight input
+      const inputId = elementId.replace('-error', '');
+      const input = document.getElementById(inputId);
+      if (input) {
+        input.classList.add('error');
+      }
     }
-    
-    // Show success message
-    function showSuccess(message) {
-        const successEl = document.getElementById('success-message');
-        if (successEl) {
-            successEl.textContent = '✅ ' + message;
-            successEl.classList.add('show');
-        }
+  }
+
+  // Show success message
+  function showSuccess(message) {
+    const successEl = document.getElementById('success-message');
+    if (successEl) {
+      successEl.textContent = '✅ ' + message;
+      successEl.classList.add('show');
     }
-    
-    // Handle Sign In
-    async function handleSignIn(event) {
-        event.preventDefault();
-        clearMessages();
-        
-        const email = document.getElementById('signin-email').value.trim();
-        const password = document.getElementById('signin-password').value;
-        
-        // Validation
-        if (!email) {
-            showError('signin-email-error', 'Email is required');
-            return;
-        }
-        
-        if (!password) {
-            showError('signin-password-error', 'Password is required');
-            return;
-        }
-        
-        // Show loading
-        const btn = document.getElementById('signin-btn');
-        const btnText = document.getElementById('signin-btn-text');
-        const spinner = document.getElementById('signin-spinner');
-        btn.disabled = true;
-        btnText.style.display = 'none';
-        spinner.style.display = 'block';
-        
-        try {
-            console.log('🔐 Starting sign-in process...');
-            
-            // Use AuthManager to sign in
-            const user = await window.authManager.signInWithEmail(email, password);
-            
-            console.log('✅ Sign-in successful:', user.email);
-            
-            showSuccess('Sign in successful! Redirecting...');
-            
-            // Redirect after delay
-            setTimeout(() => {
-                console.log('🚀 Redirecting to main app...');
-                window.location.href = 'dashboard.html';
-            }, 1500);
-            
-        } catch (error) {
-            console.error('❌ Sign-in error:', error);
-            
-            // Show user-friendly error
-            let errorMessage = 'Sign in failed. Please try again.';
-            if (error.message.includes('wrong-password')) {
-                errorMessage = 'Incorrect password. Please try again.';
-            } else if (error.message.includes('user-not-found')) {
-                errorMessage = 'No account found with this email.';
-            } else if (error.message.includes('invalid-email')) {
-                errorMessage = 'Invalid email address.';
-            } else if (error.message) {
-                errorMessage = error.message;
-            }
-            
-            showError('signin-password-error', errorMessage);
-            btn.disabled = false;
-            btnText.style.display = 'block';
-            spinner.style.display = 'none';
-        }
+  }
+
+  // Handle Sign In
+  async function handleSignIn(event) {
+    event.preventDefault();
+    clearMessages();
+
+    const email = document.getElementById('signin-email').value.trim();
+    const password = document.getElementById('signin-password').value;
+
+    // Validation
+    if (!email) {
+      showError('signin-email-error', 'Email is required');
+      return;
     }
-    
-    // Handle Sign Up
-    async function handleSignUp(event) {
-        event.preventDefault();
-        clearMessages();
-        
-        const name = document.getElementById('signup-name').value.trim();
-        const email = document.getElementById('signup-email').value.trim();
-        const password = document.getElementById('signup-password').value;
-        const confirmPassword = document.getElementById('signup-confirm-password').value;
-        
-        // Validation
-        if (!name) {
-            showError('signup-name-error', 'Name is required');
-            return;
-        }
-        
-        if (!email) {
-            showError('signup-email-error', 'Email is required');
-            return;
-        }
-        
-        if (password.length < 6) {
-            showError('signup-password-error', 'Password must be at least 6 characters');
-            return;
-        }
-        
-        if (password !== confirmPassword) {
-            showError('signup-confirm-error', 'Passwords do not match');
-            return;
-        }
-        
-        // Show loading
-        const btn = document.getElementById('signup-btn');
-        const btnText = document.getElementById('signup-btn-text');
-        const spinner = document.getElementById('signup-spinner');
-        btn.disabled = true;
-        btnText.style.display = 'none';
-        spinner.style.display = 'block';
-        
-        try {
-            console.log('📝 Starting sign-up process...');
-            
-            // Use AuthManager to sign up
-            const user = await window.authManager.signUpWithEmail(name, email, password);
-            
-            console.log('✅ Sign-up successful:', user.email);
-            
-            showSuccess('Account created! Please check your email for verification link. Redirecting...');
-            
-            // Redirect after delay
-            setTimeout(() => {
-                console.log('🚀 Redirecting to main app...');
-                window.location.href = 'dashboard.html';
-            }, 1500);
-            
-        } catch (error) {
-            console.error('❌ Sign-up error:', error);
-            
-            // Show user-friendly error
-            let errorMessage = 'Sign up failed. Please try again.';
-            if (error.message.includes('email-already-in-use')) {
-                errorMessage = 'An account with this email already exists.';
-            } else if (error.message.includes('invalid-email')) {
-                errorMessage = 'Invalid email address.';
-            } else if (error.message.includes('weak-password')) {
-                errorMessage = 'Password is too weak. Use at least 6 characters.';
-            } else if (error.message) {
-                errorMessage = error.message;
-            }
-            
-            showError('signup-confirm-error', errorMessage);
-            btn.disabled = false;
-            btnText.style.display = 'block';
-            spinner.style.display = 'none';
-        }
+
+    if (!password) {
+      showError('signin-password-error', 'Password is required');
+      return;
     }
-    
-    // Handle Google Sign In
-    async function handleGoogleSignIn() {
-        clearMessages();
-        
-        try {
-            console.log('🔵 Starting Google sign-in...');
-            
-            showSuccess('Opening Google Sign-In...');
-            
-            // Use AuthManager to sign in with Google
-            const user = await window.authManager.signInWithGoogle();
-            
-            console.log('✅ Google sign-in successful:', user.email);
-            
-            showSuccess('Google Sign-In successful! Welcome ' + user.name + '! Redirecting...');
-            
-            // Redirect after delay
-            setTimeout(() => {
-                console.log('🚀 Redirecting to main app...');
-                window.location.href = 'dashboard.html';
-            }, 1500);
-            
-        } catch (error) {
-            console.error('❌ Google sign-in error:', error);
-            
-            // Show user-friendly error
-            const errorEl = document.getElementById('error-message-global');
-            if (errorEl) {
-                let errorMessage = 'Google Sign-In failed. Please try again.';
-                if (error.message.includes('popup-closed')) {
-                    errorMessage = 'Sign-in popup was closed. Please try again.';
-                } else if (error.message.includes('cancelled')) {
-                    errorMessage = 'Sign-in was cancelled.';
-                } else if (error.message) {
-                    errorMessage = error.message;
-                }
-                
-                errorEl.textContent = '❌ ' + errorMessage;
-                errorEl.classList.add('show');
-            }
-        }
+
+    // Show loading
+    const btn = document.getElementById('signin-btn');
+    const btnText = document.getElementById('signin-btn-text');
+    const spinner = document.getElementById('signin-spinner');
+    btn.disabled = true;
+    btnText.style.display = 'none';
+    if (spinner) {
+      spinner.classList.remove('hidden');
+      spinner.style.display = 'flex';
     }
-    
-    // Handle Trial Access
-    function handleTrialAccess() {
-        showTrialModal();
+
+    try {
+      console.log('🔐 Starting sign-in process...');
+
+      // Use AuthManager to sign in
+      const user = await window.authManager.signInWithEmail(email, password);
+
+      console.log('✅ Sign-in successful:', user.email);
+
+      showSuccess('Sign in successful! Redirecting...');
+
+      // Redirect after delay
+      setTimeout(() => {
+        console.log('🚀 Redirecting to main app...');
+        window.location.href = 'dashboard.html';
+      }, 1500);
+    } catch (error) {
+      console.error('❌ Sign-in error:', error);
+
+      // Show user-friendly error
+      let errorMessage = 'Sign in failed. Please try again.';
+      if (error.message.includes('wrong-password')) {
+        errorMessage = 'Incorrect password. Please try again.';
+      } else if (error.message.includes('user-not-found')) {
+        errorMessage = 'No account found with this email.';
+      } else if (error.message.includes('invalid-email')) {
+        errorMessage = 'Invalid email address.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      showError('signin-password-error', errorMessage);
+      btn.disabled = false;
+      btnText.style.display = '';
+      if (spinner) {
+        spinner.classList.add('hidden');
+        spinner.style.display = 'none';
+      }
     }
-    
-    // Show trial modal
-    function showTrialModal() {
-        // Remove any existing modal
-        const existingModal = document.getElementById('trial-modal');
-        if (existingModal) {
-            existingModal.remove();
+  }
+
+  // Handle Sign Up
+  async function handleSignUp(event) {
+    event.preventDefault();
+    clearMessages();
+
+    const name = document.getElementById('signup-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+    const confirmPassword = document.getElementById(
+      'signup-confirm-password'
+    ).value;
+
+    // Validation
+    if (!name) {
+      showError('signup-name-error', 'Name is required');
+      return;
+    }
+
+    if (!email) {
+      showError('signup-email-error', 'Email is required');
+      return;
+    }
+
+    if (password.length < 6) {
+      showError(
+        'signup-password-error',
+        'Password must be at least 6 characters'
+      );
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showError('signup-confirm-error', 'Passwords do not match');
+      return;
+    }
+
+    // Show loading
+    const btn = document.getElementById('signup-btn');
+    const btnText = document.getElementById('signup-btn-text');
+    const spinner = document.getElementById('signup-spinner');
+    btn.disabled = true;
+    btnText.style.display = 'none';
+    if (spinner) {
+      spinner.classList.remove('hidden');
+      spinner.style.display = 'flex';
+    }
+
+    try {
+      console.log('📝 Starting sign-up process...');
+
+      // Use AuthManager to sign up
+      const user = await window.authManager.signUpWithEmail(
+        name,
+        email,
+        password
+      );
+
+      console.log('✅ Sign-up successful:', user.email);
+
+      showSuccess(
+        'Account created! Please check your email for verification link. Redirecting...'
+      );
+
+      // Redirect after delay
+      setTimeout(() => {
+        console.log('🚀 Redirecting to main app...');
+        window.location.href = 'dashboard.html';
+      }, 1500);
+    } catch (error) {
+      console.error('❌ Sign-up error:', error);
+
+      // Show user-friendly error
+      let errorMessage = 'Sign up failed. Please try again.';
+      if (error.message.includes('email-already-in-use')) {
+        errorMessage = 'An account with this email already exists.';
+      } else if (error.message.includes('invalid-email')) {
+        errorMessage = 'Invalid email address.';
+      } else if (error.message.includes('weak-password')) {
+        errorMessage = 'Password is too weak. Use at least 6 characters.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      showError('signup-confirm-error', errorMessage);
+      btn.disabled = false;
+      btnText.style.display = '';
+      if (spinner) {
+        spinner.classList.add('hidden');
+        spinner.style.display = 'none';
+      }
+    }
+  }
+
+  // Handle Google Sign In
+  async function handleGoogleSignIn() {
+    clearMessages();
+
+    try {
+      console.log('🔵 Starting Google sign-in...');
+
+      showSuccess('Opening Google Sign-In...');
+
+      // Use AuthManager to sign in with Google
+      const user = await window.authManager.signInWithGoogle();
+
+      console.log('✅ Google sign-in successful:', user.email);
+
+      showSuccess(
+        'Google Sign-In successful! Welcome ' + user.name + '! Redirecting...'
+      );
+
+      // Redirect after delay
+      setTimeout(() => {
+        console.log('🚀 Redirecting to main app...');
+        window.location.href = 'dashboard.html';
+      }, 1500);
+    } catch (error) {
+      console.error('❌ Google sign-in error:', error);
+
+      // Show user-friendly error
+      const errorEl = document.getElementById('error-message-global');
+      if (errorEl) {
+        let errorMessage = 'Google Sign-In failed. Please try again.';
+        if (error.message.includes('popup-closed')) {
+          errorMessage = 'Sign-in popup was closed. Please try again.';
+        } else if (error.message.includes('cancelled')) {
+          errorMessage = 'Sign-in was cancelled.';
+        } else if (error.message) {
+          errorMessage = error.message;
         }
-        
-        const modal = document.createElement('div');
-        modal.id = 'trial-modal';
-        modal.style.cssText = `
+
+        errorEl.textContent = '❌ ' + errorMessage;
+        errorEl.classList.add('show');
+      }
+    }
+  }
+
+  // Handle Trial Access
+  function handleTrialAccess() {
+    showTrialModal();
+  }
+
+  // Show trial modal
+  function showTrialModal() {
+    // Remove any existing modal
+    const existingModal = document.getElementById('trial-modal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'trial-modal';
+    modal.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -348,8 +374,8 @@
             z-index: 10000;
             animation: fadeIn 0.3s ease;
         `;
-        
-        modal.innerHTML = `
+
+    modal.innerHTML = `
             <div style="background: white; border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideIn 0.3s ease;">
                 <div style="text-align: center; margin-bottom: 24px;">
                     <div style="font-size: 48px; margin-bottom: 12px;">🎁</div>
@@ -458,121 +484,133 @@
                 }
             </style>
         `;
-        
-        document.body.appendChild(modal);
-        
-        // Close on outside click
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeTrialModal();
-            }
-        });
+
+    document.body.appendChild(modal);
+
+    // Close on outside click
+    modal.addEventListener('click', e => {
+      if (e.target === modal) {
+        closeTrialModal();
+      }
+    });
+  }
+
+  // Close trial modal
+  function closeTrialModal() {
+    const modal = document.getElementById('trial-modal');
+    if (modal) {
+      modal.style.animation = 'fadeOut 0.3s ease';
+      setTimeout(() => modal.remove(), 300);
     }
-    
-    // Close trial modal
-    function closeTrialModal() {
-        const modal = document.getElementById('trial-modal');
-        if (modal) {
-            modal.style.animation = 'fadeOut 0.3s ease';
-            setTimeout(() => modal.remove(), 300);
-        }
+  }
+
+  // Handle trial sign-up
+  async function handleTrialSignUp(event) {
+    event.preventDefault();
+
+    const name = document.getElementById('trial-name').value.trim();
+    const email = document.getElementById('trial-email').value.trim();
+    const company = document.getElementById('trial-company').value.trim();
+    const role = document.getElementById('trial-role').value;
+    const source = document.getElementById('trial-source').value;
+    const termsAccepted = document.getElementById('trial-terms').checked;
+
+    // Validation
+    if (!name) {
+      showTrialError('trial-name-error', 'Name is required');
+      return;
     }
-    
-    // Handle trial sign-up
-    async function handleTrialSignUp(event) {
-        event.preventDefault();
-        
-        const name = document.getElementById('trial-name').value.trim();
-        const email = document.getElementById('trial-email').value.trim();
-        const company = document.getElementById('trial-company').value.trim();
-        const role = document.getElementById('trial-role').value;
-        const source = document.getElementById('trial-source').value;
-        const termsAccepted = document.getElementById('trial-terms').checked;
-        
-        // Validation
-        if (!name) {
-            showTrialError('trial-name-error', 'Name is required');
-            return;
-        }
-        
-        if (!email) {
-            showTrialError('trial-email-error', 'Email is required');
-            return;
-        }
-        
-        if (!termsAccepted) {
-            showTrialError('trial-terms-error', 'You must accept the terms to continue');
-            return;
-        }
-        
-        // Show loading
-        const submitBtn = document.querySelector('#trial-form button[type="submit"]');
-        const submitText = document.getElementById('trial-submit-text');
-        const spinner = document.getElementById('trial-spinner');
-        submitBtn.disabled = true;
-        submitText.style.display = 'none';
-        spinner.style.display = 'block';
-        
-        try {
-            console.log('🎁 Starting trial sign-up...');
-            
-            // Use AuthManager to create trial account
-            const user = await window.authManager.createTrialAccount({
-                name,
-                email,
-                company,
-                role,
-                source
-            });
-            
-            console.log('✅ Trial account created:', user.email);
-            
-            // Show success
-            const trialErrorMsg = document.getElementById('trial-error-message');
-            trialErrorMsg.style.display = 'block';
-            trialErrorMsg.style.background = '#d1fae5';
-            trialErrorMsg.style.color = '#065f46';
-            trialErrorMsg.textContent = '✅ Trial activated! Welcome ' + name + '! You have 14 days of full access. Redirecting...';
-            
-            // Redirect after delay
-            setTimeout(() => {
-                console.log('🚀 Redirecting to main app...');
-                window.location.href = 'dashboard.html';
-            }, 2000);
-            
-        } catch (error) {
-            console.error('❌ Trial sign-up error:', error);
-            showTrialError('trial-error-message', 'Failed to start trial: ' + error.message);
-            submitBtn.disabled = false;
-            submitText.style.display = 'block';
-            spinner.style.display = 'none';
-        }
+
+    if (!email) {
+      showTrialError('trial-email-error', 'Email is required');
+      return;
     }
-    
-    // Show trial error
-    function showTrialError(elementId, message) {
-        const errorEl = document.getElementById(elementId);
-        if (errorEl) {
-            errorEl.textContent = message;
-            errorEl.style.display = 'block';
-        }
+
+    if (!termsAccepted) {
+      showTrialError(
+        'trial-terms-error',
+        'You must accept the terms to continue'
+      );
+      return;
     }
-    
-    // Scroll to sign up
-    function scrollToSignUp() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        setTimeout(() => {
-            switchTab('signup');
-        }, 500);
+
+    // Show loading
+    const submitBtn = document.querySelector(
+      '#trial-form button[type="submit"]'
+    );
+    const submitText = document.getElementById('trial-submit-text');
+    const spinner = document.getElementById('trial-spinner');
+    submitBtn.disabled = true;
+    submitText.style.display = 'none';
+    spinner.style.display = 'block';
+
+    try {
+      console.log('🎁 Starting trial sign-up...');
+
+      // Use AuthManager to create trial account
+      const user = await window.authManager.createTrialAccount({
+        name,
+        email,
+        company,
+        role,
+        source
+      });
+
+      console.log('✅ Trial account created:', user.email);
+
+      // Show success
+      const trialErrorMsg = document.getElementById('trial-error-message');
+      trialErrorMsg.style.display = 'block';
+      trialErrorMsg.style.background = '#d1fae5';
+      trialErrorMsg.style.color = '#065f46';
+      trialErrorMsg.textContent =
+        '✅ Trial activated! Welcome ' +
+        name +
+        '! You have 14 days of full access. Redirecting...';
+
+      // Redirect after delay
+      setTimeout(() => {
+        console.log('🚀 Redirecting to main app...');
+        window.location.href = 'dashboard.html';
+      }, 2000);
+    } catch (error) {
+      console.error('❌ Trial sign-up error:', error);
+      showTrialError(
+        'trial-error-message',
+        'Failed to start trial: ' + error.message
+      );
+      submitBtn.disabled = false;
+      submitText.style.display = 'block';
+      spinner.style.display = 'none';
     }
-    
-    // Show forgot password modal
-    function showForgotPasswordModal(event) {
-        if (event) event.preventDefault();
-        
-        const modal = document.createElement('div');
-        modal.id = 'forgot-password-modal';
-        modal.style.cssText = `
+  }
+
+  // Show trial error
+  function showTrialError(elementId, message) {
+    const errorEl = document.getElementById(elementId);
+    if (errorEl) {
+      errorEl.textContent = message;
+      errorEl.style.display = 'block';
+    }
+  }
+
+  // Scroll to sign up
+  function scrollToSignUp() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      switchTab('signup');
+    }, 500);
+  }
+
+  // Show forgot password modal
+  function showForgotPasswordModal(event) {
+    if (event) {
+      event.preventDefault();
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'forgot-password-modal';
+    modal.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -585,8 +623,8 @@
             z-index: 10000;
             animation: fadeIn 0.3s ease;
         `;
-        
-        modal.innerHTML = `
+
+    modal.innerHTML = `
             <div style="background: white; border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideIn 0.3s ease;">
                 <div style="text-align: center; margin-bottom: 24px;">
                     <div style="font-size: 48px; margin-bottom: 12px;">🔑</div>
@@ -617,95 +655,93 @@
                 <div id="forgot-message" style="margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 14px; display: none;"></div>
             </div>
         `;
-        
-        document.body.appendChild(modal);
-        
-        // Focus email input
-        setTimeout(() => {
-            document.getElementById('forgot-email')?.focus();
-        }, 300);
-        
-        // Close on outside click
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeForgotPasswordModal();
-            }
-        });
-    }
-    
-    // Close forgot password modal
-    function closeForgotPasswordModal() {
-        const modal = document.getElementById('forgot-password-modal');
-        if (modal) {
-            modal.remove();
-        }
-    }
-    
-    // Handle forgot password submission
-    async function handleForgotPasswordSubmit(event) {
-        event.preventDefault();
-        
-        const email = document.getElementById('forgot-email').value.trim();
-        const submitBtn = document.getElementById('forgot-submit-btn');
-        const submitText = document.getElementById('forgot-submit-text');
-        const spinner = document.getElementById('forgot-spinner');
-        const messageDiv = document.getElementById('forgot-message');
-        
-        if (!email) {
-            messageDiv.style.display = 'block';
-            messageDiv.style.background = '#fee2e2';
-            messageDiv.style.color = '#991b1b';
-            messageDiv.textContent = 'Please enter your email address';
-            return;
-        }
-        
-        // Show loading
-        submitBtn.disabled = true;
-        submitText.style.display = 'none';
-        spinner.style.display = 'block';
-        messageDiv.style.display = 'none';
-        
-        try {
-            await window.authManager.sendPasswordResetEmail(email);
-            
-            // Show success
-            messageDiv.style.display = 'block';
-            messageDiv.style.background = '#d1fae5';
-            messageDiv.style.color = '#065f46';
-            messageDiv.textContent = '✅ Password reset email sent! Check your inbox (and spam folder).';
-            
-            // Close modal after delay
-            setTimeout(() => {
-                closeForgotPasswordModal();
-            }, 3000);
-            
-        } catch (error) {
-            console.error('Password reset error:', error);
-            
-            let errorMessage = 'Failed to send reset email. Please try again.';
-            if (error.message.includes('user-not-found')) {
-                errorMessage = 'No account found with this email address.';
-            } else if (error.message.includes('invalid-email')) {
-                errorMessage = 'Invalid email address.';
-            }
-            
-            messageDiv.style.display = 'block';
-            messageDiv.style.background = '#fee2e2';
-            messageDiv.style.color = '#991b1b';
-            messageDiv.textContent = '❌ ' + errorMessage;
-            
-            submitBtn.disabled = false;
-            submitText.style.display = 'block';
-            spinner.style.display = 'none';
-        }
-    }
-    
-    // Export functions globally
-    window.showForgotPasswordModal = showForgotPasswordModal;
-    window.closeForgotPasswordModal = closeForgotPasswordModal;
-    window.handleForgotPasswordSubmit = handleForgotPasswordSubmit;
-    
-    console.log('✅ Auth UI script loaded');
-    
-})();
 
+    document.body.appendChild(modal);
+
+    // Focus email input
+    setTimeout(() => {
+      document.getElementById('forgot-email')?.focus();
+    }, 300);
+
+    // Close on outside click
+    modal.addEventListener('click', e => {
+      if (e.target === modal) {
+        closeForgotPasswordModal();
+      }
+    });
+  }
+
+  // Close forgot password modal
+  function closeForgotPasswordModal() {
+    const modal = document.getElementById('forgot-password-modal');
+    if (modal) {
+      modal.remove();
+    }
+  }
+
+  // Handle forgot password submission
+  async function handleForgotPasswordSubmit(event) {
+    event.preventDefault();
+
+    const email = document.getElementById('forgot-email').value.trim();
+    const submitBtn = document.getElementById('forgot-submit-btn');
+    const submitText = document.getElementById('forgot-submit-text');
+    const spinner = document.getElementById('forgot-spinner');
+    const messageDiv = document.getElementById('forgot-message');
+
+    if (!email) {
+      messageDiv.style.display = 'block';
+      messageDiv.style.background = '#fee2e2';
+      messageDiv.style.color = '#991b1b';
+      messageDiv.textContent = 'Please enter your email address';
+      return;
+    }
+
+    // Show loading
+    submitBtn.disabled = true;
+    submitText.style.display = 'none';
+    spinner.style.display = 'block';
+    messageDiv.style.display = 'none';
+
+    try {
+      await window.authManager.sendPasswordResetEmail(email);
+
+      // Show success
+      messageDiv.style.display = 'block';
+      messageDiv.style.background = '#d1fae5';
+      messageDiv.style.color = '#065f46';
+      messageDiv.textContent =
+        '✅ Password reset email sent! Check your inbox (and spam folder).';
+
+      // Close modal after delay
+      setTimeout(() => {
+        closeForgotPasswordModal();
+      }, 3000);
+    } catch (error) {
+      console.error('Password reset error:', error);
+
+      let errorMessage = 'Failed to send reset email. Please try again.';
+      if (error.message.includes('user-not-found')) {
+        errorMessage = 'No account found with this email address.';
+      } else if (error.message.includes('invalid-email')) {
+        errorMessage = 'Invalid email address.';
+      }
+
+      messageDiv.style.display = 'block';
+      messageDiv.style.background = '#fee2e2';
+      messageDiv.style.color = '#991b1b';
+      messageDiv.textContent = '❌ ' + errorMessage;
+
+      submitBtn.disabled = false;
+      submitText.style.display = 'block';
+      spinner.style.display = 'none';
+    }
+  }
+
+  // Export functions globally
+  window.showForgotPasswordModal = showForgotPasswordModal;
+  window.closeForgotPasswordModal = closeForgotPasswordModal;
+  window.handleForgotPasswordSubmit = handleForgotPasswordSubmit;
+
+  console.log('✅ Auth UI script loaded');
+})();

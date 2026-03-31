@@ -5,74 +5,74 @@
  */
 
 class UnifiedMenuCreator {
-    constructor() {
-        this.modes = {
-            'quick': {
-                name: 'Quick Menu',
-                description: 'Create a simple menu in 3 steps',
-                steps: 3,
-                timeEstimate: '~3 minutes',
-                icon: '⚡'
-            },
-            'guided': {
-                name: 'Guided Creation',
-                description: 'Step-by-step menu building with assistance',
-                steps: 5,
-                timeEstimate: '~10 minutes',
-                icon: '🧙'
-            },
-            'template': {
-                name: 'From Template',
-                description: 'Start with a professional template',
-                steps: 2,
-                timeEstimate: '~5 minutes',
-                icon: '📋'
-            },
-            'advanced': {
-                name: 'Advanced Builder',
-                description: 'Full control with all features',
-                steps: 1,
-                timeEstimate: '~15 minutes',
-                icon: '⚙️'
-            }
-        };
-        
-        this.currentMode = null;
-        this.currentStep = 1;
-        this.menuData = this.createEmptyMenuData();
-        this.templates = this.loadTemplates();
-        this.collaborators = [];
-        this.isCollaborative = false;
-        
-        this.init();
-    }
+  constructor() {
+    this.modes = {
+      quick: {
+        name: 'Quick Menu',
+        description: 'Create a simple menu in 3 steps',
+        steps: 3,
+        timeEstimate: '~3 minutes',
+        icon: '⚡'
+      },
+      guided: {
+        name: 'Guided Creation',
+        description: 'Step-by-step menu building with assistance',
+        steps: 5,
+        timeEstimate: '~10 minutes',
+        icon: '🧙'
+      },
+      template: {
+        name: 'From Template',
+        description: 'Start with a professional template',
+        steps: 2,
+        timeEstimate: '~5 minutes',
+        icon: '📋'
+      },
+      advanced: {
+        name: 'Advanced Builder',
+        description: 'Full control with all features',
+        steps: 1,
+        timeEstimate: '~15 minutes',
+        icon: '⚙️'
+      }
+    };
 
-    /**
-     * Initialize the unified menu creator
-     */
-    init() {
-        console.log('🎯 Initializing Unified Menu Creator...');
-        this.setupEventListeners();
-        this.loadUserPreferences();
-    }
+    this.currentMode = null;
+    this.currentStep = 1;
+    this.menuData = this.createEmptyMenuData();
+    this.templates = this.loadTemplates();
+    this.collaborators = [];
+    this.isCollaborative = false;
 
-    /**
-     * Show the menu creation interface
-     */
-    showCreator() {
-        this.renderCreatorModal();
-        this.showModeSelection();
-    }
+    this.init();
+  }
 
-    /**
-     * Render the main creator modal
-     */
-    renderCreatorModal() {
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay unified-menu-creator-modal';
-        modal.id = 'unified-menu-creator-modal';
-        
-        modal.innerHTML = `
+  /**
+   * Initialize the unified menu creator
+   */
+  init() {
+    console.log('🎯 Initializing Unified Menu Creator...');
+    this.setupEventListeners();
+    this.loadUserPreferences();
+  }
+
+  /**
+   * Show the menu creation interface
+   */
+  showCreator() {
+    this.renderCreatorModal();
+    this.showModeSelection();
+  }
+
+  /**
+   * Render the main creator modal
+   */
+  renderCreatorModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay unified-menu-creator-modal';
+    modal.id = 'unified-menu-creator-modal';
+
+    modal.innerHTML = `
             <div class="modal-content modal-extra-large">
                 <div class="modal-header">
                     <h2>🎯 Create New Menu</h2>
@@ -134,24 +134,26 @@ class UnifiedMenuCreator {
                 </div>
             </div>
         `;
-        
-        document.body.appendChild(modal);
-        this.addCreatorStyles();
-    }
 
-    /**
-     * Show mode selection interface
-     */
-    showModeSelection() {
-        const container = document.getElementById('mode-selection');
-        container.innerHTML = `
+    document.body.appendChild(modal);
+    this.addCreatorStyles();
+  }
+
+  /**
+   * Show mode selection interface
+   */
+  showModeSelection() {
+    const container = document.getElementById('mode-selection');
+    container.innerHTML = `
             <div class="mode-selection-header">
                 <h3>Choose your creation method</h3>
                 <p>Select the approach that best fits your needs</p>
             </div>
             
             <div class="mode-grid">
-                ${Object.entries(this.modes).map(([key, mode]) => `
+                ${Object.entries(this.modes)
+                  .map(
+                    ([key, mode]) => `
                     <div class="mode-card" data-mode="${key}" onclick="unifiedMenuCreator.selectMode('${key}')">
                         <div class="mode-icon">${mode.icon}</div>
                         <div class="mode-info">
@@ -163,7 +165,9 @@ class UnifiedMenuCreator {
                             </div>
                         </div>
                     </div>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </div>
             
             <div class="mode-features">
@@ -188,46 +192,46 @@ class UnifiedMenuCreator {
                 </div>
             </div>
         `;
+  }
+
+  /**
+   * Select creation mode
+   */
+  selectMode(mode) {
+    this.currentMode = mode;
+    console.log(`Selected mode: ${mode}`);
+
+    // Hide mode selection
+    document.getElementById('mode-selection').style.display = 'none';
+
+    // Show appropriate mode content
+    switch (mode) {
+      case 'quick':
+        this.showQuickMode();
+        break;
+      case 'guided':
+        this.showGuidedMode();
+        break;
+      case 'template':
+        this.showTemplateMode();
+        break;
+      case 'advanced':
+        this.showAdvancedMode();
+        break;
     }
 
-    /**
-     * Select creation mode
-     */
-    selectMode(mode) {
-        this.currentMode = mode;
-        console.log(`Selected mode: ${mode}`);
-        
-        // Hide mode selection
-        document.getElementById('mode-selection').style.display = 'none';
-        
-        // Show appropriate mode content
-        switch (mode) {
-            case 'quick':
-                this.showQuickMode();
-                break;
-            case 'guided':
-                this.showGuidedMode();
-                break;
-            case 'template':
-                this.showTemplateMode();
-                break;
-            case 'advanced':
-                this.showAdvancedMode();
-                break;
-        }
-        
-        // Show navigation buttons
-        this.updateNavigationButtons();
-    }
+    // Show navigation buttons
+    this.updateNavigationButtons();
+  }
 
-    /**
-     * Show quick mode interface
-     */
-    showQuickMode() {
-        const container = document.getElementById('quick-mode');
-        container.style.display = 'block';
-        
-        container.innerHTML = `
+  /**
+   * Show quick mode interface
+   */
+  showQuickMode() {
+    const container = document.getElementById('quick-mode');
+    container.style.display = 'block';
+
+    container.innerHTML = `
             <div class="quick-mode-content">
                 <div class="step-indicator">
                     <div class="step active" data-step="1">1</div>
@@ -332,19 +336,19 @@ class UnifiedMenuCreator {
                 </div>
             </div>
         `;
-        
-        this.currentStep = 1;
-        this.updateQuickStep();
-    }
 
-    /**
-     * Show guided mode interface
-     */
-    showGuidedMode() {
-        const container = document.getElementById('guided-mode');
-        container.style.display = 'block';
-        
-        container.innerHTML = `
+    this.currentStep = 1;
+    this.updateQuickStep();
+  }
+
+  /**
+   * Show guided mode interface
+   */
+  showGuidedMode() {
+    const container = document.getElementById('guided-mode');
+    container.style.display = 'block';
+
+    container.innerHTML = `
             <div class="guided-mode-content">
                 <div class="progress-indicator">
                     <div class="progress-bar">
@@ -379,19 +383,19 @@ class UnifiedMenuCreator {
                 </div>
             </div>
         `;
-        
-        this.currentStep = 1;
-        this.showGuidedStep(1);
-    }
 
-    /**
-     * Show template mode interface
-     */
-    showTemplateMode() {
-        const container = document.getElementById('template-mode');
-        container.style.display = 'block';
-        
-        container.innerHTML = `
+    this.currentStep = 1;
+    this.showGuidedStep(1);
+  }
+
+  /**
+   * Show template mode interface
+   */
+  showTemplateMode() {
+    const container = document.getElementById('template-mode');
+    container.style.display = 'block';
+
+    container.innerHTML = `
             <div class="template-mode-content">
                 <div class="template-selection">
                     <h3>📋 Choose a Template</h3>
@@ -415,18 +419,18 @@ class UnifiedMenuCreator {
                 </div>
             </div>
         `;
-        
-        this.loadTemplates();
-    }
 
-    /**
-     * Show advanced mode interface
-     */
-    showAdvancedMode() {
-        const container = document.getElementById('advanced-mode');
-        container.style.display = 'block';
-        
-        container.innerHTML = `
+    this.loadTemplates();
+  }
+
+  /**
+   * Show advanced mode interface
+   */
+  showAdvancedMode() {
+    const container = document.getElementById('advanced-mode');
+    container.style.display = 'block';
+
+    container.innerHTML = `
             <div class="advanced-mode-content">
                 <div class="advanced-header">
                     <h3>⚙️ Advanced Menu Builder</h3>
@@ -460,208 +464,215 @@ class UnifiedMenuCreator {
                 </div>
             </div>
         `;
-        
-        this.initializeAdvancedMode();
+
+    this.initializeAdvancedMode();
+  }
+
+  /**
+   * Update menu data
+   */
+  updateMenuData(field, value) {
+    this.menuData[field] = value;
+    console.log(`Menu data updated: ${field} = ${value}`);
+
+    // Update live preview
+    this.updateLivePreview();
+
+    // Auto-advance in quick mode
+    if (this.currentMode === 'quick' && this.shouldAutoAdvance(field)) {
+      setTimeout(() => this.nextStep(), 500);
+    }
+  }
+
+  /**
+   * Check if should auto-advance
+   */
+  shouldAutoAdvance(field) {
+    const autoAdvanceFields = ['name', 'type', 'cuisine'];
+    return autoAdvanceFields.includes(field) && this.menuData[field];
+  }
+
+  /**
+   * Go to next step
+   */
+  nextStep() {
+    if (this.currentMode === 'quick') {
+      this.nextQuickStep();
+    } else if (this.currentMode === 'guided') {
+      this.nextGuidedStep();
+    }
+  }
+
+  /**
+   * Go to previous step
+   */
+  goBack() {
+    if (this.currentMode === 'quick') {
+      this.previousQuickStep();
+    } else if (this.currentMode === 'guided') {
+      this.previousGuidedStep();
+    }
+  }
+
+  /**
+   * Next quick step
+   */
+  nextQuickStep() {
+    if (this.currentStep < 3) {
+      this.currentStep++;
+      this.updateQuickStep();
+    } else {
+      this.showCreateButton();
+    }
+  }
+
+  /**
+   * Previous quick step
+   */
+  previousQuickStep() {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+      this.updateQuickStep();
+    }
+  }
+
+  /**
+   * Update quick step display
+   */
+  updateQuickStep() {
+    // Hide all steps
+    for (let i = 1; i <= 3; i++) {
+      document.getElementById(`quick-step-${i}`).style.display = 'none';
+      document.querySelector(`[data-step="${i}"]`).classList.remove('active');
     }
 
-    /**
-     * Update menu data
-     */
-    updateMenuData(field, value) {
-        this.menuData[field] = value;
-        console.log(`Menu data updated: ${field} = ${value}`);
-        
-        // Update live preview
-        this.updateLivePreview();
-        
-        // Auto-advance in quick mode
-        if (this.currentMode === 'quick' && this.shouldAutoAdvance(field)) {
-            setTimeout(() => this.nextStep(), 500);
-        }
+    // Show current step
+    document.getElementById(`quick-step-${this.currentStep}`).style.display =
+      'block';
+    document
+      .querySelector(`[data-step="${this.currentStep}"]`)
+      .classList.add('active');
+
+    // Update navigation
+    this.updateNavigationButtons();
+  }
+
+  /**
+   * Update navigation buttons
+   */
+  updateNavigationButtons() {
+    const backBtn = document.getElementById('back-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const createBtn = document.getElementById('create-btn');
+
+    if (this.currentMode === 'quick') {
+      backBtn.style.display = this.currentStep > 1 ? 'block' : 'none';
+      nextBtn.style.display = this.currentStep < 3 ? 'block' : 'none';
+      createBtn.style.display = this.currentStep === 3 ? 'block' : 'none';
+    }
+  }
+
+  /**
+   * Show create button
+   */
+  showCreateButton() {
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('create-btn').style.display = 'block';
+  }
+
+  /**
+   * Create menu
+   */
+  async createMenu() {
+    try {
+      console.log('Creating menu with data:', this.menuData);
+
+      // Validate menu data
+      if (!this.validateMenuData()) {
+        return;
+      }
+
+      // Create menu using appropriate method
+      let createdMenu;
+      if (window.menuManager) {
+        createdMenu = await window.menuManager.createMenu(this.menuData);
+      } else {
+        createdMenu = await this.createMenuLocally();
+      }
+
+      // Show success message
+      this.showNotification(
+        `Menu "${this.menuData.name}" created successfully!`,
+        'success'
+      );
+
+      // Close creator
+      this.closeCreator();
+
+      return createdMenu;
+    } catch (error) {
+      console.error('Error creating menu:', error);
+      this.showNotification(`Failed to create menu: ${error.message}`, 'error');
+    }
+  }
+
+  /**
+   * Validate menu data
+   */
+  validateMenuData() {
+    if (!this.menuData.name || !this.menuData.type) {
+      this.showNotification('Please fill in menu name and type.', 'error');
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Create menu locally
+   */
+  async createMenuLocally() {
+    const menu = {
+      id: Date.now().toString(),
+      ...this.menuData,
+      createdAt: new Date().toISOString(),
+      status: 'draft'
+    };
+
+    // Save to localStorage
+    const menus = JSON.parse(localStorage.getItem('menus') || '[]');
+    menus.push(menu);
+    localStorage.setItem('menus', JSON.stringify(menus));
+
+    return menu;
+  }
+
+  /**
+   * Update live preview
+   */
+  updateLivePreview() {
+    const preview = document.getElementById('preview-content');
+    if (!preview) {
+      return;
     }
 
-    /**
-     * Check if should auto-advance
-     */
-    shouldAutoAdvance(field) {
-        const autoAdvanceFields = ['name', 'type', 'cuisine'];
-        return autoAdvanceFields.includes(field) && this.menuData[field];
+    const previewHTML = this.generatePreviewHTML();
+    preview.innerHTML = previewHTML;
+
+    // Show preview if we have content
+    if (this.menuData.name) {
+      document.getElementById('live-preview').style.display = 'block';
+    }
+  }
+
+  /**
+   * Generate preview HTML
+   */
+  generatePreviewHTML() {
+    if (!this.menuData.name) {
+      return '<p class="preview-empty">Start filling in your menu details to see a live preview...</p>';
     }
 
-    /**
-     * Go to next step
-     */
-    nextStep() {
-        if (this.currentMode === 'quick') {
-            this.nextQuickStep();
-        } else if (this.currentMode === 'guided') {
-            this.nextGuidedStep();
-        }
-    }
-
-    /**
-     * Go to previous step
-     */
-    goBack() {
-        if (this.currentMode === 'quick') {
-            this.previousQuickStep();
-        } else if (this.currentMode === 'guided') {
-            this.previousGuidedStep();
-        }
-    }
-
-    /**
-     * Next quick step
-     */
-    nextQuickStep() {
-        if (this.currentStep < 3) {
-            this.currentStep++;
-            this.updateQuickStep();
-        } else {
-            this.showCreateButton();
-        }
-    }
-
-    /**
-     * Previous quick step
-     */
-    previousQuickStep() {
-        if (this.currentStep > 1) {
-            this.currentStep--;
-            this.updateQuickStep();
-        }
-    }
-
-    /**
-     * Update quick step display
-     */
-    updateQuickStep() {
-        // Hide all steps
-        for (let i = 1; i <= 3; i++) {
-            document.getElementById(`quick-step-${i}`).style.display = 'none';
-            document.querySelector(`[data-step="${i}"]`).classList.remove('active');
-        }
-        
-        // Show current step
-        document.getElementById(`quick-step-${this.currentStep}`).style.display = 'block';
-        document.querySelector(`[data-step="${this.currentStep}"]`).classList.add('active');
-        
-        // Update navigation
-        this.updateNavigationButtons();
-    }
-
-    /**
-     * Update navigation buttons
-     */
-    updateNavigationButtons() {
-        const backBtn = document.getElementById('back-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const createBtn = document.getElementById('create-btn');
-        
-        if (this.currentMode === 'quick') {
-            backBtn.style.display = this.currentStep > 1 ? 'block' : 'none';
-            nextBtn.style.display = this.currentStep < 3 ? 'block' : 'none';
-            createBtn.style.display = this.currentStep === 3 ? 'block' : 'none';
-        }
-    }
-
-    /**
-     * Show create button
-     */
-    showCreateButton() {
-        document.getElementById('next-btn').style.display = 'none';
-        document.getElementById('create-btn').style.display = 'block';
-    }
-
-    /**
-     * Create menu
-     */
-    async createMenu() {
-        try {
-            console.log('Creating menu with data:', this.menuData);
-            
-            // Validate menu data
-            if (!this.validateMenuData()) {
-                return;
-            }
-            
-            // Create menu using appropriate method
-            let createdMenu;
-            if (window.menuManager) {
-                createdMenu = await window.menuManager.createMenu(this.menuData);
-            } else {
-                createdMenu = await this.createMenuLocally();
-            }
-            
-            // Show success message
-            this.showNotification(`Menu "${this.menuData.name}" created successfully!`, 'success');
-            
-            // Close creator
-            this.closeCreator();
-            
-            return createdMenu;
-            
-        } catch (error) {
-            console.error('Error creating menu:', error);
-            this.showNotification(`Failed to create menu: ${error.message}`, 'error');
-        }
-    }
-
-    /**
-     * Validate menu data
-     */
-    validateMenuData() {
-        if (!this.menuData.name || !this.menuData.type) {
-            this.showNotification('Please fill in menu name and type.', 'error');
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Create menu locally
-     */
-    async createMenuLocally() {
-        const menu = {
-            id: Date.now().toString(),
-            ...this.menuData,
-            createdAt: new Date().toISOString(),
-            status: 'draft'
-        };
-        
-        // Save to localStorage
-        const menus = JSON.parse(localStorage.getItem('menus') || '[]');
-        menus.push(menu);
-        localStorage.setItem('menus', JSON.stringify(menus));
-        
-        return menu;
-    }
-
-    /**
-     * Update live preview
-     */
-    updateLivePreview() {
-        const preview = document.getElementById('preview-content');
-        if (!preview) return;
-        
-        const previewHTML = this.generatePreviewHTML();
-        preview.innerHTML = previewHTML;
-        
-        // Show preview if we have content
-        if (this.menuData.name) {
-            document.getElementById('live-preview').style.display = 'block';
-        }
-    }
-
-    /**
-     * Generate preview HTML
-     */
-    generatePreviewHTML() {
-        if (!this.menuData.name) {
-            return '<p class="preview-empty">Start filling in your menu details to see a live preview...</p>';
-        }
-        
-        return `
+    return `
             <div class="preview-menu">
                 <div class="preview-header">
                     <h2>${this.menuData.name}</h2>
@@ -676,74 +687,76 @@ class UnifiedMenuCreator {
                 </div>
             </div>
         `;
+  }
+
+  /**
+   * Close creator
+   */
+  closeCreator() {
+    const modal = document.getElementById('unified-menu-creator-modal');
+    if (modal) {
+      modal.remove();
     }
 
-    /**
-     * Close creator
-     */
-    closeCreator() {
-        const modal = document.getElementById('unified-menu-creator-modal');
-        if (modal) {
-            modal.remove();
+    // Reset state
+    this.currentMode = null;
+    this.currentStep = 1;
+    this.menuData = this.createEmptyMenuData();
+  }
+
+  /**
+   * Create empty menu data
+   */
+  createEmptyMenuData() {
+    return {
+      name: '',
+      type: '',
+      cuisine: '',
+      description: '',
+      priceRange: '',
+      servings: null,
+      categories: [],
+      items: [],
+      createdAt: new Date().toISOString(),
+      status: 'draft'
+    };
+  }
+
+  /**
+   * Load templates
+   */
+  loadTemplates() {
+    return {
+      restaurant: {
+        italian: {
+          name: 'Italian Restaurant Menu',
+          categories: ['Antipasti', 'Primi', 'Secondi', 'Dolci']
+        },
+        french: {
+          name: 'French Bistro Menu',
+          categories: ['Entrées', 'Plats', 'Desserts']
         }
-        
-        // Reset state
-        this.currentMode = null;
-        this.currentStep = 1;
-        this.menuData = this.createEmptyMenuData();
+      },
+      catering: {
+        wedding: {
+          name: 'Wedding Reception Menu',
+          categories: ['Cocktail Hour', 'Dinner', 'Dessert Bar']
+        }
+      }
+    };
+  }
+
+  /**
+   * Add creator styles
+   */
+  addCreatorStyles() {
+    if (document.getElementById('unified-menu-creator-styles')) {
+      return;
     }
 
-    /**
-     * Create empty menu data
-     */
-    createEmptyMenuData() {
-        return {
-            name: '',
-            type: '',
-            cuisine: '',
-            description: '',
-            priceRange: '',
-            servings: null,
-            categories: [],
-            items: [],
-            createdAt: new Date().toISOString(),
-            status: 'draft'
-        };
-    }
-
-    /**
-     * Load templates
-     */
-    loadTemplates() {
-        return {
-            'restaurant': {
-                'italian': {
-                    name: 'Italian Restaurant Menu',
-                    categories: ['Antipasti', 'Primi', 'Secondi', 'Dolci']
-                },
-                'french': {
-                    name: 'French Bistro Menu',
-                    categories: ['Entrées', 'Plats', 'Desserts']
-                }
-            },
-            'catering': {
-                'wedding': {
-                    name: 'Wedding Reception Menu',
-                    categories: ['Cocktail Hour', 'Dinner', 'Dessert Bar']
-                }
-            }
-        };
-    }
-
-    /**
-     * Add creator styles
-     */
-    addCreatorStyles() {
-        if (document.getElementById('unified-menu-creator-styles')) return;
-        
-        const styles = document.createElement('style');
-        styles.id = 'unified-menu-creator-styles';
-        styles.textContent = `
+    const styles = document.createElement('style');
+    styles.id = 'unified-menu-creator-styles';
+    styles.textContent = `
             .unified-menu-creator-modal .modal-content {
                 max-width: 1000px;
                 max-height: 90vh;
@@ -921,34 +934,34 @@ class UnifiedMenuCreator {
                 font-style: italic;
             }
         `;
-        
-        document.head.appendChild(styles);
-    }
 
-    /**
-     * Setup event listeners
-     */
-    setupEventListeners() {
-        // Add any global event listeners here
-    }
+    document.head.appendChild(styles);
+  }
 
-    /**
-     * Load user preferences
-     */
-    loadUserPreferences() {
-        // Load user's preferred creation mode, templates, etc.
-    }
+  /**
+   * Setup event listeners
+   */
+  setupEventListeners() {
+    // Add any global event listeners here
+  }
 
-    /**
-     * Show notification
-     */
-    showNotification(message, type = 'info') {
-        if (window.showNotification) {
-            window.showNotification(message, type);
-        } else {
-            alert(message);
-        }
+  /**
+   * Load user preferences
+   */
+  loadUserPreferences() {
+    // Load user's preferred creation mode, templates, etc.
+  }
+
+  /**
+   * Show notification
+   */
+  showNotification(message, type = 'info') {
+    if (window.showNotification) {
+      window.showNotification(message, type);
+    } else {
+      alert(message);
     }
+  }
 }
 
 // Initialize global instance

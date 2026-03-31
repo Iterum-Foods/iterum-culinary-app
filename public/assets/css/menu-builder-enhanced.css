@@ -30,7 +30,9 @@
   border-radius: 12px;
   text-align: center;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .stat-card:hover {
@@ -355,7 +357,7 @@
   user-select: none;
 }
 
-.checkbox-item input[type="checkbox"] {
+.checkbox-item input[type='checkbox'] {
   margin-top: 2px;
   cursor: pointer;
 }
@@ -480,4 +482,3 @@
     box-shadow: none;
   }
 }
-

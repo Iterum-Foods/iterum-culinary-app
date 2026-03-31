@@ -4,27 +4,27 @@
  */
 
 class ProjectUIManager {
-    constructor() {
-        this.currentDropdown = null;
-        this.currentModal = null;
-    }
+  constructor() {
+    this.currentDropdown = null;
+    this.currentModal = null;
+  }
 
-    /**
-     * Show beautiful project dropdown
-     */
-    showProjectDropdown() {
-        // Remove any existing dropdown
-        this.closeDropdown();
+  /**
+   * Show beautiful project dropdown
+   */
+  showProjectDropdown() {
+    // Remove any existing dropdown
+    this.closeDropdown();
 
-        const dropdown = document.createElement('div');
-        dropdown.id = 'project-dropdown-modern';
-        dropdown.className = 'project-dropdown-modern';
-        
-        // Get current projects
-        const projects = window.projectManager?.projects || [];
-        const currentProject = window.projectManager?.currentProject;
+    const dropdown = document.createElement('div');
+    dropdown.id = 'project-dropdown-modern';
+    dropdown.className = 'project-dropdown-modern';
 
-        dropdown.innerHTML = `
+    // Get current projects
+    const projects = window.projectManager?.projects || [];
+    const currentProject = window.projectManager?.currentProject;
+
+    dropdown.innerHTML = `
             <div class="dropdown-content">
                 <!-- Header -->
                 <div class="dropdown-header">
@@ -33,16 +33,24 @@ class ProjectUIManager {
                 </div>
 
                 <!-- Current Project -->
-                ${currentProject ? `
+                ${
+                  currentProject
+                    ? `
                 <div class="current-project-display">
                     <div class="current-label">Currently Active:</div>
                     <div class="current-name">📋 ${currentProject.name}</div>
                 </div>
-                ` : ''}
+                `
+                    : ''
+                }
 
                 <!-- Project List -->
                 <div class="project-list">
-                    ${projects.length > 0 ? projects.map(project => `
+                    ${
+                      projects.length > 0
+                        ? projects
+                            .map(
+                              project => `
                         <div class="project-item ${project.id === currentProject?.id ? 'active' : ''}" 
                              onclick="window.projectUIManager.switchProject('${project.id}')">
                             <div class="project-item-main">
@@ -56,11 +64,17 @@ class ProjectUIManager {
                                     </div>
                                 </div>
                             </div>
-                            ${project.id === currentProject?.id ? 
-                                '<div class="project-item-badge">✓ Active</div>' : 
-                                '<div class="project-item-action">Switch →</div>'}
+                            ${
+                              project.id === currentProject?.id
+                                ? '<div class="project-item-badge">✓ Active</div>'
+                                : '<div class="project-item-action">Switch →</div>'
+                            }
                         </div>
-                    `).join('') : '<div class="no-projects">No projects yet</div>'}
+                    `
+                            )
+                            .join('')
+                        : '<div class="no-projects">No projects yet</div>'
+                    }
                 </div>
 
                 <!-- Actions -->
@@ -77,92 +91,98 @@ class ProjectUIManager {
             </div>
         `;
 
-        // Add styles
-        this.addDropdownStyles();
+    // Add styles
+    this.addDropdownStyles();
 
-        // Position dropdown
-        const projectSelector = document.querySelector('.header-project-selector-container') || 
-                                document.querySelector('.project-selector-display');
-        
-        if (projectSelector) {
-            document.body.appendChild(dropdown);
-            this.positionDropdown(dropdown, projectSelector);
-            this.currentDropdown = dropdown;
+    // Position dropdown
+    const projectSelector =
+      document.querySelector('.header-project-selector-container') ||
+      document.querySelector('.project-selector-display');
 
-            // Close on outside click
-            setTimeout(() => {
-                document.addEventListener('click', this.handleOutsideClick.bind(this));
-            }, 100);
+    if (projectSelector) {
+      document.body.appendChild(dropdown);
+      this.positionDropdown(dropdown, projectSelector);
+      this.currentDropdown = dropdown;
 
-            // Animate in
-            setTimeout(() => dropdown.classList.add('show'), 10);
-        }
+      // Close on outside click
+      setTimeout(() => {
+        document.addEventListener('click', this.handleOutsideClick.bind(this));
+      }, 100);
+
+      // Animate in
+      setTimeout(() => dropdown.classList.add('show'), 10);
     }
+  }
 
-    /**
-     * Position dropdown relative to trigger
-     */
-    positionDropdown(dropdown, trigger) {
-        const rect = trigger.getBoundingClientRect();
-        dropdown.style.position = 'fixed';
-        dropdown.style.top = (rect.bottom + 8) + 'px';
-        dropdown.style.right = '20px';
-        dropdown.style.maxWidth = '400px';
+  /**
+   * Position dropdown relative to trigger
+   */
+  positionDropdown(dropdown, trigger) {
+    const rect = trigger.getBoundingClientRect();
+    dropdown.style.position = 'fixed';
+    dropdown.style.top = rect.bottom + 8 + 'px';
+    dropdown.style.right = '20px';
+    dropdown.style.maxWidth = '400px';
+  }
+
+  /**
+   * Close dropdown
+   */
+  closeDropdown() {
+    if (this.currentDropdown) {
+      this.currentDropdown.classList.remove('show');
+      setTimeout(() => {
+        this.currentDropdown?.remove();
+        this.currentDropdown = null;
+      }, 200);
     }
+    document.removeEventListener('click', this.handleOutsideClick);
+  }
 
-    /**
-     * Close dropdown
-     */
-    closeDropdown() {
-        if (this.currentDropdown) {
-            this.currentDropdown.classList.remove('show');
-            setTimeout(() => {
-                this.currentDropdown?.remove();
-                this.currentDropdown = null;
-            }, 200);
-        }
-        document.removeEventListener('click', this.handleOutsideClick);
+  /**
+   * Handle outside click
+   */
+  handleOutsideClick(event) {
+    if (
+      this.currentDropdown &&
+      !this.currentDropdown.contains(event.target) &&
+      !event.target.closest('.header-project-selector-container') &&
+      !event.target.closest('.project-selector-display')
+    ) {
+      this.closeDropdown();
     }
+  }
 
-    /**
-     * Handle outside click
-     */
-    handleOutsideClick(event) {
-        if (this.currentDropdown && !this.currentDropdown.contains(event.target) &&
-            !event.target.closest('.header-project-selector-container') &&
-            !event.target.closest('.project-selector-display')) {
-            this.closeDropdown();
-        }
+  /**
+   * Switch to project
+   */
+  switchProject(projectId) {
+    if (window.projectManager) {
+      window.projectManager.setCurrentProject(projectId);
+      window.projectManager.updateProjectUI();
+      this.closeDropdown();
+
+      // Track analytics
+      if (window.analyticsTracker) {
+        const project = window.projectManager.projects.find(
+          p => p.id === projectId
+        );
+        window.analyticsTracker.trackProjectSwitched(projectId, project?.name);
+      }
     }
+  }
 
-    /**
-     * Switch to project
-     */
-    switchProject(projectId) {
-        if (window.projectManager) {
-            window.projectManager.setCurrentProject(projectId);
-            window.projectManager.updateProjectUI();
-            this.closeDropdown();
+  /**
+   * Show create project modal
+   */
+  showCreateModal() {
+    this.closeDropdown();
+    this.closeModal();
 
-            // Track analytics
-            if (window.analyticsTracker) {
-                const project = window.projectManager.projects.find(p => p.id === projectId);
-                window.analyticsTracker.trackProjectSwitched(projectId, project?.name);
-            }
-        }
-    }
+    const modal = document.createElement('div');
+    modal.className = 'project-modal-overlay';
 
-    /**
-     * Show create project modal
-     */
-    showCreateModal() {
-        this.closeDropdown();
-        this.closeModal();
-
-        const modal = document.createElement('div');
-        modal.className = 'project-modal-overlay';
-        
-        modal.innerHTML = `
+    modal.innerHTML = `
             <div class="modal-backdrop" onclick="window.projectUIManager.closeModal()"></div>
             <div class="modal-content modal-create">
                 <!-- Header -->
@@ -222,31 +242,31 @@ class ProjectUIManager {
             </div>
         `;
 
-        this.addModalStyles();
-        document.body.appendChild(modal);
-        this.currentModal = modal;
+    this.addModalStyles();
+    document.body.appendChild(modal);
+    this.currentModal = modal;
 
-        // Animate in
-        setTimeout(() => modal.classList.add('show'), 10);
+    // Animate in
+    setTimeout(() => modal.classList.add('show'), 10);
 
-        // Focus input
-        setTimeout(() => document.getElementById('new-project-name')?.focus(), 100);
-    }
+    // Focus input
+    setTimeout(() => document.getElementById('new-project-name')?.focus(), 100);
+  }
 
-    /**
-     * Show manage projects modal
-     */
-    showManageModal() {
-        this.closeDropdown();
-        this.closeModal();
+  /**
+   * Show manage projects modal
+   */
+  showManageModal() {
+    this.closeDropdown();
+    this.closeModal();
 
-        const projects = window.projectManager?.projects || [];
-        const currentProject = window.projectManager?.currentProject;
+    const projects = window.projectManager?.projects || [];
+    const currentProject = window.projectManager?.currentProject;
 
-        const modal = document.createElement('div');
-        modal.className = 'project-modal-overlay';
-        
-        modal.innerHTML = `
+    const modal = document.createElement('div');
+    modal.className = 'project-modal-overlay';
+
+    modal.innerHTML = `
             <div class="modal-backdrop" onclick="window.projectUIManager.closeModal()"></div>
             <div class="modal-content modal-manage">
                 <!-- Header -->
@@ -260,9 +280,13 @@ class ProjectUIManager {
 
                 <!-- Body -->
                 <div class="modal-body">
-                    ${projects.length > 0 ? `
+                    ${
+                      projects.length > 0
+                        ? `
                         <div class="project-grid">
-                            ${projects.map(project => `
+                            ${projects
+                              .map(
+                                project => `
                                 <div class="project-card ${project.id === currentProject?.id ? 'active' : ''}">
                                     <div class="project-card-icon">
                                         ${project.type === 'master' ? '🏠' : '📁'}
@@ -276,24 +300,33 @@ class ProjectUIManager {
                                         </div>
                                     </div>
                                     <div class="project-card-actions">
-                                        ${project.id === currentProject?.id ? 
-                                            '<span class="active-badge">✓ Active</span>' : 
-                                            `<button onclick="window.projectUIManager.switchProject('${project.id}')" class="btn-small primary">
+                                        ${
+                                          project.id === currentProject?.id
+                                            ? '<span class="active-badge">✓ Active</span>'
+                                            : `<button onclick="window.projectUIManager.switchProject('${project.id}')" class="btn-small primary">
                                                 Switch
-                                            </button>`}
-                                        ${project.type !== 'master' ? `
+                                            </button>`
+                                        }
+                                        ${
+                                          project.type !== 'master'
+                                            ? `
                                             <button onclick="window.projectUIManager.editProject('${project.id}')" class="btn-small secondary">
                                                 Edit
                                             </button>
                                             <button onclick="window.projectUIManager.deleteProject('${project.id}')" class="btn-small danger">
                                                 Delete
                                             </button>
-                                        ` : ''}
+                                        `
+                                            : ''
+                                        }
                                     </div>
                                 </div>
-                            `).join('')}
+                            `
+                              )
+                              .join('')}
                         </div>
-                    ` : `
+                    `
+                        : `
                         <div class="empty-state">
                             <div class="empty-icon">📁</div>
                             <h3>No Projects Yet</h3>
@@ -303,7 +336,8 @@ class ProjectUIManager {
                                 <span>Create First Project</span>
                             </button>
                         </div>
-                    `}
+                    `
+                    }
 
                     <div class="modal-footer">
                         <button onclick="window.projectUIManager.showCreateModal()" class="btn-primary">
@@ -315,75 +349,81 @@ class ProjectUIManager {
             </div>
         `;
 
-        this.addModalStyles();
-        document.body.appendChild(modal);
-        this.currentModal = modal;
+    this.addModalStyles();
+    document.body.appendChild(modal);
+    this.currentModal = modal;
 
-        // Animate in
-        setTimeout(() => modal.classList.add('show'), 10);
+    // Animate in
+    setTimeout(() => modal.classList.add('show'), 10);
+  }
+
+  /**
+   * Handle create project form submission
+   */
+  handleCreateProject(event) {
+    event.preventDefault();
+
+    const name = document.getElementById('new-project-name').value.trim();
+    const description = document
+      .getElementById('new-project-description')
+      .value.trim();
+    const type = document.getElementById('new-project-type').value;
+    const switchTo = document.getElementById('switch-to-new-project').checked;
+
+    if (!name) {
+      alert('Please enter a project name');
+      return;
     }
 
-    /**
-     * Handle create project form submission
-     */
-    handleCreateProject(event) {
-        event.preventDefault();
+    // Create project
+    if (window.projectManager) {
+      const projectId = 'project_' + Date.now();
+      const project = {
+        id: projectId,
+        name: name,
+        description: description,
+        type: type,
+        createdAt: new Date().toISOString(),
+        isDefault: false
+      };
 
-        const name = document.getElementById('new-project-name').value.trim();
-        const description = document.getElementById('new-project-description').value.trim();
-        const type = document.getElementById('new-project-type').value;
-        const switchTo = document.getElementById('switch-to-new-project').checked;
+      window.projectManager.projects.push(project);
+      window.projectManager.saveProjects();
 
-        if (!name) {
-            alert('Please enter a project name');
-            return;
-        }
+      if (switchTo) {
+        window.projectManager.setCurrentProject(projectId);
+      }
 
-        // Create project
-        if (window.projectManager) {
-            const projectId = 'project_' + Date.now();
-            const project = {
-                id: projectId,
-                name: name,
-                description: description,
-                type: type,
-                createdAt: new Date().toISOString(),
-                isDefault: false
-            };
+      window.projectManager.updateProjectUI();
 
-            window.projectManager.projects.push(project);
-            window.projectManager.saveProjects();
+      // Track analytics
+      if (window.analyticsTracker) {
+        window.analyticsTracker.trackProjectCreated(name);
+      }
 
-            if (switchTo) {
-                window.projectManager.setCurrentProject(projectId);
-            }
+      // Show success
+      this.showSuccessMessage('Project created successfully!');
+      this.closeModal();
+    }
+  }
 
-            window.projectManager.updateProjectUI();
-
-            // Track analytics
-            if (window.analyticsTracker) {
-                window.analyticsTracker.trackProjectCreated(name);
-            }
-
-            // Show success
-            this.showSuccessMessage('Project created successfully!');
-            this.closeModal();
-        }
+  /**
+   * Edit project
+   */
+  editProject(projectId) {
+    const project = window.projectManager?.projects.find(
+      p => p.id === projectId
+    );
+    if (!project) {
+      return;
     }
 
-    /**
-     * Edit project
-     */
-    editProject(projectId) {
-        const project = window.projectManager?.projects.find(p => p.id === projectId);
-        if (!project) return;
+    this.closeModal();
 
-        this.closeModal();
+    const modal = document.createElement('div');
+    modal.className = 'project-modal-overlay';
 
-        const modal = document.createElement('div');
-        modal.className = 'project-modal-overlay';
-        
-        modal.innerHTML = `
+    modal.innerHTML = `
             <div class="modal-backdrop" onclick="window.projectUIManager.closeModal()"></div>
             <div class="modal-content modal-edit">
                 <div class="modal-header">
@@ -433,120 +473,138 @@ class ProjectUIManager {
             </div>
         `;
 
-        document.body.appendChild(modal);
-        this.currentModal = modal;
-        setTimeout(() => modal.classList.add('show'), 10);
-    }
+    document.body.appendChild(modal);
+    this.currentModal = modal;
+    setTimeout(() => modal.classList.add('show'), 10);
+  }
 
-    /**
-     * Handle edit project
-     */
-    handleEditProject(event, projectId) {
-        event.preventDefault();
+  /**
+   * Handle edit project
+   */
+  handleEditProject(event, projectId) {
+    event.preventDefault();
 
-        const name = document.getElementById('edit-project-name').value.trim();
-        const description = document.getElementById('edit-project-description').value.trim();
-        const type = document.getElementById('edit-project-type').value;
+    const name = document.getElementById('edit-project-name').value.trim();
+    const description = document
+      .getElementById('edit-project-description')
+      .value.trim();
+    const type = document.getElementById('edit-project-type').value;
 
-        if (window.projectManager) {
-            const project = window.projectManager.projects.find(p => p.id === projectId);
-            if (project) {
-                project.name = name;
-                project.description = description;
-                project.type = type;
-                window.projectManager.saveProjects();
-                window.projectManager.updateProjectUI();
+    if (window.projectManager) {
+      const project = window.projectManager.projects.find(
+        p => p.id === projectId
+      );
+      if (project) {
+        project.name = name;
+        project.description = description;
+        project.type = type;
+        window.projectManager.saveProjects();
+        window.projectManager.updateProjectUI();
 
-                // Track analytics
-                if (window.analyticsTracker) {
-                    window.analyticsTracker.trackProjectEdited(projectId);
-                }
-
-                this.showSuccessMessage('Project updated successfully!');
-                this.closeModal();
-            }
-        }
-    }
-
-    /**
-     * Delete project
-     */
-    deleteProject(projectId) {
-        const project = window.projectManager?.projects.find(p => p.id === projectId);
-        if (!project) return;
-
-        if (project.type === 'master') {
-            alert('Cannot delete the Master Project');
-            return;
+        // Track analytics
+        if (window.analyticsTracker) {
+          window.analyticsTracker.trackProjectEdited(projectId);
         }
 
-        if (confirm(`Are you sure you want to delete "${project.name}"?\n\nThis will not delete your data, just the project organization.`)) {
-            if (window.projectManager) {
-                window.projectManager.projects = window.projectManager.projects.filter(p => p.id !== projectId);
-                window.projectManager.saveProjects();
+        this.showSuccessMessage('Project updated successfully!');
+        this.closeModal();
+      }
+    }
+  }
 
-                // If current project was deleted, switch to master
-                if (window.projectManager.currentProject?.id === projectId) {
-                    window.projectManager.setCurrentProject(window.projectManager.masterProjectId);
-                }
-
-                window.projectManager.updateProjectUI();
-
-                // Track analytics
-                if (window.analyticsTracker) {
-                    window.analyticsTracker.trackProjectDeleted(projectId);
-                }
-
-                this.showSuccessMessage('Project deleted');
-                this.closeModal();
-                this.showManageModal();
-            }
-        }
+  /**
+   * Delete project
+   */
+  deleteProject(projectId) {
+    const project = window.projectManager?.projects.find(
+      p => p.id === projectId
+    );
+    if (!project) {
+      return;
     }
 
-    /**
-     * Close modal
-     */
-    closeModal() {
-        if (this.currentModal) {
-            this.currentModal.classList.remove('show');
-            setTimeout(() => {
-                this.currentModal?.remove();
-                this.currentModal = null;
-            }, 200);
-        }
+    if (project.type === 'master') {
+      alert('Cannot delete the Master Project');
+      return;
     }
 
-    /**
-     * Show success message
-     */
-    showSuccessMessage(message) {
-        const toast = document.createElement('div');
-        toast.className = 'success-toast';
-        toast.innerHTML = `
+    if (
+      confirm(
+        `Are you sure you want to delete "${project.name}"?\n\nThis will not delete your data, just the project organization.`
+      )
+    ) {
+      if (window.projectManager) {
+        window.projectManager.projects = window.projectManager.projects.filter(
+          p => p.id !== projectId
+        );
+        window.projectManager.saveProjects();
+
+        // If current project was deleted, switch to master
+        if (window.projectManager.currentProject?.id === projectId) {
+          window.projectManager.setCurrentProject(
+            window.projectManager.masterProjectId
+          );
+        }
+
+        window.projectManager.updateProjectUI();
+
+        // Track analytics
+        if (window.analyticsTracker) {
+          window.analyticsTracker.trackProjectDeleted(projectId);
+        }
+
+        this.showSuccessMessage('Project deleted');
+        this.closeModal();
+        this.showManageModal();
+      }
+    }
+  }
+
+  /**
+   * Close modal
+   */
+  closeModal() {
+    if (this.currentModal) {
+      this.currentModal.classList.remove('show');
+      setTimeout(() => {
+        this.currentModal?.remove();
+        this.currentModal = null;
+      }, 200);
+    }
+  }
+
+  /**
+   * Show success message
+   */
+  showSuccessMessage(message) {
+    const toast = document.createElement('div');
+    toast.className = 'success-toast';
+    toast.innerHTML = `
             <div class="toast-content">
                 <span class="toast-icon">✓</span>
                 <span class="toast-message">${message}</span>
             </div>
         `;
 
-        document.body.appendChild(toast);
-        setTimeout(() => toast.classList.add('show'), 10);
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  /**
+   * Add dropdown styles
+   */
+  addDropdownStyles() {
+    if (document.getElementById('project-dropdown-styles')) {
+      return;
     }
 
-    /**
-     * Add dropdown styles
-     */
-    addDropdownStyles() {
-        if (document.getElementById('project-dropdown-styles')) return;
-
-        const styles = document.createElement('style');
-        styles.id = 'project-dropdown-styles';
-        styles.textContent = `
+    const styles = document.createElement('style');
+    styles.id = 'project-dropdown-styles';
+    styles.textContent = `
             .project-dropdown-modern {
                 position: fixed;
                 background: white;
@@ -738,18 +796,20 @@ class ProjectUIManager {
             }
         `;
 
-        document.head.appendChild(styles);
+    document.head.appendChild(styles);
+  }
+
+  /**
+   * Add modal styles
+   */
+  addModalStyles() {
+    if (document.getElementById('project-modal-styles')) {
+      return;
     }
 
-    /**
-     * Add modal styles
-     */
-    addModalStyles() {
-        if (document.getElementById('project-modal-styles')) return;
-
-        const styles = document.createElement('style');
-        styles.id = 'project-modal-styles';
-        styles.textContent = `
+    const styles = document.createElement('style');
+    styles.id = 'project-modal-styles';
+    styles.textContent = `
             .project-modal-overlay {
                 position: fixed;
                 top: 0;
@@ -1080,15 +1140,14 @@ class ProjectUIManager {
             }
         `;
 
-        document.head.appendChild(styles);
-    }
+    document.head.appendChild(styles);
+  }
 }
 
 // Create global instance
 window.projectUIManager = new ProjectUIManager();
 
 // Global shortcut functions
-window.showProjectSelectionDropdown = function() {
-    window.projectUIManager.showProjectDropdown();
+window.showProjectSelectionDropdown = function () {
+  window.projectUIManager.showProjectDropdown();
 };
-

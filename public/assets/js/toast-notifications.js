@@ -4,18 +4,18 @@
  */
 
 class ToastNotification {
-    constructor() {
-        this.container = null;
-        this.init();
-        console.log('🍞 Toast Notification System initialized');
-    }
-    
-    init() {
-        // Create toast container if it doesn't exist
-        if (!document.getElementById('toast-container')) {
-            this.container = document.createElement('div');
-            this.container.id = 'toast-container';
-            this.container.style.cssText = `
+  constructor() {
+    this.container = null;
+    this.init();
+    console.log('🍞 Toast Notification System initialized');
+  }
+
+  init() {
+    // Create toast container if it doesn't exist
+    if (!document.getElementById('toast-container')) {
+      this.container = document.createElement('div');
+      this.container.id = 'toast-container';
+      this.container.style.cssText = `
                 position: fixed;
                 top: 90px;
                 right: 20px;
@@ -25,36 +25,48 @@ class ToastNotification {
                 gap: 12px;
                 pointer-events: none;
             `;
-            document.body.appendChild(this.container);
-        } else {
-            this.container = document.getElementById('toast-container');
-        }
+      document.body.appendChild(this.container);
+    } else {
+      this.container = document.getElementById('toast-container');
     }
-    
-    show(message, type = 'info', duration = 4000) {
-        const toast = document.createElement('div');
-        toast.className = `toast toast-${type}`;
-        
-        // Get icon based on type
-        const icons = {
-            success: '✓',
-            error: '✕',
-            warning: '⚠',
-            info: 'ℹ'
-        };
-        
-        // Get colors based on type
-        const colors = {
-            success: { bg: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', icon: '#10b981' },
-            error: { bg: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', icon: '#ef4444' },
-            warning: { bg: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', icon: '#f59e0b' },
-            info: { bg: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', icon: '#3b82f6' }
-        };
-        
-        const color = colors[type] || colors.info;
-        const icon = icons[type] || icons.info;
-        
-        toast.style.cssText = `
+  }
+
+  show(message, type = 'info', duration = 4000) {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+
+    // Get icon based on type
+    const icons = {
+      success: '✓',
+      error: '✕',
+      warning: '⚠',
+      info: 'ℹ'
+    };
+
+    // Get colors based on type
+    const colors = {
+      success: {
+        bg: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+        icon: '#10b981'
+      },
+      error: {
+        bg: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+        icon: '#ef4444'
+      },
+      warning: {
+        bg: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+        icon: '#f59e0b'
+      },
+      info: {
+        bg: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+        icon: '#3b82f6'
+      }
+    };
+
+    const color = colors[type] || colors.info;
+    const icon = icons[type] || icons.info;
+
+    toast.style.cssText = `
             background: white;
             padding: 16px 20px;
             border-radius: 12px;
@@ -69,8 +81,8 @@ class ToastNotification {
             animation: slideInRight 0.3s ease;
             border-left: 4px solid ${color.icon};
         `;
-        
-        toast.innerHTML = `
+
+    toast.innerHTML = `
             <div style="
                 width: 32px;
                 height: 32px;
@@ -99,12 +111,12 @@ class ToastNotification {
                 transition: opacity 0.2s;
             " onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">×</button>
         `;
-        
-        // Add animation styles if not already added
-        if (!document.getElementById('toast-animations')) {
-            const style = document.createElement('style');
-            style.id = 'toast-animations';
-            style.textContent = `
+
+    // Add animation styles if not already added
+    if (!document.getElementById('toast-animations')) {
+      const style = document.createElement('style');
+      style.id = 'toast-animations';
+      style.textContent = `
                 @keyframes slideInRight {
                     from {
                         transform: translateX(400px);
@@ -132,59 +144,62 @@ class ToastNotification {
                     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
                 }
             `;
-            document.head.appendChild(style);
-        }
-        
-        this.container.appendChild(toast);
-        
-        // Auto-remove after duration
-        if (duration > 0) {
-            setTimeout(() => {
-                toast.style.animation = 'slideOutRight 0.3s ease';
-                setTimeout(() => {
-                    toast.remove();
-                }, 300);
-            }, duration);
-        }
-        
-        // Click to dismiss
-        toast.addEventListener('click', () => {
-            toast.style.animation = 'slideOutRight 0.3s ease';
-            setTimeout(() => {
-                toast.remove();
-            }, 300);
-        });
-        
-        return toast;
+      document.head.appendChild(style);
     }
-    
-    success(message, duration) {
-        return this.show(message, 'success', duration);
+
+    this.container.appendChild(toast);
+
+    // Auto-remove after duration
+    if (duration > 0) {
+      setTimeout(() => {
+        toast.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+          toast.remove();
+        }, 300);
+      }, duration);
     }
-    
-    error(message, duration) {
-        return this.show(message, 'error', duration);
-    }
-    
-    warning(message, duration) {
-        return this.show(message, 'warning', duration);
-    }
-    
-    info(message, duration) {
-        return this.show(message, 'info', duration);
-    }
+
+    // Click to dismiss
+    toast.addEventListener('click', () => {
+      toast.style.animation = 'slideOutRight 0.3s ease';
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    });
+
+    return toast;
+  }
+
+  success(message, duration) {
+    return this.show(message, 'success', duration);
+  }
+
+  error(message, duration) {
+    return this.show(message, 'error', duration);
+  }
+
+  warning(message, duration) {
+    return this.show(message, 'warning', duration);
+  }
+
+  info(message, duration) {
+    return this.show(message, 'info', duration);
+  }
 }
 
 // Initialize global toast system
 window.toast = new ToastNotification();
 
 // Convenience functions for global use
-window.showToast = (message, type, duration) => window.toast.show(message, type, duration);
-window.showSuccess = (message, duration) => window.toast.success(message, duration);
+window.showToast = (message, type, duration) =>
+  window.toast.show(message, type, duration);
+window.showSuccess = (message, duration) =>
+  window.toast.success(message, duration);
 window.showError = (message, duration) => window.toast.error(message, duration);
-window.showWarning = (message, duration) => window.toast.warning(message, duration);
+window.showWarning = (message, duration) =>
+  window.toast.warning(message, duration);
 window.showInfo = (message, duration) => window.toast.info(message, duration);
 
-console.log('✅ Toast functions available: showSuccess(), showError(), showWarning(), showInfo()');
-
-
+console.log(
+  '✅ Toast functions available: showSuccess(), showError(), showWarning(), showInfo()'
+);

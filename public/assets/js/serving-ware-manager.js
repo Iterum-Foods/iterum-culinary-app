@@ -4,44 +4,44 @@
  */
 
 class ServingWareManager {
-    constructor() {
-        this.equipmentManager = null;
-        this.init();
+  constructor() {
+    this.equipmentManager = null;
+    this.init();
+  }
+
+  async init() {
+    // Wait for equipment manager
+    if (window.equipmentManager && window.equipmentManager.initialized) {
+      this.equipmentManager = window.equipmentManager;
+      console.log('✅ Serving Ware Manager initialized');
+    } else {
+      window.addEventListener('equipmentManagerReady', () => {
+        this.equipmentManager = window.equipmentManager;
+        console.log('✅ Serving Ware Manager initialized');
+      });
+    }
+  }
+
+  /**
+   * Display serving ware inventory by category
+   */
+  displayServingWareInventory(category) {
+    if (!this.equipmentManager) {
+      console.error('Equipment Manager not initialized');
+      return;
     }
 
-    async init() {
-        // Wait for equipment manager
-        if (window.equipmentManager && window.equipmentManager.initialized) {
-            this.equipmentManager = window.equipmentManager;
-            console.log('✅ Serving Ware Manager initialized');
-        } else {
-            window.addEventListener('equipmentManagerReady', () => {
-                this.equipmentManager = window.equipmentManager;
-                console.log('✅ Serving Ware Manager initialized');
-            });
-        }
+    const inventory = this.equipmentManager.getServingWareInventory();
+    const items = inventory[category] || [];
+
+    const container = document.getElementById(`${category}-inventory`);
+    if (!container) {
+      console.error(`Container not found: ${category}-inventory`);
+      return;
     }
 
-    /**
-     * Display serving ware inventory by category
-     */
-    displayServingWareInventory(category) {
-        if (!this.equipmentManager) {
-            console.error('Equipment Manager not initialized');
-            return;
-        }
-
-        const inventory = this.equipmentManager.getServingWareInventory();
-        const items = inventory[category] || [];
-
-        const container = document.getElementById(`${category}-inventory`);
-        if (!container) {
-            console.error(`Container not found: ${category}-inventory`);
-            return;
-        }
-
-        if (items.length === 0) {
-            container.innerHTML = `
+    if (items.length === 0) {
+      container.innerHTML = `
                 <div class="empty-state" style="text-align: center; padding: 40px; color: #6B7280;">
                     <div style="font-size: 3rem; margin-bottom: 16px;">📦</div>
                     <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 8px; color: #374151;">
@@ -53,10 +53,10 @@ class ServingWareManager {
                     </button>
                 </div>
             `;
-            return;
-        }
+      return;
+    }
 
-        const html = `
+    const html = `
             <table class="w-full">
                 <thead>
                     <tr style="background: linear-gradient(135deg, #2A2420 0%, #1F2A22 100%);">
@@ -69,7 +69,9 @@ class ServingWareManager {
                     </tr>
                 </thead>
                 <tbody>
-                    ${items.map(item => `
+                    ${items
+                      .map(
+                        item => `
                         <tr style="border-bottom: 1px solid #e5e7eb;">
                             <td style="padding: 12px; font-weight: 600; color: #1F2937;">${item.name}</td>
                             <td style="padding: 12px; color: #4B5563;">${item.subcategory || 'N/A'}</td>
@@ -102,64 +104,73 @@ class ServingWareManager {
                                 </div>
                             </td>
                         </tr>
-                    `).join('')}
+                    `
+                      )
+                      .join('')}
                 </tbody>
             </table>
         `;
 
-        container.innerHTML = html;
+    container.innerHTML = html;
+  }
+
+  /**
+   * Get category display name
+   */
+  getCategoryName(category) {
+    const names = {
+      plates: 'Plates & Dishes',
+      silverware: 'Silverware & Flatware',
+      glassware: 'Glassware & Barware'
+    };
+    return names[category] || category;
+  }
+
+  /**
+   * Get condition color
+   */
+  getConditionColor(condition) {
+    const colors = {
+      Excellent: '#10b981',
+      Good: '#3b82f6',
+      Fair: '#f59e0b',
+      Poor: '#ef4444',
+      'Needs Replacement': '#dc2626'
+    };
+    return colors[condition] || '#6b7280';
+  }
+
+  /**
+   * Show linked recipes modal
+   */
+  showLinkedRecipes(itemId) {
+    const item = this.equipmentManager.equipment.find(e => e.id === itemId);
+    if (!item) {
+      return;
     }
 
-    /**
-     * Get category display name
-     */
-    getCategoryName(category) {
-        const names = {
-            'plates': 'Plates & Dishes',
-            'silverware': 'Silverware & Flatware',
-            'glassware': 'Glassware & Barware'
-        };
-        return names[category] || category;
-    }
+    const linkedRecipes = item.linkedRecipes || [];
 
-    /**
-     * Get condition color
-     */
-    getConditionColor(condition) {
-        const colors = {
-            'Excellent': '#10b981',
-            'Good': '#3b82f6',
-            'Fair': '#f59e0b',
-            'Poor': '#ef4444',
-            'Needs Replacement': '#dc2626'
-        };
-        return colors[condition] || '#6b7280';
-    }
-
-    /**
-     * Show linked recipes modal
-     */
-    showLinkedRecipes(itemId) {
-        const item = this.equipmentManager.equipment.find(e => e.id === itemId);
-        if (!item) return;
-
-        const linkedRecipes = item.linkedRecipes || [];
-
-        const modal = `
+    const modal = `
             <div class="modal-backdrop" id="linked-recipes-modal" onclick="if(event.target===this) closeModal('linked-recipes-modal')">
                 <div class="modal" style="max-width: 600px;">
                     <div class="modal-header">
                         <h2>Linked Recipes - ${item.name}</h2>
                     </div>
                     <div class="modal-body">
-                        ${linkedRecipes.length === 0 ? `
+                        ${
+                          linkedRecipes.length === 0
+                            ? `
                             <div style="text-align: center; padding: 40px; color: #6B7280;">
                                 <div style="font-size: 3rem; margin-bottom: 16px;">📝</div>
                                 <p>No recipes linked to this item yet</p>
                             </div>
-                        ` : `
+                        `
+                            : `
                             <div style="display: flex; flex-direction: column; gap: 12px;">
-                                ${linkedRecipes.map(recipe => `
+                                ${linkedRecipes
+                                  .map(
+                                    recipe => `
                                     <div style="padding: 16px; background: #F3F4F6; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
                                         <div>
                                             <div style="font-weight: 600; color: #1F2937;">${recipe.recipeName}</div>
@@ -171,9 +182,12 @@ class ServingWareManager {
                                             🗑️ Unlink
                                         </button>
                                     </div>
-                                `).join('')}
+                                `
+                                  )
+                                  .join('')}
                             </div>
-                        `}
+                        `
+                        }
                     </div>
                     <div class="modal-footer">
                         <button onclick="closeModal('linked-recipes-modal')" class="btn btn-secondary">Close</button>
@@ -182,25 +196,29 @@ class ServingWareManager {
             </div>
         `;
 
-        document.body.insertAdjacentHTML('beforeend', modal);
+    document.body.insertAdjacentHTML('beforeend', modal);
+  }
+
+  /**
+   * Link item to recipe
+   */
+  async linkToRecipe(itemId) {
+    const item = this.equipmentManager.equipment.find(e => e.id === itemId);
+    if (!item) {
+      return;
     }
 
-    /**
-     * Link item to recipe
-     */
-    async linkToRecipe(itemId) {
-        const item = this.equipmentManager.equipment.find(e => e.id === itemId);
-        if (!item) return;
+    // Get all recipes
+    const recipes = window.universalRecipeManager
+      ? window.universalRecipeManager.getAllRecipes()
+      : [];
 
-        // Get all recipes
-        const recipes = window.universalRecipeManager ? window.universalRecipeManager.getAllRecipes() : [];
+    if (recipes.length === 0) {
+      alert('No recipes found. Create some recipes first!');
+      return;
+    }
 
-        if (recipes.length === 0) {
-            alert('No recipes found. Create some recipes first!');
-            return;
-        }
-
-        const modal = `
+    const modal = `
             <div class="modal-backdrop" id="link-recipe-modal" onclick="if(event.target===this) closeModal('link-recipe-modal')">
                 <div class="modal" style="max-width: 600px;">
                     <div class="modal-header">
@@ -210,9 +228,13 @@ class ServingWareManager {
                         <label class="form-label">Select Recipe</label>
                         <select id="recipe-select" class="form-select" style="width: 100%; padding: 12px; border: 2px solid #5C4D39; border-radius: 8px;">
                             <option value="">Choose a recipe...</option>
-                            ${recipes.map(recipe => `
+                            ${recipes
+                              .map(
+                                recipe => `
                                 <option value="${recipe.id}:${recipe.name}">${recipe.name}</option>
-                            `).join('')}
+                            `
+                              )
+                              .join('')}
                         </select>
                     </div>
                     <div class="modal-footer">
@@ -223,90 +245,100 @@ class ServingWareManager {
             </div>
         `;
 
-        document.body.insertAdjacentHTML('beforeend', modal);
+    document.body.insertAdjacentHTML('beforeend', modal);
+  }
+
+  /**
+   * Confirm link recipe
+   */
+  confirmLinkRecipe(itemId) {
+    const select = document.getElementById('recipe-select');
+    const value = select.value;
+
+    if (!value) {
+      alert('Please select a recipe');
+      return;
     }
 
-    /**
-     * Confirm link recipe
-     */
-    confirmLinkRecipe(itemId) {
-        const select = document.getElementById('recipe-select');
-        const value = select.value;
+    const [recipeId, recipeName] = value.split(':');
+    this.equipmentManager.linkServingWareToRecipe(itemId, recipeId, recipeName);
 
-        if (!value) {
-            alert('Please select a recipe');
-            return;
-        }
+    closeModal('link-recipe-modal');
+    this.refreshCurrentTab();
+  }
 
-        const [recipeId, recipeName] = value.split(':');
-        this.equipmentManager.linkServingWareToRecipe(itemId, recipeId, recipeName);
+  /**
+   * Unlink recipe
+   */
+  unlinkRecipe(itemId, recipeId) {
+    if (confirm('Are you sure you want to unlink this recipe?')) {
+      this.equipmentManager.unlinkServingWareFromRecipe(itemId, recipeId);
+      closeModal('linked-recipes-modal');
+      this.refreshCurrentTab();
+    }
+  }
 
-        closeModal('link-recipe-modal');
-        this.refreshCurrentTab();
+  /**
+   * Update quantity
+   */
+  updateQuantity(itemId) {
+    const item = this.equipmentManager.equipment.find(e => e.id === itemId);
+    if (!item) {
+      return;
     }
 
-    /**
-     * Unlink recipe
-     */
-    unlinkRecipe(itemId, recipeId) {
-        if (confirm('Are you sure you want to unlink this recipe?')) {
-            this.equipmentManager.unlinkServingWareFromRecipe(itemId, recipeId);
-            closeModal('linked-recipes-modal');
-            this.refreshCurrentTab();
-        }
+    const newQuantity = prompt(
+      `Update quantity for ${item.name}:\n\nCurrent: ${item.quantity}`,
+      item.quantity
+    );
+
+    if (newQuantity === null) {
+      return;
     }
 
-    /**
-     * Update quantity
-     */
-    updateQuantity(itemId) {
-        const item = this.equipmentManager.equipment.find(e => e.id === itemId);
-        if (!item) return;
-
-        const newQuantity = prompt(`Update quantity for ${item.name}:\n\nCurrent: ${item.quantity}`, item.quantity);
-
-        if (newQuantity === null) return;
-
-        const quantity = parseInt(newQuantity);
-        if (isNaN(quantity) || quantity < 0) {
-            alert('Please enter a valid quantity');
-            return;
-        }
-
-        this.equipmentManager.updateServingWareQuantity(itemId, quantity, 'Manual Count');
-        this.refreshCurrentTab();
+    const quantity = parseInt(newQuantity);
+    if (isNaN(quantity) || quantity < 0) {
+      alert('Please enter a valid quantity');
+      return;
     }
 
-    /**
-     * Edit item
-     */
-    editItem(itemId) {
-        // Redirect to equipment edit
-        window.editEquipment(itemId);
-    }
+    this.equipmentManager.updateServingWareQuantity(
+      itemId,
+      quantity,
+      'Manual Count'
+    );
+    this.refreshCurrentTab();
+  }
 
-    /**
-     * Refresh current tab
-     */
-    refreshCurrentTab() {
-        const activeTab = document.querySelector('.equipment-tab:not(.hidden)');
-        if (activeTab) {
-            const category = activeTab.id.replace('tab-', '');
-            if (['plates', 'silverware', 'glassware'].includes(category)) {
-                this.displayServingWareInventory(category);
-            }
-        }
+  /**
+   * Edit item
+   */
+  editItem(itemId) {
+    // Redirect to equipment edit
+    window.editEquipment(itemId);
+  }
+
+  /**
+   * Refresh current tab
+   */
+  refreshCurrentTab() {
+    const activeTab = document.querySelector('.equipment-tab:not(.hidden)');
+    if (activeTab) {
+      const category = activeTab.id.replace('tab-', '');
+      if (['plates', 'silverware', 'glassware'].includes(category)) {
+        this.displayServingWareInventory(category);
+      }
     }
+  }
 }
 
 // Helper function to close modals
 function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.remove();
-    }
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.remove();
+  }
 }
 
 // Initialize on page load
 window.servingWareManager = new ServingWareManager();
-

@@ -2,8 +2,16 @@
 // Generates front-of-house briefing sheets from menu and recipe data
 
 class MenuFOHManager {
-  generateSheet({ projectId = 'master', menu = {}, menuItems = [], recipes = [], serviceDate = new Date() } = {}) {
-    const library = recipes.length ? recipes : (window.universalRecipeManager?.getRecipeLibrary?.() || []);
+  generateSheet({
+    projectId = 'master',
+    menu = {},
+    menuItems = [],
+    recipes = [],
+    serviceDate = new Date()
+  } = {}) {
+    const library = recipes.length
+      ? recipes
+      : window.universalRecipeManager?.getRecipeLibrary?.() || [];
     const sheet = {
       projectId,
       menuName: menu.name || 'Menu',
@@ -18,12 +26,12 @@ class MenuFOHManager {
       notes: []
     };
 
-    const items = Array.isArray(menuItems) ? menuItems : (menu.items || []);
+    const items = Array.isArray(menuItems) ? menuItems : menu.items || [];
     const courseMap = new Map();
     const allergenTotals = new Map();
     const dietaryTotals = new Map();
 
-    items.forEach((item) => {
+    items.forEach(item => {
       const recipe = this.resolveRecipe(item, library);
       const status = window.menuRecipeIntegration?.getRecipeStatus?.(item.id);
 
@@ -39,14 +47,16 @@ class MenuFOHManager {
       const talkingPoints = this.buildTalkingPoints(item, recipe);
       const allergens = this.normalizeList(recipe?.allergens || item.allergens);
       const dietary = this.normalizeList(recipe?.dietary || item.dietaryInfo);
-      const pairings = this.normalizePairings(recipe?.pairings || recipe?.winePairings || recipe?.beveragePairings);
+      const pairings = this.normalizePairings(
+        recipe?.pairings || recipe?.winePairings || recipe?.beveragePairings
+      );
 
-      allergens.forEach((allergen) => {
+      allergens.forEach(allergen => {
         const key = allergen.toLowerCase();
         allergenTotals.set(key, (allergenTotals.get(key) || 0) + 1);
       });
 
-      dietary.forEach((tag) => {
+      dietary.forEach(tag => {
         const key = tag.toLowerCase();
         dietaryTotals.set(key, (dietaryTotals.get(key) || 0) + 1);
       });
@@ -59,7 +69,8 @@ class MenuFOHManager {
       courseMap.get(courseKey).push({
         menuItemId: item.id,
         name: item.name,
-        description: item.description || recipe?.description || 'Description pending.',
+        description:
+          item.description || recipe?.description || 'Description pending.',
         status,
         talkingPoints,
         allergens,
@@ -115,10 +126,12 @@ class MenuFOHManager {
   resolveRecipe(item, library) {
     if (window.menuRecipeIntegration) {
       const linked = window.menuRecipeIntegration.getRecipeForMenuItem(item.id);
-      if (linked) return linked;
+      if (linked) {
+        return linked;
+      }
     }
     if (item.recipeId) {
-      return library.find((recipe) => recipe.id === item.recipeId) || null;
+      return library.find(recipe => recipe.id === item.recipeId) || null;
     }
     return null;
   }
@@ -137,7 +150,7 @@ class MenuFOHManager {
 
     const highlights = recipe?.highlights || recipe?.keyPoints;
     if (Array.isArray(highlights)) {
-      highlights.forEach((point) => {
+      highlights.forEach(point => {
         if (point && typeof point === 'string') {
           points.push(point);
         }
@@ -160,23 +173,34 @@ class MenuFOHManager {
   }
 
   normalizeList(list) {
-    if (!list) return [];
+    if (!list) {
+      return [];
+    }
     if (Array.isArray(list)) {
-      return list.map((item) => item && item.toString().trim()).filter(Boolean);
+      return list.map(item => item && item.toString().trim()).filter(Boolean);
     }
     if (typeof list === 'string') {
-      return list.split(',').map((item) => item.trim()).filter(Boolean);
+      return list
+        .split(',')
+        .map(item => item.trim())
+        .filter(Boolean);
     }
     return [];
   }
 
   normalizePairings(pairings) {
-    if (!pairings) return [];
+    if (!pairings) {
+      return [];
+    }
     if (Array.isArray(pairings)) {
       return pairings
-        .map((p) => {
-          if (!p) return '';
-          if (typeof p === 'string') return p;
+        .map(p => {
+          if (!p) {
+            return '';
+          }
+          if (typeof p === 'string') {
+            return p;
+          }
           return p.name || p.title || p.description || '';
         })
         .filter(Boolean);
@@ -184,7 +208,7 @@ class MenuFOHManager {
     if (typeof pairings === 'string') {
       return pairings
         .split('\n')
-        .map((line) => line.trim())
+        .map(line => line.trim())
         .filter(Boolean);
     }
     return [];

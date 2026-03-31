@@ -22,12 +22,12 @@ class UXEnhancementSystem {
    */
   init() {
     console.log('✨ UX Enhancement System initializing...');
-    
+
     this.setupTooltips();
     this.setupNotifications();
     this.checkFirstTimeUser();
     this.addQuickHelp();
-    
+
     console.log('✅ UX Enhancements active');
   }
 
@@ -37,7 +37,7 @@ class UXEnhancementSystem {
   checkFirstTimeUser() {
     const hasSeenOnboarding = localStorage.getItem('onboarding_completed');
     const user = window.authManager?.currentUser;
-    
+
     if (!hasSeenOnboarding && user) {
       // Show welcome guide after a moment
       setTimeout(() => {
@@ -126,7 +126,7 @@ class UXEnhancementSystem {
         }
       </style>
     `;
-    
+
     document.body.appendChild(guide);
   }
 
@@ -154,17 +154,29 @@ class UXEnhancementSystem {
    */
   showNotification(title, message, type = 'info') {
     const container = document.getElementById('notification-container');
-    if (!container) return;
-    
+    if (!container) {
+      return;
+    }
+
     const colors = {
-      success: { bg: '#dcfce7', border: '#22c55e', text: '#166534', icon: '✅' },
+      success: {
+        bg: '#dcfce7',
+        border: '#22c55e',
+        text: '#166534',
+        icon: '✅'
+      },
       error: { bg: '#fee2e2', border: '#ef4444', text: '#991b1b', icon: '❌' },
-      warning: { bg: '#fef3c7', border: '#f59e0b', text: '#92400e', icon: '⚠️' },
+      warning: {
+        bg: '#fef3c7',
+        border: '#f59e0b',
+        text: '#92400e',
+        icon: '⚠️'
+      },
       info: { bg: '#e0e7ff', border: '#667eea', text: '#3730a3', icon: 'ℹ️' }
     };
-    
+
     const color = colors[type] || colors.info;
-    
+
     const notification = document.createElement('div');
     notification.style.cssText = `
       background: ${color.bg};
@@ -180,7 +192,7 @@ class UXEnhancementSystem {
       min-width: 300px;
       max-width: 400px;
     `;
-    
+
     notification.innerHTML = `
       <div style="display: flex; align-items: start; gap: 12px;">
         <div style="font-size: 1.5rem;">${color.icon}</div>
@@ -191,11 +203,11 @@ class UXEnhancementSystem {
         <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; opacity: 0.6;">×</button>
       </div>
     `;
-    
+
     notification.onclick = () => notification.remove();
-    
+
     container.appendChild(notification);
-    
+
     // Auto-remove after 5 seconds
     setTimeout(() => {
       if (notification.parentElement) {
@@ -293,8 +305,10 @@ class UXEnhancementSystem {
    * Add quick help button
    */
   addQuickHelp() {
-    if (document.getElementById('quick-help-btn')) return;
-    
+    if (document.getElementById('quick-help-btn')) {
+      return;
+    }
+
     const helpBtn = document.createElement('button');
     helpBtn.id = 'quick-help-btn';
     helpBtn.innerHTML = '?';
@@ -315,19 +329,19 @@ class UXEnhancementSystem {
       z-index: 9998;
       transition: all 0.3s;
     `;
-    
+
     helpBtn.onmouseover = () => {
       helpBtn.style.transform = 'scale(1.1)';
       helpBtn.style.boxShadow = '0 12px 30px rgba(102, 126, 234, 0.6)';
     };
-    
+
     helpBtn.onmouseout = () => {
       helpBtn.style.transform = 'scale(1)';
       helpBtn.style.boxShadow = '0 8px 20px rgba(102, 126, 234, 0.4)';
     };
-    
+
     helpBtn.onclick = () => this.showHelpMenu();
-    
+
     document.body.appendChild(helpBtn);
   }
 
@@ -337,7 +351,7 @@ class UXEnhancementSystem {
   showHelpMenu() {
     const currentPage = this.detectCurrentPage();
     const help = this.getPageHelp(currentPage);
-    
+
     const menu = document.createElement('div');
     menu.id = 'help-menu';
     menu.innerHTML = `
@@ -354,13 +368,17 @@ class UXEnhancementSystem {
           </div>
 
           <h3 style="font-weight: 700; margin-bottom: 15px; color: #667eea;">Quick Actions:</h3>
-          ${help.actions.map(action => `
+          ${help.actions
+            .map(
+              action => `
             <div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #667eea;">
               <div style="font-weight: 600; color: #1e293b; margin-bottom: 5px;">${action.title}</div>
               <div style="color: #64748b; font-size: 0.9rem;">${action.description}</div>
               ${action.link ? `<a href="${action.link}" style="color: #667eea; font-weight: 600; font-size: 0.9rem; text-decoration: none;">→ Go there</a>` : ''}
             </div>
-          `).join('')}
+          `
+            )
+            .join('')}
 
           <div style="margin-top: 25px; padding-top: 20px; border-top: 2px solid #e2e8f0;">
             <button onclick="window.uxEnhancement.showOnboardingGuide(); this.closest('#help-menu').remove();" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-bottom: 10px;">
@@ -373,7 +391,7 @@ class UXEnhancementSystem {
         </div>
       </div>
     `;
-    
+
     document.body.appendChild(menu);
   }
 
@@ -382,18 +400,38 @@ class UXEnhancementSystem {
    */
   detectCurrentPage() {
     const path = window.location.pathname;
-    
-    if (path.includes('index.html') || path === '/') return 'dashboard';
-    if (path.includes('recipe-library')) return 'recipe-library';
-    if (path.includes('recipe-developer')) return 'recipe-developer';
-    if (path.includes('recipe-upload')) return 'recipe-upload';
-    if (path.includes('menu-builder')) return 'menu-builder';
-    if (path.includes('ingredients')) return 'ingredients';
-    if (path.includes('equipment')) return 'equipment';
-    if (path.includes('kitchen-management')) return 'kitchen-management';
-    if (path.includes('server-info')) return 'server-info';
-    if (path.includes('ingredient-highlights')) return 'highlights';
-    
+
+    if (path.includes('index.html') || path === '/') {
+      return 'dashboard';
+    }
+    if (path.includes('recipe-library')) {
+      return 'recipe-library';
+    }
+    if (path.includes('recipe-developer')) {
+      return 'recipe-developer';
+    }
+    if (path.includes('recipe-upload')) {
+      return 'recipe-upload';
+    }
+    if (path.includes('menu-builder')) {
+      return 'menu-builder';
+    }
+    if (path.includes('ingredients')) {
+      return 'ingredients';
+    }
+    if (path.includes('equipment')) {
+      return 'equipment';
+    }
+    if (path.includes('kitchen-management')) {
+      return 'kitchen-management';
+    }
+    if (path.includes('server-info')) {
+      return 'server-info';
+    }
+    if (path.includes('ingredient-highlights')) {
+      return 'highlights';
+    }
+
     return 'other';
   }
 
@@ -402,89 +440,210 @@ class UXEnhancementSystem {
    */
   getPageHelp(page) {
     const helpContent = {
-      'dashboard': {
+      dashboard: {
         title: 'Dashboard - Your Command Center',
-        description: 'Access all features from here. Click any card to jump to that tool.',
+        description:
+          'Access all features from here. Click any card to jump to that tool.',
         actions: [
-          { title: 'Create First Recipe', description: 'Start with Recipe Developer or Quick Dish Creator', link: 'recipe-developer.html' },
-          { title: 'Import Ingredients', description: 'Load 145 professional ingredients automatically', link: 'ingredients.html' },
-          { title: 'Build Your Menu', description: 'Create a menu with your recipes', link: 'menu-builder.html' }
+          {
+            title: 'Create First Recipe',
+            description: 'Start with Recipe Developer or Quick Dish Creator',
+            link: 'recipe-developer.html'
+          },
+          {
+            title: 'Import Ingredients',
+            description: 'Load 145 professional ingredients automatically',
+            link: 'ingredients.html'
+          },
+          {
+            title: 'Build Your Menu',
+            description: 'Create a menu with your recipes',
+            link: 'menu-builder.html'
+          }
         ]
       },
-      'ingredients': {
+      ingredients: {
         title: 'Ingredients Database',
-        description: 'Manage your ingredient library. Auto-imports 145 professional ingredients on first visit.',
+        description:
+          'Manage your ingredient library. Auto-imports 145 professional ingredients on first visit.',
         actions: [
-          { title: 'Auto-Import Ingredients', description: 'Click "Import Base Ingredients" to load 145 professional ingredients', link: null },
-          { title: 'Add Custom Ingredient', description: 'Use the form at the top to add your own ingredients', link: null },
-          { title: 'Filter & Search', description: 'Use filters to find ingredients by category or vendor', link: null }
+          {
+            title: 'Auto-Import Ingredients',
+            description:
+              'Click "Import Base Ingredients" to load 145 professional ingredients',
+            link: null
+          },
+          {
+            title: 'Add Custom Ingredient',
+            description: 'Use the form at the top to add your own ingredients',
+            link: null
+          },
+          {
+            title: 'Filter & Search',
+            description:
+              'Use filters to find ingredients by category or vendor',
+            link: null
+          }
         ]
       },
       'recipe-library': {
         title: 'Recipe Library',
-        description: 'All your recipes in one place. Filter by category, search by name, or view by project.',
+        description:
+          'All your recipes in one place. Filter by category, search by name, or view by project.',
         actions: [
-          { title: 'Create New Recipe', description: 'Use Recipe Developer for detailed recipes', link: 'recipe-developer.html' },
-          { title: 'Quick Add', description: 'Use Quick Dish Creator for fast entry', link: 'index.html#quick-dish' },
-          { title: 'Import Recipes', description: 'Upload PDFs or paste text in Bulk Import', link: 'bulk-recipe-import.html' }
+          {
+            title: 'Create New Recipe',
+            description: 'Use Recipe Developer for detailed recipes',
+            link: 'recipe-developer.html'
+          },
+          {
+            title: 'Quick Add',
+            description: 'Use Quick Dish Creator for fast entry',
+            link: 'index.html#quick-dish'
+          },
+          {
+            title: 'Import Recipes',
+            description: 'Upload PDFs or paste text in Bulk Import',
+            link: 'bulk-recipe-import.html'
+          }
         ]
       },
       'recipe-developer': {
         title: 'Recipe Developer',
-        description: 'Create detailed recipes with components, equipment, and plating instructions.',
+        description:
+          'Create detailed recipes with components, equipment, and plating instructions.',
         actions: [
-          { title: 'Select Ingredients', description: 'Use dropdowns to select from your ingredient database', link: null },
-          { title: 'Link Equipment', description: 'Check boxes for equipment needed in this recipe', link: null },
-          { title: 'Add Components', description: 'Break complex recipes into prep components', link: null }
+          {
+            title: 'Select Ingredients',
+            description:
+              'Use dropdowns to select from your ingredient database',
+            link: null
+          },
+          {
+            title: 'Link Equipment',
+            description: 'Check boxes for equipment needed in this recipe',
+            link: null
+          },
+          {
+            title: 'Add Components',
+            description: 'Break complex recipes into prep components',
+            link: null
+          }
         ]
       },
       'menu-builder': {
         title: 'Menu Builder',
-        description: 'Create professional menus with pricing, categories, and linked recipes.',
+        description:
+          'Create professional menus with pricing, categories, and linked recipes.',
         actions: [
-          { title: 'Create New Menu', description: 'Start a new menu for your restaurant or event', link: null },
-          { title: 'Add Menu Items', description: 'Link your recipes to create menu dishes', link: null },
-          { title: 'Set Pricing', description: 'Add prices and track costs for profitability', link: null }
+          {
+            title: 'Create New Menu',
+            description: 'Start a new menu for your restaurant or event',
+            link: null
+          },
+          {
+            title: 'Add Menu Items',
+            description: 'Link your recipes to create menu dishes',
+            link: null
+          },
+          {
+            title: 'Set Pricing',
+            description: 'Add prices and track costs for profitability',
+            link: null
+          }
         ]
       },
       'kitchen-management': {
         title: 'Kitchen Management Tools',
-        description: 'Professional tools for running your kitchen: PDFs, build sheets, checklists, and prep lists.',
+        description:
+          'Professional tools for running your kitchen: PDFs, build sheets, checklists, and prep lists.',
         actions: [
-          { title: 'Generate Recipe Book', description: 'Create a professional PDF with all your recipes', link: null },
-          { title: 'Create Build Sheets', description: 'Detailed component sheets for each recipe', link: null },
-          { title: 'Prep Lists', description: 'Auto-prioritized prep list for tomorrow', link: null }
+          {
+            title: 'Generate Recipe Book',
+            description: 'Create a professional PDF with all your recipes',
+            link: null
+          },
+          {
+            title: 'Create Build Sheets',
+            description: 'Detailed component sheets for each recipe',
+            link: null
+          },
+          {
+            title: 'Prep Lists',
+            description: 'Auto-prioritized prep list for tomorrow',
+            link: null
+          }
         ]
       },
       'server-info': {
         title: 'Server Information Sheet',
-        description: 'Create FOH reference sheets with talking points, allergens, and pairing suggestions.',
+        description:
+          'Create FOH reference sheets with talking points, allergens, and pairing suggestions.',
         actions: [
-          { title: 'Select Menu', description: 'Choose a menu to generate server info', link: null },
-          { title: 'Add Custom Notes', description: 'Click "Add Custom Point" to add talking points', link: null },
-          { title: 'Download PDF', description: 'Print or email to your service staff', link: null }
+          {
+            title: 'Select Menu',
+            description: 'Choose a menu to generate server info',
+            link: null
+          },
+          {
+            title: 'Add Custom Notes',
+            description: 'Click "Add Custom Point" to add talking points',
+            link: null
+          },
+          {
+            title: 'Download PDF',
+            description: 'Print or email to your service staff',
+            link: null
+          }
         ]
       },
-      'highlights': {
+      highlights: {
         title: 'Ingredient Highlights',
-        description: 'Showcase your unique ingredients with stories, sourcing, and pronunciation guides.',
+        description:
+          'Showcase your unique ingredients with stories, sourcing, and pronunciation guides.',
         actions: [
-          { title: 'Add Highlight', description: 'Click "Add Ingredient Highlight" to feature a special ingredient', link: null },
-          { title: 'Tell the Story', description: 'Add origin, vendor, flavor profile, and why it\'s special', link: null },
-          { title: 'Link to Dishes', description: 'Show which dishes use this ingredient', link: null }
+          {
+            title: 'Add Highlight',
+            description:
+              'Click "Add Ingredient Highlight" to feature a special ingredient',
+            link: null
+          },
+          {
+            title: 'Tell the Story',
+            description:
+              "Add origin, vendor, flavor profile, and why it's special",
+            link: null
+          },
+          {
+            title: 'Link to Dishes',
+            description: 'Show which dishes use this ingredient',
+            link: null
+          }
         ]
       },
-      'other': {
+      other: {
         title: 'Help & Support',
-        description: 'Need help? We\'re here to guide you.',
+        description: "Need help? We're here to guide you.",
         actions: [
-          { title: 'Back to Dashboard', description: 'Return to main dashboard', link: 'index.html' },
-          { title: 'View Documentation', description: 'Read full guides and tutorials', link: 'QUICK_START_GUIDE.md' },
-          { title: 'Run Setup', description: 'Load 89 Charles menu data', link: 'SETUP_89_CHARLES.html' }
+          {
+            title: 'Back to Dashboard',
+            description: 'Return to main dashboard',
+            link: 'index.html'
+          },
+          {
+            title: 'View Documentation',
+            description: 'Read full guides and tutorials',
+            link: 'QUICK_START_GUIDE.md'
+          },
+          {
+            title: 'Run Setup',
+            description: 'Load 89 Charles menu data',
+            link: 'SETUP_89_CHARLES.html'
+          }
         ]
       }
     };
-    
+
     return helpContent[page] || helpContent.other;
   }
 
@@ -492,14 +651,16 @@ class UXEnhancementSystem {
    * Add helpful hints to empty states
    */
   enhanceEmptyState(element, hints) {
-    if (!element) return;
-    
+    if (!element) {
+      return;
+    }
+
     const hintHtml = `
       <div class="quick-hint" style="margin-top: 20px;">
         <strong>💡 Quick Tip:</strong> ${hints.join(' ')}
       </div>
     `;
-    
+
     element.insertAdjacentHTML('beforeend', hintHtml);
   }
 
@@ -512,14 +673,14 @@ class UXEnhancementSystem {
 }
 
 // Global helper function for notifications
-window.showNotification = function(title, message, type = 'info') {
+window.showNotification = function (title, message, type = 'info') {
   if (window.uxEnhancement) {
     window.uxEnhancement.showNotification(title, message, type);
   }
 };
 
 // Global guided tour function
-window.startGuidedTour = function() {
+window.startGuidedTour = function () {
   document.getElementById('onboarding-guide')?.remove();
   window.showNotification(
     '🎓 Guided Tour',
@@ -539,4 +700,3 @@ window.addEventListener('load', () => {
 });
 
 console.log('✨ UX Enhancement System loaded');
-

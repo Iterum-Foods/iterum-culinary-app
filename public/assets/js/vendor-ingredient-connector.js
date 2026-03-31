@@ -53,9 +53,13 @@ class VendorIngredientConnector {
             <select id="connect-vendor-id" required
                     style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
               <option value="">Select a vendor...</option>
-              ${vendors.map(v => `
+              ${vendors
+                .map(
+                  v => `
                 <option value="${v.id}">${v.name} ${v.company ? `(${v.company})` : ''}</option>
-              `).join('')}
+              `
+                )
+                .join('')}
             </select>
           </div>
 
@@ -159,10 +163,12 @@ class VendorIngredientConnector {
     document.body.appendChild(modal);
 
     // Handle form submission
-    document.getElementById('vendor-connect-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      this.saveConnection(ingredientId, ingredientName);
-    });
+    document
+      .getElementById('vendor-connect-form')
+      .addEventListener('submit', e => {
+        e.preventDefault();
+        this.saveConnection(ingredientId, ingredientName);
+      });
   }
 
   /**
@@ -170,12 +176,18 @@ class VendorIngredientConnector {
    */
   saveConnection(ingredientId, ingredientName) {
     const vendorId = document.getElementById('connect-vendor-id').value;
-    const brandName = document.getElementById('connect-brand-name').value.trim();
+    const brandName = document
+      .getElementById('connect-brand-name')
+      .value.trim();
     const farmName = document.getElementById('connect-farm-name').value.trim();
-    const productCode = document.getElementById('connect-product-code').value.trim();
-    const price = parseFloat(document.getElementById('connect-price').value) || 0;
+    const productCode = document
+      .getElementById('connect-product-code')
+      .value.trim();
+    const price =
+      parseFloat(document.getElementById('connect-price').value) || 0;
     const unit = document.getElementById('connect-unit').value;
-    const minOrder = parseInt(document.getElementById('connect-min-order').value) || 1;
+    const minOrder =
+      parseInt(document.getElementById('connect-min-order').value) || 1;
     const notes = document.getElementById('connect-notes').value.trim();
 
     if (!vendorId) {
@@ -189,7 +201,9 @@ class VendorIngredientConnector {
     const vendorName = vendor ? vendor.name : 'Unknown Vendor';
 
     // Load existing connections
-    const connections = JSON.parse(localStorage.getItem(this.connectionsKey) || '[]');
+    const connections = JSON.parse(
+      localStorage.getItem(this.connectionsKey) || '[]'
+    );
 
     // Create new connection
     const connection = {
@@ -220,7 +234,10 @@ class VendorIngredientConnector {
     document.getElementById('vendor-ingredient-connect-modal').remove();
 
     // Show success
-    this.showNotification(`✅ Connected ${ingredientName} to ${vendorName}${brandName ? ` (${brandName})` : ''}`, 'success');
+    this.showNotification(
+      `✅ Connected ${ingredientName} to ${vendorName}${brandName ? ` (${brandName})` : ''}`,
+      'success'
+    );
 
     // Track analytics
     if (window.analyticsTracker) {
@@ -243,7 +260,9 @@ class VendorIngredientConnector {
    * Update ingredient with vendor info
    */
   updateIngredientVendorInfo(ingredientId, connection) {
-    const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
+    const ingredients = JSON.parse(
+      localStorage.getItem('ingredients_database') || '[]'
+    );
     const ingredient = ingredients.find(ing => ing.id === ingredientId);
 
     if (ingredient) {
@@ -277,7 +296,9 @@ class VendorIngredientConnector {
    * Get all connections for an ingredient
    */
   getConnectionsForIngredient(ingredientId) {
-    const connections = JSON.parse(localStorage.getItem(this.connectionsKey) || '[]');
+    const connections = JSON.parse(
+      localStorage.getItem(this.connectionsKey) || '[]'
+    );
     return connections.filter(conn => conn.ingredientId === ingredientId);
   }
 
@@ -285,7 +306,9 @@ class VendorIngredientConnector {
    * Get all connections for a vendor
    */
   getConnectionsForVendor(vendorId) {
-    const connections = JSON.parse(localStorage.getItem(this.connectionsKey) || '[]');
+    const connections = JSON.parse(
+      localStorage.getItem(this.connectionsKey) || '[]'
+    );
     return connections.filter(conn => conn.vendorId == vendorId);
   }
 
@@ -293,10 +316,12 @@ class VendorIngredientConnector {
    * Delete a connection
    */
   deleteConnection(connectionId) {
-    const connections = JSON.parse(localStorage.getItem(this.connectionsKey) || '[]');
+    const connections = JSON.parse(
+      localStorage.getItem(this.connectionsKey) || '[]'
+    );
     const filtered = connections.filter(conn => conn.id !== connectionId);
     localStorage.setItem(this.connectionsKey, JSON.stringify(filtered));
-    
+
     this.showNotification('🗑️ Connection removed', 'info');
   }
 
@@ -305,26 +330,33 @@ class VendorIngredientConnector {
    */
   createVendorBadge(ingredientId) {
     const connections = this.getConnectionsForIngredient(ingredientId);
-    
+
     if (connections.length === 0) {
       return `<span style="font-size: 12px; color: #94a3b8;">No vendors</span>`;
     }
 
-    let html = '<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">';
-    
+    let html =
+      '<div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">';
+
     connections.forEach(conn => {
       const display = [];
-      if (conn.brandName) display.push(`🏷️ ${conn.brandName}`);
-      if (conn.farmName) display.push(`🌾 ${conn.farmName}`);
-      if (display.length === 0) display.push(conn.vendorName);
-      
+      if (conn.brandName) {
+        display.push(`🏷️ ${conn.brandName}`);
+      }
+      if (conn.farmName) {
+        display.push(`🌾 ${conn.farmName}`);
+      }
+      if (display.length === 0) {
+        display.push(conn.vendorName);
+      }
+
       html += `
         <div style="display: inline-block; padding: 4px 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 6px; font-size: 11px; font-weight: 600;">
           ${display.join(' • ')}
         </div>
       `;
     });
-    
+
     html += '</div>';
     return html;
   }
@@ -348,7 +380,7 @@ class VendorIngredientConnector {
       font-weight: 600;
       animation: slideIn 0.3s ease;
     `;
-    
+
     document.body.appendChild(notification);
     setTimeout(() => notification.remove(), 3000);
   }
@@ -358,4 +390,3 @@ class VendorIngredientConnector {
 window.vendorIngredientConnector = new VendorIngredientConnector();
 
 console.log('🔗 Vendor-Ingredient Connector loaded');
-

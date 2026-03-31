@@ -5,27 +5,27 @@
  */
 
 class NapkinBrainstorming {
-    constructor() {
-        this.currentNapkin = null;
-        this.napkins = [];
-        this.isDrawing = false;
-        this.init();
-    }
+  constructor() {
+    this.currentNapkin = null;
+    this.napkins = [];
+    this.isDrawing = false;
+    this.init();
+  }
 
-    init() {
-        console.log('🧻 Napkin Brainstorming System initialized');
-        this.loadNapkins();
-        this.setupEventListeners();
-    }
+  init() {
+    console.log('🧻 Napkin Brainstorming System initialized');
+    this.loadNapkins();
+    this.setupEventListeners();
+  }
 
-    /**
-     * Create napkin-style brainstorming workspace
-     */
-    createNapkinWorkspace() {
-        const workspace = document.createElement('div');
-        workspace.id = 'napkin-workspace';
-        workspace.className = 'napkin-workspace';
-        workspace.style.cssText = `
+  /**
+   * Create napkin-style brainstorming workspace
+   */
+  createNapkinWorkspace() {
+    const workspace = document.createElement('div');
+    workspace.id = 'napkin-workspace';
+    workspace.className = 'napkin-workspace';
+    workspace.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -38,7 +38,7 @@ class NapkinBrainstorming {
             font-family: 'Kalam', 'Shadows Into Light', cursive;
         `;
 
-        workspace.innerHTML = `
+    workspace.innerHTML = `
             <div class="napkin-header" style="
                 padding: 16px 24px;
                 background: rgba(248, 250, 252, 0.95);
@@ -341,299 +341,314 @@ class NapkinBrainstorming {
             </div>
         `;
 
-        document.body.appendChild(workspace);
-        this.setupNapkinCanvas();
-        this.renderNapkinList();
-        this.newNapkin();
+    document.body.appendChild(workspace);
+    this.setupNapkinCanvas();
+    this.renderNapkinList();
+    this.newNapkin();
 
-        console.log('🧻 Napkin workspace created');
+    console.log('🧻 Napkin workspace created');
+  }
+
+  /**
+   * Setup napkin canvas with natural drawing feel
+   */
+  setupNapkinCanvas() {
+    const canvas = document.getElementById('napkin-canvas');
+    if (!canvas) {
+      return;
     }
 
-    /**
-     * Setup napkin canvas with natural drawing feel
-     */
-    setupNapkinCanvas() {
-        const canvas = document.getElementById('napkin-canvas');
-        if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
-        const ctx = canvas.getContext('2d');
-        
-        // Set canvas size
-        const resizeCanvas = () => {
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-        };
-        
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+    // Set canvas size
+    const resizeCanvas = () => {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    };
 
-        // Drawing state
-        let isDrawing = false;
-        let lastX = 0;
-        let lastY = 0;
-        let currentTool = 'pen';
-        let currentColor = '#1e293b';
-        let currentSize = 3;
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-        // Natural drawing with slight randomness
-        const draw = (e) => {
-            if (!isDrawing) return;
+    // Drawing state
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+    let currentTool = 'pen';
+    let currentColor = '#1e293b';
+    let currentSize = 3;
 
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+    // Natural drawing with slight randomness
+    const draw = e => {
+      if (!isDrawing) {
+        return;
+      }
 
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(x, y);
-            
-            // Add slight randomness for natural feel
-            const randomOffset = (Math.random() - 0.5) * 0.5;
-            ctx.lineWidth = currentSize + randomOffset;
-            
-            // Different tools have different styles
-            if (currentTool === 'pen') {
-                ctx.globalAlpha = 0.9;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-            } else if (currentTool === 'marker') {
-                ctx.globalAlpha = 0.6;
-                ctx.lineCap = 'square';
-                ctx.lineJoin = 'miter';
-            } else if (currentTool === 'highlighter') {
-                ctx.globalAlpha = 0.3;
-                ctx.lineCap = 'square';
-                ctx.lineJoin = 'miter';
-            }
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-            ctx.strokeStyle = currentColor;
-            ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(x, y);
 
-            lastX = x;
-            lastY = y;
-        };
+      // Add slight randomness for natural feel
+      const randomOffset = (Math.random() - 0.5) * 0.5;
+      ctx.lineWidth = currentSize + randomOffset;
 
-        // Mouse events
-        canvas.addEventListener('mousedown', (e) => {
-            isDrawing = true;
-            const rect = canvas.getBoundingClientRect();
-            lastX = e.clientX - rect.left;
-            lastY = e.clientY - rect.top;
-        });
+      // Different tools have different styles
+      if (currentTool === 'pen') {
+        ctx.globalAlpha = 0.9;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+      } else if (currentTool === 'marker') {
+        ctx.globalAlpha = 0.6;
+        ctx.lineCap = 'square';
+        ctx.lineJoin = 'miter';
+      } else if (currentTool === 'highlighter') {
+        ctx.globalAlpha = 0.3;
+        ctx.lineCap = 'square';
+        ctx.lineJoin = 'miter';
+      }
 
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', () => isDrawing = false);
-        canvas.addEventListener('mouseout', () => isDrawing = false);
+      ctx.strokeStyle = currentColor;
+      ctx.stroke();
 
-        // Touch events for mobile
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            isDrawing = true;
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            lastX = touch.clientX - rect.left;
-            lastY = touch.clientY - rect.top;
-        });
+      lastX = x;
+      lastY = y;
+    };
 
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            if (isDrawing) {
-                const touch = e.touches[0];
-                const rect = canvas.getBoundingClientRect();
-                const x = touch.clientX - rect.left;
-                const y = touch.clientY - rect.top;
-                
-                ctx.beginPath();
-                ctx.moveTo(lastX, lastY);
-                ctx.lineTo(x, y);
-                ctx.lineWidth = currentSize + (Math.random() - 0.5) * 0.5;
-                ctx.strokeStyle = currentColor;
-                ctx.stroke();
-                
-                lastX = x;
-                lastY = y;
-            }
-        });
+    // Mouse events
+    canvas.addEventListener('mousedown', e => {
+      isDrawing = true;
+      const rect = canvas.getBoundingClientRect();
+      lastX = e.clientX - rect.left;
+      lastY = e.clientY - rect.top;
+    });
 
-        canvas.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            isDrawing = false;
-        });
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', () => (isDrawing = false));
+    canvas.addEventListener('mouseout', () => (isDrawing = false));
 
-        // Store references
-        this.canvas = canvas;
-        this.ctx = ctx;
-        this.currentTool = currentTool;
-        this.currentColor = currentColor;
-        this.currentSize = currentSize;
+    // Touch events for mobile
+    canvas.addEventListener('touchstart', e => {
+      e.preventDefault();
+      isDrawing = true;
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      lastX = touch.clientX - rect.left;
+      lastY = touch.clientY - rect.top;
+    });
+
+    canvas.addEventListener('touchmove', e => {
+      e.preventDefault();
+      if (isDrawing) {
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.lineWidth = currentSize + (Math.random() - 0.5) * 0.5;
+        ctx.strokeStyle = currentColor;
+        ctx.stroke();
+
+        lastX = x;
+        lastY = y;
+      }
+    });
+
+    canvas.addEventListener('touchend', e => {
+      e.preventDefault();
+      isDrawing = false;
+    });
+
+    // Store references
+    this.canvas = canvas;
+    this.ctx = ctx;
+    this.currentTool = currentTool;
+    this.currentColor = currentColor;
+    this.currentSize = currentSize;
+  }
+
+  /**
+   * Set drawing tool
+   */
+  setTool(tool) {
+    this.currentTool = tool;
+
+    // Update active tool button
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+      btn.classList.remove('active');
+      btn.style.background = '#64748b';
+      btn.style.borderColor = '#475569';
+    });
+
+    const activeBtn = document.querySelector(`[data-tool="${tool}"]`);
+    if (activeBtn) {
+      activeBtn.classList.add('active');
+      activeBtn.style.background = '#3b82f6';
+      activeBtn.style.borderColor = '#1d4ed8';
+    }
+  }
+
+  /**
+   * Set brush color
+   */
+  setColor(color) {
+    this.currentColor = color;
+
+    // Update active color button
+    document.querySelectorAll('.color-btn').forEach(btn => {
+      btn.classList.remove('active');
+      btn.style.borderWidth = '2px';
+    });
+
+    const activeBtn = document.querySelector(`[data-color="${color}"]`);
+    if (activeBtn) {
+      activeBtn.classList.add('active');
+      activeBtn.style.borderWidth = '3px';
+    }
+  }
+
+  /**
+   * Set brush size
+   */
+  setBrushSize(size) {
+    this.currentSize = parseInt(size);
+    document.getElementById('brush-size-display').textContent = `${size}px`;
+  }
+
+  /**
+   * Create new napkin
+   */
+  newNapkin() {
+    const napkin = {
+      id: Date.now(),
+      title: 'New Recipe Idea',
+      timestamp: new Date().toISOString(),
+      data: null
+    };
+
+    this.currentNapkin = napkin;
+    this.napkins.push(napkin);
+
+    // Clear canvas
+    this.clearNapkin();
+
+    // Update title
+    const titleInput = document.getElementById('napkin-title');
+    if (titleInput) {
+      titleInput.value = napkin.title;
     }
 
-    /**
-     * Set drawing tool
-     */
-    setTool(tool) {
-        this.currentTool = tool;
-        
-        // Update active tool button
-        document.querySelectorAll('.tool-btn').forEach(btn => {
-            btn.classList.remove('active');
-            btn.style.background = '#64748b';
-            btn.style.borderColor = '#475569';
-        });
-        
-        const activeBtn = document.querySelector(`[data-tool="${tool}"]`);
-        if (activeBtn) {
-            activeBtn.classList.add('active');
-            activeBtn.style.background = '#3b82f6';
-            activeBtn.style.borderColor = '#1d4ed8';
-        }
+    this.renderNapkinList();
+    this.showNotification('New napkin created!', 'success');
+  }
+
+  /**
+   * Save current napkin
+   */
+  saveNapkin() {
+    if (!this.currentNapkin) {
+      return;
     }
 
-    /**
-     * Set brush color
-     */
-    setColor(color) {
-        this.currentColor = color;
-        
-        // Update active color button
-        document.querySelectorAll('.color-btn').forEach(btn => {
-            btn.classList.remove('active');
-            btn.style.borderWidth = '2px';
-        });
-        
-        const activeBtn = document.querySelector(`[data-color="${color}"]`);
-        if (activeBtn) {
-            activeBtn.classList.add('active');
-            activeBtn.style.borderWidth = '3px';
-        }
+    const title =
+      document.getElementById('napkin-title').value || 'Untitled Recipe';
+    this.currentNapkin.title = title;
+    this.currentNapkin.data = this.canvas.toDataURL();
+    this.currentNapkin.timestamp = new Date().toISOString();
+
+    // Update in napkins array
+    const index = this.napkins.findIndex(n => n.id === this.currentNapkin.id);
+    if (index !== -1) {
+      this.napkins[index] = this.currentNapkin;
     }
 
-    /**
-     * Set brush size
-     */
-    setBrushSize(size) {
-        this.currentSize = parseInt(size);
-        document.getElementById('brush-size-display').textContent = `${size}px`;
+    // Save to localStorage
+    localStorage.setItem('napkin_brainstorming', JSON.stringify(this.napkins));
+
+    this.renderNapkinList();
+    this.showNotification('Napkin saved!', 'success');
+  }
+
+  /**
+   * Load napkin
+   */
+  loadNapkin(napkinId) {
+    const napkin = this.napkins.find(n => n.id === napkinId);
+    if (!napkin) {
+      return;
     }
 
-    /**
-     * Create new napkin
-     */
-    newNapkin() {
-        const napkin = {
-            id: Date.now(),
-            title: 'New Recipe Idea',
-            timestamp: new Date().toISOString(),
-            data: null
-        };
-        
-        this.currentNapkin = napkin;
-        this.napkins.push(napkin);
-        
-        // Clear canvas
-        this.clearNapkin();
-        
-        // Update title
-        const titleInput = document.getElementById('napkin-title');
-        if (titleInput) {
-            titleInput.value = napkin.title;
-        }
-        
-        this.renderNapkinList();
-        this.showNotification('New napkin created!', 'success');
-    }
+    this.currentNapkin = napkin;
 
-    /**
-     * Save current napkin
-     */
-    saveNapkin() {
-        if (!this.currentNapkin) return;
-        
-        const title = document.getElementById('napkin-title').value || 'Untitled Recipe';
-        this.currentNapkin.title = title;
-        this.currentNapkin.data = this.canvas.toDataURL();
-        this.currentNapkin.timestamp = new Date().toISOString();
-        
-        // Update in napkins array
-        const index = this.napkins.findIndex(n => n.id === this.currentNapkin.id);
-        if (index !== -1) {
-            this.napkins[index] = this.currentNapkin;
-        }
-        
-        // Save to localStorage
-        localStorage.setItem('napkin_brainstorming', JSON.stringify(this.napkins));
-        
-        this.renderNapkinList();
-        this.showNotification('Napkin saved!', 'success');
-    }
+    // Update title
+    document.getElementById('napkin-title').value = napkin.title;
 
-    /**
-     * Load napkin
-     */
-    loadNapkin(napkinId) {
-        const napkin = this.napkins.find(n => n.id === napkinId);
-        if (!napkin) return;
-        
-        this.currentNapkin = napkin;
-        
-        // Update title
-        document.getElementById('napkin-title').value = napkin.title;
-        
-        // Load canvas data
-        if (napkin.data) {
-            const img = new Image();
-            img.onload = () => {
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this.ctx.drawImage(img, 0, 0);
-            };
-            img.src = napkin.data;
-        } else {
-            this.clearNapkin();
-        }
-        
-        this.showNotification(`Loaded: ${napkin.title}`, 'info');
-    }
-
-    /**
-     * Clear napkin
-     */
-    clearNapkin() {
+    // Load canvas data
+    if (napkin.data) {
+      const img = new Image();
+      img.onload = () => {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.drawImage(img, 0, 0);
+      };
+      img.src = napkin.data;
+    } else {
+      this.clearNapkin();
     }
 
-    /**
-     * Export napkin
-     */
-    exportNapkin() {
-        if (!this.currentNapkin) return;
-        
-        const link = document.createElement('a');
-        link.download = `${this.currentNapkin.title.replace(/[^a-z0-9]/gi, '_')}.png`;
-        link.href = this.canvas.toDataURL();
-        link.click();
-        
-        this.showNotification('Napkin exported!', 'success');
+    this.showNotification(`Loaded: ${napkin.title}`, 'info');
+  }
+
+  /**
+   * Clear napkin
+   */
+  clearNapkin() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  /**
+   * Export napkin
+   */
+  exportNapkin() {
+    if (!this.currentNapkin) {
+      return;
     }
 
-    /**
-     * Close napkin workspace
-     */
-    closeNapkin() {
-        const workspace = document.getElementById('napkin-workspace');
-        if (workspace) {
-            workspace.style.display = 'none';
-        }
+    const link = document.createElement('a');
+    link.download = `${this.currentNapkin.title.replace(/[^a-z0-9]/gi, '_')}.png`;
+    link.href = this.canvas.toDataURL();
+    link.click();
+
+    this.showNotification('Napkin exported!', 'success');
+  }
+
+  /**
+   * Close napkin workspace
+   */
+  closeNapkin() {
+    const workspace = document.getElementById('napkin-workspace');
+    if (workspace) {
+      workspace.style.display = 'none';
+    }
+  }
+
+  /**
+   * Render napkin list
+   */
+  renderNapkinList() {
+    const container = document.getElementById('napkin-list');
+    if (!container) {
+      return;
     }
 
-    /**
-     * Render napkin list
-     */
-    renderNapkinList() {
-        const container = document.getElementById('napkin-list');
-        if (!container) return;
-
-        container.innerHTML = this.napkins.map(napkin => `
+    container.innerHTML = this.napkins
+      .map(
+        napkin => `
             <div class="napkin-item" onclick="window.napkinBrainstorming.loadNapkin(${napkin.id})" style="
                 background: ${napkin.id === this.currentNapkin?.id ? '#dbeafe' : '#f8fafc'};
                 border: 2px solid ${napkin.id === this.currentNapkin?.id ? '#3b82f6' : '#e2e8f0'};
@@ -651,60 +666,62 @@ class NapkinBrainstorming {
                 </div>
                 ${napkin.data ? '<div style="color: #10b981; font-size: 10px; margin-top: 4px;">📝 Has content</div>' : ''}
             </div>
-        `).join('');
-    }
+        `
+      )
+      .join('');
+  }
 
-    /**
-     * Load napkins from localStorage
-     */
-    loadNapkins() {
-        try {
-            const saved = localStorage.getItem('napkin_brainstorming');
-            if (saved) {
-                this.napkins = JSON.parse(saved);
-            }
-        } catch (error) {
-            console.error('Error loading napkins:', error);
-            this.napkins = [];
-        }
+  /**
+   * Load napkins from localStorage
+   */
+  loadNapkins() {
+    try {
+      const saved = localStorage.getItem('napkin_brainstorming');
+      if (saved) {
+        this.napkins = JSON.parse(saved);
+      }
+    } catch (error) {
+      console.error('Error loading napkins:', error);
+      this.napkins = [];
     }
+  }
 
-    /**
-     * Show notification
-     */
-    showNotification(message, type = 'info') {
-        if (window.showToast) {
-            window.showToast(message, type);
-        } else {
-            console.log(`[${type.toUpperCase()}] ${message}`);
-        }
+  /**
+   * Show notification
+   */
+  showNotification(message, type = 'info') {
+    if (window.showToast) {
+      window.showToast(message, type);
+    } else {
+      console.log(`[${type.toUpperCase()}] ${message}`);
     }
+  }
 
-    /**
-     * Setup event listeners
-     */
-    setupEventListeners() {
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'n') {
-                e.preventDefault();
-                this.openNapkinWorkspace();
-            }
-        });
-    }
+  /**
+   * Setup event listeners
+   */
+  setupEventListeners() {
+    // Keyboard shortcuts
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey && e.key === 'n') {
+        e.preventDefault();
+        this.openNapkinWorkspace();
+      }
+    });
+  }
 
-    /**
-     * Open napkin workspace
-     */
-    openNapkinWorkspace() {
-        const workspace = document.getElementById('napkin-workspace');
-        if (workspace) {
-            workspace.style.display = 'flex';
-        } else {
-            this.createNapkinWorkspace();
-            document.getElementById('napkin-workspace').style.display = 'flex';
-        }
+  /**
+   * Open napkin workspace
+   */
+  openNapkinWorkspace() {
+    const workspace = document.getElementById('napkin-workspace');
+    if (workspace) {
+      workspace.style.display = 'flex';
+    } else {
+      this.createNapkinWorkspace();
+      document.getElementById('napkin-workspace').style.display = 'flex';
     }
+  }
 }
 
 // Initialize global instance

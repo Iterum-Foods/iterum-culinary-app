@@ -1,4 +1,3 @@
-
 (function () {
   const FRACTION_MAP = {
     '¼': 0.25,
@@ -13,11 +12,24 @@
   };
 
   const DEFAULT_SERVINGS = 4;
-  const INGREDIENT_KEYS = ['ingredients', 'recipeIngredient', 'ingredientList', 'items'];
-  const INSTRUCTION_KEYS = ['instructions', 'recipeInstructions', 'steps', 'directions', 'method'];
+  const INGREDIENT_KEYS = [
+    'ingredients',
+    'recipeIngredient',
+    'ingredientList',
+    'items'
+  ];
+  const INSTRUCTION_KEYS = [
+    'instructions',
+    'recipeInstructions',
+    'steps',
+    'directions',
+    'method'
+  ];
 
   function slugify(value) {
-    if (!value) return 'recipe';
+    if (!value) {
+      return 'recipe';
+    }
     return String(value)
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
@@ -25,12 +37,14 @@
   }
 
   function parseFractionToken(token) {
-    if (!token) return null;
+    if (!token) {
+      return null;
+    }
     const trimmed = token.trim();
     if (FRACTION_MAP[trimmed] !== undefined) {
       return FRACTION_MAP[trimmed];
     }
-    if (/^[0-9]+\\/[0-9]+$/.test(trimmed)) {
+    if (/^[0-9]+\/[0-9]+$/.test(trimmed)) {
       const parts = trimmed.split('/');
       const numerator = parseFloat(parts[0]);
       const denominator = parseFloat(parts[1] || 1);
@@ -46,9 +60,15 @@
   }
 
   function parseQuantityFromString(text) {
-    if (!text) return '';
-    const match = String(text).trim().match(/^([0-9\\s\\/.,¼½¾⅓⅔⅛⅜⅝⅞-]+)/);
-    if (!match) return '';
+    if (!text) {
+      return '';
+    }
+    const match = String(text)
+      .trim()
+      .match(/^([0-9\\s\\/.,¼½¾⅓⅔⅛⅜⅝⅞-]+)/);
+    if (!match) {
+      return '';
+    }
     const tokens = match[1].trim().split(/\\s+/);
     let total = 0;
     let found = false;
@@ -63,7 +83,9 @@
   }
 
   function stripQuantityFromLine(line) {
-    if (!line) return { remainder: '', quantity: '', unit: '' };
+    if (!line) {
+      return { remainder: '', quantity: '', unit: '' };
+    }
     const cleaned = line.trim();
     const quantityMatch = cleaned.match(/^([0-9\\s\\/.,¼½¾⅓⅔⅛⅜⅝⅞-]+)/);
     let remainder = cleaned;
@@ -85,8 +107,12 @@
   }
 
   function parseServings(value) {
-    if (value === null || value === undefined) return DEFAULT_SERVINGS;
-    if (typeof value === 'number') return value || DEFAULT_SERVINGS;
+    if (value === null || value === undefined) {
+      return DEFAULT_SERVINGS;
+    }
+    if (typeof value === 'number') {
+      return value || DEFAULT_SERVINGS;
+    }
     const text = String(value).trim();
     const match = text.match(/([0-9]+)/);
     if (match) {
@@ -96,9 +122,15 @@
   }
 
   function parseIsoDuration(duration) {
-    if (!duration || typeof duration !== 'string') return 0;
-    const match = duration.match(/P(?:(\\d+)D)?(?:T(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+)S)?)?/i);
-    if (!match) return 0;
+    if (!duration || typeof duration !== 'string') {
+      return 0;
+    }
+    const match = duration.match(
+      /P(?:(\\d+)D)?(?:T(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+)S)?)?/i
+    );
+    if (!match) {
+      return 0;
+    }
     const days = parseInt(match[1] || '0', 10);
     const hours = parseInt(match[2] || '0', 10);
     const minutes = parseInt(match[3] || '0', 10);
@@ -107,8 +139,12 @@
   }
 
   function parseDuration(value) {
-    if (!value) return 0;
-    if (typeof value === 'number') return value;
+    if (!value) {
+      return 0;
+    }
+    if (typeof value === 'number') {
+      return value;
+    }
     const text = String(value).trim();
     if (/^P/i.test(text)) {
       return parseIsoDuration(text);
@@ -125,7 +161,9 @@
   }
 
   function normalizeTags(value) {
-    if (!value) return [];
+    if (!value) {
+      return [];
+    }
     if (Array.isArray(value)) {
       return value.map(tag => String(tag).trim()).filter(Boolean);
     }
@@ -137,16 +175,22 @@
 
   function collectIngredientEntries(node, label = null) {
     const results = [];
-    if (!node || typeof node !== 'object') return results;
+    if (!node || typeof node !== 'object') {
+      return results;
+    }
 
     const addEntry = (value, component) => {
-      if (value === null || value === undefined || value === '') return;
+      if (value === null || value === undefined || value === '') {
+        return;
+      }
       results.push({ value, component });
     };
 
     INGREDIENT_KEYS.forEach(key => {
       const value = node[key];
-      if (!value) return;
+      if (!value) {
+        return;
+      }
       if (Array.isArray(value)) {
         value.forEach(item => addEntry(item, label));
       } else if (typeof value === 'string') {
@@ -159,7 +203,9 @@
       if (Array.isArray(list)) {
         list.forEach(item => {
           const nestedLabel = item?.name || item?.title || label;
-          collectIngredientEntries(item, nestedLabel).forEach(entry => results.push(entry));
+          collectIngredientEntries(item, nestedLabel).forEach(entry =>
+            results.push(entry)
+          );
         });
       }
     });
@@ -168,11 +214,15 @@
   }
 
   function normalizeIngredientEntry(entry) {
-    if (!entry) return null;
+    if (!entry) {
+      return null;
+    }
     const component = entry.component || null;
     let payload = entry.value !== undefined ? entry.value : entry;
 
-    if (payload === null || payload === undefined) return null;
+    if (payload === null || payload === undefined) {
+      return null;
+    }
 
     if (Array.isArray(payload)) {
       const flattened = [];
@@ -188,7 +238,10 @@
     }
 
     if (typeof payload === 'object' && payload.ingredients) {
-      return collectIngredientEntries(payload, payload.name || payload.title || component)
+      return collectIngredientEntries(
+        payload,
+        payload.name || payload.title || component
+      )
         .map(item => normalizeIngredientEntry(item))
         .flat()
         .filter(Boolean);
@@ -207,7 +260,14 @@
       unit = parsed.unit;
       ingredientName = parsed.remainder || rawLine;
     } else if (typeof payload === 'object') {
-      rawLine = (payload.original || payload.raw || payload.text || payload.line || payload.item || '').trim();
+      rawLine = (
+        payload.original ||
+        payload.raw ||
+        payload.text ||
+        payload.line ||
+        payload.item ||
+        ''
+      ).trim();
       if (!rawLine) {
         const parts = [
           payload.quantity || payload.amount || '',
@@ -217,14 +277,29 @@
         rawLine = parts.join(' ').trim();
       }
       const parsed = stripQuantityFromLine(rawLine);
-      quantity = payload.quantity !== undefined ? payload.quantity : (payload.amount !== undefined ? payload.amount : parsed.quantity);
+      quantity =
+        payload.quantity !== undefined
+          ? payload.quantity
+          : payload.amount !== undefined
+            ? payload.amount
+            : parsed.quantity;
       unit = payload.unit || payload.measure || parsed.unit;
-      ingredientName = (payload.name || payload.ingredient || parsed.remainder || rawLine).trim();
-      preparation = payload.preparation || payload.note || payload.comment || '';
+      ingredientName = (
+        payload.name ||
+        payload.ingredient ||
+        parsed.remainder ||
+        rawLine
+      ).trim();
+      preparation =
+        payload.preparation || payload.note || payload.comment || '';
     }
 
-    if (!rawLine) rawLine = ingredientName;
-    if (!ingredientName) ingredientName = rawLine;
+    if (!rawLine) {
+      rawLine = ingredientName;
+    }
+    if (!ingredientName) {
+      ingredientName = rawLine;
+    }
 
     return {
       raw: rawLine,
@@ -243,7 +318,9 @@
       const result = normalizeIngredientEntry(entry);
       if (Array.isArray(result)) {
         result.forEach(item => {
-          if (item && item.raw) normalized.push(item);
+          if (item && item.raw) {
+            normalized.push(item);
+          }
         });
       } else if (result && result.raw) {
         normalized.push(result);
@@ -254,16 +331,22 @@
 
   function collectInstructionEntries(node) {
     const results = [];
-    if (!node || typeof node !== 'object') return results;
+    if (!node || typeof node !== 'object') {
+      return results;
+    }
 
     const addEntry = value => {
-      if (value === null || value === undefined || value === '') return;
+      if (value === null || value === undefined || value === '') {
+        return;
+      }
       results.push(value);
     };
 
     INSTRUCTION_KEYS.forEach(key => {
       const value = node[key];
-      if (!value) return;
+      if (!value) {
+        return;
+      }
       if (Array.isArray(value)) {
         value.forEach(item => addEntry(item));
       } else {
@@ -286,7 +369,9 @@
   }
 
   function normalizeInstructionEntry(entry) {
-    if (!entry) return null;
+    if (!entry) {
+      return null;
+    }
     if (typeof entry === 'string') {
       const trimmed = entry.trim();
       return trimmed ? trimmed : null;
@@ -304,9 +389,15 @@
           .flat()
           .filter(Boolean);
       }
-      if (entry.text) return entry.text.trim();
-      if (entry.description) return entry.description.trim();
-      if (entry.content) return entry.content.trim();
+      if (entry.text) {
+        return entry.text.trim();
+      }
+      if (entry.description) {
+        return entry.description.trim();
+      }
+      if (entry.content) {
+        return entry.content.trim();
+      }
     }
     return null;
   }
@@ -318,7 +409,9 @@
       const result = normalizeInstructionEntry(entry);
       if (Array.isArray(result)) {
         result.forEach(item => {
-          if (item) normalized.push(item);
+          if (item) {
+            normalized.push(item);
+          }
         });
       } else if (result) {
         normalized.push(result);
@@ -328,9 +421,14 @@
   }
 
   function normalizeRecipeFromData(raw, context = {}) {
-    if (!raw) return null;
-    const title = context.title || raw.title || raw.name || raw.recipeName || raw.label;
-    if (!title) return null;
+    if (!raw) {
+      return null;
+    }
+    const title =
+      context.title || raw.title || raw.name || raw.recipeName || raw.label;
+    if (!title) {
+      return null;
+    }
 
     const ingredients = normalizeIngredients(raw);
     const instructions = normalizeInstructions(raw);
@@ -338,7 +436,7 @@
     const prepTime = parseDuration(context.prepTime || raw.prepTime);
     const cookTime = parseDuration(context.cookTime || raw.cookTime);
     const totalTimeRaw = parseDuration(context.totalTime || raw.totalTime);
-    const totalTime = totalTimeRaw || (prepTime + cookTime);
+    const totalTime = totalTimeRaw || prepTime + cookTime;
 
     const idBase = context.id || raw.id || raw.slug;
     const recipeId = idBase ? `json_${slugify(idBase)}` : null;
@@ -349,14 +447,19 @@
       description: context.description || raw.description || raw.summary || '',
       ingredients,
       instructions,
-      servings: parseServings(context.servings || raw.servings || raw.recipeYield || raw.yield),
-      category: context.category || raw.category || raw.recipeCategory || 'Imported',
+      servings: parseServings(
+        context.servings || raw.servings || raw.recipeYield || raw.yield
+      ),
+      category:
+        context.category || raw.category || raw.recipeCategory || 'Imported',
       cuisine: context.cuisine || raw.cuisine || raw.recipeCuisine || 'Unknown',
       difficulty: context.difficulty || raw.difficulty || 'Medium',
       prepTime,
       cookTime,
       totalTime,
-      tags: normalizeTags(context.tags || raw.tags || raw.keywords || raw.labels),
+      tags: normalizeTags(
+        context.tags || raw.tags || raw.keywords || raw.labels
+      ),
       createdAt: context.createdAt || new Date().toISOString(),
       sourceFile: context.fileName || null,
       sourceFormat: context.format || null,
@@ -371,9 +474,13 @@
   }
 
   function getExtension(fileName) {
-    if (!fileName) return '';
+    if (!fileName) {
+      return '';
+    }
     const parts = fileName.split('.');
-    if (parts.length <= 1) return '';
+    if (parts.length <= 1) {
+      return '';
+    }
     return parts.pop().toLowerCase();
   }
 
@@ -381,7 +488,8 @@
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => resolve(reader.result || '');
-      reader.onerror = () => reject(new Error(`Unable to read file ${file.name}`));
+      reader.onerror = () =>
+        reject(new Error(`Unable to read file ${file.name}`));
       reader.readAsText(file);
     });
   }
@@ -429,7 +537,9 @@
       if (extension === 'csv') {
         return this.parseCsvFile(file);
       }
-      throw new Error(`Unsupported file format \"${extension || 'unknown'}\". Try JSON, TXT, or CSV files.`);
+      throw new Error(
+        `Unsupported file format \"${extension || 'unknown'}\". Try JSON, TXT, or CSV files.`
+      );
     }
 
     async parseJsonFile(file) {
@@ -447,13 +557,15 @@
       }
 
       return rawRecipes
-        .map((raw, idx) => normalizeRecipeFromData(raw, {
-          id: raw.id ? `json_${slugify(raw.id)}` : null,
-          fileName: file.name,
-          format: getExtension(file.name),
-          source: 'json-file',
-          index: idx
-        }))
+        .map((raw, idx) =>
+          normalizeRecipeFromData(raw, {
+            id: raw.id ? `json_${slugify(raw.id)}` : null,
+            fileName: file.name,
+            format: getExtension(file.name),
+            source: 'json-file',
+            index: idx
+          })
+        )
         .filter(Boolean)
         .map((recipe, idx) => ({
           ...recipe,
@@ -465,12 +577,24 @@
     }
 
     extractJsonRecipes(data) {
-      if (!data) return [];
-      if (Array.isArray(data)) return data;
-      if (Array.isArray(data.recipes)) return data.recipes;
-      if (Array.isArray(data.items)) return data.items;
-      if (Array.isArray(data.data)) return data.data;
-      if (data.recipe) return [data.recipe];
+      if (!data) {
+        return [];
+      }
+      if (Array.isArray(data)) {
+        return data;
+      }
+      if (Array.isArray(data.recipes)) {
+        return data.recipes;
+      }
+      if (Array.isArray(data.items)) {
+        return data.items;
+      }
+      if (Array.isArray(data.data)) {
+        return data.data;
+      }
+      if (data.recipe) {
+        return [data.recipe];
+      }
       return [data];
     }
 
@@ -488,10 +612,13 @@
         importSource: 'text-file',
         sourceFile: file.name,
         sourceFormat: getExtension(file.name),
-        isComplete: typeof recipe.isComplete === 'boolean'
-          ? recipe.isComplete
-          : (Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0 &&
-             Array.isArray(recipe.instructions) && recipe.instructions.length > 0)
+        isComplete:
+          typeof recipe.isComplete === 'boolean'
+            ? recipe.isComplete
+            : Array.isArray(recipe.ingredients) &&
+              recipe.ingredients.length > 0 &&
+              Array.isArray(recipe.instructions) &&
+              recipe.instructions.length > 0
       }));
     }
 
@@ -512,15 +639,20 @@
         }
       }
       // Fallback: treat CSV as lines joined with newlines
-      const normalized = normalizeRecipeFromData({
-        title: file.name.replace(/\\.[^.]+$/, ''),
-        ingredients: text.split('\\n').slice(1)
-      }, {
-        fileName: file.name,
-        format: getExtension(file.name),
-        source: 'csv-file'
-      });
-      return normalized ? [{ ...normalized, id: normalized.id || this.makeId(file.name, 0) }] : [];
+      const normalized = normalizeRecipeFromData(
+        {
+          title: file.name.replace(/\\.[^.]+$/, ''),
+          ingredients: text.split('\\n').slice(1)
+        },
+        {
+          fileName: file.name,
+          format: getExtension(file.name),
+          source: 'csv-file'
+        }
+      );
+      return normalized
+        ? [{ ...normalized, id: normalized.id || this.makeId(file.name, 0) }]
+        : [];
     }
 
     makeId(fileName, index) {

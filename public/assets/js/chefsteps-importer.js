@@ -1,5 +1,5 @@
 (function () {
-class ChefStepsImporter {
+  class ChefStepsImporter {
     constructor(options = {}) {
       this.utils = window.RecipeImportUtils || {};
       this.defaultOptions = options;
@@ -8,10 +8,12 @@ class ChefStepsImporter {
     isChefStepsUrl(url) {
       try {
         const { hostname, pathname } = new URL(url);
-        return hostname.includes('chefsteps.com') && /\/recipes\//i.test(pathname);
-        } catch (error) {
-            return false;
-        }
+        return (
+          hostname.includes('chefsteps.com') && /\/recipes\//i.test(pathname)
+        );
+      } catch (error) {
+        return false;
+      }
     }
 
     async importUrls(urls, progressCallback = () => {}) {
@@ -36,19 +38,25 @@ class ChefStepsImporter {
 
     async importUrl(url) {
       if (!this.isChefStepsUrl(url)) {
-        throw new Error('Please provide a valid ChefSteps recipe URL (https://www.chefsteps.com/recipes/...).');
+        throw new Error(
+          'Please provide a valid ChefSteps recipe URL (https://www.chefsteps.com/recipes/...).'
+        );
       }
 
       let html;
       try {
         html = await this.fetchHtml(url);
       } catch (error) {
-        throw new Error('ChefSteps blocks direct access from the browser. Download the recipe JSON (Share → Export JSON) and upload it via the Files tab.');
+        throw new Error(
+          'ChefSteps blocks direct access from the browser. Download the recipe JSON (Share → Export JSON) and upload it via the Files tab.'
+        );
       }
 
       const recipes = this.extractRecipesFromHtml(html, url);
       if (!recipes.length) {
-        throw new Error('No structured recipe data found. Download the recipe JSON and import it through the Files tab.');
+        throw new Error(
+          'No structured recipe data found. Download the recipe JSON and import it through the Files tab.'
+        );
       }
 
       return recipes[0];
@@ -63,14 +71,18 @@ class ChefStepsImporter {
     }
 
     extractRecipesFromHtml(html, url) {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-      const scripts = doc.querySelectorAll('script[type="application/ld+json"]');
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const scripts = doc.querySelectorAll(
+        'script[type="application/ld+json"]'
+      );
       const recipes = [];
 
-      scripts.forEach((script) => {
+      scripts.forEach(script => {
         const content = script.textContent;
-        if (!content) return;
+        if (!content) {
+          return;
+        }
         try {
           const data = JSON.parse(content);
           recipes.push(...this.collectSchemaRecipes(data, url));
@@ -84,10 +96,12 @@ class ChefStepsImporter {
 
     collectSchemaRecipes(node, url) {
       const results = [];
-      if (!node) return results;
+      if (!node) {
+        return results;
+      }
 
       if (Array.isArray(node)) {
-        node.forEach((child) => {
+        node.forEach(child => {
           results.push(...this.collectSchemaRecipes(child, url));
         });
         return results;
@@ -100,7 +114,9 @@ class ChefStepsImporter {
 
         const type = node['@type'];
         const types = Array.isArray(type) ? type : [type];
-        if (types.some((value) => String(value || '').toLowerCase() === 'recipe')) {
+        if (
+          types.some(value => String(value || '').toLowerCase() === 'recipe')
+        ) {
           const normalized = this.normalizeSchemaRecipe(node, url);
           if (normalized) {
             results.push(normalized);
@@ -114,13 +130,16 @@ class ChefStepsImporter {
     normalizeSchemaRecipe(schema, url) {
       const utils = this.utils;
       const title = schema.name || schema.headline;
-      if (!title) return null;
+      if (!title) {
+        return null;
+      }
 
       const base = {
         title,
         description: schema.description || '',
         recipeIngredient: schema.recipeIngredient || schema.ingredients || [],
-        recipeInstructions: schema.recipeInstructions || schema.instructions || [],
+        recipeInstructions:
+          schema.recipeInstructions || schema.instructions || [],
         recipeYield: schema.recipeYield || schema.yield || schema.servings,
         prepTime: schema.prepTime,
         cookTime: schema.cookTime,
@@ -146,12 +165,12 @@ class ChefStepsImporter {
       if (!normalized) {
         // Minimal fallback if utility helpers are unavailable
         const ingredients = Array.isArray(base.recipeIngredient)
-          ? base.recipeIngredient.map((line) => ({ raw: line, ingredient: line }))
+          ? base.recipeIngredient.map(line => ({ raw: line, ingredient: line }))
           : [];
         const instructions = [];
         const instructionSource = base.recipeInstructions;
         if (Array.isArray(instructionSource)) {
-          instructionSource.forEach((item) => {
+          instructionSource.forEach(item => {
             if (typeof item === 'string') {
               instructions.push(item);
             } else if (item && typeof item === 'object' && item.text) {
@@ -175,12 +194,12 @@ class ChefStepsImporter {
           tags: Array.isArray(schema.keywords) ? schema.keywords : [],
           importSource: 'chefsteps',
           sourceUrl: url,
-            source: 'ChefSteps',
+          source: 'ChefSteps',
           createdAt: new Date().toISOString()
         };
       }
 
-                return {
+      return {
         ...normalized,
         id: normalized.id || context.id,
         importSource: 'chefsteps',
@@ -190,5 +209,5 @@ class ChefStepsImporter {
     }
   }
 
-    window.ChefStepsImporter = ChefStepsImporter;
+  window.ChefStepsImporter = ChefStepsImporter;
 })();

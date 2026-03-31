@@ -7,7 +7,13 @@ class PhotoManager {
   constructor() {
     this.storageKey = 'recipe_photos';
     this.maxFileSize = 5 * 1024 * 1024; // 5MB
-    this.allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    this.allowedTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/webp',
+      'image/gif'
+    ];
     this.compressionQuality = 0.8;
     this.init();
   }
@@ -62,7 +68,6 @@ class PhotoManager {
         uploadedPhotos.push(photo);
 
         console.log('✅ Photo uploaded:', photo.id);
-
       } catch (error) {
         console.error('❌ Error uploading photo:', error);
       }
@@ -86,13 +91,17 @@ class PhotoManager {
   validateFile(file) {
     // Check file type
     if (!this.allowedTypes.includes(file.type)) {
-      alert(`File type not supported: ${file.type}\nAllowed: JPG, PNG, WebP, GIF`);
+      alert(
+        `File type not supported: ${file.type}\nAllowed: JPG, PNG, WebP, GIF`
+      );
       return false;
     }
 
     // Check file size
     if (file.size > this.maxFileSize) {
-      alert(`File too large: ${(file.size / 1024 / 1024).toFixed(2)}MB\nMaximum: ${this.maxFileSize / 1024 / 1024}MB`);
+      alert(
+        `File too large: ${(file.size / 1024 / 1024).toFixed(2)}MB\nMaximum: ${this.maxFileSize / 1024 / 1024}MB`
+      );
       return false;
     }
 
@@ -106,7 +115,7 @@ class PhotoManager {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
-      reader.onload = (e) => {
+      reader.onload = e => {
         const img = new Image();
         img.onload = () => {
           // Create canvas
@@ -165,7 +174,9 @@ class PhotoManager {
    */
   getRecipePhotos(recipeId) {
     const allPhotos = this.getAllPhotos();
-    return allPhotos.filter(p => p.recipeId === recipeId && p.type === 'recipe');
+    return allPhotos.filter(
+      p => p.recipeId === recipeId && p.type === 'recipe'
+    );
   }
 
   /**
@@ -173,10 +184,11 @@ class PhotoManager {
    */
   getStepPhotos(recipeId, stepNumber) {
     const allPhotos = this.getAllPhotos();
-    return allPhotos.filter(p => 
-      p.recipeId === recipeId && 
-      p.type === 'step' && 
-      p.stepNumber === stepNumber
+    return allPhotos.filter(
+      p =>
+        p.recipeId === recipeId &&
+        p.type === 'step' &&
+        p.stepNumber === stepNumber
     );
   }
 
@@ -185,7 +197,9 @@ class PhotoManager {
    */
   getIngredientPhoto(ingredientId) {
     const allPhotos = this.getAllPhotos();
-    return allPhotos.find(p => p.ingredientId === ingredientId && p.type === 'ingredient');
+    return allPhotos.find(
+      p => p.ingredientId === ingredientId && p.type === 'ingredient'
+    );
   }
 
   /**
@@ -193,7 +207,9 @@ class PhotoManager {
    */
   getEquipmentPhoto(equipmentId) {
     const allPhotos = this.getAllPhotos();
-    return allPhotos.find(p => p.equipmentId === equipmentId && p.type === 'equipment');
+    return allPhotos.find(
+      p => p.equipmentId === equipmentId && p.type === 'equipment'
+    );
   }
 
   /**
@@ -224,7 +240,7 @@ class PhotoManager {
    */
   setPrimaryPhoto(recipeId, photoId) {
     const photos = this.getAllPhotos();
-    
+
     // Clear any existing primary
     photos.forEach(p => {
       if (p.recipeId === recipeId && p.type === 'recipe') {
@@ -296,18 +312,24 @@ class PhotoManager {
 
       if (input && dropzone) {
         // File input change
-        input.addEventListener('change', async (e) => {
+        input.addEventListener('change', async e => {
           const files = Array.from(e.target.files);
           const uploaded = await this.uploadPhotos(files, {
-            recipeId, stepNumber, ingredientId, equipmentId, type
+            recipeId,
+            stepNumber,
+            ingredientId,
+            equipmentId,
+            type
           });
-          
-          if (onUpload) onUpload(uploaded);
+
+          if (onUpload) {
+            onUpload(uploaded);
+          }
           this.showPreview(uploaded, preview);
         });
 
         // Drag & drop
-        dropzone.addEventListener('dragover', (e) => {
+        dropzone.addEventListener('dragover', e => {
           e.preventDefault();
           dropzone.classList.add('dragover');
         });
@@ -316,16 +338,22 @@ class PhotoManager {
           dropzone.classList.remove('dragover');
         });
 
-        dropzone.addEventListener('drop', async (e) => {
+        dropzone.addEventListener('drop', async e => {
           e.preventDefault();
           dropzone.classList.remove('dragover');
-          
+
           const files = Array.from(e.dataTransfer.files);
           const uploaded = await this.uploadPhotos(files, {
-            recipeId, stepNumber, ingredientId, equipmentId, type
+            recipeId,
+            stepNumber,
+            ingredientId,
+            equipmentId,
+            type
           });
-          
-          if (onUpload) onUpload(uploaded);
+
+          if (onUpload) {
+            onUpload(uploaded);
+          }
           this.showPreview(uploaded, preview);
         });
       }
@@ -338,9 +366,13 @@ class PhotoManager {
    * Show photo preview
    */
   showPreview(photos, container) {
-    if (!container) return;
+    if (!container) {
+      return;
+    }
 
-    const html = photos.map(photo => `
+    const html = photos
+      .map(
+        photo => `
       <div class="photo-preview-item" data-photo-id="${photo.id}">
         <img src="${photo.dataUrl}" alt="${photo.filename}">
         <div class="photo-preview-overlay">
@@ -349,7 +381,9 @@ class PhotoManager {
           </button>
         </div>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
 
     container.innerHTML = html;
   }
@@ -358,7 +392,11 @@ class PhotoManager {
    * Create photo gallery
    */
   createGallery(photos, options = {}) {
-    const { showCaptions = true, allowDelete = true, allowPrimary = true } = options;
+    const {
+      showCaptions = true,
+      allowDelete = true,
+      allowPrimary = true
+    } = options;
 
     if (!photos || photos.length === 0) {
       return '<div class="empty-gallery"><p>No photos yet</p></div>';
@@ -366,33 +404,49 @@ class PhotoManager {
 
     return `
       <div class="photo-gallery">
-        ${photos.map(photo => `
+        ${photos
+          .map(
+            photo => `
           <div class="gallery-item ${photo.isPrimary ? 'primary' : ''}" data-photo-id="${photo.id}">
             <img src="${photo.dataUrl}" alt="${photo.caption || photo.filename}" 
                  onclick="window.photoManager.viewFullScreen('${photo.id}')">
             ${photo.isPrimary ? '<div class="primary-badge">⭐ Primary</div>' : ''}
-            ${showCaptions ? `
+            ${
+              showCaptions
+                ? `
               <div class="photo-caption">
                 <input type="text" 
                        value="${photo.caption || ''}" 
                        placeholder="Add caption..."
                        onchange="window.photoManager.updateCaption('${photo.id}', this.value)">
               </div>
-            ` : ''}
+            `
+                : ''
+            }
             <div class="photo-actions">
-              ${allowPrimary && !photo.isPrimary ? `
+              ${
+                allowPrimary && !photo.isPrimary
+                  ? `
                 <button class="btn-sm btn-secondary" onclick="window.photoManager.setPrimaryPhoto('${photo.recipeId}', '${photo.id}')">
                   ⭐ Set Primary
                 </button>
-              ` : ''}
-              ${allowDelete ? `
+              `
+                  : ''
+              }
+              ${
+                allowDelete
+                  ? `
                 <button class="btn-sm btn-danger" onclick="window.photoManager.deletePhoto('${photo.id}')">
                   🗑️ Delete
                 </button>
-              ` : ''}
+              `
+                  : ''
+              }
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     `;
   }
@@ -404,7 +458,9 @@ class PhotoManager {
     const photos = this.getAllPhotos();
     const photo = photos.find(p => p.id === photoId);
 
-    if (!photo) return;
+    if (!photo) {
+      return;
+    }
 
     // Create modal
     const modal = document.createElement('div');
@@ -435,16 +491,24 @@ class PhotoManager {
             ➕ Add Photo
           </button>
         </div>
-        ${photos.length > 0 ? `
+        ${
+          photos.length > 0
+            ? `
           <div class="step-photo-gallery">
-            ${photos.map(photo => `
+            ${photos
+              .map(
+                photo => `
               <div class="step-photo-item">
                 <img src="${photo.dataUrl}" alt="Step ${stepNumber}" onclick="window.photoManager.viewFullScreen('${photo.id}')">
                 <button class="btn-delete-mini" onclick="window.photoManager.deletePhoto('${photo.id}')">✕</button>
               </div>
-            `).join('')}
+            `
+              )
+              .join('')}
           </div>
-        ` : '<p class="text-muted">No photos for this step yet</p>'}
+        `
+            : '<p class="text-muted">No photos for this step yet</p>'
+        }
       </div>
     `;
   }
@@ -468,7 +532,7 @@ class PhotoManager {
             stepNumber,
             type: 'step',
             multiple: true,
-            onUpload: (photos) => {
+            onUpload: photos => {
               console.log('Photos uploaded for step:', photos);
               modal.remove();
               // Refresh the recipe view
@@ -489,8 +553,11 @@ class PhotoManager {
    */
   getStorageInfo() {
     const photos = this.getAllPhotos();
-    const totalSize = photos.reduce((sum, p) => sum + (p.dataUrl?.length || 0), 0);
-    
+    const totalSize = photos.reduce(
+      (sum, p) => sum + (p.dataUrl?.length || 0),
+      0
+    );
+
     return {
       photoCount: photos.length,
       totalSizeBytes: totalSize,
@@ -523,7 +590,7 @@ class PhotoManager {
    */
   async exportPhotos(recipeId) {
     const photos = this.getRecipePhotos(recipeId);
-    
+
     if (photos.length === 0) {
       alert('No photos to export');
       return;
@@ -545,4 +612,3 @@ class PhotoManager {
 window.photoManager = new PhotoManager();
 
 console.log('📸 Photo Manager loaded');
-

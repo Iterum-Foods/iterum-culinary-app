@@ -11,9 +11,64 @@ service cloud.firestore {
       return request.auth != null;
     }
     
-    // Check if user owns the document
+    // Check if user owns the document (strict: Firestore doc id must be auth uid)
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Project doc access: firebaseUid (preferred), or legacy ownerId / ownerEmail
+    function projectDocData(projectId) {
+      return get(/databases/$(database)/documents/projects/$(projectId)).data;
+    }
+
+    function canAccessProjectDoc(projectId) {
+      return isAuthenticated()
+        && exists(/databases/$(database)/documents/projects/$(projectId))
+        && (
+          projectDocData(projectId).firebaseUid == request.auth.uid
+          || projectDocData(projectId).ownerId == request.auth.uid
+          || (
+            projectDocData(projectId).keys().hasAny(['ownerEmail'])
+            && projectDocData(projectId).ownerEmail == request.auth.token.email
+          )
+          || projectOwnerSlugMatchesAuth(projectId)
+        );
+    }
+
+    function canCreateProjectDoc() {
+      return isAuthenticated()
+        && request.resource.data.keys().hasAny(['firebaseUid'])
+        && request.resource.data.firebaseUid == request.auth.uid;
+    }
+
+    function canUpdateProjectDoc(projectId) {
+      return isAuthenticated()
+        && (
+          (
+            resource.data.keys().hasAny(['firebaseUid'])
+            && resource.data.firebaseUid == request.auth.uid
+            && request.resource.data.firebaseUid == resource.data.firebaseUid
+          )
+          || (
+            !resource.data.keys().hasAny(['firebaseUid'])
+            && request.resource.data.keys().hasAny(['firebaseUid'])
+            && request.resource.data.firebaseUid == request.auth.uid
+            && (
+              projectOwnerSlugMatchesAuth(projectId)
+              || (
+                projectDocData(projectId).keys().hasAny(['ownerEmail'])
+                && projectDocData(projectId).ownerEmail == request.auth.token.email
+              )
+              || projectDocData(projectId).ownerId == request.auth.uid
+            )
+          )
+        );
+    }
+
+    function canDeleteProjectDoc() {
+      return isAuthenticated()
+        && resource.data.keys().hasAny(['firebaseUid'])
+        && resource.data.firebaseUid == request.auth.uid;
     }
     
     // Check if email is valid
@@ -21,16 +76,24 @@ service cloud.firestore {
       return email is string && email.matches('.*@.*[.].*');
     }
     
-    // Check if data size is within limits
+    // Writes: cap document size; deletes have no request.resource
     function isValidSize() {
-      return request.resource.size() < 1000000; // 1MB limit per document
+      return request.resource == null || request.resource.size() < 1000000;
     }
-    
-    // Check if timestamp is recent (prevent replay attacks)
-    function isRecentTimestamp() {
-      return request.time - request.resource.data.timestamp < duration.value(5, 'm');
+
+    // userId path aligns with auth uid OR existing profile email (slug ids from client)
+    function userProfileEmailMatches(userId) {
+      return exists(/databases/$(database)/documents/users/$(userId))
+        && get(/databases/$(database)/documents/users/$(userId)).data.email
+          == request.auth.token.email;
     }
-    
+
+    // project.ownerId often mirrors `users/{slug}` document id from client
+    function projectOwnerSlugMatchesAuth(projectId) {
+      return projectDocData(projectId).keys().hasAny(['ownerId'])
+        && userProfileEmailMatches(projectDocData(projectId).ownerId);
+    }
+
     // ============================================
     // USER PROFILES
     // ============================================
@@ -105,6 +168,14 @@ service cloud.firestore {
         allow read: if isOwner(userId);
         allow write: if isOwner(userId) && isValidSize();
       }
+
+      // Snapshots (e.g. recipeLibrary — firestore-sync.js; user doc id may be slug)
+      match /snapshots/{snapshotId} {
+        allow read: if isAuthenticated()
+          && (isOwner(userId) || userProfileEmailMatches(userId));
+        allow write: if isAuthenticated() && isValidSize()
+          && (isOwner(userId) || userProfileEmailMatches(userId));
+      }
     }
     
     // ============================================
@@ -112,26 +183,29 @@ service cloud.firestore {
     // ============================================
     
     match /projects/{projectId} {
-      // Authenticated users can read any project
-      allow read: if isAuthenticated();
-      
-      // Users can create/update projects
-      allow create, update: if isAuthenticated() && isValidSize();
-      
-      // Users can delete their own projects
-      allow delete: if isAuthenticated();
-      
-      // Project sub-collections
+      // Single-doc get + queries: each returned doc must pass canAccessProjectDoc.
+      // Broad unfiltered collection scans still fail rule evaluation (no false allow list).
+      allow read: if canAccessProjectDoc(projectId);
+
+      allow create: if canCreateProjectDoc() && isValidSize();
+      allow update: if canUpdateProjectDoc(projectId) && isValidSize();
+      allow delete: if canDeleteProjectDoc();
+
+      // Project sub-collections — same tenant as parent project doc
       match /snapshots/{snapshotId} {
-        allow read, write: if isAuthenticated() && isValidSize();
+        allow read, write: if canAccessProjectDoc(projectId) && isValidSize();
       }
-      
+
       match /menus/{menuId} {
-        allow read, write: if isAuthenticated() && isValidSize();
+        allow read, write: if canAccessProjectDoc(projectId) && isValidSize();
       }
-      
+
       match /recipes/{recipeId} {
-        allow read, write: if isAuthenticated() && isValidSize();
+        allow read, write: if canAccessProjectDoc(projectId) && isValidSize();
+      }
+
+      match /checklists/{checklistId} {
+        allow read, write: if canAccessProjectDoc(projectId) && isValidSize();
       }
     }
     

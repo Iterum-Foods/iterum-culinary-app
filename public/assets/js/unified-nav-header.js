@@ -4,109 +4,138 @@
  */
 
 class UnifiedNavHeader {
-    constructor() {
-        this.currentPage = this.detectCurrentPage();
-        this.init();
+  constructor() {
+    this.currentPage = this.detectCurrentPage();
+    this.init();
+  }
+
+  detectCurrentPage() {
+    const path = window.location.pathname;
+    if (path.includes('index')) {
+      return 'dashboard';
+    }
+    if (path.includes('recipe-library')) {
+      return 'recipes';
+    }
+    if (path.includes('recipe-developer')) {
+      return 'developer';
+    }
+    if (path.includes('menu-builder')) {
+      return 'menu';
+    }
+    if (path.includes('calendar')) {
+      return 'calendar';
+    }
+    if (path.includes('kitchen-management')) {
+      return 'kitchen';
+    }
+    if (path.includes('ingredients')) {
+      return 'ingredients';
+    }
+    if (path.includes('vendor')) {
+      return 'vendors';
+    }
+    if (path.includes('equipment')) {
+      return 'equipment';
+    }
+    if (path.includes('user-profile')) {
+      return 'profile';
+    }
+    if (path.includes('ingredient-highlights')) {
+      return 'highlights';
+    }
+    if (path.includes('server-info')) {
+      return 'server';
+    }
+    if (path.includes('audit-log')) {
+      return 'audit';
+    }
+    return 'other';
+  }
+
+  init() {
+    // Check if sidebar already exists
+    if (document.querySelector('.unified-nav-sidebar')) {
+      console.log('Navigation sidebar already exists');
+      return;
     }
 
-    detectCurrentPage() {
-        const path = window.location.pathname;
-        if (path.includes('index')) return 'dashboard';
-        if (path.includes('recipe-library')) return 'recipes';
-        if (path.includes('recipe-developer')) return 'developer';
-        if (path.includes('menu-builder')) return 'menu';
-        if (path.includes('calendar')) return 'calendar';
-        if (path.includes('kitchen-management')) return 'kitchen';
-        if (path.includes('ingredients')) return 'ingredients';
-        if (path.includes('vendor')) return 'vendors';
-        if (path.includes('equipment')) return 'equipment';
-        if (path.includes('user-profile')) return 'profile';
-        if (path.includes('ingredient-highlights')) return 'highlights';
-        if (path.includes('server-info')) return 'server';
-        if (path.includes('audit-log')) return 'audit';
-        return 'other';
+    this.injectHeader();
+  }
+
+  injectHeader() {
+    // Check if sidebar already exists
+    if (document.querySelector('.unified-nav-sidebar')) {
+      console.log('Navigation sidebar already exists');
+      return;
     }
 
-    init() {
-        // Check if sidebar already exists
-        if (document.querySelector('.unified-nav-sidebar')) {
-            console.log('Navigation sidebar already exists');
-            return;
+    const sidebar = document.createElement('aside');
+    sidebar.className = 'unified-nav-sidebar';
+    sidebar.innerHTML = this.getSidebarHTML();
+
+    // Insert at start of body
+    document.body.insertBefore(sidebar, document.body.firstChild);
+
+    // Add main content wrapper if it doesn't exist
+    if (!document.querySelector('.main-content-wrapper')) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'main-content-wrapper';
+
+      // Move all existing body children (except sidebar) into wrapper
+      const children = Array.from(document.body.children);
+      children.forEach(child => {
+        if (
+          child !== sidebar &&
+          !child.classList.contains('main-content-wrapper')
+        ) {
+          wrapper.appendChild(child);
         }
+      });
 
-        this.injectHeader();
+      document.body.appendChild(wrapper);
     }
 
-    injectHeader() {
-        // Check if sidebar already exists
-        if (document.querySelector('.unified-nav-sidebar')) {
-            console.log('Navigation sidebar already exists');
-            return;
+    // Add styles
+    this.injectStyles();
+
+    // Setup dropdown hover delay
+    this.setupDropdownHover();
+
+    // Setup mobile toggle
+    this.setupMobileToggle();
+
+    console.log('✅ Navigation sidebar injected');
+  }
+
+  setupDropdownHover() {
+    // Add delay for dropdown hover to stay open when moving to it
+    const dropdowns = document.querySelectorAll('.nav-dropdown');
+
+    dropdowns.forEach(dropdown => {
+      let hoverTimeout;
+
+      dropdown.addEventListener('mouseenter', () => {
+        clearTimeout(hoverTimeout);
+        const content = dropdown.querySelector('.nav-dropdown-content');
+        if (content) {
+          content.classList.add('show');
         }
+      });
 
-        const sidebar = document.createElement('aside');
-        sidebar.className = 'unified-nav-sidebar';
-        sidebar.innerHTML = this.getSidebarHTML();
+      dropdown.addEventListener('mouseleave', () => {
+        hoverTimeout = setTimeout(() => {
+          const content = dropdown.querySelector('.nav-dropdown-content');
+          if (content) {
+            content.classList.remove('show');
+          }
+        }, 300); // 300ms delay before closing
+      });
+    });
+  }
 
-        // Insert at start of body
-        document.body.insertBefore(sidebar, document.body.firstChild);
-
-        // Add main content wrapper if it doesn't exist
-        if (!document.querySelector('.main-content-wrapper')) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'main-content-wrapper';
-            
-            // Move all existing body children (except sidebar) into wrapper
-            const children = Array.from(document.body.children);
-            children.forEach(child => {
-                if (child !== sidebar && !child.classList.contains('main-content-wrapper')) {
-                    wrapper.appendChild(child);
-                }
-            });
-            
-            document.body.appendChild(wrapper);
-        }
-
-        // Add styles
-        this.injectStyles();
-
-        // Setup dropdown hover delay
-        this.setupDropdownHover();
-
-        // Setup mobile toggle
-        this.setupMobileToggle();
-
-        console.log('✅ Navigation sidebar injected');
-    }
-
-    setupDropdownHover() {
-        // Add delay for dropdown hover to stay open when moving to it
-        const dropdowns = document.querySelectorAll('.nav-dropdown');
-        
-        dropdowns.forEach(dropdown => {
-            let hoverTimeout;
-            
-            dropdown.addEventListener('mouseenter', () => {
-                clearTimeout(hoverTimeout);
-                const content = dropdown.querySelector('.nav-dropdown-content');
-                if (content) {
-                    content.classList.add('show');
-                }
-            });
-            
-            dropdown.addEventListener('mouseleave', () => {
-                hoverTimeout = setTimeout(() => {
-                    const content = dropdown.querySelector('.nav-dropdown-content');
-                    if (content) {
-                        content.classList.remove('show');
-                    }
-                }, 300); // 300ms delay before closing
-            });
-        });
-    }
-
-    getSidebarHTML() {
-        return `
+  getSidebarHTML() {
+    return `
             <div class="sidebar-header">
                 <a href="index.html" class="nav-logo">
                     <span class="nav-logo-icon">🍳</span>
@@ -199,32 +228,34 @@ class UnifiedNavHeader {
                 </div>
             </div>
         `;
-    }
+  }
 
-    setupMobileToggle() {
-        const toggle = document.getElementById('sidebar-toggle');
-        const sidebar = document.querySelector('.unified-nav-sidebar');
-        
-        if (toggle && sidebar) {
-            toggle.addEventListener('click', () => {
-                sidebar.classList.toggle('mobile-open');
-            });
+  setupMobileToggle() {
+    const toggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.querySelector('.unified-nav-sidebar');
 
-            // Close sidebar when clicking outside on mobile
-            document.addEventListener('click', (e) => {
-                if (window.innerWidth <= 768 && 
-                    sidebar.classList.contains('mobile-open') &&
-                    !sidebar.contains(e.target) &&
-                    !toggle.contains(e.target)) {
-                    sidebar.classList.remove('mobile-open');
-                }
-            });
+    if (toggle && sidebar) {
+      toggle.addEventListener('click', () => {
+        sidebar.classList.toggle('mobile-open');
+      });
+
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', e => {
+        if (
+          window.innerWidth <= 768 &&
+          sidebar.classList.contains('mobile-open') &&
+          !sidebar.contains(e.target) &&
+          !toggle.contains(e.target)
+        ) {
+          sidebar.classList.remove('mobile-open');
         }
+      });
     }
+  }
 
-    injectStyles() {
-        const style = document.createElement('style');
-        style.textContent = `
+  injectStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
             /* Sidebar Styles */
             .unified-nav-sidebar {
                 position: fixed;
@@ -526,172 +557,186 @@ class UnifiedNavHeader {
                 .old-header,
                 .top-nav { display: none !important; }
         `;
-        document.head.appendChild(style);
+    document.head.appendChild(style);
+  }
+
+  updateProjectChip(projectName = 'Master Project') {
+    const chip = document.getElementById('nav-project-chip');
+    if (chip) {
+      chip.textContent = `Project: ${projectName}`;
+    }
+  }
+
+  updateUserInfo(user) {
+    const nameEl = document.getElementById('nav-user-name');
+    const emailEl = document.getElementById('nav-user-email');
+    const avatarEl = document.getElementById('nav-user-avatar');
+
+    if (nameEl && user) {
+      const displayName =
+        user.displayName || user.name || user.email?.split('@')[0] || 'Chef';
+      nameEl.textContent = displayName;
     }
 
-    updateProjectChip(projectName = 'Master Project') {
-        const chip = document.getElementById('nav-project-chip');
-        if (chip) {
-            chip.textContent = `Project: ${projectName}`;
-        }
+    if (emailEl && user) {
+      emailEl.textContent = user.email || 'Loading...';
     }
 
-    updateUserInfo(user) {
-        const nameEl = document.getElementById('nav-user-name');
-        const emailEl = document.getElementById('nav-user-email');
-        const avatarEl = document.getElementById('nav-user-avatar');
-        
-        if (nameEl && user) {
-            const displayName = user.displayName || user.name || user.email?.split('@')[0] || 'Chef';
-            nameEl.textContent = displayName;
-        }
-
-        if (emailEl && user) {
-            emailEl.textContent = user.email || 'Loading...';
-        }
-
-        if (avatarEl && user) {
-            if (user.photoURL || user.avatarUrl) {
-                avatarEl.innerHTML = `<img src="${user.photoURL || user.avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-            } else {
-                const initial = (user.name || user.email || 'C')[0].toUpperCase();
-                avatarEl.textContent = initial;
-                avatarEl.style.backgroundColor = '#4d7c0f'; // Olive green
-            }
-        }
+    if (avatarEl && user) {
+      if (user.photoURL || user.avatarUrl) {
+        avatarEl.innerHTML = `<img src="${user.photoURL || user.avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+      } else {
+        const initial = (user.name || user.email || 'C')[0].toUpperCase();
+        avatarEl.textContent = initial;
+        avatarEl.style.backgroundColor = '#4d7c0f'; // Olive green
+      }
     }
+  }
 }
 
 // Load user info from localStorage as fallback
 function loadUserInfoFromStorage() {
-    try {
-        const currentUserStr = localStorage.getItem('current_user');
-        if (currentUserStr) {
-            const user = JSON.parse(currentUserStr);
-            if (window.unifiedNavHeader && user) {
-                window.unifiedNavHeader.updateUserInfo(user);
-            }
-        }
-    } catch (e) {
-        console.warn('Could not load user from storage:', e);
+  try {
+    const currentUserStr = localStorage.getItem('current_user');
+    if (currentUserStr) {
+      const user = JSON.parse(currentUserStr);
+      if (window.unifiedNavHeader && user) {
+        window.unifiedNavHeader.updateUserInfo(user);
+      }
     }
+  } catch (e) {
+    console.warn('Could not load user from storage:', e);
+  }
 }
 
 // Auto-initialize
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        window.unifiedNavHeader = new UnifiedNavHeader();
-        
-        // Try to load user info immediately
-        loadUserInfoFromStorage();
-        
-        // Update user info when AuthManager is ready
-        setTimeout(() => {
-            if (window.authManager?.currentUser) {
-                window.unifiedNavHeader.updateUserInfo(window.authManager.currentUser);
-            } else {
-                // Check authManager after a delay
-                const checkAuth = setInterval(() => {
-                    if (window.authManager?.currentUser) {
-                        window.unifiedNavHeader.updateUserInfo(window.authManager.currentUser);
-                        clearInterval(checkAuth);
-                    }
-                }, 500);
-                setTimeout(() => clearInterval(checkAuth), 10000); // Stop after 10s
-            }
-        }, 100);
-        
-        // Listen for auth events
-        window.addEventListener('userLoggedIn', (e) => {
-            if (e.detail?.user) {
-                window.unifiedNavHeader.updateUserInfo(e.detail.user);
-            }
-        });
-        
-        // Listen for auth state changes
-        if (window.authManager && typeof window.authManager.on === 'function') {
-            window.authManager.on('auth_state_changed', (user) => {
-                if (user) {
-                    window.unifiedNavHeader.updateUserInfo(user);
-                }
-            });
-        }
-    });
-} else {
+  document.addEventListener('DOMContentLoaded', () => {
     window.unifiedNavHeader = new UnifiedNavHeader();
+
+    // Try to load user info immediately
     loadUserInfoFromStorage();
-    
+
+    // Update user info when AuthManager is ready
     setTimeout(() => {
-        if (window.authManager?.currentUser) {
-            window.unifiedNavHeader.updateUserInfo(window.authManager.currentUser);
-        }
+      if (window.authManager?.currentUser) {
+        window.unifiedNavHeader.updateUserInfo(window.authManager.currentUser);
+      } else {
+        // Check authManager after a delay
+        const checkAuth = setInterval(() => {
+          if (window.authManager?.currentUser) {
+            window.unifiedNavHeader.updateUserInfo(
+              window.authManager.currentUser
+            );
+            clearInterval(checkAuth);
+          }
+        }, 500);
+        setTimeout(() => clearInterval(checkAuth), 10000); // Stop after 10s
+      }
     }, 100);
+
+    // Listen for auth events
+    window.addEventListener('userLoggedIn', e => {
+      if (e.detail?.user) {
+        window.unifiedNavHeader.updateUserInfo(e.detail.user);
+      }
+    });
+
+    // Listen for auth state changes
+    if (window.authManager && typeof window.authManager.on === 'function') {
+      window.authManager.on('auth_state_changed', user => {
+        if (user) {
+          window.unifiedNavHeader.updateUserInfo(user);
+        }
+      });
+    }
+  });
+} else {
+  window.unifiedNavHeader = new UnifiedNavHeader();
+  loadUserInfoFromStorage();
+
+  setTimeout(() => {
+    if (window.authManager?.currentUser) {
+      window.unifiedNavHeader.updateUserInfo(window.authManager.currentUser);
+    }
+  }, 100);
 }
 
-document.addEventListener('projectChanged', (event) => {
-    const detail = event.detail || {};
-    const projectName = detail.project?.name || detail.projectName || detail.projectId || 'Master Project';
-    window.unifiedNavHeader?.updateProjectChip(projectName);
+document.addEventListener('projectChanged', event => {
+  const detail = event.detail || {};
+  const projectName =
+    detail.project?.name ||
+    detail.projectName ||
+    detail.projectId ||
+    'Master Project';
+  window.unifiedNavHeader?.updateProjectChip(projectName);
 });
 
 document.addEventListener('iterumAppReady', () => {
-    updateHeaderProjectChip();
+  updateHeaderProjectChip();
 });
 
 // Also listen for project changes
-document.addEventListener('projectChanged', (event) => {
-    const detail = event.detail || {};
-    const projectName = detail.project?.name || detail.projectName || 'Master Project';
-    window.unifiedNavHeader?.updateProjectChip(projectName);
+document.addEventListener('projectChanged', event => {
+  const detail = event.detail || {};
+  const projectName =
+    detail.project?.name || detail.projectName || 'Master Project';
+  window.unifiedNavHeader?.updateProjectChip(projectName);
 });
 
 // Function to update header project chip
 function updateHeaderProjectChip() {
-    let projectName = 'Master Project';
-    
-    // Try to get from projectManager first
-    if (window.projectManager?.currentProject?.name) {
-        projectName = window.projectManager.currentProject.name;
-    } else {
-        // Try to get from localStorage (project ID stored, need to find project name)
-        const projectId = localStorage.getItem(`iterum_current_project_${window.projectManager?.currentUserId || ''}`) || 
-                         localStorage.getItem('iterum_current_project');
-        
-        if (projectId && window.projectManager) {
-            // Load projects if not loaded
-            if (!window.projectManager.projects || window.projectManager.projects.length === 0) {
-                window.projectManager.loadProjects();
-            }
-            
-            const project = window.projectManager.projects?.find(p => p.id === projectId);
-            if (project) {
-                projectName = project.name;
-            }
-        }
+  let projectName = 'Master Project';
+
+  // Try to get from projectManager first
+  if (window.projectManager?.currentProject?.name) {
+    projectName = window.projectManager.currentProject.name;
+  } else {
+    // Try to get from localStorage (project ID stored, need to find project name)
+    const projectId =
+      localStorage.getItem(
+        `iterum_current_project_${window.projectManager?.currentUserId || ''}`
+      ) || localStorage.getItem('iterum_current_project');
+
+    if (projectId && window.projectManager) {
+      // Load projects if not loaded
+      if (
+        !window.projectManager.projects ||
+        window.projectManager.projects.length === 0
+      ) {
+        window.projectManager.loadProjects();
+      }
+
+      const project = window.projectManager.projects?.find(
+        p => p.id === projectId
+      );
+      if (project) {
+        projectName = project.name;
+      }
     }
-    
-    window.unifiedNavHeader?.updateProjectChip(projectName);
+  }
+
+  window.unifiedNavHeader?.updateProjectChip(projectName);
 }
 
 // Update header when page loads
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(updateHeaderProjectChip, 500); // Wait for projectManager to initialize
-    });
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(updateHeaderProjectChip, 500); // Wait for projectManager to initialize
+  });
 } else {
-    setTimeout(updateHeaderProjectChip, 500);
+  setTimeout(updateHeaderProjectChip, 500);
 }
 
 // Global sign out function
-window.signOut = function() {
-    if (confirm('Are you sure you want to sign out?')) {
-        if (window.authManager) {
-            window.authManager.signOut();
-        }
-        localStorage.clear();
-        window.location.href = 'index.html';
+window.signOut = function () {
+  if (confirm('Are you sure you want to sign out?')) {
+    if (window.authManager) {
+      window.authManager.signOut();
     }
+    localStorage.clear();
+    window.location.href = 'index.html';
+  }
 };
 
 console.log('✅ Unified Nav Header script loaded');
-

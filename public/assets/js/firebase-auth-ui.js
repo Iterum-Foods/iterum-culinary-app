@@ -5,58 +5,60 @@
  */
 
 class FirebaseAuthUI {
-    constructor() {
-        this.firebaseAuth = null;
-        this.modalContainer = null;
-        this.isModalOpen = false;
-        
-        this.init();
-    }
+  constructor() {
+    this.firebaseAuth = null;
+    this.modalContainer = null;
+    this.isModalOpen = false;
 
-    /**
-     * Initialize Firebase Auth UI
-     */
-    init() {
-        // Wait for Firebase Auth to be available
-        const checkForFirebaseAuth = () => {
-            if (window.firebaseAuth) {
-                this.firebaseAuth = window.firebaseAuth;
-                console.log('🎨 Firebase Auth UI initialized');
-                return true;
-            }
-            return false;
-        };
-        
-        if (!checkForFirebaseAuth()) {
-            // Check every 500ms for up to 10 seconds
-            let attempts = 0;
-            const interval = setInterval(() => {
-                attempts++;
-                if (checkForFirebaseAuth() || attempts >= 20) {
-                    clearInterval(interval);
-                }
-            }, 500);
+    this.init();
+  }
+
+  /**
+   * Initialize Firebase Auth UI
+   */
+  init() {
+    // Wait for Firebase Auth to be available
+    const checkForFirebaseAuth = () => {
+      if (window.firebaseAuth) {
+        this.firebaseAuth = window.firebaseAuth;
+        console.log('🎨 Firebase Auth UI initialized');
+        return true;
+      }
+      return false;
+    };
+
+    if (!checkForFirebaseAuth()) {
+      // Check every 500ms for up to 10 seconds
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        if (checkForFirebaseAuth() || attempts >= 20) {
+          clearInterval(interval);
         }
+      }, 500);
+    }
+  }
+
+  /**
+   * Show Firebase authentication modal
+   */
+  showAuthModal() {
+    if (this.isModalOpen) {
+      return;
     }
 
-    /**
-     * Show Firebase authentication modal
-     */
-    showAuthModal() {
-        if (this.isModalOpen) return;
-        
-        this.createModal();
-        this.isModalOpen = true;
-    }
+    this.createModal();
+    this.isModalOpen = true;
+  }
 
-    /**
-     * Create the authentication modal
-     */
-    createModal() {
-        // Create modal container
-        this.modalContainer = document.createElement('div');
-        this.modalContainer.className = 'firebase-auth-modal';
-        this.modalContainer.innerHTML = `
+  /**
+   * Create the authentication modal
+   */
+  createModal() {
+    // Create modal container
+    this.modalContainer = document.createElement('div');
+    this.modalContainer.className = 'firebase-auth-modal';
+    this.modalContainer.innerHTML = `
             <div class="firebase-auth-modal-content">
                 <div class="firebase-auth-header">
                     <h3>🔥 Sign in to Iterum</h3>
@@ -134,270 +136,304 @@ class FirebaseAuthUI {
                 </div>
             </div>
         `;
-        
-        // Add to page
-        document.body.appendChild(this.modalContainer);
-        
-        // Add styles
-        this.addStyles();
-        
-        // Close on outside click
-        this.modalContainer.addEventListener('click', (e) => {
-            if (e.target === this.modalContainer) {
-                this.closeModal();
-            }
-        });
-        
-        // Close on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.isModalOpen) {
-                this.closeModal();
-            }
-        });
-        
-        // Add form event listener
-        const emailForm = document.getElementById('firebase-auth-email-form');
-        if (emailForm) {
-            emailForm.addEventListener('submit', (e) => this.handleEmailAuth(e));
-        }
+
+    // Add to page
+    document.body.appendChild(this.modalContainer);
+
+    // Add styles
+    this.addStyles();
+
+    // Close on outside click
+    this.modalContainer.addEventListener('click', e => {
+      if (e.target === this.modalContainer) {
+        this.closeModal();
+      }
+    });
+
+    // Close on escape key
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && this.isModalOpen) {
+        this.closeModal();
+      }
+    });
+
+    // Add form event listener
+    const emailForm = document.getElementById('firebase-auth-email-form');
+    if (emailForm) {
+      emailForm.addEventListener('submit', e => this.handleEmailAuth(e));
+    }
+  }
+
+  /**
+   * Close the authentication modal
+   */
+  closeModal() {
+    if (this.modalContainer) {
+      this.modalContainer.remove();
+      this.modalContainer = null;
+    }
+    this.isModalOpen = false;
+  }
+
+  /**
+   * Handle Google sign-in
+   */
+  async signInWithGoogle() {
+    if (!this.firebaseAuth) {
+      this.showError('Firebase Auth not available');
+      return;
     }
 
-    /**
-     * Close the authentication modal
-     */
-    closeModal() {
-        if (this.modalContainer) {
-            this.modalContainer.remove();
-            this.modalContainer = null;
-        }
-        this.isModalOpen = false;
+    this.showLoading();
+
+    try {
+      await this.firebaseAuth.signInWithGoogle();
+      this.closeModal();
+    } catch (error) {
+      this.showError(error.message);
+      this.hideLoading();
+    }
+  }
+
+  /**
+   * Handle anonymous sign-in
+   */
+  async signInAnonymously() {
+    if (!this.firebaseAuth) {
+      this.showError('Firebase Auth not available');
+      return;
     }
 
-    /**
-     * Handle Google sign-in
-     */
-    async signInWithGoogle() {
-        if (!this.firebaseAuth) {
-            this.showError('Firebase Auth not available');
-            return;
-        }
-        
-        this.showLoading();
-        
-        try {
-            await this.firebaseAuth.signInWithGoogle();
-            this.closeModal();
-            
-        } catch (error) {
-            this.showError(error.message);
-            this.hideLoading();
-        }
+    this.showLoading();
+
+    try {
+      await this.firebaseAuth.signInAnonymously();
+      this.closeModal();
+    } catch (error) {
+      this.showError(error.message);
+      this.hideLoading();
+    }
+  }
+
+  /**
+   * Switch between sign in and sign up tabs
+   */
+  switchTab(tab) {
+    const tabs = document.querySelectorAll('.firebase-auth-tab');
+    const confirmPasswordGroup = document.getElementById(
+      'firebase-auth-confirm-password-group'
+    );
+    const submitText = document.getElementById('firebase-auth-submit-text');
+
+    // Update tab appearance
+    tabs.forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+
+    if (tab === 'signup') {
+      confirmPasswordGroup.style.display = 'block';
+      submitText.textContent = 'Sign Up';
+    } else {
+      confirmPasswordGroup.style.display = 'none';
+      submitText.textContent = 'Sign In';
+    }
+  }
+
+  /**
+   * Handle email/password authentication (both sign in and sign up)
+   */
+  async handleEmailAuth(event) {
+    event.preventDefault();
+
+    if (!this.firebaseAuth) {
+      this.showError('Firebase Auth not available');
+      return;
     }
 
-    /**
-     * Handle anonymous sign-in
-     */
-    async signInAnonymously() {
-        if (!this.firebaseAuth) {
-            this.showError('Firebase Auth not available');
-            return;
-        }
-        
-        this.showLoading();
-        
-        try {
-            await this.firebaseAuth.signInAnonymously();
-            this.closeModal();
-            
-        } catch (error) {
-            this.showError(error.message);
-            this.hideLoading();
-        }
+    const email = document.getElementById('firebase-auth-email').value;
+    const password = document.getElementById('firebase-auth-password').value;
+    const confirmPassword = document.getElementById(
+      'firebase-auth-confirm-password'
+    ).value;
+    const isSignUp =
+      event.target.querySelector('.firebase-auth-tab.active').textContent ===
+      'Sign Up';
+
+    if (!email || !password) {
+      this.showError('Please fill in all fields');
+      return;
     }
 
-    /**
-     * Switch between sign in and sign up tabs
-     */
-    switchTab(tab) {
-        const tabs = document.querySelectorAll('.firebase-auth-tab');
-        const confirmPasswordGroup = document.getElementById('firebase-auth-confirm-password-group');
-        const submitText = document.getElementById('firebase-auth-submit-text');
-        
-        // Update tab appearance
-        tabs.forEach(t => t.classList.remove('active'));
-        event.target.classList.add('active');
-        
-        if (tab === 'signup') {
-            confirmPasswordGroup.style.display = 'block';
-            submitText.textContent = 'Sign Up';
-        } else {
-            confirmPasswordGroup.style.display = 'none';
-            submitText.textContent = 'Sign In';
-        }
+    if (isSignUp) {
+      if (!confirmPassword) {
+        this.showError('Please confirm your password');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        this.showError('Passwords do not match');
+        return;
+      }
+
+      if (password.length < 6) {
+        this.showError('Password must be at least 6 characters');
+        return;
+      }
     }
 
-    /**
-     * Handle email/password authentication (both sign in and sign up)
-     */
-    async handleEmailAuth(event) {
-        event.preventDefault();
-        
-        if (!this.firebaseAuth) {
-            this.showError('Firebase Auth not available');
-            return;
-        }
-        
-        const email = document.getElementById('firebase-auth-email').value;
-        const password = document.getElementById('firebase-auth-password').value;
-        const confirmPassword = document.getElementById('firebase-auth-confirm-password').value;
-        const isSignUp = event.target.querySelector('.firebase-auth-tab.active').textContent === 'Sign Up';
-        
-        if (!email || !password) {
-            this.showError('Please fill in all fields');
-            return;
-        }
-        
-        if (isSignUp) {
-            if (!confirmPassword) {
-                this.showError('Please confirm your password');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                this.showError('Passwords do not match');
-                return;
-            }
-            
-            if (password.length < 6) {
-                this.showError('Password must be at least 6 characters');
-                return;
-            }
-        }
-        
-        this.showLoading();
-        
-        try {
-            if (isSignUp) {
-                await this.firebaseAuth.createUserWithEmail(email, password);
-            } else {
-                await this.firebaseAuth.signInWithEmail(email, password);
-            }
-            this.closeModal();
-            
-        } catch (error) {
-            this.showError(error.message);
-            this.hideLoading();
-        }
+    this.showLoading();
+
+    try {
+      if (isSignUp) {
+        await this.firebaseAuth.createUserWithEmail(email, password);
+      } else {
+        await this.firebaseAuth.signInWithEmail(email, password);
+      }
+      this.closeModal();
+    } catch (error) {
+      this.showError(error.message);
+      this.hideLoading();
+    }
+  }
+
+  /**
+   * Handle account creation
+   */
+  async handleCreateAccount(event) {
+    event.preventDefault();
+
+    if (!this.firebaseAuth) {
+      this.showError('Firebase Auth not available');
+      return;
     }
 
-    /**
-     * Handle account creation
-     */
-    async handleCreateAccount(event) {
-        event.preventDefault();
-        
-        if (!this.firebaseAuth) {
-            this.showError('Firebase Auth not available');
-            return;
-        }
-        
-        const displayName = document.getElementById('firebase-display-name').value;
-        const email = document.getElementById('firebase-create-email').value;
-        const password = document.getElementById('firebase-create-password').value;
-        
-        if (!displayName || !email || !password) {
-            this.showError('Please fill in all fields');
-            return;
-        }
-        
-        if (password.length < 6) {
-            this.showError('Password must be at least 6 characters');
-            return;
-        }
-        
-        this.showLoading();
-        
-        try {
-            await this.firebaseAuth.createAccountWithEmail(email, password, displayName);
-            this.closeModal();
-            
-        } catch (error) {
-            this.showError(error.message);
-            this.hideLoading();
-        }
+    const displayName = document.getElementById('firebase-display-name').value;
+    const email = document.getElementById('firebase-create-email').value;
+    const password = document.getElementById('firebase-create-password').value;
+
+    if (!displayName || !email || !password) {
+      this.showError('Please fill in all fields');
+      return;
     }
 
-    /**
-     * Show create account form
-     */
-    showCreateAccount() {
-        const signInForm = this.modalContainer.querySelector('.firebase-auth-form:not(.firebase-auth-create-form)');
-        const createForm = this.modalContainer.querySelector('.firebase-auth-create-form');
-        
-        if (signInForm) signInForm.style.display = 'none';
-        if (createForm) createForm.style.display = 'block';
+    if (password.length < 6) {
+      this.showError('Password must be at least 6 characters');
+      return;
     }
 
-    /**
-     * Show sign-in form
-     */
-    showSignIn() {
-        const signInForm = this.modalContainer.querySelector('.firebase-auth-form:not(.firebase-auth-create-form)');
-        const createForm = this.modalContainer.querySelector('.firebase-auth-create-form');
-        
-        if (signInForm) signInForm.style.display = 'block';
-        if (createForm) createForm.style.display = 'none';
+    this.showLoading();
+
+    try {
+      await this.firebaseAuth.createAccountWithEmail(
+        email,
+        password,
+        displayName
+      );
+      this.closeModal();
+    } catch (error) {
+      this.showError(error.message);
+      this.hideLoading();
+    }
+  }
+
+  /**
+   * Show create account form
+   */
+  showCreateAccount() {
+    const signInForm = this.modalContainer.querySelector(
+      '.firebase-auth-form:not(.firebase-auth-create-form)'
+    );
+    const createForm = this.modalContainer.querySelector(
+      '.firebase-auth-create-form'
+    );
+
+    if (signInForm) {
+      signInForm.style.display = 'none';
+    }
+    if (createForm) {
+      createForm.style.display = 'block';
+    }
+  }
+
+  /**
+   * Show sign-in form
+   */
+  showSignIn() {
+    const signInForm = this.modalContainer.querySelector(
+      '.firebase-auth-form:not(.firebase-auth-create-form)'
+    );
+    const createForm = this.modalContainer.querySelector(
+      '.firebase-auth-create-form'
+    );
+
+    if (signInForm) {
+      signInForm.style.display = 'block';
+    }
+    if (createForm) {
+      createForm.style.display = 'none';
+    }
+  }
+
+  /**
+   * Show loading state
+   */
+  showLoading() {
+    const loading = this.modalContainer.querySelector('.firebase-auth-loading');
+    const forms = this.modalContainer.querySelectorAll('.firebase-auth-form');
+
+    if (loading) {
+      loading.style.display = 'block';
+    }
+    forms.forEach(form => (form.style.display = 'none'));
+  }
+
+  /**
+   * Hide loading state
+   */
+  hideLoading() {
+    const loading = this.modalContainer.querySelector('.firebase-auth-loading');
+    const signInForm = this.modalContainer.querySelector(
+      '.firebase-auth-form:not(.firebase-auth-create-form)'
+    );
+
+    if (loading) {
+      loading.style.display = 'none';
+    }
+    if (signInForm) {
+      signInForm.style.display = 'block';
+    }
+  }
+
+  /**
+   * Show error message
+   */
+  showError(message) {
+    const errorDiv = this.modalContainer.querySelector('.firebase-auth-error');
+    const errorMessage = this.modalContainer.querySelector(
+      '.firebase-auth-error-message'
+    );
+
+    if (errorDiv && errorMessage) {
+      errorMessage.textContent = message;
+      errorDiv.style.display = 'block';
+
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        errorDiv.style.display = 'none';
+      }, 5000);
+    }
+  }
+
+  /**
+   * Add CSS styles for the modal
+   */
+  addStyles() {
+    if (document.getElementById('firebase-auth-styles')) {
+      return;
     }
 
-    /**
-     * Show loading state
-     */
-    showLoading() {
-        const loading = this.modalContainer.querySelector('.firebase-auth-loading');
-        const forms = this.modalContainer.querySelectorAll('.firebase-auth-form');
-        
-        if (loading) loading.style.display = 'block';
-        forms.forEach(form => form.style.display = 'none');
-    }
-
-    /**
-     * Hide loading state
-     */
-    hideLoading() {
-        const loading = this.modalContainer.querySelector('.firebase-auth-loading');
-        const signInForm = this.modalContainer.querySelector('.firebase-auth-form:not(.firebase-auth-create-form)');
-        
-        if (loading) loading.style.display = 'none';
-        if (signInForm) signInForm.style.display = 'block';
-    }
-
-    /**
-     * Show error message
-     */
-    showError(message) {
-        const errorDiv = this.modalContainer.querySelector('.firebase-auth-error');
-        const errorMessage = this.modalContainer.querySelector('.firebase-auth-error-message');
-        
-        if (errorDiv && errorMessage) {
-            errorMessage.textContent = message;
-            errorDiv.style.display = 'block';
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
-        }
-    }
-
-    /**
-     * Add CSS styles for the modal
-     */
-    addStyles() {
-        if (document.getElementById('firebase-auth-styles')) return;
-        
-        const style = document.createElement('style');
-        style.id = 'firebase-auth-styles';
-        style.textContent = `
+    const style = document.createElement('style');
+    style.id = 'firebase-auth-styles';
+    style.textContent = `
             .firebase-auth-modal {
                 position: fixed;
                 top: 0;
@@ -741,9 +777,9 @@ class FirebaseAuthUI {
                 }
             }
         `;
-        
-        document.head.appendChild(style);
-    }
+
+    document.head.appendChild(style);
+  }
 }
 
 // Initialize Firebase Auth UI

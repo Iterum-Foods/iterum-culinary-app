@@ -1,46 +1,46 @@
 class ChecklistUI {
-    constructor(manager) {
-        this.manager = manager;
-        this.container = null;
-        this.statusContainer = null;
-        this.recentContainer = null;
-        this.modal = null;
+  constructor(manager) {
+    this.manager = manager;
+    this.container = null;
+    this.statusContainer = null;
+    this.recentContainer = null;
+    this.modal = null;
+  }
+
+  init() {
+    this.container = document.getElementById('checklist-dashboard-card');
+    if (!this.container) {
+      console.warn('ChecklistUI: container element not found.');
+      return;
     }
 
-    init() {
-        this.container = document.getElementById('checklist-dashboard-card');
-        if (!this.container) {
-            console.warn('ChecklistUI: container element not found.');
-            return;
-        }
+    this.renderBase();
+    this.renderStatus();
+    this.renderRecent();
 
-        this.renderBase();
-        this.renderStatus();
-        this.renderRecent();
+    this.manager.on('projectChanged', () => {
+      this.renderStatus();
+      this.renderRecent();
+    });
 
-        this.manager.on('projectChanged', () => {
-            this.renderStatus();
-            this.renderRecent();
-        });
+    this.manager.on('entriesLoaded', () => {
+      this.renderStatus();
+      this.renderRecent();
+    });
 
-        this.manager.on('entriesLoaded', () => {
-            this.renderStatus();
-            this.renderRecent();
-        });
+    this.manager.on('entryAdded', () => {
+      this.renderStatus();
+      this.renderRecent();
+    });
 
-        this.manager.on('entryAdded', () => {
-            this.renderStatus();
-            this.renderRecent();
-        });
+    this.manager.on('entrySynced', () => {
+      this.renderStatus();
+      this.renderRecent();
+    });
+  }
 
-        this.manager.on('entrySynced', () => {
-            this.renderStatus();
-            this.renderRecent();
-        });
-    }
-
-    renderBase() {
-        this.container.innerHTML = `
+  renderBase() {
+    this.container.innerHTML = `
             <div class="dashboard-card-header">
                 <div>
                     <div class="dashboard-card-title">Food Safety Checklists</div>
@@ -61,62 +61,73 @@ class ChecklistUI {
             </div>
         `;
 
-        this.injectStyles();
+    this.injectStyles();
 
-        this.statusContainer = this.container.querySelector('#checklist-status-list');
-        this.recentContainer = this.container.querySelector('#checklist-recent-list');
+    this.statusContainer = this.container.querySelector(
+      '#checklist-status-list'
+    );
+    this.recentContainer = this.container.querySelector(
+      '#checklist-recent-list'
+    );
 
-        this.container.querySelectorAll('[data-template]').forEach((button) => {
-            button.addEventListener('click', () => {
-                const templateId = button.getAttribute('data-template');
-                this.openEntryModal(templateId);
-            });
-        });
+    this.container.querySelectorAll('[data-template]').forEach(button => {
+      button.addEventListener('click', () => {
+        const templateId = button.getAttribute('data-template');
+        this.openEntryModal(templateId);
+      });
+    });
 
-        const reviewButton = this.container.querySelector('#checklist-review-all');
-        reviewButton.addEventListener('click', () => {
-            this.openHistoryModal();
-        });
+    const reviewButton = this.container.querySelector('#checklist-review-all');
+    reviewButton.addEventListener('click', () => {
+      this.openHistoryModal();
+    });
+  }
+
+  renderStatus() {
+    if (!this.statusContainer) {
+      return;
     }
 
-    renderStatus() {
-        if (!this.statusContainer) return;
+    const projectId = this.manager.getActiveProjectId();
+    const templates = this.manager.getTemplates();
 
-        const projectId = this.manager.getActiveProjectId();
-        const templates = this.manager.getTemplates();
-
-        if (!templates.length) {
-            this.statusContainer.innerHTML = '<p class="text-sm text-gray-500">No checklists configured.</p>';
-            return;
-        }
-
-        const items = templates.map((template) => {
-            const status = this.manager.getTemplateStatus(template.id, projectId);
-            return this.renderStatusCard(status);
-        });
-
-        this.statusContainer.innerHTML = `<div class="checklist-status-grid">${items.join('')}</div>`;
-
-        this.statusContainer.querySelectorAll('[data-template-log]').forEach((button) => {
-            const templateId = button.getAttribute('data-template-log');
-            button.addEventListener('click', () => this.openEntryModal(templateId));
-        });
+    if (!templates.length) {
+      this.statusContainer.innerHTML =
+        '<p class="text-sm text-gray-500">No checklists configured.</p>';
+      return;
     }
 
-    renderStatusCard(status) {
-        const template = status.template;
-        const className = status.overdue ? 'status-pill status-pill-danger' : 'status-pill status-pill-safe';
-        const dueLabel = status.overdue
-            ? 'Overdue'
-            : status.dueInMinutes !== null
-                ? `Due in ${this.formatMinutes(status.dueInMinutes)}`
-                : 'Log Needed';
+    const items = templates.map(template => {
+      const status = this.manager.getTemplateStatus(template.id, projectId);
+      return this.renderStatusCard(status);
+    });
 
-        const lastEntry = status.lastEntry
-            ? `${this.formatRelativeTime(status.lastEntry.timestamp)} • ${status.lastEntry.status === 'attention' ? '⚠️ Requires review' : '✅ Normal'}`
-            : 'No entries recorded';
+    this.statusContainer.innerHTML = `<div class="checklist-status-grid">${items.join('')}</div>`;
 
-        return `
+    this.statusContainer
+      .querySelectorAll('[data-template-log]')
+      .forEach(button => {
+        const templateId = button.getAttribute('data-template-log');
+        button.addEventListener('click', () => this.openEntryModal(templateId));
+      });
+  }
+
+  renderStatusCard(status) {
+    const template = status.template;
+    const className = status.overdue
+      ? 'status-pill status-pill-danger'
+      : 'status-pill status-pill-safe';
+    const dueLabel = status.overdue
+      ? 'Overdue'
+      : status.dueInMinutes !== null
+        ? `Due in ${this.formatMinutes(status.dueInMinutes)}`
+        : 'Log Needed';
+
+    const lastEntry = status.lastEntry
+      ? `${this.formatRelativeTime(status.lastEntry.timestamp)} • ${status.lastEntry.status === 'attention' ? '⚠️ Requires review' : '✅ Normal'}`
+      : 'No entries recorded';
+
+    return `
             <div class="checklist-status-card">
                 <div class="checklist-status-header">
                     <div>
@@ -132,7 +143,7 @@ class ChecklistUI {
                     </div>
                     <div class="status-row">
                         <span class="status-label">Project Tags</span>
-                        <span class="status-value">${(template.projectTags || []).map((tag) => `#${tag}`).join(' ') || '—'}</span>
+                        <span class="status-value">${(template.projectTags || []).map(tag => `#${tag}`).join(' ') || '—'}</span>
                     </div>
                 </div>
                 <div class="checklist-status-footer">
@@ -140,81 +151,92 @@ class ChecklistUI {
                 </div>
             </div>
         `;
+  }
+
+  renderRecent() {
+    if (!this.recentContainer) {
+      return;
     }
 
-    renderRecent() {
-        if (!this.recentContainer) return;
+    const projectId = this.manager.getActiveProjectId();
+    const entries = this.manager.getRecentEntries(projectId, 6);
 
-        const projectId = this.manager.getActiveProjectId();
-        const entries = this.manager.getRecentEntries(projectId, 6);
+    if (!entries.length) {
+      this.recentContainer.innerHTML =
+        '<p class="text-sm text-gray-500">No checklist entries yet.</p>';
+      return;
+    }
 
-        if (!entries.length) {
-            this.recentContainer.innerHTML = '<p class="text-sm text-gray-500">No checklist entries yet.</p>';
-            return;
-        }
+    const listItems = entries
+      .map(entry => {
+        const template = this.manager.getTemplate(entry.templateId);
+        const statusIcon = entry.status === 'attention' ? '⚠️' : '✅';
+        const summary = this.buildEntrySummary(template, entry);
 
-        const listItems = entries
-            .map((entry) => {
-                const template = this.manager.getTemplate(entry.templateId);
-                const statusIcon = entry.status === 'attention' ? '⚠️' : '✅';
-                const summary = this.buildEntrySummary(template, entry);
-
-                return `
+        return `
                     <div class="checklist-entry-row">
                         <div class="entry-meta">
                             <div class="entry-title">${statusIcon} ${template?.name || entry.templateId}</div>
-                            <div class="entry-subtitle">${this.formatRelativeTime(entry.timestamp)} • ${entry.projectTags?.map((tag) => `#${tag}`).join(' ') || ''}</div>
+                            <div class="entry-subtitle">${this.formatRelativeTime(entry.timestamp)} • ${entry.projectTags?.map(tag => `#${tag}`).join(' ') || ''}</div>
                         </div>
                         <div class="entry-summary">${summary}</div>
                     </div>
                 `;
-            })
-            .join('');
+      })
+      .join('');
 
-        this.recentContainer.innerHTML = listItems;
+    this.recentContainer.innerHTML = listItems;
+  }
+
+  buildEntrySummary(template, entry) {
+    if (!template) {
+      return '';
+    }
+    const fields = template.fields || [];
+    const pieces = [];
+
+    fields.forEach(field => {
+      const value = entry.data?.[field.id];
+      if (value === undefined || value === null || value === '') {
+        return;
+      }
+      if (field.type === 'textarea') {
+        return;
+      } // skip verbose fields in summary
+
+      let displayValue = value;
+      if (field.type === 'number') {
+        displayValue = Number(value).toFixed(1);
+        if (field.id === 'temperature') {
+          displayValue += '°F';
+        } else if (field.id === 'concentration') {
+          displayValue += ' ppm';
+        }
+      }
+
+      pieces.push(
+        `<span>${field.label}: <strong>${displayValue}</strong></span>`
+      );
+    });
+
+    if (entry.requiresAttention) {
+      pieces.push('<span class="entry-flag">⚠️ Attention Required</span>');
     }
 
-    buildEntrySummary(template, entry) {
-        if (!template) return '';
-        const fields = template.fields || [];
-        const pieces = [];
+    return pieces.join(' • ') || 'No data recorded';
+  }
 
-        fields.forEach((field) => {
-            const value = entry.data?.[field.id];
-            if (value === undefined || value === null || value === '') return;
-            if (field.type === 'textarea') return; // skip verbose fields in summary
-
-            let displayValue = value;
-            if (field.type === 'number') {
-                displayValue = Number(value).toFixed(1);
-                if (field.id === 'temperature') {
-                    displayValue += '°F';
-                } else if (field.id === 'concentration') {
-                    displayValue += ' ppm';
-                }
-            }
-
-            pieces.push(`<span>${field.label}: <strong>${displayValue}</strong></span>`);
-        });
-
-        if (entry.requiresAttention) {
-            pieces.push('<span class="entry-flag">⚠️ Attention Required</span>');
-        }
-
-        return pieces.join(' • ') || 'No data recorded';
+  openEntryModal(templateId) {
+    const template = this.manager.getTemplate(templateId);
+    if (!template) {
+      window.showError?.('Checklist template not found.');
+      return;
     }
 
-    openEntryModal(templateId) {
-        const template = this.manager.getTemplate(templateId);
-        if (!template) {
-            window.showError?.('Checklist template not found.');
-            return;
-        }
-
-        this.closeModal();
-        this.modal = document.createElement('div');
-        this.modal.className = 'checklist-modal-overlay';
-        this.modal.innerHTML = `
+    this.closeModal();
+    this.modal = document.createElement('div');
+    this.modal.className = 'checklist-modal-overlay';
+    this.modal.innerHTML = `
             <div class="checklist-modal">
                 <div class="checklist-modal-header">
                     <h3>${template.name}</h3>
@@ -232,31 +254,35 @@ class ChecklistUI {
             </div>
         `;
 
-        document.body.appendChild(this.modal);
+    document.body.appendChild(this.modal);
 
-        this.modal.querySelector('.checklist-modal-close').addEventListener('click', () => this.closeModal());
-        this.modal.querySelector('[data-dismiss]').addEventListener('click', () => this.closeModal());
+    this.modal
+      .querySelector('.checklist-modal-close')
+      .addEventListener('click', () => this.closeModal());
+    this.modal
+      .querySelector('[data-dismiss]')
+      .addEventListener('click', () => this.closeModal());
 
-        const form = this.modal.querySelector('#checklist-entry-form');
-        form.addEventListener('submit', (event) => {
-            event.preventDefault();
-            this.handleFormSubmit(template);
-        });
-    }
+    const form = this.modal.querySelector('#checklist-entry-form');
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      this.handleFormSubmit(template);
+    });
+  }
 
-    openHistoryModal() {
-        const projectId = this.manager.getActiveProjectId();
-        const entries = this.manager.getEntries(projectId);
+  openHistoryModal() {
+    const projectId = this.manager.getActiveProjectId();
+    const entries = this.manager.getEntries(projectId);
 
-        this.closeModal();
-        this.modal = document.createElement('div');
-        this.modal.className = 'checklist-modal-overlay';
+    this.closeModal();
+    this.modal = document.createElement('div');
+    this.modal.className = 'checklist-modal-overlay';
 
-        const rows = entries.slice(0, 50).map((entry) => {
-            const template = this.manager.getTemplate(entry.templateId);
-            const statusIcon = entry.status === 'attention' ? '⚠️' : '✅';
-            const summary = this.buildEntrySummary(template, entry);
-            return `
+    const rows = entries.slice(0, 50).map(entry => {
+      const template = this.manager.getTemplate(entry.templateId);
+      const statusIcon = entry.status === 'attention' ? '⚠️' : '✅';
+      const summary = this.buildEntrySummary(template, entry);
+      return `
                 <tr>
                     <td>${statusIcon}</td>
                     <td>${template?.name || entry.templateId}</td>
@@ -265,9 +291,9 @@ class ChecklistUI {
                     <td>${entry.requiresAttention ? 'Needs Review' : 'Complete'}</td>
                 </tr>
             `;
-        });
+    });
 
-        this.modal.innerHTML = `
+    this.modal.innerHTML = `
             <div class="checklist-modal checklist-modal-wide">
                 <div class="checklist-modal-header">
                     <h3>Checklist History</h3>
@@ -292,42 +318,47 @@ class ChecklistUI {
             </div>
         `;
 
-        document.body.appendChild(this.modal);
-        this.modal.querySelector('.checklist-modal-close').addEventListener('click', () => this.closeModal());
-    }
+    document.body.appendChild(this.modal);
+    this.modal
+      .querySelector('.checklist-modal-close')
+      .addEventListener('click', () => this.closeModal());
+  }
 
-    renderFormFields(template) {
-        return template.fields
-            .map((field) => {
-                const fieldId = `chk-field-${template.id}-${field.id}`;
-                const requiredAttr = field.required ? 'required' : '';
+  renderFormFields(template) {
+    return template.fields
+      .map(field => {
+        const fieldId = `chk-field-${template.id}-${field.id}`;
+        const requiredAttr = field.required ? 'required' : '';
 
-                if (field.type === 'textarea') {
-                    return `
+        if (field.type === 'textarea') {
+          return `
                         <div class="form-group">
                             <label for="${fieldId}" class="form-label">${field.label}${field.requiredOnAlert ? ' *' : ''}</label>
                             <textarea id="${fieldId}" name="${field.id}" class="form-textarea" ${requiredAttr} placeholder="${field.placeholder || ''}"></textarea>
                         </div>
                     `;
-                }
+        }
 
-                if (field.type === 'number') {
-                    const minAttr = field.min !== undefined ? `min="${field.min}"` : '';
-                    const maxAttr = field.max !== undefined ? `max="${field.max}"` : '';
-                    const stepAttr = field.step !== undefined ? `step="${field.step}"` : 'step="0.1"';
-                    return `
+        if (field.type === 'number') {
+          const minAttr = field.min !== undefined ? `min="${field.min}"` : '';
+          const maxAttr = field.max !== undefined ? `max="${field.max}"` : '';
+          const stepAttr =
+            field.step !== undefined ? `step="${field.step}"` : 'step="0.1"';
+          return `
                         <div class="form-group">
                             <label for="${fieldId}" class="form-label">${field.label}${field.required ? ' *' : ''}</label>
                             <input id="${fieldId}" name="${field.id}" type="number" class="form-input" ${requiredAttr} ${minAttr} ${maxAttr} ${stepAttr} />
                         </div>
                     `;
-                }
+        }
 
-                if (field.type === 'select') {
-                    const options = (field.options || []).map((option) => `<option value="${option}">${option}</option>`).join('');
-                    const datalistId = `${fieldId}-options`;
+        if (field.type === 'select') {
+          const options = (field.options || [])
+            .map(option => `<option value="${option}">${option}</option>`)
+            .join('');
+          const datalistId = `${fieldId}-options`;
 
-                    return `
+          return `
                         <div class="form-group">
                             <label for="${fieldId}" class="form-label">${field.label}${field.required ? ' *' : ''}</label>
                             <input id="${fieldId}" name="${field.id}" class="form-input" list="${datalistId}" ${requiredAttr} placeholder="${field.placeholder || ''}" />
@@ -336,100 +367,120 @@ class ChecklistUI {
                             </datalist>
                         </div>
                     `;
-                }
+        }
 
-                return `
+        return `
                     <div class="form-group">
                         <label for="${fieldId}" class="form-label">${field.label}${field.required ? ' *' : ''}</label>
                         <input id="${fieldId}" name="${field.id}" type="text" class="form-input" ${requiredAttr} placeholder="${field.placeholder || ''}" />
                     </div>
                 `;
-            })
-            .join('');
-    }
+      })
+      .join('');
+  }
 
-    handleFormSubmit(template) {
-        const form = this.modal.querySelector('#checklist-entry-form');
-        const formData = new FormData(form);
-        const payload = {};
+  handleFormSubmit(template) {
+    const form = this.modal.querySelector('#checklist-entry-form');
+    const formData = new FormData(form);
+    const payload = {};
 
-        template.fields.forEach((field) => {
-            let value = formData.get(field.id);
-            if (value === null || value === undefined || value === '') {
-                if (field.required) {
-                    value = '';
-                } else {
-                    return;
-                }
-            }
-
-            if (field.type === 'number') {
-                value = Number(value);
-                if (Number.isNaN(value)) {
-                    window.showError?.(`${field.label} must be a valid number.`);
-                    throw new Error('Invalid numeric entry');
-                }
-            } else {
-                value = value.toString();
-            }
-
-            payload[field.id] = value;
-        });
-
-        try {
-            const entry = this.manager.addEntry(template.id, payload);
-            if (entry.requiresAttention) {
-                window.showWarning?.('Entry saved, but values are outside target range. Please complete corrective actions.');
-            } else {
-                window.showSuccess?.('Checklist entry saved.');
-            }
-            this.closeModal();
-        } catch (error) {
-            console.error('Checklist entry error:', error);
-            window.showError?.(error.message || 'Unable to save checklist entry.');
+    template.fields.forEach(field => {
+      let value = formData.get(field.id);
+      if (value === null || value === undefined || value === '') {
+        if (field.required) {
+          value = '';
+        } else {
+          return;
         }
-    }
+      }
 
-    closeModal() {
-        if (this.modal) {
-            this.modal.remove();
-            this.modal = null;
+      if (field.type === 'number') {
+        value = Number(value);
+        if (Number.isNaN(value)) {
+          window.showError?.(`${field.label} must be a valid number.`);
+          throw new Error('Invalid numeric entry');
         }
+      } else {
+        value = value.toString();
+      }
+
+      payload[field.id] = value;
+    });
+
+    try {
+      const entry = this.manager.addEntry(template.id, payload);
+      if (entry.requiresAttention) {
+        window.showWarning?.(
+          'Entry saved, but values are outside target range. Please complete corrective actions.'
+        );
+      } else {
+        window.showSuccess?.('Checklist entry saved.');
+      }
+      this.closeModal();
+    } catch (error) {
+      console.error('Checklist entry error:', error);
+      window.showError?.(error.message || 'Unable to save checklist entry.');
     }
+  }
 
-    formatRelativeTime(timestamp) {
-        const date = this.manager.parseTimestamp(timestamp);
-        if (!date) return 'N/A';
-        const diffMs = Date.now() - date;
-        const diffMinutes = Math.round(diffMs / 60000);
-
-        if (diffMinutes < 1) return 'Just now';
-        if (diffMinutes < 60) return `${diffMinutes} min ago`;
-        const diffHours = Math.round(diffMinutes / 60);
-        if (diffHours < 24) return `${diffHours} hr ago`;
-        const diffDays = Math.round(diffHours / 24);
-        return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+  closeModal() {
+    if (this.modal) {
+      this.modal.remove();
+      this.modal = null;
     }
+  }
 
-    formatMinutes(minutes) {
-        if (minutes === null || minutes === undefined) return 'Now';
-        if (minutes <= 0) return 'Now';
-        if (minutes < 60) return `${minutes} min`;
-        const hours = Math.round(minutes / 60);
-        return `${hours} hr`;
+  formatRelativeTime(timestamp) {
+    const date = this.manager.parseTimestamp(timestamp);
+    if (!date) {
+      return 'N/A';
     }
+    const diffMs = Date.now() - date;
+    const diffMinutes = Math.round(diffMs / 60000);
 
-    formatDate(timestamp) {
-        const date = new Date(this.manager.parseTimestamp(timestamp));
-        if (Number.isNaN(date.getTime())) return 'Invalid date';
-        return date.toLocaleString();
+    if (diffMinutes < 1) {
+      return 'Just now';
     }
+    if (diffMinutes < 60) {
+      return `${diffMinutes} min ago`;
+    }
+    const diffHours = Math.round(diffMinutes / 60);
+    if (diffHours < 24) {
+      return `${diffHours} hr ago`;
+    }
+    const diffDays = Math.round(diffHours / 24);
+    return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+  }
 
-    injectStyles() {
-        if (document.getElementById('checklist-ui-styles')) return;
-        const style = document.createElement('style');
-        style.id = 'checklist-ui-styles';
-        style.textContent = `
+  formatMinutes(minutes) {
+    if (minutes === null || minutes === undefined) {
+      return 'Now';
+    }
+    if (minutes <= 0) {
+      return 'Now';
+    }
+    if (minutes < 60) {
+      return `${minutes} min`;
+    }
+    const hours = Math.round(minutes / 60);
+    return `${hours} hr`;
+  }
+
+  formatDate(timestamp) {
+    const date = new Date(this.manager.parseTimestamp(timestamp));
+    if (Number.isNaN(date.getTime())) {
+      return 'Invalid date';
+    }
+    return date.toLocaleString();
+  }
+
+  injectStyles() {
+    if (document.getElementById('checklist-ui-styles')) {
+      return;
+    }
+    const style = document.createElement('style');
+    style.id = 'checklist-ui-styles';
+    style.textContent = `
             .checklist-status-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -655,14 +706,14 @@ class ChecklistUI {
             }
         `;
 
-        document.head.appendChild(style);
-    }
+    document.head.appendChild(style);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (!window.checklistManager) return;
-    window.checklistUI = new ChecklistUI(window.checklistManager);
-    window.checklistUI.init();
+  if (!window.checklistManager) {
+    return;
+  }
+  window.checklistUI = new ChecklistUI(window.checklistManager);
+  window.checklistUI.init();
 });
-
-

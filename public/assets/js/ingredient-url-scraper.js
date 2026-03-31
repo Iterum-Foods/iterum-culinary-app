@@ -31,12 +31,12 @@ class IngredientURLScraper {
       if (domain.includes('fooddb.ca')) {
         return await this.scrapeFoodDBCa(normalizedUrl);
       }
-      
+
       // Check other known sources
       if (domain.includes('wikipedia.org')) {
         return await this.scrapeWikipedia(normalizedUrl);
       }
-      
+
       if (domain.includes('usda.gov') || domain.includes('nutrition')) {
         return await this.scrapeNutritionDatabase(normalizedUrl);
       }
@@ -74,20 +74,30 @@ class IngredientURLScraper {
       };
 
       // Extract name - usually in h1 or title
-      const nameEl = doc.querySelector('h1') || doc.querySelector('.product-title') || doc.querySelector('title');
+      const nameEl =
+        doc.querySelector('h1') ||
+        doc.querySelector('.product-title') ||
+        doc.querySelector('title');
       if (nameEl) {
         ingredient.name = nameEl.textContent.trim();
         // Clean up common suffixes
-        ingredient.name = ingredient.name.replace(/\s*-\s*FoodDB.*$/i, '').trim();
+        ingredient.name = ingredient.name
+          .replace(/\s*-\s*FoodDB.*$/i, '')
+          .trim();
       }
 
       // Extract description
-      const descEl = doc.querySelector('.description') || doc.querySelector('.product-description') || 
-                     doc.querySelector('meta[name="description"]') || doc.querySelector('p');
+      const descEl =
+        doc.querySelector('.description') ||
+        doc.querySelector('.product-description') ||
+        doc.querySelector('meta[name="description"]') ||
+        doc.querySelector('p');
       if (descEl) {
-        ingredient.description = descEl.textContent?.trim() || descEl.getAttribute('content') || '';
+        ingredient.description =
+          descEl.textContent?.trim() || descEl.getAttribute('content') || '';
         if (ingredient.description.length > 500) {
-          ingredient.description = ingredient.description.substring(0, 500) + '...';
+          ingredient.description =
+            ingredient.description.substring(0, 500) + '...';
         }
       }
 
@@ -137,15 +147,22 @@ class IngredientURLScraper {
     const nutrition = {};
 
     // Look for nutrition tables or structured data
-    const nutritionTable = doc.querySelector('table.nutrition') || 
-                         doc.querySelector('.nutrition-info') ||
-                         doc.querySelector('[class*="nutrition"]');
+    const nutritionTable =
+      doc.querySelector('table.nutrition') ||
+      doc.querySelector('.nutrition-info') ||
+      doc.querySelector('[class*="nutrition"]');
 
     if (nutritionTable) {
       const rows = nutritionTable.querySelectorAll('tr, .nutrition-row');
       rows.forEach(row => {
-        const label = row.querySelector('td:first-child, .label, .nutrient-name')?.textContent?.toLowerCase() || '';
-        const value = row.querySelector('td:last-child, .value, .nutrient-value')?.textContent?.trim() || '';
+        const label =
+          row
+            .querySelector('td:first-child, .label, .nutrient-name')
+            ?.textContent?.toLowerCase() || '';
+        const value =
+          row
+            .querySelector('td:last-child, .value, .nutrient-value')
+            ?.textContent?.trim() || '';
 
         if (label.includes('calorie') || label.includes('energy')) {
           nutrition.calories = this.parseNumber(value);
@@ -186,7 +203,9 @@ class IngredientURLScraper {
    */
   extractCategoryFromFoodDB(doc) {
     // Look for breadcrumbs, categories, or tags
-    const breadcrumbs = doc.querySelector('.breadcrumb, .breadcrumbs, nav[aria-label="breadcrumb"]');
+    const breadcrumbs = doc.querySelector(
+      '.breadcrumb, .breadcrumbs, nav[aria-label="breadcrumb"]'
+    );
     if (breadcrumbs) {
       const links = breadcrumbs.querySelectorAll('a');
       for (const link of links) {
@@ -198,8 +217,9 @@ class IngredientURLScraper {
     }
 
     // Check meta tags
-    const metaCategory = doc.querySelector('meta[property="article:section"]') ||
-                        doc.querySelector('meta[name="category"]');
+    const metaCategory =
+      doc.querySelector('meta[property="article:section"]') ||
+      doc.querySelector('meta[name="category"]');
     if (metaCategory) {
       const cat = metaCategory.getAttribute('content')?.toLowerCase();
       if (cat && this.isValidCategory(cat)) {
@@ -208,7 +228,9 @@ class IngredientURLScraper {
     }
 
     // Check for category tags
-    const categoryTags = doc.querySelectorAll('.category, .tag, [class*="category"]');
+    const categoryTags = doc.querySelectorAll(
+      '.category, .tag, [class*="category"]'
+    );
     for (const tag of categoryTags) {
       const text = tag.textContent.toLowerCase();
       if (this.isValidCategory(text)) {
@@ -224,13 +246,25 @@ class IngredientURLScraper {
    */
   extractAllergensFromFoodDB(doc) {
     const allergens = [];
-    
+
     // Look for allergen information
-    const allergenSection = doc.querySelector('.allergens, .allergen-info, [class*="allergen"]');
+    const allergenSection = doc.querySelector(
+      '.allergens, .allergen-info, [class*="allergen"]'
+    );
     if (allergenSection) {
       const allergenText = allergenSection.textContent.toLowerCase();
-      const commonAllergens = ['milk', 'eggs', 'fish', 'shellfish', 'tree nuts', 'peanuts', 'wheat', 'soy', 'sesame'];
-      
+      const commonAllergens = [
+        'milk',
+        'eggs',
+        'fish',
+        'shellfish',
+        'tree nuts',
+        'peanuts',
+        'wheat',
+        'soy',
+        'sesame'
+      ];
+
       commonAllergens.forEach(allergen => {
         if (allergenText.includes(allergen)) {
           allergens.push(allergen);
@@ -246,7 +280,7 @@ class IngredientURLScraper {
    */
   extractTagsFromFoodDB(doc) {
     const tags = [];
-    
+
     // Look for tag elements
     const tagElements = doc.querySelectorAll('.tag, .keyword, [class*="tag"]');
     tagElements.forEach(el => {
@@ -259,7 +293,10 @@ class IngredientURLScraper {
     // Also check meta keywords
     const metaKeywords = doc.querySelector('meta[name="keywords"]');
     if (metaKeywords) {
-      const keywords = metaKeywords.getAttribute('content')?.split(',').map(k => k.trim());
+      const keywords = metaKeywords
+        .getAttribute('content')
+        ?.split(',')
+        .map(k => k.trim());
       if (keywords) {
         tags.push(...keywords);
       }
@@ -357,10 +394,11 @@ class IngredientURLScraper {
       try {
         const proxy = this.corsProxies[this.proxyIndex];
         const proxyUrl = proxy + encodeURIComponent(url);
-        
+
         const response = await fetch(proxyUrl, {
           headers: {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+            Accept:
+              'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
           }
         });
 
@@ -369,7 +407,7 @@ class IngredientURLScraper {
         }
 
         const data = await response.text();
-        
+
         // Handle allorigins.win format
         if (proxy.includes('allorigins.win')) {
           try {
@@ -388,7 +426,9 @@ class IngredientURLScraper {
       }
     }
 
-    throw new Error(`All CORS proxies failed. Last error: ${lastError?.message}`);
+    throw new Error(
+      `All CORS proxies failed. Last error: ${lastError?.message}`
+    );
   }
 
   /**
@@ -406,7 +446,9 @@ class IngredientURLScraper {
    * Parse number from string
    */
   parseNumber(str) {
-    if (!str) return null;
+    if (!str) {
+      return null;
+    }
     const match = str.match(/[\d.]+/);
     return match ? parseFloat(match[0]) : null;
   }
@@ -416,8 +458,20 @@ class IngredientURLScraper {
    */
   isValidCategory(cat) {
     const validCategories = [
-      'vegetable', 'fruit', 'protein', 'grain', 'dairy', 'spice', 'herb',
-      'oil', 'fat', 'nut', 'seed', 'legume', 'beverage', 'condiment'
+      'vegetable',
+      'fruit',
+      'protein',
+      'grain',
+      'dairy',
+      'spice',
+      'herb',
+      'oil',
+      'fat',
+      'nut',
+      'seed',
+      'legume',
+      'beverage',
+      'condiment'
     ];
     return validCategories.some(valid => cat.includes(valid));
   }
@@ -427,20 +481,20 @@ class IngredientURLScraper {
    */
   normalizeCategory(cat) {
     const mappings = {
-      'vegetable': 'vegetables',
-      'fruit': 'fruits',
-      'protein': 'proteins',
-      'grain': 'grains',
-      'dairy': 'dairy',
-      'spice': 'spices',
-      'herb': 'spices',
-      'oil': 'oils',
-      'fat': 'oils',
-      'nut': 'nuts',
-      'seed': 'nuts',
-      'legume': 'proteins',
-      'beverage': 'beverages',
-      'condiment': 'condiments'
+      vegetable: 'vegetables',
+      fruit: 'fruits',
+      protein: 'proteins',
+      grain: 'grains',
+      dairy: 'dairy',
+      spice: 'spices',
+      herb: 'spices',
+      oil: 'oils',
+      fat: 'oils',
+      nut: 'nuts',
+      seed: 'nuts',
+      legume: 'proteins',
+      beverage: 'beverages',
+      condiment: 'condiments'
     };
 
     for (const [key, value] of Object.entries(mappings)) {
@@ -463,13 +517,20 @@ class IngredientURLScraper {
    * Check if category is weight-based
    */
   isWeightCategory(cat) {
-    return ['vegetables', 'fruits', 'proteins', 'grains', 'dairy', 'nuts'].includes(cat);
+    return [
+      'vegetables',
+      'fruits',
+      'proteins',
+      'grains',
+      'dairy',
+      'nuts'
+    ].includes(cat);
   }
 }
 
 // Initialize and expose globally
 window.ingredientURLScraper = new IngredientURLScraper();
-window.fetchIngredientMetadata = (url) => window.ingredientURLScraper.fetchIngredientMetadata(url);
+window.fetchIngredientMetadata = url =>
+  window.ingredientURLScraper.fetchIngredientMetadata(url);
 
 console.log('✅ Ingredient URL Scraper loaded (supports fooddb.ca)');
-

@@ -3,69 +3,68 @@
  * Shows banner if email is not verified
  */
 
-(function() {
-    'use strict';
-    
-    console.log('📧 Email Verification Banner initializing...');
-    
-    // Wait for AuthManager
-    async function waitForAuthManager() {
-        let attempts = 0;
-        while (!window.authManager && attempts < 50) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-            attempts++;
-        }
-        return window.authManager;
+(function () {
+  'use strict';
+
+  console.log('📧 Email Verification Banner initializing...');
+
+  // Wait for AuthManager
+  async function waitForAuthManager() {
+    let attempts = 0;
+    while (!window.authManager && attempts < 50) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
     }
-    
-    // Check if email verification banner should be shown
-    async function checkEmailVerification() {
-        const authManager = await waitForAuthManager();
-        
-        if (!authManager || !authManager.isAuthenticated) {
-            return; // Not logged in
-        }
-        
-        const user = authManager.currentUser;
-        
-        // Only show for email accounts (not Google or trial)
-        if (user.type !== 'email') {
-            return;
-        }
-        
-        // Check if Firebase user is verified
-        try {
-            const firebaseAuth = window.firebaseAuth;
-            if (!firebaseAuth || !firebaseAuth.currentUser) {
-                return;
-            }
-            
-            // Reload user to get latest verification status
-            await firebaseAuth.currentUser.reload();
-            
-            if (firebaseAuth.currentUser.emailVerified) {
-                console.log('✅ Email is verified');
-                return;
-            }
-            
-            // Email not verified - show banner
-            showVerificationBanner();
-            
-        } catch (error) {
-            console.error('Error checking email verification:', error);
-        }
+    return window.authManager;
+  }
+
+  // Check if email verification banner should be shown
+  async function checkEmailVerification() {
+    const authManager = await waitForAuthManager();
+
+    if (!authManager || !authManager.isAuthenticated) {
+      return; // Not logged in
     }
-    
-    // Show verification banner
-    function showVerificationBanner() {
-        // Don't show if already dismissed
-        if (sessionStorage.getItem('verification_banner_dismissed')) {
-            return;
-        }
-        
-        const banner = document.createElement('div');
-        banner.id = 'email-verification-banner';
-        banner.style.cssText = `
+
+    const user = authManager.currentUser;
+
+    // Only show for email accounts (not Google or trial)
+    if (user.type !== 'email') {
+      return;
+    }
+
+    // Check if Firebase user is verified
+    try {
+      const firebaseAuth = window.firebaseAuth;
+      if (!firebaseAuth || !firebaseAuth.currentUser) {
+        return;
+      }
+
+      // Reload user to get latest verification status
+      await firebaseAuth.currentUser.reload();
+
+      if (firebaseAuth.currentUser.emailVerified) {
+        console.log('✅ Email is verified');
+        return;
+      }
+
+      // Email not verified - show banner
+      showVerificationBanner();
+    } catch (error) {
+      console.error('Error checking email verification:', error);
+    }
+  }
+
+  // Show verification banner
+  function showVerificationBanner() {
+    // Don't show if already dismissed
+    if (sessionStorage.getItem('verification_banner_dismissed')) {
+      return;
+    }
+
+    const banner = document.createElement('div');
+    banner.id = 'email-verification-banner';
+    banner.style.cssText = `
             position: fixed;
             top: 80px;
             left: 50%;
@@ -80,8 +79,8 @@
             width: calc(100% - 40px);
             animation: slideDown 0.4s ease;
         `;
-        
-        banner.innerHTML = `
+
+    banner.innerHTML = `
             <style>
                 @keyframes slideDown {
                     from { transform: translate(-50%, -100px); opacity: 0; }
@@ -116,19 +115,19 @@
                 </button>
             </div>
         `;
-        
-        document.body.appendChild(banner);
-    }
-    
-    // Resend verification email
-    window.resendVerificationEmail = async function() {
-        try {
-            await window.authManager.sendEmailVerification();
-            
-            // Show success message
-            const banner = document.getElementById('email-verification-banner');
-            if (banner) {
-                banner.innerHTML = `
+
+    document.body.appendChild(banner);
+  }
+
+  // Resend verification email
+  window.resendVerificationEmail = async function () {
+    try {
+      await window.authManager.sendEmailVerification();
+
+      // Show success message
+      const banner = document.getElementById('email-verification-banner');
+      if (banner) {
+        banner.innerHTML = `
                     <div style="text-align: center; padding: 8px;">
                         <div style="font-size: 32px; margin-bottom: 8px;">✅</div>
                         <div style="font-weight: 700; color: #065f46; margin-bottom: 4px;">
@@ -139,40 +138,38 @@
                         </div>
                     </div>
                 `;
-                banner.style.background = 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
-                banner.style.borderColor = '#10b981';
-                
-                setTimeout(() => {
-                    dismissVerificationBanner();
-                }, 3000);
-            }
-            
-        } catch (error) {
-            console.error('Error resending verification:', error);
-            alert('Failed to resend verification email. Please try again.');
-        }
-    };
-    
-    // Dismiss verification banner
-    window.dismissVerificationBanner = function() {
-        const banner = document.getElementById('email-verification-banner');
-        if (banner) {
-            sessionStorage.setItem('verification_banner_dismissed', 'true');
-            banner.style.animation = 'slideDown 0.3s ease reverse';
-            setTimeout(() => banner.remove(), 300);
-        }
-    };
-    
-    // Initialize after page load
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(checkEmailVerification, 2000);
-        });
-    } else {
-        setTimeout(checkEmailVerification, 2000);
-    }
-    
-    console.log('✅ Email Verification Banner loaded');
-    
-})();
+        banner.style.background =
+          'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)';
+        banner.style.borderColor = '#10b981';
 
+        setTimeout(() => {
+          dismissVerificationBanner();
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Error resending verification:', error);
+      alert('Failed to resend verification email. Please try again.');
+    }
+  };
+
+  // Dismiss verification banner
+  window.dismissVerificationBanner = function () {
+    const banner = document.getElementById('email-verification-banner');
+    if (banner) {
+      sessionStorage.setItem('verification_banner_dismissed', 'true');
+      banner.style.animation = 'slideDown 0.3s ease reverse';
+      setTimeout(() => banner.remove(), 300);
+    }
+  };
+
+  // Initialize after page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(checkEmailVerification, 2000);
+    });
+  } else {
+    setTimeout(checkEmailVerification, 2000);
+  }
+
+  console.log('✅ Email Verification Banner loaded');
+})();

@@ -3,27 +3,27 @@
  * Handles profile editing, password changes, and account management
  */
 
-(function() {
-    'use strict';
-    
-    console.log('👤 Profile Editor initializing...');
-    
-    /**
-     * Show profile edit modal
-     */
-    window.showProfileEditModal = async function() {
-        console.log('📝 Opening profile editor...');
-        
-        if (!window.authManager || !window.authManager.currentUser) {
-            alert('Please sign in to edit your profile');
-            return;
-        }
-        
-        const user = window.authManager.currentUser;
-        
-        const modal = document.createElement('div');
-        modal.id = 'profile-edit-modal';
-        modal.style.cssText = `
+(function () {
+  'use strict';
+
+  console.log('👤 Profile Editor initializing...');
+
+  /**
+   * Show profile edit modal
+   */
+  window.showProfileEditModal = async function () {
+    console.log('📝 Opening profile editor...');
+
+    if (!window.authManager || !window.authManager.currentUser) {
+      alert('Please sign in to edit your profile');
+      return;
+    }
+
+    const user = window.authManager.currentUser;
+
+    const modal = document.createElement('div');
+    modal.id = 'profile-edit-modal';
+    modal.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -38,8 +38,8 @@
             animation: fadeIn 0.3s ease;
             padding: 20px;
         `;
-        
-        modal.innerHTML = `
+
+    modal.innerHTML = `
             <style>
                 @keyframes fadeIn {
                     from { opacity: 0; }
@@ -132,7 +132,9 @@
                     
                     <!-- Password Tab -->
                     <div id="profile-tab-password" class="profile-tab-content">
-                        ${user.type === 'google' ? `
+                        ${
+                          user.type === 'google'
+                            ? `
                             <div style="text-align: center; padding: 40px 20px;">
                                 <div style="font-size: 48px; margin-bottom: 16px;">🔵</div>
                                 <h3 style="font-size: 20px; font-weight: 700; color: #1f2937; margin-bottom: 8px;">Google Account</h3>
@@ -142,7 +144,8 @@
                                     Open Google Account
                                 </a>
                             </div>
-                        ` : `
+                        `
+                            : `
                             <form id="password-change-form" onsubmit="handlePasswordChange(event)">
                                 <div style="margin-bottom: 20px;">
                                     <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">
@@ -178,7 +181,8 @@
                                 
                                 <div id="password-message" style="margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 14px; display: none;"></div>
                             </form>
-                        `}
+                        `
+                        }
                     </div>
                     
                     <!-- Account Tab -->
@@ -202,7 +206,9 @@
                             </div>
                         </div>
                         
-                        ${user.type === 'trial' ? `
+                        ${
+                          user.type === 'trial'
+                            ? `
                             <div style="background: #fef3c7; border: 2px solid #f59e0b; padding: 16px; border-radius: 10px; margin-bottom: 20px;">
                                 <div style="font-weight: 700; color: #92400e; margin-bottom: 8px;">🎁 Trial Account</div>
                                 <div style="color: #92400e; font-size: 14px;">
@@ -213,7 +219,9 @@
                                     Upgrade to Pro
                                 </button>
                             </div>
-                        ` : ''}
+                        `
+                            : ''
+                        }
                         
                         <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 20px;">
                             <h4 style="font-size: 16px; font-weight: 700; color: #ef4444; margin-bottom: 12px;">Danger Zone</h4>
@@ -235,204 +243,207 @@
                 </div>
             </div>
         `;
-        
-        document.body.appendChild(modal);
-        
-        // Close on outside click
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeProfileEditModal();
-            }
-        });
-    };
-    
-    /**
-     * Close profile edit modal
-     */
-    window.closeProfileEditModal = function() {
-        const modal = document.getElementById('profile-edit-modal');
-        if (modal) {
-            modal.remove();
-        }
-    };
-    
-    /**
-     * Switch profile tabs
-     */
-    window.switchProfileTab = function(tab) {
-        // Update tab buttons
-        document.querySelectorAll('.profile-tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.querySelector(`[onclick="switchProfileTab('${tab}')"]`)?.classList.add('active');
-        
-        // Update tab content
-        document.querySelectorAll('.profile-tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
-        document.getElementById(`profile-tab-${tab}`)?.classList.add('active');
-    };
-    
-    /**
-     * Handle profile update
-     */
-    window.handleProfileUpdate = async function(event) {
-        event.preventDefault();
-        
-        const name = document.getElementById('profile-name').value.trim();
-        const btn = document.getElementById('profile-update-btn');
-        const btnText = document.getElementById('profile-update-text');
-        const spinner = document.getElementById('profile-update-spinner');
-        const messageDiv = document.getElementById('profile-message');
-        
-        // Show loading
-        btn.disabled = true;
-        btnText.style.display = 'none';
-        spinner.style.display = 'inline';
-        messageDiv.style.display = 'none';
-        
-        try {
-            await window.authManager.updateProfile({
-                displayName: name
-            });
-            
-            // Show success
-            messageDiv.style.display = 'block';
-            messageDiv.style.background = '#d1fae5';
-            messageDiv.style.color = '#065f46';
-            messageDiv.textContent = '✅ Profile updated successfully!';
-            
-            // Reload header display
-            if (window.location.reload) {
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-            }
-            
-        } catch (error) {
-            console.error('Profile update error:', error);
-            messageDiv.style.display = 'block';
-            messageDiv.style.background = '#fee2e2';
-            messageDiv.style.color = '#991b1b';
-            messageDiv.textContent = '❌ Failed to update profile: ' + error.message;
-            
-            btn.disabled = false;
-            btnText.style.display = 'inline';
-            spinner.style.display = 'none';
-        }
-    };
-    
-    /**
-     * Handle password change
-     */
-    window.handlePasswordChange = async function(event) {
-        event.preventDefault();
-        
-        const currentPassword = document.getElementById('current-password').value;
-        const newPassword = document.getElementById('new-password').value;
-        const confirmPassword = document.getElementById('confirm-password').value;
-        const btn = document.getElementById('password-change-btn');
-        const btnText = document.getElementById('password-change-text');
-        const spinner = document.getElementById('password-change-spinner');
-        const messageDiv = document.getElementById('password-message');
-        
-        // Validation
-        if (newPassword.length < 6) {
-            messageDiv.style.display = 'block';
-            messageDiv.style.background = '#fee2e2';
-            messageDiv.style.color = '#991b1b';
-            messageDiv.textContent = '❌ Password must be at least 6 characters';
-            return;
-        }
-        
-        if (newPassword !== confirmPassword) {
-            messageDiv.style.display = 'block';
-            messageDiv.style.background = '#fee2e2';
-            messageDiv.style.color = '#991b1b';
-            messageDiv.textContent = '❌ Passwords do not match';
-            return;
-        }
-        
-        // Show loading
-        btn.disabled = true;
-        btnText.style.display = 'none';
-        spinner.style.display = 'inline';
-        messageDiv.style.display = 'none';
-        
-        try {
-            await window.authManager.updatePassword(currentPassword, newPassword);
-            
-            // Show success
-            messageDiv.style.display = 'block';
-            messageDiv.style.background = '#d1fae5';
-            messageDiv.style.color = '#065f46';
-            messageDiv.textContent = '✅ Password updated successfully!';
-            
-            // Clear form
-            document.getElementById('current-password').value = '';
-            document.getElementById('new-password').value = '';
-            document.getElementById('confirm-password').value = '';
-            
-        } catch (error) {
-            console.error('Password change error:', error);
-            
-            let errorMessage = 'Failed to update password';
-            if (error.message.includes('wrong-password')) {
-                errorMessage = 'Current password is incorrect';
-            } else if (error.message.includes('weak-password')) {
-                errorMessage = 'New password is too weak';
-            }
-            
-            messageDiv.style.display = 'block';
-            messageDiv.style.background = '#fee2e2';
-            messageDiv.style.color = '#991b1b';
-            messageDiv.textContent = '❌ ' + errorMessage;
-        }
-        
-        btn.disabled = false;
-        btnText.style.display = 'inline';
-        spinner.style.display = 'none';
-    };
-    
-    /**
-     * Handle account deletion
-     */
-    window.handleAccountDeletion = async function() {
-        const user = window.authManager.currentUser;
-        
-        if (!confirm(`⚠️ Are you absolutely sure you want to delete your account?\n\nThis will permanently delete:\n• Your profile\n• All your recipes\n• All your menus\n• All your data\n\nThis action CANNOT be undone.`)) {
-            return;
-        }
-        
-        if (!confirm('Type "DELETE" to confirm')) {
-            return;
-        }
-        
-        const password = prompt('Enter your password to confirm deletion:');
-        
-        if (!password) {
-            return;
-        }
-        
-        try {
-            await window.authManager.deleteAccount(password);
-            
-            alert('Your account has been deleted. You will be redirected to the login page.');
-            window.location.href = 'launch.html';
-            
-        } catch (error) {
-            console.error('Account deletion error:', error);
-            
-            let errorMessage = 'Failed to delete account';
-            if (error.message.includes('wrong-password')) {
-                errorMessage = 'Incorrect password';
-            }
-            
-            alert('❌ ' + errorMessage);
-        }
-    };
-    
-    console.log('✅ Profile Editor loaded');
-    
-})();
 
+    document.body.appendChild(modal);
+
+    // Close on outside click
+    modal.addEventListener('click', e => {
+      if (e.target === modal) {
+        closeProfileEditModal();
+      }
+    });
+  };
+
+  /**
+   * Close profile edit modal
+   */
+  window.closeProfileEditModal = function () {
+    const modal = document.getElementById('profile-edit-modal');
+    if (modal) {
+      modal.remove();
+    }
+  };
+
+  /**
+   * Switch profile tabs
+   */
+  window.switchProfileTab = function (tab) {
+    // Update tab buttons
+    document.querySelectorAll('.profile-tab-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    document
+      .querySelector(`[onclick="switchProfileTab('${tab}')"]`)
+      ?.classList.add('active');
+
+    // Update tab content
+    document.querySelectorAll('.profile-tab-content').forEach(content => {
+      content.classList.remove('active');
+    });
+    document.getElementById(`profile-tab-${tab}`)?.classList.add('active');
+  };
+
+  /**
+   * Handle profile update
+   */
+  window.handleProfileUpdate = async function (event) {
+    event.preventDefault();
+
+    const name = document.getElementById('profile-name').value.trim();
+    const btn = document.getElementById('profile-update-btn');
+    const btnText = document.getElementById('profile-update-text');
+    const spinner = document.getElementById('profile-update-spinner');
+    const messageDiv = document.getElementById('profile-message');
+
+    // Show loading
+    btn.disabled = true;
+    btnText.style.display = 'none';
+    spinner.style.display = 'inline';
+    messageDiv.style.display = 'none';
+
+    try {
+      await window.authManager.updateProfile({
+        displayName: name
+      });
+
+      // Show success
+      messageDiv.style.display = 'block';
+      messageDiv.style.background = '#d1fae5';
+      messageDiv.style.color = '#065f46';
+      messageDiv.textContent = '✅ Profile updated successfully!';
+
+      // Reload header display
+      if (window.location.reload) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      }
+    } catch (error) {
+      console.error('Profile update error:', error);
+      messageDiv.style.display = 'block';
+      messageDiv.style.background = '#fee2e2';
+      messageDiv.style.color = '#991b1b';
+      messageDiv.textContent = '❌ Failed to update profile: ' + error.message;
+
+      btn.disabled = false;
+      btnText.style.display = 'inline';
+      spinner.style.display = 'none';
+    }
+  };
+
+  /**
+   * Handle password change
+   */
+  window.handlePasswordChange = async function (event) {
+    event.preventDefault();
+
+    const currentPassword = document.getElementById('current-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    const btn = document.getElementById('password-change-btn');
+    const btnText = document.getElementById('password-change-text');
+    const spinner = document.getElementById('password-change-spinner');
+    const messageDiv = document.getElementById('password-message');
+
+    // Validation
+    if (newPassword.length < 6) {
+      messageDiv.style.display = 'block';
+      messageDiv.style.background = '#fee2e2';
+      messageDiv.style.color = '#991b1b';
+      messageDiv.textContent = '❌ Password must be at least 6 characters';
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      messageDiv.style.display = 'block';
+      messageDiv.style.background = '#fee2e2';
+      messageDiv.style.color = '#991b1b';
+      messageDiv.textContent = '❌ Passwords do not match';
+      return;
+    }
+
+    // Show loading
+    btn.disabled = true;
+    btnText.style.display = 'none';
+    spinner.style.display = 'inline';
+    messageDiv.style.display = 'none';
+
+    try {
+      await window.authManager.updatePassword(currentPassword, newPassword);
+
+      // Show success
+      messageDiv.style.display = 'block';
+      messageDiv.style.background = '#d1fae5';
+      messageDiv.style.color = '#065f46';
+      messageDiv.textContent = '✅ Password updated successfully!';
+
+      // Clear form
+      document.getElementById('current-password').value = '';
+      document.getElementById('new-password').value = '';
+      document.getElementById('confirm-password').value = '';
+    } catch (error) {
+      console.error('Password change error:', error);
+
+      let errorMessage = 'Failed to update password';
+      if (error.message.includes('wrong-password')) {
+        errorMessage = 'Current password is incorrect';
+      } else if (error.message.includes('weak-password')) {
+        errorMessage = 'New password is too weak';
+      }
+
+      messageDiv.style.display = 'block';
+      messageDiv.style.background = '#fee2e2';
+      messageDiv.style.color = '#991b1b';
+      messageDiv.textContent = '❌ ' + errorMessage;
+    }
+
+    btn.disabled = false;
+    btnText.style.display = 'inline';
+    spinner.style.display = 'none';
+  };
+
+  /**
+   * Handle account deletion
+   */
+  window.handleAccountDeletion = async function () {
+    const user = window.authManager.currentUser;
+
+    if (
+      !confirm(
+        `⚠️ Are you absolutely sure you want to delete your account?\n\nThis will permanently delete:\n• Your profile\n• All your recipes\n• All your menus\n• All your data\n\nThis action CANNOT be undone.`
+      )
+    ) {
+      return;
+    }
+
+    if (!confirm('Type "DELETE" to confirm')) {
+      return;
+    }
+
+    const password = prompt('Enter your password to confirm deletion:');
+
+    if (!password) {
+      return;
+    }
+
+    try {
+      await window.authManager.deleteAccount(password);
+
+      alert(
+        'Your account has been deleted. You will be redirected to the login page.'
+      );
+      window.location.href = 'launch.html';
+    } catch (error) {
+      console.error('Account deletion error:', error);
+
+      let errorMessage = 'Failed to delete account';
+      if (error.message.includes('wrong-password')) {
+        errorMessage = 'Incorrect password';
+      }
+
+      alert('❌ ' + errorMessage);
+    }
+  };
+
+  console.log('✅ Profile Editor loaded');
+})();

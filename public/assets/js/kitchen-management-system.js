@@ -27,13 +27,17 @@ class KitchenManagementSystem {
   async init(userId, userEmail) {
     this.userId = userId;
     this.userEmail = userEmail;
-    
+
     console.log(`🔧 Kitchen Management System initialized for ${userEmail}`);
-    
+
     if (window.projectManager) {
-      this.currentProjectId = window.projectManager.currentProject?.id || window.projectManager.masterProjectId || 'master';
-      window.addEventListener('projectChanged', async (event) => {
-        this.currentProjectId = event.detail?.project?.id || this.currentProjectId;
+      this.currentProjectId =
+        window.projectManager.currentProject?.id ||
+        window.projectManager.masterProjectId ||
+        'master';
+      window.addEventListener('projectChanged', async event => {
+        this.currentProjectId =
+          event.detail?.project?.id || this.currentProjectId;
         await this.loadUserData();
       });
     }
@@ -56,21 +60,30 @@ class KitchenManagementSystem {
       }
 
       // Determine project ID and load menu data
-      const projectId = this.currentProjectId || window.projectManager?.currentProject?.id || window.projectManager?.masterProjectId || 'master';
+      const projectId =
+        this.currentProjectId ||
+        window.projectManager?.currentProject?.id ||
+        window.projectManager?.masterProjectId ||
+        'master';
       this.currentProjectId = projectId;
       const menuKey = `${window.enhancedMenuManager?.storageKey || 'menu_data'}_${projectId}`;
       const storedMenu = localStorage.getItem(menuKey);
       if (storedMenu) {
         this.currentMenuData = JSON.parse(storedMenu);
         this.currentMenu = this.currentMenuData?.menu || null;
-        this.currentMenuItems = Array.isArray(this.currentMenuData?.items) ? this.currentMenuData.items : [];
+        this.currentMenuItems = Array.isArray(this.currentMenuData?.items)
+          ? this.currentMenuData.items
+          : [];
       } else {
         // Fallback to legacy per-user menu storage
         const legacyKey = `menu_${this.userId}`;
         const legacyMenu = localStorage.getItem(legacyKey);
         if (legacyMenu) {
           const parsedLegacy = JSON.parse(legacyMenu);
-          this.currentMenuData = { menu: parsedLegacy, items: parsedLegacy?.items || [] };
+          this.currentMenuData = {
+            menu: parsedLegacy,
+            items: parsedLegacy?.items || []
+          };
           this.currentMenu = parsedLegacy;
           this.currentMenuItems = parsedLegacy?.items || [];
         } else {
@@ -82,34 +95,60 @@ class KitchenManagementSystem {
 
       if (window.firestoreSync?.fetchLatestMenuSnapshot) {
         try {
-          const remoteSnapshot = await window.firestoreSync.fetchLatestMenuSnapshot(projectId);
+          const remoteSnapshot =
+            await window.firestoreSync.fetchLatestMenuSnapshot(projectId);
           if (remoteSnapshot) {
-            const remoteUpdatedAt = Date.parse(remoteSnapshot.updatedAt || remoteSnapshot.syncedAt || 0);
-            const localUpdatedAt = Date.parse(this.currentMenu?.updatedAt || this.currentMenuData?.menu?.updatedAt || 0);
+            const remoteUpdatedAt = Date.parse(
+              remoteSnapshot.updatedAt || remoteSnapshot.syncedAt || 0
+            );
+            const localUpdatedAt = Date.parse(
+              this.currentMenu?.updatedAt ||
+                this.currentMenuData?.menu?.updatedAt ||
+                0
+            );
 
-            if (!this.currentMenuItems.length || (remoteUpdatedAt && remoteUpdatedAt > localUpdatedAt)) {
+            if (
+              !this.currentMenuItems.length ||
+              (remoteUpdatedAt && remoteUpdatedAt > localUpdatedAt)
+            ) {
               this.currentMenuData = {
                 menu: remoteSnapshot.menu || null,
-                items: Array.isArray(remoteSnapshot.items) ? remoteSnapshot.items : [],
+                items: Array.isArray(remoteSnapshot.items)
+                  ? remoteSnapshot.items
+                  : []
               };
               this.currentMenu = this.currentMenuData.menu;
               this.currentMenuItems = this.currentMenuData.items;
 
-              localStorage.setItem(menuKey, JSON.stringify(this.currentMenuData));
+              localStorage.setItem(
+                menuKey,
+                JSON.stringify(this.currentMenuData)
+              );
 
-              if (remoteSnapshot.links && window.menuRecipeIntegration?.storageKey) {
-                localStorage.setItem(window.menuRecipeIntegration.storageKey, JSON.stringify(remoteSnapshot.links));
+              if (
+                remoteSnapshot.links &&
+                window.menuRecipeIntegration?.storageKey
+              ) {
+                localStorage.setItem(
+                  window.menuRecipeIntegration.storageKey,
+                  JSON.stringify(remoteSnapshot.links)
+                );
               }
 
               console.log('☁️ Kitchen data hydrated from Firestore snapshot');
             }
           }
         } catch (error) {
-          console.warn('⚠️ Unable to hydrate kitchen data from Firestore:', error?.message || error);
+          console.warn(
+            '⚠️ Unable to hydrate kitchen data from Firestore:',
+            error?.message || error
+          );
         }
       }
- 
-      console.log(`📊 Loaded ${this.currentRecipes.length} recipes and ${this.currentMenuItems.length} menu items for project ${projectId}`);
+
+      console.log(
+        `📊 Loaded ${this.currentRecipes.length} recipes and ${this.currentMenuItems.length} menu items for project ${projectId}`
+      );
     } catch (error) {
       console.error('Error loading user data:', error);
     }
@@ -147,7 +186,7 @@ class KitchenManagementSystem {
    */
   generateBuildSheet(recipeId) {
     const recipe = this.currentRecipes.find(r => r.id === recipeId);
-    
+
     if (!recipe) {
       console.error('Recipe not found:', recipeId);
       return null;
@@ -159,7 +198,7 @@ class KitchenManagementSystem {
       version: recipe.version || '1.0',
       generatedDate: new Date().toISOString(),
       generatedBy: this.userEmail,
-      
+
       // Recipe Overview
       category: recipe.category,
       servings: recipe.servings || 1,
@@ -167,7 +206,7 @@ class KitchenManagementSystem {
       cookTime: recipe.cookTime,
       totalTime: (recipe.prepTime || 0) + (recipe.cookTime || 0),
       difficulty: recipe.difficulty,
-      
+
       // Components with par levels
       components: (recipe.components || []).map(comp => ({
         name: comp.name,
@@ -178,16 +217,16 @@ class KitchenManagementSystem {
         ingredients: comp.ingredients || [],
         instructions: comp.instructions || []
       })),
-      
+
       // Ingredients
       ingredients: recipe.ingredients || [],
-      
+
       // Instructions
       instructions: recipe.instructions || [],
-      
+
       // Plating
       plating: recipe.plating || [],
-      
+
       // Quality Standards
       qualityChecks: [
         'Check ingredient freshness',
@@ -197,10 +236,10 @@ class KitchenManagementSystem {
         'Verify plating consistency',
         'Check portion sizes'
       ],
-      
+
       // Equipment Needed
       equipment: recipe.equipmentNeeded || recipe.equipment || [],
-      
+
       // Allergens & Dietary
       allergens: recipe.allergens || [],
       dietary: recipe.dietary || []
@@ -217,14 +256,23 @@ class KitchenManagementSystem {
       date: date.toISOString().split('T')[0],
       generatedBy: this.userEmail,
       restaurant: this.currentMenu?.projectName || 'Restaurant',
-      
+
       sections: [
         {
           name: 'Equipment Check',
           items: [
-            { task: 'All cooking equipment functioning properly', checked: false },
-            { task: 'Refrigeration temperatures correct (33-40°F)', checked: false },
-            { task: 'Freezer temperatures correct (0°F or below)', checked: false },
+            {
+              task: 'All cooking equipment functioning properly',
+              checked: false
+            },
+            {
+              task: 'Refrigeration temperatures correct (33-40°F)',
+              checked: false
+            },
+            {
+              task: 'Freezer temperatures correct (0°F or below)',
+              checked: false
+            },
             { task: 'Ovens calibrated and preheated', checked: false },
             { task: 'All small equipment clean and ready', checked: false },
             { task: 'Fire suppression system checked', checked: false }
@@ -234,7 +282,10 @@ class KitchenManagementSystem {
           name: 'Ingredient Quality',
           items: [
             { task: 'All ingredients within shelf life', checked: false },
-            { task: 'Proper FIFO (First In, First Out) rotation', checked: false },
+            {
+              task: 'Proper FIFO (First In, First Out) rotation',
+              checked: false
+            },
             { task: 'All proteins at proper temperature', checked: false },
             { task: 'Fresh herbs and vegetables trimmed', checked: false },
             { task: 'All sauces and components prepared', checked: false },
@@ -254,13 +305,15 @@ class KitchenManagementSystem {
         },
         {
           name: 'Recipe Components',
-          items: this.currentRecipes.flatMap(recipe => 
-            (recipe.components || []).map(comp => ({
-              task: `${comp.name} - Par: ${comp.dailyPar || 'N/A'}`,
-              checked: false,
-              shelfLife: comp.shelfLife
-            }))
-          ).slice(0, 10) // Limit to top 10 for checklist
+          items: this.currentRecipes
+            .flatMap(recipe =>
+              (recipe.components || []).map(comp => ({
+                task: `${comp.name} - Par: ${comp.dailyPar || 'N/A'}`,
+                checked: false,
+                shelfLife: comp.shelfLife
+              }))
+            )
+            .slice(0, 10) // Limit to top 10 for checklist
         },
         {
           name: 'Safety & Sanitation',
@@ -278,7 +331,7 @@ class KitchenManagementSystem {
           items: [
             { task: 'All recipes reviewed by team', checked: false },
             { task: 'Daily specials communicated', checked: false },
-            { task: '86\'d items noted', checked: false },
+            { task: "86'd items noted", checked: false },
             { task: 'Timing and plating reviewed', checked: false },
             { task: 'Team briefing completed', checked: false },
             { task: 'Communication systems tested', checked: false }
@@ -302,7 +355,9 @@ class KitchenManagementSystem {
     }
 
     if (!window.menuPrepManager) {
-      console.warn('⚠️ MenuPrepManager not available, returning fallback list.');
+      console.warn(
+        '⚠️ MenuPrepManager not available, returning fallback list.'
+      );
       return {
         prepDate: serviceDate.toISOString().split('T')[0],
         generatedDate: new Date().toISOString(),
@@ -335,7 +390,7 @@ class KitchenManagementSystem {
     try {
       const userId = this.userId || this.getUserId();
       const prepListsKey = `prep_lists_${userId}`;
-      
+
       // Load existing prep lists
       let prepLists = [];
       const existing = localStorage.getItem(prepListsKey);
@@ -349,8 +404,8 @@ class KitchenManagementSystem {
       }
 
       // Check if prep list for this date already exists
-      const existingIndex = prepLists.findIndex(p => 
-        (p.prepDate || p.date) === (prepList.prepDate || prepList.date)
+      const existingIndex = prepLists.findIndex(
+        p => (p.prepDate || p.date) === (prepList.prepDate || prepList.date)
       );
 
       if (existingIndex >= 0) {
@@ -404,7 +459,9 @@ class KitchenManagementSystem {
     }
 
     if (!window.menuFOHManager) {
-      console.warn('⚠️ MenuFOHManager not available, returning fallback briefing.');
+      console.warn(
+        '⚠️ MenuFOHManager not available, returning fallback briefing.'
+      );
       return {
         serviceDate: briefingDate.toISOString().split('T')[0],
         generatedDate: new Date().toISOString(),
@@ -416,7 +473,12 @@ class KitchenManagementSystem {
         allergenSummary: {},
         dietarySummary: {},
         notes: ['FOH manager not available.'],
-        warnings: [{ type: 'missing-manager', message: 'Menu FOH manager script not loaded.' }]
+        warnings: [
+          {
+            type: 'missing-manager',
+            message: 'Menu FOH manager script not loaded.'
+          }
+        ]
       };
     }
 
@@ -451,7 +513,7 @@ class KitchenManagementSystem {
    */
   async exportKitchenDocuments() {
     console.log('📦 Exporting all kitchen documents...');
-    
+
     const documents = {
       recipeBook: await this.generateRecipeBookPDF(),
       buildSheets: this.currentRecipes.map(r => this.generateBuildSheet(r.id)),
@@ -494,7 +556,7 @@ class RecipeBookPDFGenerator {
         producer: 'Iterum Kitchen Management System',
         creationDate: new Date()
       },
-      
+
       coverPage: {
         title: menu?.name || 'Recipe Book',
         subtitle: menu?.description || 'Professional Recipe Collection',
@@ -502,21 +564,23 @@ class RecipeBookPDFGenerator {
         date: new Date().toLocaleDateString(),
         logo: '🍃 Iterum'
       },
-      
+
       tableOfContents: recipes.map((recipe, index) => ({
         title: recipe.title || recipe.name,
         category: recipe.category,
         pageNumber: index + 1
       })),
-      
-      recipes: recipes.map(recipe => this.formatRecipeForPDF(recipe, {
-        includeComponents,
-        includePhotos,
-        includeNutrition,
-        includeCosts,
-        format
-      })),
-      
+
+      recipes: recipes.map(recipe =>
+        this.formatRecipeForPDF(recipe, {
+          includeComponents,
+          includePhotos,
+          includeNutrition,
+          includeCosts,
+          format
+        })
+      ),
+
       appendix: {
         ingredientsIndex: this.generateIngredientsIndex(recipes),
         equipmentList: this.generateEquipmentList(recipes),
@@ -537,20 +601,20 @@ class RecipeBookPDFGenerator {
       cookTime: recipe.cookTime,
       totalTime: (recipe.prepTime || 0) + (recipe.cookTime || 0),
       difficulty: recipe.difficulty,
-      
+
       components: options.includeComponents ? recipe.components : undefined,
       ingredients: recipe.ingredients,
       instructions: recipe.instructions,
       plating: recipe.plating,
-      
+
       nutrition: options.includeNutrition ? recipe.nutrition : undefined,
       costs: options.includeCosts ? recipe.costs : undefined,
       photo: options.includePhotos ? recipe.photo : undefined,
-      
+
       allergens: recipe.allergens,
       dietary: recipe.dietary,
       equipment: recipe.equipment,
-      
+
       notes: recipe.notes,
       version: recipe.version,
       lastUpdated: recipe.updatedAt
@@ -559,7 +623,7 @@ class RecipeBookPDFGenerator {
 
   generateIngredientsIndex(recipes) {
     const ingredientMap = new Map();
-    
+
     recipes.forEach(recipe => {
       (recipe.ingredients || []).forEach(ing => {
         const name = ing.name || ing.ingredientName;
@@ -580,7 +644,7 @@ class RecipeBookPDFGenerator {
 
   generateEquipmentList(recipes) {
     const equipmentSet = new Set();
-    
+
     recipes.forEach(recipe => {
       (recipe.equipment || []).forEach(equip => {
         equipmentSet.add(equip.name || equip);
@@ -592,7 +656,7 @@ class RecipeBookPDFGenerator {
 
   generateAllergenMatrix(recipes) {
     const matrix = {};
-    
+
     recipes.forEach(recipe => {
       matrix[recipe.title || recipe.name] = recipe.allergens || [];
     });
@@ -626,16 +690,18 @@ class RecipeVersionTracker {
     };
 
     versions[recipeId].push(version);
-    
+
     // Keep only last 20 versions per recipe
     if (versions[recipeId].length > 20) {
       versions[recipeId] = versions[recipeId].slice(-20);
     }
 
     localStorage.setItem(this.storageKey, JSON.stringify(versions));
-    
-    console.log(`📝 Saved version ${version.versionNumber} of recipe ${recipe.title || recipe.name}`);
-    
+
+    console.log(
+      `📝 Saved version ${version.versionNumber} of recipe ${recipe.title || recipe.name}`
+    );
+
     return version;
   }
 
@@ -671,7 +737,7 @@ class RecipeVersionTracker {
 
   findDifferences(obj1, obj2) {
     const diffs = [];
-    
+
     Object.keys(obj1).forEach(key => {
       if (JSON.stringify(obj1[key]) !== JSON.stringify(obj2[key])) {
         diffs.push({
@@ -690,7 +756,7 @@ class RecipeVersionTracker {
 window.kitchenManagementSystem = new KitchenManagementSystem();
 
 // Auto-initialize when user authenticates
-window.addEventListener('userAuthenticated', (event) => {
+window.addEventListener('userAuthenticated', event => {
   if (event.detail && event.detail.userId) {
     window.kitchenManagementSystem.init(
       event.detail.userId,
@@ -700,4 +766,3 @@ window.addEventListener('userAuthenticated', (event) => {
 });
 
 console.log('🔧 Kitchen Management System loaded');
-

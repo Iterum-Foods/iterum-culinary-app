@@ -14,7 +14,9 @@
       this.bindEvents();
       this.ensureDate();
       this.renderAll();
-      document.addEventListener('projectChanged', (event) => this.handleProjectChanged(event));
+      document.addEventListener('projectChanged', event =>
+        this.handleProjectChanged(event)
+      );
     },
     cacheElements() {
       this.dateInput = document.getElementById('dashboard-date');
@@ -47,45 +49,47 @@
         });
       }
       if (this.saveNotesBtn) {
-        this.saveNotesBtn.addEventListener('click', (e) => {
+        this.saveNotesBtn.addEventListener('click', e => {
           e.preventDefault();
           this.saveNotes();
         });
       }
       if (this.clearNotesBtn) {
-        this.clearNotesBtn.addEventListener('click', (e) => {
+        this.clearNotesBtn.addEventListener('click', e => {
           e.preventDefault();
           this.notesContent.value = '';
         });
       }
       if (this.taskForm) {
-        this.taskForm.addEventListener('submit', (e) => {
+        this.taskForm.addEventListener('submit', e => {
           e.preventDefault();
           this.addTask();
         });
       }
       if (this.clearCompletedBtn) {
-        this.clearCompletedBtn.addEventListener('click', (e) => {
+        this.clearCompletedBtn.addEventListener('click', e => {
           e.preventDefault();
           this.clearCompletedTasks();
         });
       }
       if (this.resetTasksBtn) {
-        this.resetTasksBtn.addEventListener('click', (e) => {
+        this.resetTasksBtn.addEventListener('click', e => {
           e.preventDefault();
           this.resetTaskList();
         });
       }
       if (this.taskList) {
-        this.taskList.addEventListener('click', (e) => {
+        this.taskList.addEventListener('click', e => {
           const target = e.target;
           const taskId = target.dataset.taskId;
-          if (!taskId) return;
+          if (!taskId) {
+            return;
+          }
           if (target.dataset.action === 'delete') {
             this.deleteTask(taskId);
           }
         });
-        this.taskList.addEventListener('change', (e) => {
+        this.taskList.addEventListener('change', e => {
           const target = e.target;
           if (target.matches('input[type="checkbox"][data-task-id]')) {
             this.toggleTask(target.dataset.taskId, target.checked);
@@ -93,22 +97,24 @@
         });
       }
       if (this.ideaForm) {
-        this.ideaForm.addEventListener('submit', (e) => {
+        this.ideaForm.addEventListener('submit', e => {
           e.preventDefault();
           this.addIdea();
         });
       }
       if (this.clearIdeasBtn) {
-        this.clearIdeasBtn.addEventListener('click', (e) => {
+        this.clearIdeasBtn.addEventListener('click', e => {
           e.preventDefault();
           this.clearIdeas();
         });
       }
       if (this.ideaList) {
-        this.ideaList.addEventListener('click', (e) => {
+        this.ideaList.addEventListener('click', e => {
           const target = e.target;
           const ideaId = target.dataset.ideaId;
-          if (!ideaId) return;
+          if (!ideaId) {
+            return;
+          }
           if (target.dataset.action === 'delete') {
             this.deleteIdea(ideaId);
           } else if (target.dataset.action === 'toggle') {
@@ -121,12 +127,12 @@
       if (this.quickStatTasks) {
         const map = this.getTasksMap();
         const tasks = map[this.activeDate] || [];
-        const openTasks = tasks.filter((task) => !task.done).length;
+        const openTasks = tasks.filter(task => !task.done).length;
         this.quickStatTasks.textContent = openTasks;
       }
       if (this.quickStatIdeas) {
         const ideas = this.getIdeas();
-        const openIdeas = ideas.filter((idea) => idea.status !== 'done').length;
+        const openIdeas = ideas.filter(idea => idea.status !== 'done').length;
         this.quickStatIdeas.textContent = openIdeas;
       }
       if (this.quickStatNotes) {
@@ -140,19 +146,27 @@
           if (typeof window.projectManager.getActiveProject === 'function') {
             const project = window.projectManager.getActiveProject();
             if (project) {
-              this.projectId = project.id || project.projectId || this.projectId;
-              this.updateProjectChip(project.name || project.title || 'Active Project');
+              this.projectId =
+                project.id || project.projectId || this.projectId;
+              this.updateProjectChip(
+                project.name || project.title || 'Active Project'
+              );
               return;
             }
           }
           if (window.projectManager.currentProjectId) {
             this.projectId = window.projectManager.currentProjectId;
-            this.updateProjectChip(window.projectManager.currentProjectName || 'Active Project');
+            this.updateProjectChip(
+              window.projectManager.currentProjectName || 'Active Project'
+            );
             return;
           }
           if (window.projectManager.currentProject) {
-            this.projectId = window.projectManager.currentProject.id || this.projectId;
-            this.updateProjectChip(window.projectManager.currentProject.name || 'Active Project');
+            this.projectId =
+              window.projectManager.currentProject.id || this.projectId;
+            this.updateProjectChip(
+              window.projectManager.currentProject.name || 'Active Project'
+            );
             return;
           }
         }
@@ -201,7 +215,7 @@
       if (content) {
         map[this.activeDate] = {
           content,
-          updatedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         };
       } else {
         delete map[this.activeDate];
@@ -218,8 +232,15 @@
       if (totalDays === 0) {
         this.notesStatus.textContent = 'No saved notes yet';
       } else {
-        const lastUpdated = entry?.updatedAt ? new Date(entry.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—';
-        this.notesStatus.textContent = entry ? `Saved · ${lastUpdated}` : `${totalDays} day${totalDays === 1 ? '' : 's'} logged`;
+        const lastUpdated = entry?.updatedAt
+          ? new Date(entry.updatedAt).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          : '—';
+        this.notesStatus.textContent = entry
+          ? `Saved · ${lastUpdated}`
+          : `${totalDays} day${totalDays === 1 ? '' : 's'} logged`;
       }
       this.updateQuickStats();
     },
@@ -248,7 +269,7 @@
         id: this.generateId(),
         text,
         done: false,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date().toISOString()
       });
       map[this.activeDate] = tasks;
       this.setTasksMap(map);
@@ -259,7 +280,7 @@
     toggleTask(taskId, done) {
       const map = this.getTasksMap();
       const tasks = map[this.activeDate] || [];
-      const task = tasks.find((t) => t.id === taskId);
+      const task = tasks.find(t => t.id === taskId);
       if (task) {
         task.done = !!done;
         this.setTasksMap(map);
@@ -269,7 +290,7 @@
     deleteTask(taskId) {
       const map = this.getTasksMap();
       const tasks = map[this.activeDate] || [];
-      map[this.activeDate] = tasks.filter((t) => t.id !== taskId);
+      map[this.activeDate] = tasks.filter(t => t.id !== taskId);
       this.setTasksMap(map);
       this.renderTasks();
       this.setStatus(this.taskStatus, 'Task removed');
@@ -277,7 +298,7 @@
     clearCompletedTasks() {
       const map = this.getTasksMap();
       const tasks = map[this.activeDate] || [];
-      const remaining = tasks.filter((t) => !t.done);
+      const remaining = tasks.filter(t => !t.done);
       if (remaining.length === tasks.length) {
         this.setStatus(this.taskStatus, 'Nothing to clear');
         return;
@@ -299,21 +320,24 @@
       const tasks = map[this.activeDate] || [];
       this.taskList.innerHTML = '';
       if (tasks.length === 0) {
-        this.taskList.innerHTML = '<li class="text-sm text-center py-4" style="color: var(--brand-text-muted);">No tasks yet. Add the first one above.</li>';
+        this.taskList.innerHTML =
+          '<li class="text-sm text-center py-4" style="color: var(--brand-text-muted);">No tasks yet. Add the first one above.</li>';
         this.taskStatus.textContent = 'Nothing queued';
         this.updateQuickStats();
         return;
       }
-      const openCount = tasks.filter((t) => !t.done).length;
+      const openCount = tasks.filter(t => !t.done).length;
       this.taskStatus.textContent = `${openCount} open · ${tasks.length} total`;
       tasks
         .sort((a, b) => {
           if (a.done === b.done) {
-            return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+            return (
+              new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            );
           }
           return a.done ? 1 : -1;
         })
-        .forEach((task) => {
+        .forEach(task => {
           const item = document.createElement('li');
           item.className = 'task-item';
           item.innerHTML = `
@@ -351,7 +375,7 @@
         title: title || 'Untitled idea',
         notes,
         status: 'open',
-        createdAt: new Date().toISOString(),
+        createdAt: new Date().toISOString()
       });
       this.setIdeas(ideas);
       this.ideaTitle.value = '';
@@ -361,7 +385,7 @@
     },
     toggleIdeaStatus(ideaId) {
       const ideas = this.getIdeas();
-      const idea = ideas.find((item) => item.id === ideaId);
+      const idea = ideas.find(item => item.id === ideaId);
       if (idea) {
         idea.status = idea.status === 'done' ? 'open' : 'done';
         this.setIdeas(ideas);
@@ -369,7 +393,7 @@
       }
     },
     deleteIdea(ideaId) {
-      const ideas = this.getIdeas().filter((item) => item.id !== ideaId);
+      const ideas = this.getIdeas().filter(item => item.id !== ideaId);
       this.setIdeas(ideas);
       this.renderIdeas();
       this.setStatus(this.ideaStatus, 'Idea removed');
@@ -383,19 +407,24 @@
       const ideas = this.getIdeas();
       this.ideaList.innerHTML = '';
       if (ideas.length === 0) {
-        this.ideaList.innerHTML = '<div class="text-sm text-center py-4" style="color: var(--brand-text-muted);">No recipe ideas captured yet.</div>';
+        this.ideaList.innerHTML =
+          '<div class="text-sm text-center py-4" style="color: var(--brand-text-muted);">No recipe ideas captured yet.</div>';
         this.ideaStatus.textContent = 'No ideas yet';
         this.updateQuickStats();
         return;
       }
       this.ideaStatus.textContent = `${ideas.length} idea${ideas.length === 1 ? '' : 's'}`;
-      ideas.forEach((idea) => {
+      ideas.forEach(idea => {
         const card = document.createElement('div');
-        card.className = 'idea-item flex flex-col gap-2 p-3 rounded-md border mb-2';
+        card.className =
+          'idea-item flex flex-col gap-2 p-3 rounded-md border mb-2';
         card.style.borderColor = 'var(--brand-border-light)';
         card.style.backgroundColor = 'var(--brand-bg-primary)';
         const createdAt = new Date(idea.createdAt);
-        const prettyDate = createdAt.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+        const prettyDate = createdAt.toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric'
+        });
         card.innerHTML = `
           <div class="flex justify-between items-center text-xs" style="color: var(--brand-text-muted);">
             <span>${prettyDate}</span>
@@ -427,7 +456,9 @@
         const nextId = project?.id || project?.projectId || detail.projectId;
         if (nextId && nextId !== this.projectId) {
           this.projectId = nextId;
-          this.updateProjectChip(project?.name || project?.title || 'Active Project');
+          this.updateProjectChip(
+            project?.name || project?.title || 'Active Project'
+          );
           this.renderAll();
         }
       } catch (error) {
@@ -435,7 +466,9 @@
       }
     },
     setStatus(element, message) {
-      if (!element) return;
+      if (!element) {
+        return;
+      }
       element.textContent = message;
       element.style.transition = 'all 0.3s';
       element.style.opacity = '0.7';
@@ -455,7 +488,7 @@
     },
     generateId() {
       return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-    },
+    }
   };
 
   // Initialize when DOM is ready
@@ -470,4 +503,3 @@
   // Make Dashboard available globally for debugging
   window.Dashboard = Dashboard;
 })();
-

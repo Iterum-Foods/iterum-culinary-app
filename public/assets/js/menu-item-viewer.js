@@ -4,44 +4,46 @@
  */
 
 class MenuItemViewer {
-    constructor() {
-        console.log('🍽️ Menu Item Viewer initialized');
+  constructor() {
+    console.log('🍽️ Menu Item Viewer initialized');
+  }
+
+  viewMenuItem(menuId, itemIndex) {
+    console.log(`👁️ Viewing menu item: ${menuId}, index: ${itemIndex}`);
+
+    // Get menu
+    const menu = this.getMenu(menuId);
+    if (!menu) {
+      alert('Menu not found');
+      return;
     }
 
-    viewMenuItem(menuId, itemIndex) {
-        console.log(`👁️ Viewing menu item: ${menuId}, index: ${itemIndex}`);
-        
-        // Get menu
-        const menu = this.getMenu(menuId);
-        if (!menu) {
-            alert('Menu not found');
-            return;
-        }
-        
-        const item = menu.items[itemIndex];
-        if (!item) {
-            alert('Menu item not found');
-            return;
-        }
-        
-        this.showItemModal(item, menu, itemIndex);
+    const item = menu.items[itemIndex];
+    if (!item) {
+      alert('Menu item not found');
+      return;
     }
 
-    getMenu(menuId) {
-        const user = window.authManager?.currentUser;
-        if (!user) return null;
-        
-        const userId = user.userId || user.id;
-        const menuKey = `menus_${userId}`;
-        const menus = JSON.parse(localStorage.getItem(menuKey) || '[]');
-        
-        return menus.find(m => m.id === menuId);
+    this.showItemModal(item, menu, itemIndex);
+  }
+
+  getMenu(menuId) {
+    const user = window.authManager?.currentUser;
+    if (!user) {
+      return null;
     }
 
-    showItemModal(item, menu, itemIndex) {
-        // Create modal
-        const modal = document.createElement('div');
-        modal.style.cssText = `
+    const userId = user.userId || user.id;
+    const menuKey = `menus_${userId}`;
+    const menus = JSON.parse(localStorage.getItem(menuKey) || '[]');
+
+    return menus.find(m => m.id === menuId);
+  }
+
+  showItemModal(item, menu, itemIndex) {
+    // Create modal
+    const modal = document.createElement('div');
+    modal.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -57,68 +59,88 @@ class MenuItemViewer {
             animation: fadeIn 0.3s ease;
         `;
 
-        // Build ingredients list
-        const ingredientsHTML = item.ingredients && item.ingredients.length > 0
-            ? `
+    // Build ingredients list
+    const ingredientsHTML =
+      item.ingredients && item.ingredients.length > 0
+        ? `
                 <div style="padding: 25px; background: white; border-bottom: 2px solid #f1f5f9;">
                     <h3 style="font-size: 1.2rem; font-weight: 700; color: #1e293b; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px;">
                         <span>🥬</span> Ingredients <span style="background: #667eea; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700;">${item.ingredients.length}</span>
                     </h3>
                     <ul style="list-style: none; margin: 0; padding: 0;">
-                        ${item.ingredients.map(ing => {
-                            const ingredient = typeof ing === 'string' ? ing : ing.name || ing.ingredient;
-                            const quantity = typeof ing === 'object' ? `${ing.quantity || ''} ${ing.unit || ''}` : '';
+                        ${item.ingredients
+                          .map(ing => {
+                            const ingredient =
+                              typeof ing === 'string'
+                                ? ing
+                                : ing.name || ing.ingredient;
+                            const quantity =
+                              typeof ing === 'object'
+                                ? `${ing.quantity || ''} ${ing.unit || ''}`
+                                : '';
                             return `
                                 <li style="padding: 10px 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
                                     <span style="font-weight: 500; color: #1e293b;">${ingredient}</span>
                                     ${quantity ? `<span style="color: #64748b; font-size: 0.9rem;">${quantity}</span>` : ''}
                                 </li>
                             `;
-                        }).join('')}
+                          })
+                          .join('')}
                     </ul>
                 </div>
             `
-            : '';
+        : '';
 
-        // Build allergens
-        const allergensHTML = item.allergens && item.allergens.length > 0
-            ? `
+    // Build allergens
+    const allergensHTML =
+      item.allergens && item.allergens.length > 0
+        ? `
                 <div style="padding: 20px 25px; background: #fef3c7; border-bottom: 2px solid #fbbf24;">
                     <h3 style="font-size: 1.1rem; font-weight: 700; color: #92400e; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
                         <span>⚠️</span> Allergen Information
                     </h3>
                     <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        ${item.allergens.map(allergen => `
+                        ${item.allergens
+                          .map(
+                            allergen => `
                             <span style="display: inline-block; background: #fee2e2; color: #991b1b; padding: 6px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600;">
                                 ${allergen}
                             </span>
-                        `).join('')}
+                        `
+                          )
+                          .join('')}
                     </div>
                 </div>
             `
-            : '';
+        : '';
 
-        // Build dietary info
-        const dietaryHTML = item.dietary && item.dietary.length > 0
-            ? `
+    // Build dietary info
+    const dietaryHTML =
+      item.dietary && item.dietary.length > 0
+        ? `
                 <div style="padding: 20px 25px; background: #dcfce7; border-bottom: 2px solid #10b981;">
                     <h3 style="font-size: 1.1rem; font-weight: 700; color: #15803d; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
                         <span>🌱</span> Dietary Information
                     </h3>
                     <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        ${item.dietary.map(diet => `
+                        ${item.dietary
+                          .map(
+                            diet => `
                             <span style="display: inline-block; background: #d1fae5; color: #065f46; padding: 6px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600;">
                                 ${diet}
                             </span>
-                        `).join('')}
+                        `
+                          )
+                          .join('')}
                     </div>
                 </div>
             `
-            : '';
+        : '';
 
-        // Build prep instructions
-        const prepHTML = item.prepInstructions || item.preparation
-            ? `
+    // Build prep instructions
+    const prepHTML =
+      item.prepInstructions || item.preparation
+        ? `
                 <div style="padding: 25px; background: #f8fafc; border-bottom: 2px solid #f1f5f9;">
                     <h3 style="font-size: 1.2rem; font-weight: 700; color: #1e293b; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
                         <span>👨‍🍳</span> Preparation
@@ -126,11 +148,11 @@ class MenuItemViewer {
                     <p style="color: #1e293b; line-height: 1.8; margin: 0; white-space: pre-wrap;">${item.prepInstructions || item.preparation}</p>
                 </div>
             `
-            : '';
+        : '';
 
-        // Build plating
-        const platingHTML = item.plating
-            ? `
+    // Build plating
+    const platingHTML = item.plating
+      ? `
                 <div style="padding: 25px; background: white; border-bottom: 2px solid #f1f5f9;">
                     <h3 style="font-size: 1.2rem; font-weight: 700; color: #1e293b; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
                         <span>🎨</span> Plating & Presentation
@@ -138,9 +160,9 @@ class MenuItemViewer {
                     <p style="color: #1e293b; line-height: 1.8; margin: 0; white-space: pre-wrap;">${item.plating}</p>
                 </div>
             `
-            : '';
+      : '';
 
-        modal.innerHTML = `
+    modal.innerHTML = `
             <div style="background: white; border-radius: 20px; max-width: 900px; width: 100%; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 30px 90px rgba(0,0,0,0.5);">
                 
                 <!-- Header -->
@@ -156,11 +178,15 @@ class MenuItemViewer {
                         <span style="display: inline-block; background: rgba(255,255,255,0.25); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">
                             💰 $${item.price?.toFixed(2) || '0.00'}
                         </span>
-                        ${item.cost ? `
+                        ${
+                          item.cost
+                            ? `
                             <span style="display: inline-block; background: rgba(255,255,255,0.25); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">
                                 📊 Cost: $${item.cost.toFixed(2)}
                             </span>
-                        ` : ''}
+                        `
+                            : ''
+                        }
                     </div>
                 </div>
 
@@ -168,11 +194,15 @@ class MenuItemViewer {
                 <div style="overflow-y: auto; flex: 1;">
                     
                     <!-- Description -->
-                    ${item.description ? `
+                    ${
+                      item.description
+                        ? `
                         <div style="padding: 25px; background: #f8fafc; border-bottom: 2px solid #f1f5f9;">
                             <p style="color: #1e293b; line-height: 1.8; font-size: 1.05rem; margin: 0; font-style: italic;">${item.description}</p>
                         </div>
-                    ` : ''}
+                    `
+                        : ''
+                    }
 
                     <!-- Allergens -->
                     ${allergensHTML}
@@ -190,14 +220,18 @@ class MenuItemViewer {
                     ${platingHTML}
 
                     <!-- Chef's Notes -->
-                    ${item.notes ? `
+                    ${
+                      item.notes
+                        ? `
                         <div style="padding: 25px; background: #fef3c7; border-bottom: 2px solid #f1f5f9;">
                             <h3 style="font-size: 1.2rem; font-weight: 700; color: #92400e; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
                                 <span>💡</span> Chef's Notes
                             </h3>
                             <p style="color: #78350f; line-height: 1.8; margin: 0; white-space: pre-wrap;">${item.notes}</p>
                         </div>
-                    ` : ''}
+                    `
+                        : ''
+                    }
 
                 </div>
 
@@ -219,48 +253,52 @@ class MenuItemViewer {
             </div>
         `;
 
-        // Add animation CSS
-        const style = document.createElement('style');
-        style.textContent = `
+    // Add animation CSS
+    const style = document.createElement('style');
+    style.textContent = `
             @keyframes fadeIn {
                 from { opacity: 0; }
                 to { opacity: 1; }
             }
         `;
-        document.head.appendChild(style);
+    document.head.appendChild(style);
 
-        modal.onclick = (e) => {
-            if (e.target === modal) modal.remove();
-        };
+    modal.onclick = e => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    };
 
-        document.body.appendChild(modal);
+    document.body.appendChild(modal);
+  }
+
+  editMenuItem(menuId, itemIndex) {
+    console.log(`✏️ Editing menu item: ${menuId}, index: ${itemIndex}`);
+
+    const menu = this.getMenu(menuId);
+    if (!menu) {
+      alert('Menu not found');
+      return;
     }
 
-    editMenuItem(menuId, itemIndex) {
-        console.log(`✏️ Editing menu item: ${menuId}, index: ${itemIndex}`);
-        
-        const menu = this.getMenu(menuId);
-        if (!menu) {
-            alert('Menu not found');
-            return;
-        }
-        
-        const item = menu.items[itemIndex];
-        if (!item) {
-            alert('Menu item not found');
-            return;
-        }
-
-        // Close any open modals
-        document.querySelectorAll('div[style*="position: fixed"]').forEach(el => el.remove());
-
-        // Show edit modal
-        this.showEditModal(item, menu, itemIndex);
+    const item = menu.items[itemIndex];
+    if (!item) {
+      alert('Menu item not found');
+      return;
     }
 
-    showEditModal(item, menu, itemIndex) {
-        const modal = document.createElement('div');
-        modal.style.cssText = `
+    // Close any open modals
+    document
+      .querySelectorAll('div[style*="position: fixed"]')
+      .forEach(el => el.remove());
+
+    // Show edit modal
+    this.showEditModal(item, menu, itemIndex);
+  }
+
+  showEditModal(item, menu, itemIndex) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -275,7 +313,7 @@ class MenuItemViewer {
             backdrop-filter: blur(5px);
         `;
 
-        modal.innerHTML = `
+    modal.innerHTML = `
             <div style="background: white; border-radius: 20px; max-width: 700px; width: 100%; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 30px 90px rgba(0,0,0,0.5);">
                 
                 <!-- Header -->
@@ -340,163 +378,194 @@ class MenuItemViewer {
             </div>
         `;
 
-        modal.onclick = (e) => {
-            if (e.target === modal) modal.remove();
-        };
+    modal.onclick = e => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    };
 
-        document.body.appendChild(modal);
+    document.body.appendChild(modal);
+  }
+
+  ingredientsToText(ingredients) {
+    if (!ingredients || !Array.isArray(ingredients)) {
+      return '';
     }
 
-    ingredientsToText(ingredients) {
-        if (!ingredients || !Array.isArray(ingredients)) return '';
-        
-        return ingredients.map(ing => {
-            if (typeof ing === 'string') return ing;
-            const name = ing.name || ing.ingredient || '';
-            const quantity = ing.quantity ? `${ing.quantity} ${ing.unit || ''}`.trim() : '';
-            return quantity ? `${name} - ${quantity}` : name;
-        }).join('\n');
+    return ingredients
+      .map(ing => {
+        if (typeof ing === 'string') {
+          return ing;
+        }
+        const name = ing.name || ing.ingredient || '';
+        const quantity = ing.quantity
+          ? `${ing.quantity} ${ing.unit || ''}`.trim()
+          : '';
+        return quantity ? `${name} - ${quantity}` : name;
+      })
+      .join('\n');
+  }
+
+  textToIngredients(text) {
+    if (!text) {
+      return [];
     }
 
-    textToIngredients(text) {
-        if (!text) return [];
-        
-        return text.split('\n')
-            .map(line => line.trim())
-            .filter(line => line)
-            .map(line => {
-                // Try to parse "ingredient - quantity unit" format
-                const parts = line.split('-').map(p => p.trim());
-                if (parts.length === 2) {
-                    const quantityParts = parts[1].split(/\s+/);
-                    return {
-                        name: parts[0],
-                        quantity: quantityParts[0] || '',
-                        unit: quantityParts.slice(1).join(' ') || ''
-                    };
-                }
-                return { name: line };
-            });
+    return text
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line)
+      .map(line => {
+        // Try to parse "ingredient - quantity unit" format
+        const parts = line.split('-').map(p => p.trim());
+        if (parts.length === 2) {
+          const quantityParts = parts[1].split(/\s+/);
+          return {
+            name: parts[0],
+            quantity: quantityParts[0] || '',
+            unit: quantityParts.slice(1).join(' ') || ''
+          };
+        }
+        return { name: line };
+      });
+  }
+
+  saveMenuItem(menuId, itemIndex) {
+    console.log(`💾 Saving menu item: ${menuId}, index: ${itemIndex}`);
+
+    const user = window.authManager?.currentUser;
+    if (!user) {
+      alert('Please sign in first');
+      return;
     }
 
-    saveMenuItem(menuId, itemIndex) {
-        console.log(`💾 Saving menu item: ${menuId}, index: ${itemIndex}`);
-        
-        const user = window.authManager?.currentUser;
-        if (!user) {
-            alert('Please sign in first');
-            return;
-        }
-        
-        const userId = user.userId || user.id;
-        const menuKey = `menus_${userId}`;
-        const menus = JSON.parse(localStorage.getItem(menuKey) || '[]');
-        const menu = menus.find(m => m.id === menuId);
-        
-        if (!menu || !menu.items[itemIndex]) {
-            alert('Menu item not found');
-            return;
-        }
+    const userId = user.userId || user.id;
+    const menuKey = `menus_${userId}`;
+    const menus = JSON.parse(localStorage.getItem(menuKey) || '[]');
+    const menu = menus.find(m => m.id === menuId);
 
-        // Get form values
-        const name = document.getElementById('edit-name').value.trim();
-        const category = document.getElementById('edit-category').value.trim();
-        const price = parseFloat(document.getElementById('edit-price').value) || 0;
-        const description = document.getElementById('edit-description').value.trim();
-        const ingredientsText = document.getElementById('edit-ingredients').value;
-        const allergensText = document.getElementById('edit-allergens').value;
-
-        if (!name) {
-            alert('Please enter a dish name');
-            return;
-        }
-
-        // Update item
-        menu.items[itemIndex] = {
-            ...menu.items[itemIndex],
-            name,
-            category,
-            price,
-            description,
-            ingredients: this.textToIngredients(ingredientsText),
-            allergens: allergensText.split(',').map(a => a.trim()).filter(a => a),
-            lastModified: new Date().toISOString()
-        };
-
-        // Save menu
-        localStorage.setItem(menuKey, JSON.stringify(menus));
-        
-        // Close modal
-        document.querySelectorAll('div[style*="position: fixed"]').forEach(el => el.remove());
-        
-        // Refresh display
-        if (typeof displayMenuItems === 'function') {
-            displayMenuItems(menu);
-        }
-        
-        // Show success
-        this.showToast('✅ Menu item updated!');
+    if (!menu || !menu.items[itemIndex]) {
+      alert('Menu item not found');
+      return;
     }
 
-    duplicateMenuItem(menuId, itemIndex) {
-        console.log(`📋 Duplicating menu item: ${menuId}, index: ${itemIndex}`);
-        
-        const user = window.authManager?.currentUser;
-        if (!user) return;
-        
-        const userId = user.userId || user.id;
-        const menuKey = `menus_${userId}`;
-        const menus = JSON.parse(localStorage.getItem(menuKey) || '[]');
-        const menu = menus.find(m => m.id === menuId);
-        
-        if (!menu || !menu.items[itemIndex]) {
-            alert('Menu item not found');
-            return;
-        }
+    // Get form values
+    const name = document.getElementById('edit-name').value.trim();
+    const category = document.getElementById('edit-category').value.trim();
+    const price = parseFloat(document.getElementById('edit-price').value) || 0;
+    const description = document
+      .getElementById('edit-description')
+      .value.trim();
+    const ingredientsText = document.getElementById('edit-ingredients').value;
+    const allergensText = document.getElementById('edit-allergens').value;
 
-        const item = menu.items[itemIndex];
-        const duplicate = {
-            ...item,
-            name: `${item.name} (Copy)`,
-            id: `item_${Date.now()}`,
-            createdAt: new Date().toISOString()
-        };
-
-        menu.items.push(duplicate);
-        localStorage.setItem(menuKey, JSON.stringify(menus));
-
-        // Close modal and refresh
-        document.querySelectorAll('div[style*="position: fixed"]').forEach(el => el.remove());
-        
-        if (typeof displayMenuItems === 'function') {
-            displayMenuItems(menu);
-        }
-
-        this.showToast('✅ Menu item duplicated!');
+    if (!name) {
+      alert('Please enter a dish name');
+      return;
     }
 
-    printMenuItem(menuId, itemIndex) {
-        console.log(`🖨️ Printing menu item: ${menuId}, index: ${itemIndex}`);
-        
-        const menu = this.getMenu(menuId);
-        if (!menu || !menu.items[itemIndex]) {
-            alert('Menu item not found');
-            return;
-        }
+    // Update item
+    menu.items[itemIndex] = {
+      ...menu.items[itemIndex],
+      name,
+      category,
+      price,
+      description,
+      ingredients: this.textToIngredients(ingredientsText),
+      allergens: allergensText
+        .split(',')
+        .map(a => a.trim())
+        .filter(a => a),
+      lastModified: new Date().toISOString()
+    };
 
-        const item = menu.items[itemIndex];
-        
-        const printWindow = window.open('', '_blank');
-        
-        const ingredientsHTML = item.ingredients && item.ingredients.length > 0
-            ? item.ingredients.map(ing => {
-                const name = typeof ing === 'string' ? ing : ing.name || ing.ingredient;
-                const quantity = typeof ing === 'object' ? `${ing.quantity || ''} ${ing.unit || ''}`.trim() : '';
-                return `<li>${name}${quantity ? ` - ${quantity}` : ''}</li>`;
-            }).join('')
-            : '<li>No ingredients listed</li>';
-        
-        printWindow.document.write(`
+    // Save menu
+    localStorage.setItem(menuKey, JSON.stringify(menus));
+
+    // Close modal
+    document
+      .querySelectorAll('div[style*="position: fixed"]')
+      .forEach(el => el.remove());
+
+    // Refresh display
+    if (typeof displayMenuItems === 'function') {
+      displayMenuItems(menu);
+    }
+
+    // Show success
+    this.showToast('✅ Menu item updated!');
+  }
+
+  duplicateMenuItem(menuId, itemIndex) {
+    console.log(`📋 Duplicating menu item: ${menuId}, index: ${itemIndex}`);
+
+    const user = window.authManager?.currentUser;
+    if (!user) {
+      return;
+    }
+
+    const userId = user.userId || user.id;
+    const menuKey = `menus_${userId}`;
+    const menus = JSON.parse(localStorage.getItem(menuKey) || '[]');
+    const menu = menus.find(m => m.id === menuId);
+
+    if (!menu || !menu.items[itemIndex]) {
+      alert('Menu item not found');
+      return;
+    }
+
+    const item = menu.items[itemIndex];
+    const duplicate = {
+      ...item,
+      name: `${item.name} (Copy)`,
+      id: `item_${Date.now()}`,
+      createdAt: new Date().toISOString()
+    };
+
+    menu.items.push(duplicate);
+    localStorage.setItem(menuKey, JSON.stringify(menus));
+
+    // Close modal and refresh
+    document
+      .querySelectorAll('div[style*="position: fixed"]')
+      .forEach(el => el.remove());
+
+    if (typeof displayMenuItems === 'function') {
+      displayMenuItems(menu);
+    }
+
+    this.showToast('✅ Menu item duplicated!');
+  }
+
+  printMenuItem(menuId, itemIndex) {
+    console.log(`🖨️ Printing menu item: ${menuId}, index: ${itemIndex}`);
+
+    const menu = this.getMenu(menuId);
+    if (!menu || !menu.items[itemIndex]) {
+      alert('Menu item not found');
+      return;
+    }
+
+    const item = menu.items[itemIndex];
+
+    const printWindow = window.open('', '_blank');
+
+    const ingredientsHTML =
+      item.ingredients && item.ingredients.length > 0
+        ? item.ingredients
+            .map(ing => {
+              const name =
+                typeof ing === 'string' ? ing : ing.name || ing.ingredient;
+              const quantity =
+                typeof ing === 'object'
+                  ? `${ing.quantity || ''} ${ing.unit || ''}`.trim()
+                  : '';
+              return `<li>${name}${quantity ? ` - ${quantity}` : ''}</li>`;
+            })
+            .join('')
+        : '<li>No ingredients listed</li>';
+
+    printWindow.document.write(`
             <!DOCTYPE html>
             <html>
             <head>
@@ -535,37 +604,57 @@ class MenuItemViewer {
                         <div class="meta-label">Price</div>
                         <div class="meta-value">$${item.price?.toFixed(2) || '0.00'}</div>
                     </div>
-                    ${item.cost ? `
+                    ${
+                      item.cost
+                        ? `
                         <div class="meta-item">
                             <div class="meta-label">Cost</div>
                             <div class="meta-value">$${item.cost.toFixed(2)}</div>
                         </div>
-                    ` : ''}
+                    `
+                        : ''
+                    }
                 </div>
                 
-                ${item.allergens && item.allergens.length > 0 ? `
+                ${
+                  item.allergens && item.allergens.length > 0
+                    ? `
                     <div class="allergens">
                         <strong>⚠️ Contains Allergens:</strong> ${item.allergens.join(', ')}
                     </div>
-                ` : ''}
+                `
+                    : ''
+                }
                 
                 <h2>🥬 Ingredients</h2>
                 <ul>${ingredientsHTML}</ul>
                 
-                ${item.prepInstructions || item.preparation ? `
+                ${
+                  item.prepInstructions || item.preparation
+                    ? `
                     <h2>👨‍🍳 Preparation</h2>
                     <p style="line-height: 1.8; white-space: pre-wrap;">${item.prepInstructions || item.preparation}</p>
-                ` : ''}
+                `
+                    : ''
+                }
                 
-                ${item.plating ? `
+                ${
+                  item.plating
+                    ? `
                     <h2>🎨 Plating</h2>
                     <p style="line-height: 1.8; white-space: pre-wrap;">${item.plating}</p>
-                ` : ''}
+                `
+                    : ''
+                }
                 
-                ${item.notes ? `
+                ${
+                  item.notes
+                    ? `
                     <h2>💡 Chef's Notes</h2>
                     <p style="font-style: italic; background: #fef3c7; padding: 15px; border-radius: 8px; line-height: 1.8;">${item.notes}</p>
-                ` : ''}
+                `
+                    : ''
+                }
                 
                 <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #94a3b8; font-size: 0.9rem;">
                     ${menu.name} | Printed from Iterum Culinary App | ${new Date().toLocaleDateString()}
@@ -573,14 +662,14 @@ class MenuItemViewer {
             </body>
             </html>
         `);
-        
-        printWindow.document.close();
-        setTimeout(() => printWindow.print(), 500);
-    }
 
-    showToast(message) {
-        const toast = document.createElement('div');
-        toast.style.cssText = `
+    printWindow.document.close();
+    setTimeout(() => printWindow.print(), 500);
+  }
+
+  showToast(message) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
             position: fixed;
             top: 100px;
             left: 50%;
@@ -594,22 +683,24 @@ class MenuItemViewer {
             z-index: 999999;
             animation: slideDown 0.3s ease;
         `;
-        toast.textContent = message;
-        
-        document.body.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.style.animation = 'slideUp 0.3s ease';
-            setTimeout(() => toast.remove(), 300);
-        }, 2000);
-    }
+    toast.textContent = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.animation = 'slideUp 0.3s ease';
+      setTimeout(() => toast.remove(), 300);
+    }, 2000);
+  }
 }
 
 // Initialize global instance
 window.menuItemViewer = new MenuItemViewer();
 
 // Make functions globally available
-window.viewMenuItem = (menuId, itemIndex) => window.menuItemViewer.viewMenuItem(menuId, itemIndex);
-window.editMenuItem = (menuId, itemIndex) => window.menuItemViewer.editMenuItem(menuId, itemIndex);
-window.duplicateMenuItem = (menuId, itemIndex) => window.menuItemViewer.duplicateMenuItem(menuId, itemIndex);
-
+window.viewMenuItem = (menuId, itemIndex) =>
+  window.menuItemViewer.viewMenuItem(menuId, itemIndex);
+window.editMenuItem = (menuId, itemIndex) =>
+  window.menuItemViewer.editMenuItem(menuId, itemIndex);
+window.duplicateMenuItem = (menuId, itemIndex) =>
+  window.menuItemViewer.duplicateMenuItem(menuId, itemIndex);

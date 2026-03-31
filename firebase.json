@@ -10,9 +10,9 @@
     "public": "public",
     "ignore": [
       "firebase.json",
-      "**/.*",
-      "!**/.nojekyll",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/.firebase/**"
     ],
     "rewrites": [
       {

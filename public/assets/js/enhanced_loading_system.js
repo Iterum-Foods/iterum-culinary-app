@@ -4,18 +4,18 @@
  */
 
 class LoadingSystem {
-    constructor() {
-        this.loadingStates = new Map();
-        this.progressBars = new Map();
-        this.skeletonTemplates = this.createSkeletonTemplates();
-    }
+  constructor() {
+    this.loadingStates = new Map();
+    this.progressBars = new Map();
+    this.skeletonTemplates = this.createSkeletonTemplates();
+  }
 
-    /**
-     * Create skeleton screen templates for different content types
-     */
-    createSkeletonTemplates() {
-        return {
-            recipe: `
+  /**
+   * Create skeleton screen templates for different content types
+   */
+  createSkeletonTemplates() {
+    return {
+      recipe: `
                 <div class="skeleton-recipe">
                     <div class="skeleton-header">
                         <div class="skeleton-title"></div>
@@ -40,9 +40,12 @@ class LoadingSystem {
                     </div>
                 </div>
             `,
-            recipeList: `
+      recipeList: `
                 <div class="skeleton-recipe-list">
-                    ${Array(6).fill().map(() => `
+                    ${Array(6)
+                      .fill()
+                      .map(
+                        () => `
                         <div class="skeleton-recipe-card">
                             <div class="skeleton-image"></div>
                             <div class="skeleton-content">
@@ -51,10 +54,12 @@ class LoadingSystem {
                                 <div class="skeleton-line short"></div>
                             </div>
                         </div>
-                    `).join('')}
+                    `
+                      )
+                      .join('')}
                 </div>
             `,
-            ingredient: `
+      ingredient: `
                 <div class="skeleton-ingredient">
                     <div class="skeleton-header">
                         <div class="skeleton-title"></div>
@@ -66,7 +71,7 @@ class LoadingSystem {
                     </div>
                 </div>
             `,
-            equipment: `
+      equipment: `
                 <div class="skeleton-equipment">
                     <div class="skeleton-header">
                         <div class="skeleton-title"></div>
@@ -79,7 +84,7 @@ class LoadingSystem {
                     </div>
                 </div>
             `,
-            dashboard: `
+      dashboard: `
                 <div class="skeleton-dashboard">
                     <div class="skeleton-stats">
                         <div class="skeleton-stat">
@@ -115,136 +120,152 @@ class LoadingSystem {
                     </div>
                 </div>
             `
-        };
+    };
+  }
+
+  /**
+   * Show loading state for an element
+   */
+  showLoading(element, type = 'recipe', message = 'Loading...') {
+    if (!element) {
+      return;
     }
 
-    /**
-     * Show loading state for an element
-     */
-    showLoading(element, type = 'recipe', message = 'Loading...') {
-        if (!element) return;
+    const loadingId = this.generateLoadingId();
+    this.loadingStates.set(loadingId, {
+      element,
+      originalContent: element.innerHTML
+    });
 
-        const loadingId = this.generateLoadingId();
-        this.loadingStates.set(loadingId, { element, originalContent: element.innerHTML });
+    // Add loading overlay
+    const overlay = this.createLoadingOverlay(message);
+    element.appendChild(overlay);
 
-        // Add loading overlay
-        const overlay = this.createLoadingOverlay(message);
-        element.appendChild(overlay);
+    // Show skeleton content
+    const skeleton = this.createSkeleton(type);
+    element.appendChild(skeleton);
 
-        // Show skeleton content
-        const skeleton = this.createSkeleton(type);
-        element.appendChild(skeleton);
+    // Add loading styles
+    element.classList.add('loading');
+    element.style.position = 'relative';
 
-        // Add loading styles
-        element.classList.add('loading');
-        element.style.position = 'relative';
+    return loadingId;
+  }
 
-        return loadingId;
+  /**
+   * Hide loading state and show content
+   */
+  hideLoading(loadingId, content = null) {
+    const loadingState = this.loadingStates.get(loadingId);
+    if (!loadingState) {
+      return;
     }
 
-    /**
-     * Hide loading state and show content
-     */
-    hideLoading(loadingId, content = null) {
-        const loadingState = this.loadingStates.get(loadingId);
-        if (!loadingState) return;
+    const { element } = loadingState;
 
-        const { element } = loadingState;
-
-        // Remove loading overlay and skeleton
-        const overlay = element.querySelector('.loading-overlay');
-        const skeleton = element.querySelector('.skeleton-content');
-        if (overlay) overlay.remove();
-        if (skeleton) skeleton.remove();
-
-        // Remove loading class
-        element.classList.remove('loading');
-
-        // Show content with fade-in animation
-        if (content) {
-            element.innerHTML = content;
-            this.fadeIn(element);
-        } else {
-            // Restore original content
-            element.innerHTML = loadingState.originalContent;
-            this.fadeIn(element);
-        }
-
-        this.loadingStates.delete(loadingId);
+    // Remove loading overlay and skeleton
+    const overlay = element.querySelector('.loading-overlay');
+    const skeleton = element.querySelector('.skeleton-content');
+    if (overlay) {
+      overlay.remove();
+    }
+    if (skeleton) {
+      skeleton.remove();
     }
 
-    /**
-     * Create loading overlay with message
-     */
-    createLoadingOverlay(message) {
-        const overlay = document.createElement('div');
-        overlay.className = 'loading-overlay';
-        overlay.innerHTML = `
+    // Remove loading class
+    element.classList.remove('loading');
+
+    // Show content with fade-in animation
+    if (content) {
+      element.innerHTML = content;
+      this.fadeIn(element);
+    } else {
+      // Restore original content
+      element.innerHTML = loadingState.originalContent;
+      this.fadeIn(element);
+    }
+
+    this.loadingStates.delete(loadingId);
+  }
+
+  /**
+   * Create loading overlay with message
+   */
+  createLoadingOverlay(message) {
+    const overlay = document.createElement('div');
+    overlay.className = 'loading-overlay';
+    overlay.innerHTML = `
             <div class="loading-spinner">
                 <div class="spinner"></div>
                 <div class="loading-message">${message}</div>
             </div>
         `;
-        return overlay;
+    return overlay;
+  }
+
+  /**
+   * Create skeleton content
+   */
+  createSkeleton(type) {
+    const skeleton = document.createElement('div');
+    skeleton.className = 'skeleton-content';
+    skeleton.innerHTML =
+      this.skeletonTemplates[type] || this.skeletonTemplates.recipe;
+    return skeleton;
+  }
+
+  /**
+   * Show progress bar for long operations
+   */
+  showProgress(container, operation = 'Processing') {
+    const progressId = this.generateLoadingId();
+    const progressBar = this.createProgressBar(operation);
+    container.appendChild(progressBar);
+    this.progressBars.set(progressId, { container, progressBar });
+    return progressId;
+  }
+
+  /**
+   * Update progress bar
+   */
+  updateProgress(progressId, percentage, message = null) {
+    const progressState = this.progressBars.get(progressId);
+    if (!progressState) {
+      return;
     }
 
-    /**
-     * Create skeleton content
-     */
-    createSkeleton(type) {
-        const skeleton = document.createElement('div');
-        skeleton.className = 'skeleton-content';
-        skeleton.innerHTML = this.skeletonTemplates[type] || this.skeletonTemplates.recipe;
-        return skeleton;
+    const { progressBar } = progressState;
+    const bar = progressBar.querySelector('.progress-fill');
+    const messageEl = progressBar.querySelector('.progress-message');
+
+    bar.style.width = `${percentage}%`;
+    if (message && messageEl) {
+      messageEl.textContent = message;
+    }
+  }
+
+  /**
+   * Hide progress bar
+   */
+  hideProgress(progressId) {
+    const progressState = this.progressBars.get(progressId);
+    if (!progressState) {
+      return;
     }
 
-    /**
-     * Show progress bar for long operations
-     */
-    showProgress(container, operation = 'Processing') {
-        const progressId = this.generateLoadingId();
-        const progressBar = this.createProgressBar(operation);
-        container.appendChild(progressBar);
-        this.progressBars.set(progressId, { container, progressBar });
-        return progressId;
-    }
+    const { container, progressBar } = progressState;
+    progressBar.remove();
+    this.progressBars.delete(progressId);
+  }
 
-    /**
-     * Update progress bar
-     */
-    updateProgress(progressId, percentage, message = null) {
-        const progressState = this.progressBars.get(progressId);
-        if (!progressState) return;
-
-        const { progressBar } = progressState;
-        const bar = progressBar.querySelector('.progress-fill');
-        const messageEl = progressBar.querySelector('.progress-message');
-
-        bar.style.width = `${percentage}%`;
-        if (message && messageEl) {
-            messageEl.textContent = message;
-        }
-    }
-
-    /**
-     * Hide progress bar
-     */
-    hideProgress(progressId) {
-        const progressState = this.progressBars.get(progressId);
-        if (!progressState) return;
-
-        const { container, progressBar } = progressState;
-        progressBar.remove();
-        this.progressBars.delete(progressId);
-    }
-
-    /**
-     * Create progress bar element
-     */
-    createProgressBar(operation) {
-        const progressBar = document.createElement('div');
-        progressBar.className = 'progress-bar';
-        progressBar.innerHTML = `
+  /**
+   * Create progress bar element
+   */
+  createProgressBar(operation) {
+    const progressBar = document.createElement('div');
+    progressBar.className = 'progress-bar';
+    progressBar.innerHTML = `
             <div class="progress-header">
                 <span class="progress-operation">${operation}</span>
                 <span class="progress-percentage">0%</span>
@@ -254,75 +275,75 @@ class LoadingSystem {
             </div>
             <div class="progress-message">Starting...</div>
         `;
-        return progressBar;
-    }
+    return progressBar;
+  }
 
-    /**
-     * Show loading for async operations
-     */
-    async withLoading(element, type, asyncOperation, message = 'Loading...') {
-        const loadingId = this.showLoading(element, type, message);
-        
-        try {
-            const result = await asyncOperation();
-            this.hideLoading(loadingId);
-            return result;
-        } catch (error) {
-            this.hideLoading(loadingId);
-            this.showError(element, error.message);
-            throw error;
-        }
-    }
+  /**
+   * Show loading for async operations
+   */
+  async withLoading(element, type, asyncOperation, message = 'Loading...') {
+    const loadingId = this.showLoading(element, type, message);
 
-    /**
-     * Show error state
-     */
-    showError(element, message) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'error-state';
-        errorDiv.innerHTML = `
+    try {
+      const result = await asyncOperation();
+      this.hideLoading(loadingId);
+      return result;
+    } catch (error) {
+      this.hideLoading(loadingId);
+      this.showError(element, error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Show error state
+   */
+  showError(element, message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-state';
+    errorDiv.innerHTML = `
             <div class="error-icon">⚠️</div>
             <div class="error-message">${message}</div>
             <button class="error-retry" onclick="location.reload()">Retry</button>
         `;
-        element.innerHTML = '';
-        element.appendChild(errorDiv);
-    }
+    element.innerHTML = '';
+    element.appendChild(errorDiv);
+  }
 
-    /**
-     * Fade in animation
-     */
-    fadeIn(element) {
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(10px)';
-        
-        requestAnimationFrame(() => {
-            element.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-            element.style.opacity = '1';
-            element.style.transform = 'translateY(0)';
-        });
-    }
+  /**
+   * Fade in animation
+   */
+  fadeIn(element) {
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(10px)';
 
-    /**
-     * Generate unique loading ID
-     */
-    generateLoadingId() {
-        return `loading_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    }
+    requestAnimationFrame(() => {
+      element.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      element.style.opacity = '1';
+      element.style.transform = 'translateY(0)';
+    });
+  }
 
-    /**
-     * Initialize loading system
-     */
-    init() {
-        this.injectStyles();
-        this.setupGlobalLoading();
-    }
+  /**
+   * Generate unique loading ID
+   */
+  generateLoadingId() {
+    return `loading_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
 
-    /**
-     * Inject loading styles
-     */
-    injectStyles() {
-        const styles = `
+  /**
+   * Initialize loading system
+   */
+  init() {
+    this.injectStyles();
+    this.setupGlobalLoading();
+  }
+
+  /**
+   * Inject loading styles
+   */
+  injectStyles() {
+    const styles = `
             /* Modern Dark Loading Overlay */
             .loading-overlay {
                 position: absolute;
@@ -591,58 +612,62 @@ class LoadingSystem {
             }
         `;
 
-        const styleSheet = document.createElement('style');
-        styleSheet.textContent = styles;
-        document.head.appendChild(styleSheet);
-    }
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
+  }
 
-    /**
-     * Setup global loading indicators
-     */
-    setupGlobalLoading() {
-        // Add global loading indicator for page transitions
-        document.addEventListener('click', (e) => {
-            const link = e.target.closest('a[href]');
-            if (link && !link.href.startsWith('javascript:') && !link.href.startsWith('#')) {
-                this.showPageTransition();
-            }
-        });
+  /**
+   * Setup global loading indicators
+   */
+  setupGlobalLoading() {
+    // Add global loading indicator for page transitions
+    document.addEventListener('click', e => {
+      const link = e.target.closest('a[href]');
+      if (
+        link &&
+        !link.href.startsWith('javascript:') &&
+        !link.href.startsWith('#')
+      ) {
+        this.showPageTransition();
+      }
+    });
 
-        // Add loading for form submissions
-        document.addEventListener('submit', (e) => {
-            const form = e.target;
-            if (form.classList.contains('loading-form')) {
-                this.showFormLoading(form);
-            }
-        });
-    }
+    // Add loading for form submissions
+    document.addEventListener('submit', e => {
+      const form = e.target;
+      if (form.classList.contains('loading-form')) {
+        this.showFormLoading(form);
+      }
+    });
+  }
 
-    /**
-     * Show page transition loading
-     */
-    showPageTransition() {
-        const overlay = document.createElement('div');
-        overlay.id = 'page-transition-overlay';
-        overlay.className = 'loading-overlay';
-        overlay.innerHTML = `
+  /**
+   * Show page transition loading
+   */
+  showPageTransition() {
+    const overlay = document.createElement('div');
+    overlay.id = 'page-transition-overlay';
+    overlay.className = 'loading-overlay';
+    overlay.innerHTML = `
             <div class="loading-spinner">
                 <div class="spinner"></div>
                 <div class="loading-message">Loading page...</div>
             </div>
         `;
-        document.body.appendChild(overlay);
-    }
+    document.body.appendChild(overlay);
+  }
 
-    /**
-     * Show form loading
-     */
-    showFormLoading(form) {
-        const submitBtn = form.querySelector('button[type="submit"]');
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<div class="spinner small"></div> Submitting...';
-        }
+  /**
+   * Show form loading
+   */
+  showFormLoading(form) {
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<div class="spinner small"></div> Submitting...';
     }
+  }
 }
 
 // Initialize loading system
@@ -653,10 +678,10 @@ window.loadingSystem = loadingSystem;
 
 // Auto-initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    loadingSystem.init();
+  loadingSystem.init();
 });
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = LoadingSystem;
-} 
+  module.exports = LoadingSystem;
+}

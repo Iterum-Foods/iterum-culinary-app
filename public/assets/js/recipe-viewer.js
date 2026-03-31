@@ -4,39 +4,39 @@
  */
 
 class RecipeViewer {
-    constructor() {
-        this.currentRecipe = null;
+  constructor() {
+    this.currentRecipe = null;
+  }
+
+  viewRecipe(recipeId) {
+    console.log(`👁️ Viewing recipe: ${recipeId}`);
+
+    // Get recipe from universal recipe manager
+    let recipe = null;
+    if (window.universalRecipeManager) {
+      recipe = window.universalRecipeManager.getRecipe(recipeId);
     }
 
-    viewRecipe(recipeId) {
-        console.log(`👁️ Viewing recipe: ${recipeId}`);
-        
-        // Get recipe from universal recipe manager
-        let recipe = null;
-        if (window.universalRecipeManager) {
-            recipe = window.universalRecipeManager.getRecipe(recipeId);
-        }
-        
-        // Fallback to localStorage
-        if (!recipe) {
-            const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
-            recipe = recipes.find(r => r.id === recipeId);
-        }
-        
-        if (!recipe) {
-            console.error('Recipe not found:', recipeId);
-            alert('Recipe not found');
-            return;
-        }
-        
-        this.currentRecipe = recipe;
-        this.showRecipeModal(recipe);
+    // Fallback to localStorage
+    if (!recipe) {
+      const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
+      recipe = recipes.find(r => r.id === recipeId);
     }
 
-    showRecipeModal(recipe) {
-        // Create modal backdrop
-        const modal = document.createElement('div');
-        modal.style.cssText = `
+    if (!recipe) {
+      console.error('Recipe not found:', recipeId);
+      alert('Recipe not found');
+      return;
+    }
+
+    this.currentRecipe = recipe;
+    this.showRecipeModal(recipe);
+  }
+
+  showRecipeModal(recipe) {
+    // Create modal backdrop
+    const modal = document.createElement('div');
+    modal.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -52,59 +52,80 @@ class RecipeViewer {
             animation: fadeIn 0.3s ease;
         `;
 
-        // Build ingredients list
-        const ingredientsHTML = recipe.ingredients && recipe.ingredients.length > 0
-            ? recipe.ingredients.map(ing => `
+    // Build ingredients list
+    const ingredientsHTML =
+      recipe.ingredients && recipe.ingredients.length > 0
+        ? recipe.ingredients
+            .map(
+              ing => `
                 <li style="padding: 8px 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-weight: 500; color: #1e293b;">${ing.name || ing.ingredient || ing}</span>
                     <span style="color: #64748b; font-size: 0.9rem;">${ing.quantity || ''} ${ing.unit || ''}</span>
                 </li>
-            `).join('')
-            : '<li style="color: #94a3b8; padding: 20px; text-align: center;">No ingredients listed</li>';
+            `
+            )
+            .join('')
+        : '<li style="color: #94a3b8; padding: 20px; text-align: center;">No ingredients listed</li>';
 
-        // Build instructions
-        const instructionsHTML = recipe.instructions && recipe.instructions.length > 0
-            ? recipe.instructions.map((step, i) => `
+    // Build instructions
+    const instructionsHTML =
+      recipe.instructions && recipe.instructions.length > 0
+        ? recipe.instructions
+            .map(
+              (step, i) => `
                 <div style="display: flex; gap: 15px; margin-bottom: 20px; padding: 15px; background: #f8fafc; border-radius: 12px; border-left: 4px solid #667eea;">
                     <div style="flex-shrink: 0; width: 32px; height: 32px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">
                         ${i + 1}
                     </div>
                     <p style="margin: 0; line-height: 1.7; color: #1e293b; flex: 1;">${step.text || step}</p>
                 </div>
-            `).join('')
-            : '<p style="color: #94a3b8; padding: 20px; text-align: center;">No instructions provided</p>';
+            `
+            )
+            .join('')
+        : '<p style="color: #94a3b8; padding: 20px; text-align: center;">No instructions provided</p>';
 
-        // Build tags
-        const tagsHTML = recipe.tags && recipe.tags.length > 0
-            ? recipe.tags.map(tag => `
+    // Build tags
+    const tagsHTML =
+      recipe.tags && recipe.tags.length > 0
+        ? recipe.tags
+            .map(
+              tag => `
                 <span style="display: inline-block; background: #dbeafe; color: #1e40af; padding: 5px 12px; border-radius: 16px; font-size: 0.85rem; font-weight: 600; margin: 4px;">
                     ${tag}
                 </span>
-            `).join('')
-            : '<span style="color: #94a3b8;">No tags</span>';
+            `
+            )
+            .join('')
+        : '<span style="color: #94a3b8;">No tags</span>';
 
-        // Build components section if available
-        const componentsHTML = recipe.components && recipe.components.length > 0
-            ? `
+    // Build components section if available
+    const componentsHTML =
+      recipe.components && recipe.components.length > 0
+        ? `
                 <div style="padding: 25px; background: white; border-bottom: 2px solid #f1f5f9;">
                     <h3 style="font-size: 1.2rem; font-weight: 700; color: #1e293b; margin: 0 0 20px 0; display: flex; align-items: center; gap: 10px;">
                         <span>🧩</span> Components
                     </h3>
                     <div style="display: grid; gap: 15px;">
-                        ${recipe.components.map(comp => `
+                        ${recipe.components
+                          .map(
+                            comp => `
                             <div style="padding: 15px; background: #f8fafc; border-radius: 12px; border-left: 4px solid #10b981;">
                                 <div style="font-weight: 700; color: #1e293b; margin-bottom: 8px;">${comp.name}</div>
                                 <div style="color: #64748b; font-size: 0.9rem; line-height: 1.6;">${comp.description || comp.instructions || ''}</div>
                             </div>
-                        `).join('')}
+                        `
+                          )
+                          .join('')}
                     </div>
                 </div>
             `
-            : '';
+        : '';
 
-        // Build plating/presentation section
-        const platingHTML = recipe.plating || recipe.presentation
-            ? `
+    // Build plating/presentation section
+    const platingHTML =
+      recipe.plating || recipe.presentation
+        ? `
                 <div style="padding: 25px; background: #f8fafc; border-bottom: 2px solid #f1f5f9;">
                     <h3 style="font-size: 1.2rem; font-weight: 700; color: #1e293b; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
                         <span>🎨</span> Plating & Presentation
@@ -112,14 +133,14 @@ class RecipeViewer {
                     <p style="color: #1e293b; line-height: 1.8; margin: 0;">${recipe.plating || recipe.presentation}</p>
                 </div>
             `
-            : '';
+        : '';
 
-        // Build photo section
-        const photoHTML = recipe.photo
-            ? `<img src="${recipe.photo}" style="width: 100%; height: 300px; object-fit: cover; cursor: pointer;" onclick="window.open('${recipe.photo}', '_blank')" title="Click to view full size">`
-            : '';
+    // Build photo section
+    const photoHTML = recipe.photo
+      ? `<img src="${recipe.photo}" style="width: 100%; height: 300px; object-fit: cover; cursor: pointer;" onclick="window.open('${recipe.photo}', '_blank')" title="Click to view full size">`
+      : '';
 
-        modal.innerHTML = `
+    modal.innerHTML = `
             <div style="background: white; border-radius: 20px; max-width: 1000px; width: 100%; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 30px 90px rgba(0,0,0,0.5);">
                 
                 <!-- Header with Photo -->
@@ -137,11 +158,15 @@ class RecipeViewer {
                             <span style="display: inline-block; background: ${recipe.photo ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.2)'}; color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; backdrop-filter: blur(10px);">
                                 ${recipe.difficulty || 'Medium'}
                             </span>
-                            ${recipe.cuisine ? `
+                            ${
+                              recipe.cuisine
+                                ? `
                                 <span style="display: inline-block; background: ${recipe.photo ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.2)'}; color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; backdrop-filter: blur(10px);">
                                     ${recipe.cuisine}
                                 </span>
-                            ` : ''}
+                            `
+                                : ''
+                            }
                         </div>
                     </div>
                 </div>
@@ -154,45 +179,65 @@ class RecipeViewer {
                         <p style="color: #1e293b; line-height: 1.8; font-size: 1.05rem; margin: 0 0 20px 0;">${recipe.description || 'No description provided.'}</p>
                         
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px;">
-                            ${recipe.prepTime ? `
+                            ${
+                              recipe.prepTime
+                                ? `
                                 <div style="text-align: center; padding: 15px; background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                                     <div style="font-size: 1.8rem; font-weight: 700; color: #667eea; margin-bottom: 5px;">⏱️</div>
                                     <div style="font-size: 0.8rem; color: #64748b; font-weight: 600;">PREP TIME</div>
                                     <div style="font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-top: 3px;">${recipe.prepTime}</div>
                                 </div>
-                            ` : ''}
-                            ${recipe.cookTime ? `
+                            `
+                                : ''
+                            }
+                            ${
+                              recipe.cookTime
+                                ? `
                                 <div style="text-align: center; padding: 15px; background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                                     <div style="font-size: 1.8rem; font-weight: 700; color: #ef4444; margin-bottom: 5px;">🔥</div>
                                     <div style="font-size: 0.8rem; color: #64748b; font-weight: 600;">COOK TIME</div>
                                     <div style="font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-top: 3px;">${recipe.cookTime}</div>
                                 </div>
-                            ` : ''}
-                            ${recipe.servings ? `
+                            `
+                                : ''
+                            }
+                            ${
+                              recipe.servings
+                                ? `
                                 <div style="text-align: center; padding: 15px; background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                                     <div style="font-size: 1.8rem; font-weight: 700; color: #10b981; margin-bottom: 5px;">🍽️</div>
                                     <div style="font-size: 0.8rem; color: #64748b; font-weight: 600;">SERVINGS</div>
                                     <div style="font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-top: 3px;">${recipe.servings}</div>
                                 </div>
-                            ` : ''}
-                            ${recipe.yield ? `
+                            `
+                                : ''
+                            }
+                            ${
+                              recipe.yield
+                                ? `
                                 <div style="text-align: center; padding: 15px; background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
                                     <div style="font-size: 1.8rem; font-weight: 700; color: #f59e0b; margin-bottom: 5px;">📊</div>
                                     <div style="font-size: 0.8rem; color: #64748b; font-weight: 600;">YIELD</div>
                                     <div style="font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-top: 3px;">${recipe.yield}</div>
                                 </div>
-                            ` : ''}
+                            `
+                                : ''
+                            }
                         </div>
                     </div>
 
                     <!-- Tags -->
-                    ${recipe.tags && recipe.tags.length > 0 ? `
+                    ${
+                      recipe.tags && recipe.tags.length > 0
+                        ? `
                         <div style="padding: 20px 25px; background: white; border-bottom: 2px solid #f1f5f9;">
                             <div style="line-height: 2;">
                                 ${tagsHTML}
                             </div>
                         </div>
-                    ` : ''}
+                    `
+                        : ''
+                    }
 
                     <!-- Components -->
                     ${componentsHTML}
@@ -221,14 +266,18 @@ class RecipeViewer {
                     ${platingHTML}
 
                     <!-- Notes -->
-                    ${recipe.notes ? `
+                    ${
+                      recipe.notes
+                        ? `
                         <div style="padding: 25px; background: white; border-bottom: 2px solid #f1f5f9;">
                             <h3 style="font-size: 1.2rem; font-weight: 700; color: #1e293b; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
                                 <span>💡</span> Chef's Notes
                             </h3>
                             <p style="color: #1e293b; line-height: 1.8; margin: 0; font-style: italic; background: #fef3c7; padding: 15px; border-radius: 12px; border-left: 4px solid #f59e0b;">${recipe.notes}</p>
                         </div>
-                    ` : ''}
+                    `
+                        : ''
+                    }
 
                 </div>
 
@@ -250,102 +299,118 @@ class RecipeViewer {
             </div>
         `;
 
-        // Add CSS animation
-        const style = document.createElement('style');
-        style.textContent = `
+    // Add CSS animation
+    const style = document.createElement('style');
+    style.textContent = `
             @keyframes fadeIn {
                 from { opacity: 0; }
                 to { opacity: 1; }
             }
         `;
-        document.head.appendChild(style);
+    document.head.appendChild(style);
 
-        modal.onclick = (e) => {
-            if (e.target === modal) modal.remove();
-        };
+    modal.onclick = e => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    };
 
-        document.body.appendChild(modal);
+    document.body.appendChild(modal);
+  }
+
+  editRecipe(recipeId) {
+    // Store recipe ID and navigate to editor
+    localStorage.setItem('recipe_to_edit', recipeId);
+    sessionStorage.setItem('recipe_to_edit', recipeId);
+    window.location.href = `recipe-developer.html?edit=${recipeId}`;
+  }
+
+  duplicateRecipe(recipeId) {
+    console.log(`📋 Duplicating recipe: ${recipeId}`);
+
+    let recipe = null;
+    if (window.universalRecipeManager) {
+      recipe = window.universalRecipeManager.getRecipe(recipeId);
+    } else {
+      const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
+      recipe = recipes.find(r => r.id === recipeId);
     }
 
-    editRecipe(recipeId) {
-        // Store recipe ID and navigate to editor
-        localStorage.setItem('recipe_to_edit', recipeId);
-        sessionStorage.setItem('recipe_to_edit', recipeId);
-        window.location.href = `recipe-developer.html?edit=${recipeId}`;
+    if (!recipe) {
+      alert('Recipe not found');
+      return;
     }
 
-    duplicateRecipe(recipeId) {
-        console.log(`📋 Duplicating recipe: ${recipeId}`);
-        
-        let recipe = null;
-        if (window.universalRecipeManager) {
-            recipe = window.universalRecipeManager.getRecipe(recipeId);
-        } else {
-            const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
-            recipe = recipes.find(r => r.id === recipeId);
-        }
-        
-        if (!recipe) {
-            alert('Recipe not found');
-            return;
-        }
-        
-        // Create duplicate with new ID and modified name
-        const duplicate = {
-            ...recipe,
-            id: `recipe_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            name: `${recipe.name} (Copy)`,
-            dateAdded: new Date().toISOString(),
-            lastModified: new Date().toISOString()
-        };
-        
-        // Save duplicate
-        if (window.universalRecipeManager) {
-            window.universalRecipeManager.saveRecipe(duplicate);
-        } else {
-            const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
-            recipes.push(duplicate);
-            localStorage.setItem('recipes', JSON.stringify(recipes));
-        }
-        
-        // Close modal and reload
-        document.querySelectorAll('div[style*="position: fixed"]').forEach(el => el.remove());
-        alert('✅ Recipe duplicated successfully!');
-        
-        // Reload recipes if on library page
-        if (typeof loadRecipes === 'function') {
-            loadRecipes();
-        }
+    // Create duplicate with new ID and modified name
+    const duplicate = {
+      ...recipe,
+      id: `recipe_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      name: `${recipe.name} (Copy)`,
+      dateAdded: new Date().toISOString(),
+      lastModified: new Date().toISOString()
+    };
+
+    // Save duplicate
+    if (window.universalRecipeManager) {
+      window.universalRecipeManager.saveRecipe(duplicate);
+    } else {
+      const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
+      recipes.push(duplicate);
+      localStorage.setItem('recipes', JSON.stringify(recipes));
     }
 
-    printRecipe(recipeId) {
-        console.log(`🖨️ Printing recipe: ${recipeId}`);
-        
-        let recipe = null;
-        if (window.universalRecipeManager) {
-            recipe = window.universalRecipeManager.getRecipe(recipeId);
-        } else {
-            const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
-            recipe = recipes.find(r => r.id === recipeId);
-        }
-        
-        if (!recipe) {
-            alert('Recipe not found');
-            return;
-        }
-        
-        // Create print window
-        const printWindow = window.open('', '_blank');
-        
-        const ingredientsHTML = recipe.ingredients && recipe.ingredients.length > 0
-            ? recipe.ingredients.map(ing => `<li>${ing.name || ing.ingredient || ing} - ${ing.quantity || ''} ${ing.unit || ''}</li>`).join('')
-            : '<li>No ingredients listed</li>';
-        
-        const instructionsHTML = recipe.instructions && recipe.instructions.length > 0
-            ? recipe.instructions.map((step, i) => `<li><strong>Step ${i + 1}:</strong> ${step.text || step}</li>`).join('')
-            : '<li>No instructions provided</li>';
-        
-        printWindow.document.write(`
+    // Close modal and reload
+    document
+      .querySelectorAll('div[style*="position: fixed"]')
+      .forEach(el => el.remove());
+    alert('✅ Recipe duplicated successfully!');
+
+    // Reload recipes if on library page
+    if (typeof loadRecipes === 'function') {
+      loadRecipes();
+    }
+  }
+
+  printRecipe(recipeId) {
+    console.log(`🖨️ Printing recipe: ${recipeId}`);
+
+    let recipe = null;
+    if (window.universalRecipeManager) {
+      recipe = window.universalRecipeManager.getRecipe(recipeId);
+    } else {
+      const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
+      recipe = recipes.find(r => r.id === recipeId);
+    }
+
+    if (!recipe) {
+      alert('Recipe not found');
+      return;
+    }
+
+    // Create print window
+    const printWindow = window.open('', '_blank');
+
+    const ingredientsHTML =
+      recipe.ingredients && recipe.ingredients.length > 0
+        ? recipe.ingredients
+            .map(
+              ing =>
+                `<li>${ing.name || ing.ingredient || ing} - ${ing.quantity || ''} ${ing.unit || ''}</li>`
+            )
+            .join('')
+        : '<li>No ingredients listed</li>';
+
+    const instructionsHTML =
+      recipe.instructions && recipe.instructions.length > 0
+        ? recipe.instructions
+            .map(
+              (step, i) =>
+                `<li><strong>Step ${i + 1}:</strong> ${step.text || step}</li>`
+            )
+            .join('')
+        : '<li>No instructions provided</li>';
+
+    printWindow.document.write(`
             <!DOCTYPE html>
             <html>
             <head>
@@ -392,21 +457,20 @@ class RecipeViewer {
             </body>
             </html>
         `);
-        
-        printWindow.document.close();
-        
-        // Wait a bit then trigger print
-        setTimeout(() => {
-            printWindow.print();
-        }, 500);
-    }
+
+    printWindow.document.close();
+
+    // Wait a bit then trigger print
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
+  }
 }
 
 // Initialize global instance
 window.recipeViewer = new RecipeViewer();
 
 // Make functions globally available for onclick handlers
-window.viewRecipe = (id) => window.recipeViewer.viewRecipe(id);
-window.editRecipe = (id) => window.recipeViewer.editRecipe(id);
-window.duplicateRecipe = (id) => window.recipeViewer.duplicateRecipe(id);
-
+window.viewRecipe = id => window.recipeViewer.viewRecipe(id);
+window.editRecipe = id => window.recipeViewer.editRecipe(id);
+window.duplicateRecipe = id => window.recipeViewer.duplicateRecipe(id);

@@ -5,61 +5,65 @@
  */
 
 class IngredientSelectorIntegrated {
-    constructor() {
-        this.ingredients = [];
-        this.unitConverter = window.unitConverter;
-        this.vendorComparator = window.vendorPriceComparator;
-        this.initialized = false;
+  constructor() {
+    this.ingredients = [];
+    this.unitConverter = window.unitConverter;
+    this.vendorComparator = window.vendorPriceComparator;
+    this.initialized = false;
+  }
+
+  /**
+   * Initialize and load ingredients
+   */
+  async init() {
+    if (this.initialized) {
+      return;
     }
 
-    /**
-     * Initialize and load ingredients
-     */
-    async init() {
-        if (this.initialized) return;
+    await this.loadIngredients();
+    this.initialized = true;
+    console.log('✅ Integrated Ingredient Selector initialized');
+  }
 
-        await this.loadIngredients();
-        this.initialized = true;
-        console.log('✅ Integrated Ingredient Selector initialized');
+  /**
+   * Load ingredients from database
+   */
+  async loadIngredients() {
+    // Load from enhanced manager if available
+    if (window.ingredientsManager) {
+      this.ingredients = window.ingredientsManager.getAllIngredients();
+    } else {
+      // Fallback to direct localStorage
+      this.ingredients = JSON.parse(
+        localStorage.getItem('ingredients_database') ||
+          localStorage.getItem('ingredients') ||
+          '[]'
+      );
     }
 
-    /**
-     * Load ingredients from database
-     */
-    async loadIngredients() {
-        // Load from enhanced manager if available
-        if (window.ingredientsManager) {
-            this.ingredients = window.ingredientsManager.getAllIngredients();
-        } else {
-            // Fallback to direct localStorage
-            this.ingredients = JSON.parse(
-                localStorage.getItem('ingredients_database') || 
-                localStorage.getItem('ingredients') || 
-                '[]'
-            );
-        }
+    console.log(
+      `📦 Loaded ${this.ingredients.length} ingredients for selector`
+    );
+  }
 
-        console.log(`📦 Loaded ${this.ingredients.length} ingredients for selector`);
-    }
+  /**
+   * Create ingredient selector HTML
+   * @param {Object} options - Configuration options
+   */
+  createSelector(options = {}) {
+    const {
+      id = `ingredient-select-${Date.now()}`,
+      name = 'ingredient',
+      placeholder = 'Search or select ingredient...',
+      onSelect = null,
+      showVendorInfo = true,
+      showPrice = true,
+      classNames = ''
+    } = options;
 
-    /**
-     * Create ingredient selector HTML
-     * @param {Object} options - Configuration options
-     */
-    createSelector(options = {}) {
-        const {
-            id = `ingredient-select-${Date.now()}`,
-            name = 'ingredient',
-            placeholder = 'Search or select ingredient...',
-            onSelect = null,
-            showVendorInfo = true,
-            showPrice = true,
-            classNames = ''
-        } = options;
-
-        const container = document.createElement('div');
-        container.className = `ingredient-selector-container ${classNames}`;
-        container.innerHTML = `
+    const container = document.createElement('div');
+    container.className = `ingredient-selector-container ${classNames}`;
+    container.innerHTML = `
             <div class="ingredient-selector-wrapper">
                 <input 
                     type="text" 
@@ -77,79 +81,97 @@ class IngredientSelectorIntegrated {
             <div id="${id}-info" class="ingredient-info hidden"></div>
         `;
 
-        // Setup search functionality
-        this.setupSearch(id, onSelect, showVendorInfo, showPrice);
+    // Setup search functionality
+    this.setupSearch(id, onSelect, showVendorInfo, showPrice);
 
-        return container;
+    return container;
+  }
+
+  /**
+   * Setup search and selection functionality
+   */
+  setupSearch(id, onSelect, showVendorInfo, showPrice) {
+    const input = document.getElementById(`${id}-input`);
+    const dropdown = document.getElementById(`${id}-dropdown`);
+    const hiddenId = document.getElementById(`${id}-id`);
+    const hiddenName = document.getElementById(`${id}-name`);
+    const hiddenUnit = document.getElementById(`${id}-base-unit`);
+    const hiddenPrice = document.getElementById(`${id}-best-price`);
+    const info = document.getElementById(`${id}-info`);
+
+    let selectedIngredient = null;
+    let filteredIngredients = [];
+
+    // Search input handler
+    input.addEventListener('input', e => {
+      const query = e.target.value.toLowerCase().trim();
+
+      if (query.length < 1) {
+        dropdown.classList.add('hidden');
+        return;
+      }
+
+      // Filter ingredients
+      filteredIngredients = this.ingredients
+        .filter(
+          ing =>
+            ing.name.toLowerCase().includes(query) ||
+            (ing.category && ing.category.toLowerCase().includes(query)) ||
+            (ing.subcategory && ing.subcategory.toLowerCase().includes(query))
+        )
+        .slice(0, 20); // Limit to 20 results
+
+      this.renderDropdown(dropdown, filteredIngredients, ingredient => {
+        this.selectIngredient(
+          ingredient,
+          id,
+          input,
+          dropdown,
+          hiddenId,
+          hiddenName,
+          hiddenUnit,
+          hiddenPrice,
+          info,
+          showVendorInfo,
+          showPrice,
+          onSelect
+        );
+      });
+    });
+
+    // Focus handler
+    input.addEventListener('focus', () => {
+      if (input.value.length >= 1) {
+        dropdown.classList.remove('hidden');
+      }
+    });
+
+    // Click outside to close
+    document.addEventListener('click', e => {
+      if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.add('hidden');
+      }
+    });
+  }
+
+  /**
+   * Render dropdown with ingredients
+   */
+  renderDropdown(dropdown, ingredients, onSelect) {
+    if (ingredients.length === 0) {
+      dropdown.innerHTML =
+        '<div class="dropdown-item">No ingredients found</div>';
+      dropdown.classList.remove('hidden');
+      return;
     }
 
-    /**
-     * Setup search and selection functionality
-     */
-    setupSearch(id, onSelect, showVendorInfo, showPrice) {
-        const input = document.getElementById(`${id}-input`);
-        const dropdown = document.getElementById(`${id}-dropdown`);
-        const hiddenId = document.getElementById(`${id}-id`);
-        const hiddenName = document.getElementById(`${id}-name`);
-        const hiddenUnit = document.getElementById(`${id}-base-unit`);
-        const hiddenPrice = document.getElementById(`${id}-best-price`);
-        const info = document.getElementById(`${id}-info`);
+    dropdown.innerHTML = ingredients
+      .map(ing => {
+        const bestPrice = ing.bestPrice || {};
+        const vendorCount = ing.vendorPrices?.length || 0;
+        const isBuiltIn = /^ing_\d+$/.test(ing.id);
 
-        let selectedIngredient = null;
-        let filteredIngredients = [];
-
-        // Search input handler
-        input.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            
-            if (query.length < 1) {
-                dropdown.classList.add('hidden');
-                return;
-            }
-
-            // Filter ingredients
-            filteredIngredients = this.ingredients.filter(ing => 
-                ing.name.toLowerCase().includes(query) ||
-                (ing.category && ing.category.toLowerCase().includes(query)) ||
-                (ing.subcategory && ing.subcategory.toLowerCase().includes(query))
-            ).slice(0, 20); // Limit to 20 results
-
-            this.renderDropdown(dropdown, filteredIngredients, (ingredient) => {
-                this.selectIngredient(ingredient, id, input, dropdown, hiddenId, hiddenName, hiddenUnit, hiddenPrice, info, showVendorInfo, showPrice, onSelect);
-            });
-        });
-
-        // Focus handler
-        input.addEventListener('focus', () => {
-            if (input.value.length >= 1) {
-                dropdown.classList.remove('hidden');
-            }
-        });
-
-        // Click outside to close
-        document.addEventListener('click', (e) => {
-            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.classList.add('hidden');
-            }
-        });
-    }
-
-    /**
-     * Render dropdown with ingredients
-     */
-    renderDropdown(dropdown, ingredients, onSelect) {
-        if (ingredients.length === 0) {
-            dropdown.innerHTML = '<div class="dropdown-item">No ingredients found</div>';
-            dropdown.classList.remove('hidden');
-            return;
-        }
-
-        dropdown.innerHTML = ingredients.map(ing => {
-            const bestPrice = ing.bestPrice || {};
-            const vendorCount = ing.vendorPrices?.length || 0;
-            const isBuiltIn = /^ing_\d+$/.test(ing.id);
-            
-            return `
+        return `
                 <div class="dropdown-item ingredient-item" data-id="${ing.id}">
                     <div class="ingredient-item-name">
                         ${ing.name}
@@ -157,104 +179,124 @@ class IngredientSelectorIntegrated {
                     </div>
                     <div class="ingredient-item-meta">
                         <span class="ingredient-category">${ing.category || 'Uncategorized'}</span>
-                        ${bestPrice.price ? `
+                        ${
+                          bestPrice.price
+                            ? `
                             <span class="ingredient-price">$${bestPrice.price.toFixed(2)}/${bestPrice.unit}</span>
-                        ` : ''}
+                        `
+                            : ''
+                        }
                         ${vendorCount > 0 ? `<span class="vendor-count">${vendorCount} vendor${vendorCount !== 1 ? 's' : ''}</span>` : ''}
                     </div>
                 </div>
             `;
-        }).join('');
+      })
+      .join('');
 
-        // Add click handlers
-        dropdown.querySelectorAll('.ingredient-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const ingredientId = item.dataset.id;
-                const ingredient = this.ingredients.find(ing => ing.id === ingredientId);
-                if (ingredient) {
-                    onSelect(ingredient);
-                }
-            });
-        });
+    // Add click handlers
+    dropdown.querySelectorAll('.ingredient-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const ingredientId = item.dataset.id;
+        const ingredient = this.ingredients.find(
+          ing => ing.id === ingredientId
+        );
+        if (ingredient) {
+          onSelect(ingredient);
+        }
+      });
+    });
 
-        dropdown.classList.remove('hidden');
+    dropdown.classList.remove('hidden');
+  }
+
+  /**
+   * Handle ingredient selection
+   */
+  selectIngredient(
+    ingredient,
+    id,
+    input,
+    dropdown,
+    hiddenId,
+    hiddenName,
+    hiddenUnit,
+    hiddenPrice,
+    info,
+    showVendorInfo,
+    showPrice,
+    onSelect
+  ) {
+    selectedIngredient = ingredient;
+
+    // Update hidden fields
+    hiddenId.value = ingredient.id;
+    hiddenName.value = ingredient.name;
+    hiddenUnit.value = ingredient.unit || ingredient.default_unit || 'g';
+
+    // Get best price
+    const bestPrice = ingredient.bestPrice || {
+      price: ingredient.cost || 0,
+      unit: ingredient.unit || 'g',
+      vendor: ingredient.supplier || 'Default'
+    };
+
+    hiddenPrice.value = bestPrice.normalizedPrice || bestPrice.price || 0;
+
+    // Update input display
+    input.value = ingredient.name;
+
+    // Hide dropdown
+    dropdown.classList.add('hidden');
+
+    // Show info panel
+    if (showVendorInfo || showPrice) {
+      this.renderInfo(ingredient, info, showVendorInfo, showPrice);
+      info.classList.remove('hidden');
     }
 
-    /**
-     * Handle ingredient selection
-     */
-    selectIngredient(ingredient, id, input, dropdown, hiddenId, hiddenName, hiddenUnit, hiddenPrice, info, showVendorInfo, showPrice, onSelect) {
-        selectedIngredient = ingredient;
-        
-        // Update hidden fields
-        hiddenId.value = ingredient.id;
-        hiddenName.value = ingredient.name;
-        hiddenUnit.value = ingredient.unit || ingredient.default_unit || 'g';
-        
-        // Get best price
-        const bestPrice = ingredient.bestPrice || {
-            price: ingredient.cost || 0,
-            unit: ingredient.unit || 'g',
-            vendor: ingredient.supplier || 'Default'
-        };
-        
-        hiddenPrice.value = bestPrice.normalizedPrice || bestPrice.price || 0;
-
-        // Update input display
-        input.value = ingredient.name;
-
-        // Hide dropdown
-        dropdown.classList.add('hidden');
-
-        // Show info panel
-        if (showVendorInfo || showPrice) {
-            this.renderInfo(ingredient, info, showVendorInfo, showPrice);
-            info.classList.remove('hidden');
-        }
-
-        // Callback
-        if (onSelect) {
-            onSelect(ingredient);
-        }
+    // Callback
+    if (onSelect) {
+      onSelect(ingredient);
     }
+  }
 
-    /**
-     * Render ingredient info panel
-     */
-    renderInfo(ingredient, info, showVendorInfo, showPrice) {
-        const bestPrice = ingredient.bestPrice || {};
-        const vendorCount = ingredient.vendorPrices?.length || 0;
+  /**
+   * Render ingredient info panel
+   */
+  renderInfo(ingredient, info, showVendorInfo, showPrice) {
+    const bestPrice = ingredient.bestPrice || {};
+    const vendorCount = ingredient.vendorPrices?.length || 0;
 
-        let html = `<div class="ingredient-info-content">`;
+    let html = `<div class="ingredient-info-content">`;
 
-        if (showPrice && bestPrice.price) {
-            html += `
+    if (showPrice && bestPrice.price) {
+      html += `
                 <div class="info-row">
                     <span class="info-label">Best Price:</span>
                     <span class="info-value">$${bestPrice.price.toFixed(2)}/${bestPrice.unit}</span>
                     ${bestPrice.vendor ? `<span class="info-vendor">from ${bestPrice.vendor}</span>` : ''}
                 </div>
             `;
-        }
+    }
 
-        html += `
+    html += `
             <div class="info-row">
                 <span class="info-label">Base Unit:</span>
                 <span class="info-value">${ingredient.unit || 'g'}</span>
             </div>
         `;
 
-        if (showVendorInfo && vendorCount > 0) {
-            html += `
+    if (showVendorInfo && vendorCount > 0) {
+      html += `
                 <div class="info-row">
                     <span class="info-label">Vendors:</span>
                     <span class="info-value">${vendorCount} available</span>
                 </div>
             `;
-        }
+    }
 
-        if (ingredient.casePricing) {
-            html += `
+    if (ingredient.casePricing) {
+      html += `
                 <div class="info-row">
                     <span class="info-label">Case Pricing:</span>
                     <span class="info-value">
@@ -263,32 +305,34 @@ class IngredientSelectorIntegrated {
                     </span>
                 </div>
             `;
-        }
-
-        html += `</div>`;
-        info.innerHTML = html;
     }
 
-    /**
-     * Create quantity and unit selector
-     */
-    createQuantityUnitSelector(options = {}) {
-        const {
-            id = `qty-unit-${Date.now()}`,
-            name = 'ingredient',
-            defaultValue = 1,
-            defaultUnit = 'g',
-            ingredient = null,
-            onUnitChange = null
-        } = options;
+    html += `</div>`;
+    info.innerHTML = html;
+  }
 
-        const container = document.createElement('div');
-        container.className = 'quantity-unit-selector';
-        
-        // Get available units based on ingredient
-        const availableUnits = ingredient ? this.getAvailableUnits(ingredient) : this.getAllUnits();
+  /**
+   * Create quantity and unit selector
+   */
+  createQuantityUnitSelector(options = {}) {
+    const {
+      id = `qty-unit-${Date.now()}`,
+      name = 'ingredient',
+      defaultValue = 1,
+      defaultUnit = 'g',
+      ingredient = null,
+      onUnitChange = null
+    } = options;
 
-        container.innerHTML = `
+    const container = document.createElement('div');
+    container.className = 'quantity-unit-selector';
+
+    // Get available units based on ingredient
+    const availableUnits = ingredient
+      ? this.getAvailableUnits(ingredient)
+      : this.getAllUnits();
+
+    container.innerHTML = `
             <input 
                 type="number" 
                 id="${id}-qty" 
@@ -303,118 +347,126 @@ class IngredientSelectorIntegrated {
                 name="${name}_unit"
                 class="unit-select"
             >
-                ${availableUnits.map(unit => `
+                ${availableUnits
+                  .map(
+                    unit => `
                     <option value="${unit.value}" ${unit.value === defaultUnit ? 'selected' : ''}>
                         ${unit.label}
                     </option>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </select>
         `;
 
-        // Add unit change handler
-        if (onUnitChange) {
-            const unitSelect = container.querySelector(`#${id}-unit`);
-            unitSelect.addEventListener('change', () => {
-                onUnitChange(unitSelect.value);
-            });
-        }
-
-        return container;
+    // Add unit change handler
+    if (onUnitChange) {
+      const unitSelect = container.querySelector(`#${id}-unit`);
+      unitSelect.addEventListener('change', () => {
+        onUnitChange(unitSelect.value);
+      });
     }
 
-    /**
-     * Get available units for an ingredient
-     */
-    getAvailableUnits(ingredient) {
-        const baseUnit = ingredient.unit || ingredient.default_unit || 'g';
-        const category = this.unitConverter.getUnitCategory(baseUnit);
-        
-        let units = [];
+    return container;
+  }
 
-        if (category === 'weight') {
-            units = [
-                { value: 'g', label: 'g' },
-                { value: 'kg', label: 'kg' },
-                { value: 'oz', label: 'oz' },
-                { value: 'lb', label: 'lb' }
-            ];
-        } else if (category === 'volume') {
-            units = [
-                { value: 'ml', label: 'ml' },
-                { value: 'l', label: 'L' },
-                { value: 'fl oz', label: 'fl oz' },
-                { value: 'cup', label: 'cup' },
-                { value: 'qt', label: 'qt' },
-                { value: 'gal', label: 'gal' }
-            ];
-        } else {
-            units = [
-                { value: 'piece', label: 'piece' },
-                { value: 'each', label: 'each' },
-                { value: 'bunch', label: 'bunch' }
-            ];
-        }
+  /**
+   * Get available units for an ingredient
+   */
+  getAvailableUnits(ingredient) {
+    const baseUnit = ingredient.unit || ingredient.default_unit || 'g';
+    const category = this.unitConverter.getUnitCategory(baseUnit);
 
-        return units;
+    let units = [];
+
+    if (category === 'weight') {
+      units = [
+        { value: 'g', label: 'g' },
+        { value: 'kg', label: 'kg' },
+        { value: 'oz', label: 'oz' },
+        { value: 'lb', label: 'lb' }
+      ];
+    } else if (category === 'volume') {
+      units = [
+        { value: 'ml', label: 'ml' },
+        { value: 'l', label: 'L' },
+        { value: 'fl oz', label: 'fl oz' },
+        { value: 'cup', label: 'cup' },
+        { value: 'qt', label: 'qt' },
+        { value: 'gal', label: 'gal' }
+      ];
+    } else {
+      units = [
+        { value: 'piece', label: 'piece' },
+        { value: 'each', label: 'each' },
+        { value: 'bunch', label: 'bunch' }
+      ];
     }
 
-    /**
-     * Get all available units
-     */
-    getAllUnits() {
-        return [
-            { value: 'g', label: 'g' },
-            { value: 'kg', label: 'kg' },
-            { value: 'oz', label: 'oz' },
-            { value: 'lb', label: 'lb' },
-            { value: 'ml', label: 'ml' },
-            { value: 'l', label: 'L' },
-            { value: 'fl oz', label: 'fl oz' },
-            { value: 'cup', label: 'cup' },
-            { value: 'piece', label: 'piece' },
-            { value: 'each', label: 'each' }
-        ];
+    return units;
+  }
+
+  /**
+   * Get all available units
+   */
+  getAllUnits() {
+    return [
+      { value: 'g', label: 'g' },
+      { value: 'kg', label: 'kg' },
+      { value: 'oz', label: 'oz' },
+      { value: 'lb', label: 'lb' },
+      { value: 'ml', label: 'ml' },
+      { value: 'l', label: 'L' },
+      { value: 'fl oz', label: 'fl oz' },
+      { value: 'cup', label: 'cup' },
+      { value: 'piece', label: 'piece' },
+      { value: 'each', label: 'each' }
+    ];
+  }
+
+  /**
+   * Calculate cost for recipe ingredient
+   */
+  calculateIngredientCost(ingredient, quantity, unit) {
+    if (!this.vendorComparator) {
+      return null;
     }
 
-    /**
-     * Calculate cost for recipe ingredient
-     */
-    calculateIngredientCost(ingredient, quantity, unit) {
-        if (!this.vendorComparator) {
-            return null;
-        }
+    return (
+      this.vendorComparator.vendorComparator?.calculateIngredientCost(
+        ingredient,
+        quantity,
+        unit
+      ) ||
+      this.unitConverter.calculateIngredientCost(ingredient, quantity, unit)
+    );
+  }
 
-        return this.vendorComparator.vendorComparator?.calculateIngredientCost(
-            ingredient,
-            quantity,
-            unit
-        ) || this.unitConverter.calculateIngredientCost(ingredient, quantity, unit);
-    }
+  /**
+   * Get ingredient by ID
+   */
+  getIngredientById(id) {
+    return this.ingredients.find(ing => ing.id === id);
+  }
 
-    /**
-     * Get ingredient by ID
-     */
-    getIngredientById(id) {
-        return this.ingredients.find(ing => ing.id === id);
-    }
+  /**
+   * Get ingredient by name (fuzzy match)
+   */
+  getIngredientByName(name) {
+    const normalized = name.toLowerCase().trim();
+    return this.ingredients.find(
+      ing =>
+        ing.name.toLowerCase() === normalized ||
+        ing.name.toLowerCase().includes(normalized)
+    );
+  }
 
-    /**
-     * Get ingredient by name (fuzzy match)
-     */
-    getIngredientByName(name) {
-        const normalized = name.toLowerCase().trim();
-        return this.ingredients.find(ing => 
-            ing.name.toLowerCase() === normalized ||
-            ing.name.toLowerCase().includes(normalized)
-        );
-    }
-
-    /**
-     * Refresh ingredients list
-     */
-    async refresh() {
-        await this.loadIngredients();
-    }
+  /**
+   * Refresh ingredients list
+   */
+  async refresh() {
+    await this.loadIngredients();
+  }
 }
 
 // Create global instance
@@ -422,11 +474,11 @@ window.ingredientSelector = new IngredientSelectorIntegrated();
 
 // Auto-initialize
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        window.ingredientSelector.init();
-    });
-} else {
+  document.addEventListener('DOMContentLoaded', () => {
     window.ingredientSelector.init();
+  });
+} else {
+  window.ingredientSelector.init();
 }
 
 // Add styles
@@ -597,4 +649,3 @@ style.textContent = `
 document.head.appendChild(style);
 
 console.log('📦 Integrated Ingredient Selector loaded');
-

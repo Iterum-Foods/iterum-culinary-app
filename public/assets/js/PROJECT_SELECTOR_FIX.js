@@ -5,36 +5,38 @@
 
 // Function to ensure project selector is visible
 function ensureProjectSelectorVisible() {
-    const headerSelector = document.getElementById('header-project-selector');
-    const projectContainer = document.getElementById('project-selector-container');
-    
-    if (headerSelector && projectContainer) {
-        // Make sure the header area is visible
-        headerSelector.classList.remove('hidden');
-        headerSelector.style.display = 'block';
-        
-        // Ensure the project container has proper styling
-        projectContainer.style.display = 'flex';
-        projectContainer.style.width = '100%';
-        
-        console.log('✅ Project selector visibility fixed');
-        return true;
-    }
-    
-    console.warn('⚠️ Project selector elements not found');
-    return false;
+  const headerSelector = document.getElementById('header-project-selector');
+  const projectContainer = document.getElementById(
+    'project-selector-container'
+  );
+
+  if (headerSelector && projectContainer) {
+    // Make sure the header area is visible
+    headerSelector.classList.remove('hidden');
+    headerSelector.style.display = 'block';
+
+    // Ensure the project container has proper styling
+    projectContainer.style.display = 'flex';
+    projectContainer.style.width = '100%';
+
+    console.log('✅ Project selector visibility fixed');
+    return true;
+  }
+
+  console.warn('⚠️ Project selector elements not found');
+  return false;
 }
 
 // Function to add enhanced project selector styles
 function addEnhancedProjectStyles() {
-    const existingStyle = document.getElementById('project-selector-styles');
-    if (existingStyle) {
-        existingStyle.remove();
-    }
-    
-    const style = document.createElement('style');
-    style.id = 'project-selector-styles';
-    style.textContent = `
+  const existingStyle = document.getElementById('project-selector-styles');
+  if (existingStyle) {
+    existingStyle.remove();
+  }
+
+  const style = document.createElement('style');
+  style.id = 'project-selector-styles';
+  style.textContent = `
         /* Enhanced Project Selector Styles */
         #header-project-selector {
             display: block !important;
@@ -200,33 +202,33 @@ function addEnhancedProjectStyles() {
             }
         }
     `;
-    
-    document.head.appendChild(style);
-    console.log('✅ Enhanced project selector styles added');
+
+  document.head.appendChild(style);
+  console.log('✅ Enhanced project selector styles added');
 }
 
 // Initialize fix when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(() => {
-            addEnhancedProjectStyles();
-            ensureProjectSelectorVisible();
-        }, 500);
-    });
-} else {
+  document.addEventListener('DOMContentLoaded', function () {
     setTimeout(() => {
-        addEnhancedProjectStyles();
-        ensureProjectSelectorVisible();
+      addEnhancedProjectStyles();
+      ensureProjectSelectorVisible();
     }, 500);
+  });
+} else {
+  setTimeout(() => {
+    addEnhancedProjectStyles();
+    ensureProjectSelectorVisible();
+  }, 500);
 }
 
 // Also run periodically to catch late-loading elements
 let attempts = 0;
 const checkInterval = setInterval(() => {
-    attempts++;
-    if (ensureProjectSelectorVisible() || attempts > 10) {
-        clearInterval(checkInterval);
-    }
+  attempts++;
+  if (ensureProjectSelectorVisible() || attempts > 10) {
+    clearInterval(checkInterval);
+  }
 }, 1000);
 
 // Make functions available globally

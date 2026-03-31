@@ -1,3 +1,16 @@
+/**
+ * Menu-Recipe Integration System
+ * Automatically creates recipe stubs for menu items and manages the connection
+ */
+
+class MenuRecipeIntegration {
+  constructor() {
+    this.storageKey = 'menu_recipe_links';
+    this.recipeStubsKey = 'recipe_stubs';
+    this.auditStorageKey = 'menu_recipe_audit';
+    this.init();
+  }
+
   buildTags(menuItem) {
     const tags = [];
     if (menuItem.category) {
@@ -15,18 +28,6 @@
     }
     return Array.from(new Set(tags));
   }
-/**
- * Menu-Recipe Integration System
- * Automatically creates recipe stubs for menu items and manages the connection
- */
-
-class MenuRecipeIntegration {
-  constructor() {
-    this.storageKey = 'menu_recipe_links';
-    this.recipeStubsKey = 'recipe_stubs';
-    this.auditStorageKey = 'menu_recipe_audit';
-    this.init();
-  }
 
   buildRecipeStubFromMenuItem(menuItem) {
     const now = new Date().toISOString();
@@ -41,9 +42,13 @@ class MenuRecipeIntegration {
       cook_time: menuItem.cookTime || null,
       servings: menuItem.servings || 4,
       tags: this.buildTags(menuItem),
-      dietary_restrictions: Array.isArray(menuItem.dietary) ? menuItem.dietary : [],
+      dietary_restrictions: Array.isArray(menuItem.dietary)
+        ? menuItem.dietary
+        : [],
       allergens: Array.isArray(menuItem.allergens) ? menuItem.allergens : [],
-      equipment_needed: Array.isArray(menuItem.equipment) ? menuItem.equipment : [],
+      equipment_needed: Array.isArray(menuItem.equipment)
+        ? menuItem.equipment
+        : [],
       status: 'draft',
       recipe_status: 'needs-development',
       type: menuItem.recipeType || 'menu-item',
@@ -52,7 +57,7 @@ class MenuRecipeIntegration {
       menuItemName: menuItem.name,
       menuItemPrice: menuItem.price,
       targetFoodCostPercent: 30,
-      targetCost: menuItem.price ? (menuItem.price * 0.30).toFixed(2) : null,
+      targetCost: menuItem.price ? (menuItem.price * 0.3).toFixed(2) : null,
       ingredients: [],
       instructions: [],
       createdAt: now,
@@ -116,7 +121,6 @@ class MenuRecipeIntegration {
 
       console.log('✅ Recipe stub created:', recipeStub.id);
       return recipeStub;
-
     } catch (error) {
       console.error('❌ Error creating recipe stub:', error);
       throw error;
@@ -124,7 +128,9 @@ class MenuRecipeIntegration {
   }
 
   promptRecipeLink(menuItemId) {
-    const menuItem = window.enhancedMenuManager?.menuItems?.find(item => item.id === menuItemId);
+    const menuItem = window.enhancedMenuManager?.menuItems?.find(
+      item => item.id === menuItemId
+    );
     if (!menuItem) {
       window.showError?.('Menu item not found.');
       return;
@@ -132,7 +138,9 @@ class MenuRecipeIntegration {
 
     const recipes = window.universalRecipeManager?.getRecipeLibrary?.() || [];
     if (!recipes.length) {
-      window.showError?.('No recipes available to link. Create or import recipes first.');
+      window.showError?.(
+        'No recipes available to link. Create or import recipes first.'
+      );
       return;
     }
 
@@ -176,33 +184,42 @@ class MenuRecipeIntegration {
 
     const closeModal = () => modal.remove();
 
-    modal.querySelector('.checklist-modal-close').addEventListener('click', closeModal);
-    modal.querySelector('[data-action="cancel"]').addEventListener('click', closeModal);
+    modal
+      .querySelector('.checklist-modal-close')
+      .addEventListener('click', closeModal);
+    modal
+      .querySelector('[data-action="cancel"]')
+      .addEventListener('click', closeModal);
 
-    modal.querySelector('[data-action="link"]').addEventListener('click', async () => {
-      const recipeId = select.value;
-      if (!recipeId) {
-        window.showError?.('Please select a recipe to link.');
-        return;
-      }
-      await this.linkMenuItemToRecipe(menuItemId, recipeId, {
-        source: 'manual',
-        linkedBy: window.authManager?.currentUser?.id,
-        auditLog: { status: 'linked', message: 'Manually linked to existing recipe.' }
-      });
-      const recipe = this.getRecipeById(recipeId);
-      if (menuItem) {
-        menuItem.recipeId = recipeId;
-        menuItem.recipeLinkStatus = 'linked';
-        menuItem.recipeName = recipe?.title || recipe?.name || menuItem.name;
-        if (window.enhancedMenuManager) {
-          await window.enhancedMenuManager.saveMenu();
-          window.enhancedMenuManager.renderMenuItems();
+    modal
+      .querySelector('[data-action="link"]')
+      .addEventListener('click', async () => {
+        const recipeId = select.value;
+        if (!recipeId) {
+          window.showError?.('Please select a recipe to link.');
+          return;
         }
-      }
-      window.showSuccess?.('Menu item linked to recipe.');
-      closeModal();
-    });
+        await this.linkMenuItemToRecipe(menuItemId, recipeId, {
+          source: 'manual',
+          linkedBy: window.authManager?.currentUser?.id,
+          auditLog: {
+            status: 'linked',
+            message: 'Manually linked to existing recipe.'
+          }
+        });
+        const recipe = this.getRecipeById(recipeId);
+        if (menuItem) {
+          menuItem.recipeId = recipeId;
+          menuItem.recipeLinkStatus = 'linked';
+          menuItem.recipeName = recipe?.title || recipe?.name || menuItem.name;
+          if (window.enhancedMenuManager) {
+            await window.enhancedMenuManager.saveMenu();
+            window.enhancedMenuManager.renderMenuItems();
+          }
+        }
+        window.showSuccess?.('Menu item linked to recipe.');
+        closeModal();
+      });
 
     document.body.appendChild(modal);
   }
@@ -220,7 +237,8 @@ class MenuRecipeIntegration {
     localStorage.setItem('recipes', JSON.stringify(recipes));
 
     if (menuItem) {
-      const existing = window.universalRecipeManager?.getRecipeLibrary?.() || recipes;
+      const existing =
+        window.universalRecipeManager?.getRecipeLibrary?.() || recipes;
       const recipeIndex = existing.findIndex(r => r.id === recipeStub.id);
       if (recipeIndex !== -1) {
         const enriched = {
@@ -263,15 +281,17 @@ class MenuRecipeIntegration {
           status: recipeStub.status,
           type: recipeStub.type,
           source: recipeStub.source,
-          tags: recipeStub.tags,
-          linked_menu_items: recipeStub.menuItemId ? [{
-            menu_item_id: recipeStub.menuItemId,
-            menu_item_name: recipeStub.menuItemName,
-            menu_item_price: recipeStub.menuItemPrice
-          }] : undefined,
-          type: recipeStub.type
+          linked_menu_items: recipeStub.menuItemId
+            ? [
+                {
+                  menu_item_id: recipeStub.menuItemId,
+                  menu_item_name: recipeStub.menuItemName,
+                  menu_item_price: recipeStub.menuItemPrice
+                }
+              ]
+            : undefined
         });
-        
+
         if (response.id) {
           recipeStub.backendId = response.id;
           console.log('✅ Recipe stub synced to backend:', response.id);
@@ -300,13 +320,15 @@ class MenuRecipeIntegration {
     // Check stubs first
     const stubs = this.getRecipeStubs();
     let recipe = stubs.find(r => r.id === recipeId);
-    
+
     if (!recipe) {
       // Check main recipes
-      const unified = window.universalRecipeManager?.getRecipeLibrary?.() || JSON.parse(localStorage.getItem('recipes') || '[]');
+      const unified =
+        window.universalRecipeManager?.getRecipeLibrary?.() ||
+        JSON.parse(localStorage.getItem('recipes') || '[]');
       recipe = unified.find(r => r.id === recipeId);
     }
-    
+
     return recipe;
   }
 
@@ -318,7 +340,8 @@ class MenuRecipeIntegration {
     links[menuItemId] = {
       recipeId: recipeId,
       linkedAt: new Date().toISOString(),
-      linkedBy: options.linkedBy || (window.authManager?.currentUser?.id || 'system'),
+      linkedBy:
+        options.linkedBy || window.authManager?.currentUser?.id || 'system',
       source: options.source || 'manual',
       recipeStatus: options.recipeStatus || 'linked'
     };
@@ -330,19 +353,22 @@ class MenuRecipeIntegration {
     }
 
     if (window.enhancedMenuManager?.syncToCloud) {
-      window.enhancedMenuManager.syncToCloud().catch((error) => {
+      window.enhancedMenuManager.syncToCloud().catch(error => {
         console.warn('⚠️ Menu link sync skipped:', error?.message || error);
       });
     }
 
-    window.dispatchEvent(new CustomEvent('menuWorkflowUpdated', {
-      detail: {
-        projectId: window.enhancedMenuManager?.getCurrentProjectId?.() || 'master',
-        menuItemId,
-        recipeId,
-        source: options.source || 'manual'
-      }
-    }));
+    window.dispatchEvent(
+      new CustomEvent('menuWorkflowUpdated', {
+        detail: {
+          projectId:
+            window.enhancedMenuManager?.getCurrentProjectId?.() || 'master',
+          menuItemId,
+          recipeId,
+          source: options.source || 'manual'
+        }
+      })
+    );
   }
 
   /**
@@ -359,11 +385,11 @@ class MenuRecipeIntegration {
   getRecipeForMenuItem(menuItemId) {
     const links = this.getMenuRecipeLinks();
     const link = links[menuItemId];
-    
+
     if (!link) {
       return null;
     }
-    
+
     const recipe = this.getRecipeById(link.recipeId);
     if (!recipe) {
       this.recordLinkAudit(menuItemId, link.recipeId, {
@@ -379,7 +405,7 @@ class MenuRecipeIntegration {
    */
   getRecipeStatus(menuItemId) {
     const recipe = this.getRecipeForMenuItem(menuItemId);
-    
+
     if (!recipe) {
       this.recordLinkAudit(menuItemId, null, {
         status: 'no-recipe',
@@ -396,9 +422,12 @@ class MenuRecipeIntegration {
 
     // Check if recipe is complete
     const hasIngredients = recipe.ingredients && recipe.ingredients.length > 0;
-    const hasInstructions = recipe.instructions && recipe.instructions.length > 0;
-    const hasCosting = recipe.ingredients && recipe.ingredients.every(i => i.cost);
-    const hasAllergens = Array.isArray(recipe.allergens) && recipe.allergens.length > 0;
+    const hasInstructions =
+      recipe.instructions && recipe.instructions.length > 0;
+    const hasCosting =
+      recipe.ingredients && recipe.ingredients.every(i => i.cost);
+    const hasAllergens =
+      Array.isArray(recipe.allergens) && recipe.allergens.length > 0;
 
     if (hasCosting && hasIngredients && hasInstructions) {
       this.recordLinkAudit(menuItemId, recipe.id, {
@@ -478,7 +507,9 @@ class MenuRecipeIntegration {
     try {
       const auditKey = this.auditStorageKey;
       const existing = localStorage.getItem(auditKey);
-      if (!existing) return null;
+      if (!existing) {
+        return null;
+      }
       const log = JSON.parse(existing);
       return log[menuItemId] || null;
     } catch (error) {
@@ -486,7 +517,6 @@ class MenuRecipeIntegration {
       return null;
     }
   }
-
 
   /**
    * Open recipe in recipe developer
@@ -499,7 +529,7 @@ class MenuRecipeIntegration {
 
     // Store the recipe ID for the developer to load
     sessionStorage.setItem('recipe_to_edit', recipeId);
-    
+
     // Navigate to recipe developer
     window.location.href = 'recipe-developer.html';
   }
@@ -509,7 +539,7 @@ class MenuRecipeIntegration {
    */
   calculateMenuItemCost(menuItemId) {
     const recipe = this.getRecipeForMenuItem(menuItemId);
-    
+
     if (!recipe || !recipe.ingredients || recipe.ingredients.length === 0) {
       return {
         hasCost: false,
@@ -547,13 +577,13 @@ class MenuRecipeIntegration {
    */
   calculateFoodCostPercent(menuItem) {
     const cost = this.calculateMenuItemCost(menuItem.id);
-    
+
     if (!cost.hasCost || !menuItem.price || menuItem.price === 0) {
       return null;
     }
 
     const foodCostPercent = (cost.totalCost / menuItem.price) * 100;
-    
+
     return {
       percent: foodCostPercent.toFixed(1),
       cost: cost.totalCost.toFixed(2),
@@ -573,14 +603,27 @@ class MenuRecipeIntegration {
     const text = name + ' ' + desc;
 
     const cuisineKeywords = {
-      'Italian': ['pasta', 'pizza', 'risotto', 'italian', 'marinara', 'parmesan'],
-      'Asian': ['sushi', 'ramen', 'stir fry', 'asian', 'teriyaki', 'tempura'],
-      'Mexican': ['taco', 'burrito', 'quesadilla', 'mexican', 'salsa', 'guacamole'],
-      'American': ['burger', 'bbq', 'steak', 'american', 'wings', 'fries'],
-      'French': ['french', 'coq au vin', 'ratatouille', 'bouillabaisse'],
-      'Mediterranean': ['mediterranean', 'greek', 'hummus', 'falafel', 'tzatziki'],
-      'Indian': ['curry', 'tandoori', 'indian', 'naan', 'biryani'],
-      'Seafood': ['fish', 'seafood', 'salmon', 'shrimp', 'lobster', 'scallops']
+      Italian: ['pasta', 'pizza', 'risotto', 'italian', 'marinara', 'parmesan'],
+      Asian: ['sushi', 'ramen', 'stir fry', 'asian', 'teriyaki', 'tempura'],
+      Mexican: [
+        'taco',
+        'burrito',
+        'quesadilla',
+        'mexican',
+        'salsa',
+        'guacamole'
+      ],
+      American: ['burger', 'bbq', 'steak', 'american', 'wings', 'fries'],
+      French: ['french', 'coq au vin', 'ratatouille', 'bouillabaisse'],
+      Mediterranean: [
+        'mediterranean',
+        'greek',
+        'hummus',
+        'falafel',
+        'tzatziki'
+      ],
+      Indian: ['curry', 'tandoori', 'indian', 'naan', 'biryani'],
+      Seafood: ['fish', 'seafood', 'salmon', 'shrimp', 'lobster', 'scallops']
     };
 
     for (const [cuisine, keywords] of Object.entries(cuisineKeywords)) {
@@ -618,7 +661,7 @@ class MenuRecipeIntegration {
    */
   async updateRecipeFromMenuItem(menuItem) {
     const recipe = this.getRecipeForMenuItem(menuItem.id);
-    
+
     if (!recipe) {
       return;
     }
@@ -628,7 +671,9 @@ class MenuRecipeIntegration {
     recipe.description = menuItem.description;
     recipe.category = menuItem.category;
     recipe.menuItemPrice = menuItem.price;
-    recipe.targetCost = menuItem.price ? (menuItem.price * 0.30).toFixed(2) : null;
+    recipe.targetCost = menuItem.price
+      ? (menuItem.price * 0.3).toFixed(2)
+      : null;
     recipe.updatedAt = new Date().toISOString();
 
     // Save updated recipe
@@ -643,7 +688,7 @@ class MenuRecipeIntegration {
   async deleteRecipeForMenuItem(menuItemId, keepRecipe = false) {
     const links = this.getMenuRecipeLinks();
     const link = links[menuItemId];
-    
+
     if (!link) {
       return;
     }
@@ -688,19 +733,19 @@ class MenuRecipeIntegration {
 
     for (const item of menuItems) {
       const status = this.getRecipeStatus(item.id);
-      
+
       if (status.status !== 'no-recipe') {
         stats.withRecipes++;
       }
-      
+
       if (status.status === 'complete' || status.status === 'costed') {
         stats.withCompleteRecipes++;
       }
-      
+
       if (status.status === 'costed') {
         stats.withCosting++;
       }
-      
+
       if (status.status === 'no-recipe' || status.status === 'stub') {
         stats.needsDevelopment++;
       }
@@ -710,16 +755,15 @@ class MenuRecipeIntegration {
       if (costData) {
         totalFoodCost += parseFloat(costData.percent);
         itemsWithCost++;
-        
+
         if (costData.isOverTarget) {
           stats.overTargetCount++;
         }
       }
     }
 
-    stats.averageFoodCost = itemsWithCost > 0 
-      ? (totalFoodCost / itemsWithCost).toFixed(1) 
-      : 0;
+    stats.averageFoodCost =
+      itemsWithCost > 0 ? (totalFoodCost / itemsWithCost).toFixed(1) : 0;
 
     return stats;
   }
@@ -729,4 +773,3 @@ class MenuRecipeIntegration {
 window.menuRecipeIntegration = new MenuRecipeIntegration();
 
 console.log('🔗 Menu-Recipe Integration loaded');
-

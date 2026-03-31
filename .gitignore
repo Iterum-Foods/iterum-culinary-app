@@ -115,3 +115,9 @@ user_profiles/
 api_keys.txt
 secrets.txt
 .secrets
+
+# Playwright
+/playwright-report/
+/test-results/
+/blob-report/
+playwright/.cache/

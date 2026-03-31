@@ -13,14 +13,14 @@ class CentralDataLoader {
 
   init() {
     console.log('📂 Central Data Loader initialized');
-    
+
     // Listen for authentication events
-    window.addEventListener('userLoggedIn', (e) => {
+    window.addEventListener('userLoggedIn', e => {
       console.log('👤 User logged in - loading all data...');
       this.loadAllData();
     });
 
-    window.addEventListener('userSwitched', (e) => {
+    window.addEventListener('userSwitched', e => {
       console.log('🔄 User switched - reloading data...');
       this.loadAllData();
     });
@@ -61,16 +61,17 @@ class CentralDataLoader {
       console.log(`✅ All data loaded in ${loadTime}ms`);
 
       // Dispatch event that data is ready
-      window.dispatchEvent(new CustomEvent('dataLoaded', {
-        detail: {
-          cache: this.dataCache,
-          loadTime: loadTime
-        }
-      }));
+      window.dispatchEvent(
+        new CustomEvent('dataLoaded', {
+          detail: {
+            cache: this.dataCache,
+            loadTime: loadTime
+          }
+        })
+      );
 
       // Show data stats
       this.logDataStats();
-
     } catch (error) {
       console.error('❌ Error loading data:', error);
       this.isLoading = false;
@@ -84,44 +85,77 @@ class CentralDataLoader {
     const userId = this.getCurrentUserId();
 
     // Load recipes
-    this.dataCache.recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
-    this.dataCache.recipeIdeas = JSON.parse(localStorage.getItem('recipe_ideas') || '[]');
-    this.dataCache.recipeStubs = JSON.parse(localStorage.getItem('recipe_stubs') || '[]');
+    this.dataCache.recipes = JSON.parse(
+      localStorage.getItem('recipes') || '[]'
+    );
+    this.dataCache.recipeIdeas = JSON.parse(
+      localStorage.getItem('recipe_ideas') || '[]'
+    );
+    this.dataCache.recipeStubs = JSON.parse(
+      localStorage.getItem('recipe_stubs') || '[]'
+    );
 
     // Load projects
-    this.dataCache.projects = JSON.parse(localStorage.getItem(`iterum_projects_user_${userId}`) || '[]');
-    this.dataCache.currentProject = localStorage.getItem(`iterum_current_project_user_${userId}`) || 'master';
+    this.dataCache.projects = JSON.parse(
+      localStorage.getItem(`iterum_projects_user_${userId}`) || '[]'
+    );
+    this.dataCache.currentProject =
+      localStorage.getItem(`iterum_current_project_user_${userId}`) || 'master';
 
     // Load ingredients
-    this.dataCache.ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
-    this.dataCache.customIngredients = JSON.parse(localStorage.getItem('custom_ingredients') || '[]');
+    this.dataCache.ingredients = JSON.parse(
+      localStorage.getItem('ingredients_database') || '[]'
+    );
+    this.dataCache.customIngredients = JSON.parse(
+      localStorage.getItem('custom_ingredients') || '[]'
+    );
 
     // Load vendors
-    this.dataCache.vendors = JSON.parse(localStorage.getItem('iterum_vendors') || '[]');
-    this.dataCache.vendorConnections = JSON.parse(localStorage.getItem('vendor_ingredient_connections') || '[]');
+    this.dataCache.vendors = JSON.parse(
+      localStorage.getItem('iterum_vendors') || '[]'
+    );
+    this.dataCache.vendorConnections = JSON.parse(
+      localStorage.getItem('vendor_ingredient_connections') || '[]'
+    );
 
     // Load equipment
-    this.dataCache.equipment = JSON.parse(localStorage.getItem('equipment_list') || '[]');
+    this.dataCache.equipment = JSON.parse(
+      localStorage.getItem('equipment_list') || '[]'
+    );
 
     // Load inventory
-    this.dataCache.inventory = JSON.parse(localStorage.getItem('inventory_items') || '[]');
-    this.dataCache.inventoryTransactions = JSON.parse(localStorage.getItem('inventory_transactions') || '[]');
+    this.dataCache.inventory = JSON.parse(
+      localStorage.getItem('inventory_items') || '[]'
+    );
+    this.dataCache.inventoryTransactions = JSON.parse(
+      localStorage.getItem('inventory_transactions') || '[]'
+    );
 
     // Load production plans
-    this.dataCache.productionPlans = JSON.parse(localStorage.getItem('production_plans') || '[]');
+    this.dataCache.productionPlans = JSON.parse(
+      localStorage.getItem('production_plans') || '[]'
+    );
 
     // Load menus (from all projects)
     this.dataCache.menus = this.loadAllMenus();
-    this.dataCache.menuRecipeLinks = JSON.parse(localStorage.getItem('menu_recipe_links') || '{}');
+    this.dataCache.menuRecipeLinks = JSON.parse(
+      localStorage.getItem('menu_recipe_links') || '{}'
+    );
 
     // Load photos
-    this.dataCache.photos = JSON.parse(localStorage.getItem('recipe_photos') || '[]');
+    this.dataCache.photos = JSON.parse(
+      localStorage.getItem('recipe_photos') || '[]'
+    );
 
     // Load notes
-    this.dataCache.dailyNotes = JSON.parse(localStorage.getItem('daily_notes') || '{}');
+    this.dataCache.dailyNotes = JSON.parse(
+      localStorage.getItem('daily_notes') || '{}'
+    );
 
     // Load user preferences
-    this.dataCache.userPreferences = JSON.parse(localStorage.getItem('user_preferences') || '{}');
+    this.dataCache.userPreferences = JSON.parse(
+      localStorage.getItem('user_preferences') || '{}'
+    );
 
     console.log('✅ Data loaded from localStorage');
   }
@@ -193,7 +227,6 @@ class CentralDataLoader {
       }
 
       console.log('✅ Backend sync complete');
-
     } catch (error) {
       console.warn('⚠️ Backend sync failed:', error.message);
       // Continue with localStorage data
@@ -217,17 +250,17 @@ class CentralDataLoader {
    */
   refresh(dataType) {
     const userId = this.getCurrentUserId();
-    
+
     const keyMap = {
-      'recipes': 'recipes',
-      'ingredients': 'ingredients_database',
-      'vendors': 'iterum_vendors',
-      'equipment': 'equipment_list',
-      'inventory': 'inventory_items',
-      'projects': `iterum_projects_user_${userId}`,
-      'productionPlans': 'production_plans',
-      'photos': 'recipe_photos',
-      'dailyNotes': 'daily_notes'
+      recipes: 'recipes',
+      ingredients: 'ingredients_database',
+      vendors: 'iterum_vendors',
+      equipment: 'equipment_list',
+      inventory: 'inventory_items',
+      projects: `iterum_projects_user_${userId}`,
+      productionPlans: 'production_plans',
+      photos: 'recipe_photos',
+      dailyNotes: 'daily_notes'
     };
 
     const key = keyMap[dataType];
@@ -273,7 +306,7 @@ class CentralDataLoader {
     if (window.authManager?.currentUser) {
       return window.authManager.currentUser.userId;
     }
-    
+
     const sessionUser = localStorage.getItem('current_user');
     if (sessionUser) {
       try {
@@ -283,7 +316,7 @@ class CentralDataLoader {
         return 'guest';
       }
     }
-    
+
     return 'guest';
   }
 
@@ -298,11 +331,13 @@ class CentralDataLoader {
    * Wait for data to be loaded
    */
   async waitForData(maxWaitMs = 5000) {
-    if (this.isLoaded) return true;
+    if (this.isLoaded) {
+      return true;
+    }
 
     const startTime = Date.now();
-    
-    return new Promise((resolve) => {
+
+    return new Promise(resolve => {
       const checkInterval = setInterval(() => {
         if (this.isLoaded) {
           clearInterval(checkInterval);
@@ -327,7 +362,9 @@ class CentralDataLoader {
         stubs: this.dataCache.recipeStubs?.length || 0
       },
       ingredients: {
-        total: (this.dataCache.ingredients?.length || 0) + (this.dataCache.customIngredients?.length || 0),
+        total:
+          (this.dataCache.ingredients?.length || 0) +
+          (this.dataCache.customIngredients?.length || 0),
         base: this.dataCache.ingredients?.length || 0,
         custom: this.dataCache.customIngredients?.length || 0
       },
@@ -338,11 +375,17 @@ class CentralDataLoader {
       inventory: {
         items: this.dataCache.inventory?.length || 0,
         transactions: this.dataCache.inventoryTransactions?.length || 0,
-        value: this.dataCache.inventory?.reduce((sum, item) => sum + (item.cost || 0) * (item.quantity || 0), 0) || 0
+        value:
+          this.dataCache.inventory?.reduce(
+            (sum, item) => sum + (item.cost || 0) * (item.quantity || 0),
+            0
+          ) || 0
       },
       production: {
         plans: this.dataCache.productionPlans?.length || 0,
-        active: this.dataCache.productionPlans?.filter(p => p.status !== 'executed').length || 0
+        active:
+          this.dataCache.productionPlans?.filter(p => p.status !== 'executed')
+            .length || 0
       },
       projects: {
         total: this.dataCache.projects?.length || 0,
@@ -399,15 +442,19 @@ class CentralDataLoader {
     document.body.appendChild(indicator);
 
     // Remove after data loads
-    window.addEventListener('dataLoaded', () => {
-      setTimeout(() => {
-        const ind = document.getElementById('data-loading-indicator');
-        if (ind) {
-          ind.style.animation = 'slideOut 0.3s ease';
-          setTimeout(() => ind.remove(), 300);
-        }
-      }, 500);
-    }, { once: true });
+    window.addEventListener(
+      'dataLoaded',
+      () => {
+        setTimeout(() => {
+          const ind = document.getElementById('data-loading-indicator');
+          if (ind) {
+            ind.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => ind.remove(), 300);
+          }
+        }, 500);
+      },
+      { once: true }
+    );
   }
 
   /**
@@ -415,7 +462,7 @@ class CentralDataLoader {
    */
   showDataLoadedNotification() {
     const summary = this.getSummary();
-    
+
     const notification = document.createElement('div');
     notification.style.cssText = `
       position: fixed;
@@ -429,7 +476,7 @@ class CentralDataLoader {
       min-width: 300px;
       border-left: 4px solid #22c55e;
     `;
-    
+
     notification.innerHTML = `
       <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
         <div style="font-size: 24px;">✅</div>
@@ -454,7 +501,9 @@ class CentralDataLoader {
    * Sync from backend
    */
   async syncFromBackend() {
-    if (!window.authApiHelper) return;
+    if (!window.authApiHelper) {
+      return;
+    }
 
     try {
       // Try to get latest data from backend
@@ -475,7 +524,6 @@ class CentralDataLoader {
           // Silently fail, use localStorage data
         }
       }
-
     } catch (error) {
       console.warn('Backend sync unavailable, using local data only');
     }
@@ -517,4 +565,3 @@ window.addEventListener('userLoggedIn', () => {
 });
 
 console.log('📂 Central Data Loader ready');
-

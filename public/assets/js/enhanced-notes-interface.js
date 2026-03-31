@@ -5,30 +5,30 @@
  */
 
 class EnhancedNotesInterface {
-    constructor() {
-        this.currentNote = null;
-        this.isEditing = false;
-        this.searchQuery = '';
-        this.currentFilter = 'all';
-        this.currentSort = 'date';
-        this.init();
-    }
+  constructor() {
+    this.currentNote = null;
+    this.isEditing = false;
+    this.searchQuery = '';
+    this.currentFilter = 'all';
+    this.currentSort = 'date';
+    this.init();
+  }
 
-    init() {
-        console.log('📝 Enhanced Notes Interface initialized');
-        this.createNotesInterface();
-        this.setupEventListeners();
-        this.loadNotes();
-    }
+  init() {
+    console.log('📝 Enhanced Notes Interface initialized');
+    this.createNotesInterface();
+    this.setupEventListeners();
+    this.loadNotes();
+  }
 
-    /**
-     * Create the enhanced notes interface
-     */
-    createNotesInterface() {
-        const notesContainer = document.createElement('div');
-        notesContainer.id = 'enhanced-notes-interface';
-        notesContainer.className = 'enhanced-notes-interface';
-        notesContainer.style.cssText = `
+  /**
+   * Create the enhanced notes interface
+   */
+  createNotesInterface() {
+    const notesContainer = document.createElement('div');
+    notesContainer.id = 'enhanced-notes-interface';
+    notesContainer.className = 'enhanced-notes-interface';
+    notesContainer.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -41,7 +41,7 @@ class EnhancedNotesInterface {
             font-family: 'Inter', sans-serif;
         `;
 
-        notesContainer.innerHTML = `
+    notesContainer.innerHTML = `
             <div class="notes-header" style="
                 padding: 20px 24px;
                 background: rgba(15, 23, 42, 0.95);
@@ -244,22 +244,22 @@ class EnhancedNotesInterface {
             </div>
         `;
 
-        document.body.appendChild(notesContainer);
-        this.renderCategories();
-        this.renderTemplates();
-        this.renderNotes();
-        this.renderStats();
-    }
+    document.body.appendChild(notesContainer);
+    this.renderCategories();
+    this.renderTemplates();
+    this.renderNotes();
+    this.renderStats();
+  }
 
-    /**
-     * Render categories
-     */
-    renderCategories() {
-        const container = document.getElementById('category-list');
-        if (!container) return;
+  /**
+   * Render categories
+   */
+  renderCategories() {
+    const container = document.getElementById('category-list');
+    if (!container) return;
 
-        const categories = window.robustNotesSystem.categories;
-        container.innerHTML = `
+    const categories = window.robustNotesSystem.categories;
+    container.innerHTML = `
             <div class="category-item" onclick="window.enhancedNotesInterface.filterNotes('all')" style="
                 background: rgba(51, 65, 85, 0.3);
                 border: 1px solid #475569;
@@ -275,7 +275,9 @@ class EnhancedNotesInterface {
                     <span style="font-weight: 500;">All Notes</span>
                 </div>
             </div>
-            ${categories.map(category => `
+            ${categories
+              .map(
+                category => `
                 <div class="category-item" onclick="window.enhancedNotesInterface.filterNotes('${category.id}')" style="
                     background: rgba(51, 65, 85, 0.3);
                     border: 1px solid #475569;
@@ -291,19 +293,23 @@ class EnhancedNotesInterface {
                         <span style="font-weight: 500;">${category.name}</span>
                     </div>
                 </div>
-            `).join('')}
+            `
+              )
+              .join('')}
         `;
-    }
+  }
 
-    /**
-     * Render templates
-     */
-    renderTemplates() {
-        const container = document.getElementById('template-list');
-        if (!container) return;
+  /**
+   * Render templates
+   */
+  renderTemplates() {
+    const container = document.getElementById('template-list');
+    if (!container) return;
 
-        const templates = window.robustNotesSystem.templates;
-        container.innerHTML = templates.map(template => `
+    const templates = window.robustNotesSystem.templates;
+    container.innerHTML = templates
+      .map(
+        template => `
             <div class="template-item" onclick="window.enhancedNotesInterface.createFromTemplate('${template.id}')" style="
                 background: rgba(51, 65, 85, 0.3);
                 border: 1px solid #475569;
@@ -318,20 +324,26 @@ class EnhancedNotesInterface {
                 <div style="font-weight: 500; margin-bottom: 2px;">${template.name}</div>
                 <div style="color: #94a3b8; font-size: 10px;">${template.category}</div>
             </div>
-        `).join('');
-    }
+        `
+      )
+      .join('');
+  }
 
-    /**
-     * Render notes list
-     */
-    renderNotes() {
-        const container = document.getElementById('notes-list');
-        if (!container) return;
+  /**
+   * Render notes list
+   */
+  renderNotes() {
+    const container = document.getElementById('notes-list');
+    if (!container) return;
 
-        const notes = window.robustNotesSystem.getNotes(this.currentFilter, this.currentSort, this.searchQuery);
-        
-        if (notes.length === 0) {
-            container.innerHTML = `
+    const notes = window.robustNotesSystem.getNotes(
+      this.currentFilter,
+      this.currentSort,
+      this.searchQuery
+    );
+
+    if (notes.length === 0) {
+      container.innerHTML = `
                 <div style="
                     text-align: center;
                     padding: 40px 20px;
@@ -342,10 +354,12 @@ class EnhancedNotesInterface {
                     <div style="font-size: 14px;">Create your first note or try a different filter</div>
                 </div>
             `;
-            return;
-        }
+      return;
+    }
 
-        container.innerHTML = notes.map(note => `
+    container.innerHTML = notes
+      .map(
+        note => `
             <div class="note-item" onclick="window.enhancedNotesInterface.selectNote(${note.id})" style="
                 background: rgba(51, 65, 85, 0.3);
                 border: 1px solid #475569;
@@ -372,7 +386,9 @@ class EnhancedNotesInterface {
                     ${note.content.substring(0, 100)}${note.content.length > 100 ? '...' : ''}
                 </div>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    ${note.tags.map(tag => `
+                    ${note.tags
+                      .map(
+                        tag => `
                         <span style="
                             background: rgba(59, 130, 246, 0.2);
                             color: #60a5fa;
@@ -380,21 +396,25 @@ class EnhancedNotesInterface {
                             border-radius: 4px;
                             font-size: 10px;
                         ">${tag}</span>
-                    `).join('')}
+                    `
+                      )
+                      .join('')}
                 </div>
             </div>
-        `).join('');
-    }
+        `
+      )
+      .join('');
+  }
 
-    /**
-     * Render statistics
-     */
-    renderStats() {
-        const container = document.getElementById('notes-stats');
-        if (!container) return;
+  /**
+   * Render statistics
+   */
+  renderStats() {
+    const container = document.getElementById('notes-stats');
+    if (!container) return;
 
-        const stats = window.robustNotesSystem.getStats();
-        container.innerHTML = `
+    const stats = window.robustNotesSystem.getStats();
+    container.innerHTML = `
             <div style="margin-bottom: 8px;">
                 <span style="color: #e2e8f0; font-weight: 500;">${stats.totalNotes}</span> notes
             </div>
@@ -408,27 +428,27 @@ class EnhancedNotesInterface {
                 <span style="color: #e2e8f0; font-weight: 500;">${stats.averageWordsPerNote}</span> avg words
             </div>
         `;
-    }
+  }
 
-    /**
-     * Select note for editing
-     */
-    selectNote(noteId) {
-        const note = window.robustNotesSystem.notes.find(n => n.id === noteId);
-        if (!note) return;
+  /**
+   * Select note for editing
+   */
+  selectNote(noteId) {
+    const note = window.robustNotesSystem.notes.find(n => n.id === noteId);
+    if (!note) return;
 
-        this.currentNote = note;
-        this.renderNoteEditor();
-    }
+    this.currentNote = note;
+    this.renderNoteEditor();
+  }
 
-    /**
-     * Render note editor
-     */
-    renderNoteEditor() {
-        const container = document.getElementById('note-editor-content');
-        if (!container || !this.currentNote) return;
+  /**
+   * Render note editor
+   */
+  renderNoteEditor() {
+    const container = document.getElementById('note-editor-content');
+    if (!container || !this.currentNote) return;
 
-        container.innerHTML = `
+    container.innerHTML = `
             <div style="margin-bottom: 16px;">
                 <input type="text" id="note-title" value="${this.currentNote.title}" style="
                     width: 100%;
@@ -455,9 +475,12 @@ class EnhancedNotesInterface {
                             color: #e2e8f0;
                             font-size: 14px;
                         ">
-                            ${window.robustNotesSystem.categories.map(cat => 
-                                `<option value="${cat.id}" ${cat.id === this.currentNote.category ? 'selected' : ''}>${cat.name}</option>`
-                            ).join('')}
+                            ${window.robustNotesSystem.categories
+                              .map(
+                                cat =>
+                                  `<option value="${cat.id}" ${cat.id === this.currentNote.category ? 'selected' : ''}>${cat.name}</option>`
+                              )
+                              .join('')}
                         </select>
                     </div>
                     <div>
@@ -554,259 +577,272 @@ class EnhancedNotesInterface {
                 <div>Reading time: ${this.currentNote.readingTime} min</div>
             </div>
         `;
+  }
+
+  /**
+   * Create new note
+   */
+  newNote() {
+    const note = window.robustNotesSystem.createNote({
+      title: 'New Note',
+      content: '',
+      category: 'personal'
+    });
+    this.currentNote = note;
+    this.renderNoteEditor();
+    this.renderNotes();
+    this.renderStats();
+  }
+
+  /**
+   * Create note from template
+   */
+  createFromTemplate(templateId) {
+    const note = window.robustNotesSystem.createFromTemplate(templateId);
+    if (note) {
+      this.currentNote = note;
+      this.renderNoteEditor();
+      this.renderNotes();
+      this.renderStats();
+    }
+  }
+
+  /**
+   * Update note title
+   */
+  updateNoteTitle(title) {
+    if (this.currentNote) {
+      window.robustNotesSystem.updateNote(this.currentNote.id, { title });
+      this.currentNote.title = title;
+    }
+  }
+
+  /**
+   * Update note category
+   */
+  updateNoteCategory(category) {
+    if (this.currentNote) {
+      window.robustNotesSystem.updateNote(this.currentNote.id, { category });
+      this.currentNote.category = category;
+    }
+  }
+
+  /**
+   * Update note priority
+   */
+  updateNotePriority(priority) {
+    if (this.currentNote) {
+      window.robustNotesSystem.updateNote(this.currentNote.id, { priority });
+      this.currentNote.priority = priority;
+    }
+  }
+
+  /**
+   * Update note tags
+   */
+  updateNoteTags(tags) {
+    if (this.currentNote) {
+      const tagArray = tags
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(tag => tag);
+      window.robustNotesSystem.updateNote(this.currentNote.id, {
+        tags: tagArray
+      });
+      this.currentNote.tags = tagArray;
+    }
+  }
+
+  /**
+   * Update note content
+   */
+  updateNoteContent(content) {
+    if (this.currentNote) {
+      window.robustNotesSystem.updateNote(this.currentNote.id, { content });
+      this.currentNote.content = content;
+    }
+  }
+
+  /**
+   * Save note
+   */
+  saveNote() {
+    if (this.currentNote) {
+      window.robustNotesSystem.updateNote(this.currentNote.id, {
+        title: document.getElementById('note-title').value,
+        content: document.getElementById('note-content').value,
+        category: document.getElementById('note-category').value,
+        priority: document.getElementById('note-priority').value,
+        tags: document
+          .getElementById('note-tags')
+          .value.split(',')
+          .map(tag => tag.trim())
+          .filter(tag => tag)
+      });
+      this.renderNotes();
+      this.renderStats();
+      this.showNotification('Note saved!', 'success');
+    }
+  }
+
+  /**
+   * Delete note
+   */
+  deleteNote() {
+    if (
+      this.currentNote &&
+      confirm('Are you sure you want to delete this note?')
+    ) {
+      window.robustNotesSystem.deleteNote(this.currentNote.id);
+      this.currentNote = null;
+      this.renderNoteEditor();
+      this.renderNotes();
+      this.renderStats();
+      this.showNotification('Note deleted!', 'info');
+    }
+  }
+
+  /**
+   * Duplicate note
+   */
+  duplicateNote() {
+    if (this.currentNote) {
+      const newNote = window.robustNotesSystem.createNote({
+        title: `${this.currentNote.title} (Copy)`,
+        content: this.currentNote.content,
+        category: this.currentNote.category,
+        tags: this.currentNote.tags,
+        priority: this.currentNote.priority
+      });
+      this.currentNote = newNote;
+      this.renderNoteEditor();
+      this.renderNotes();
+      this.renderStats();
+      this.showNotification('Note duplicated!', 'success');
+    }
+  }
+
+  /**
+   * Filter notes
+   */
+  filterNotes(category) {
+    this.currentFilter = category;
+    this.renderNotes();
+  }
+
+  /**
+   * Search notes
+   */
+  searchNotes(query) {
+    this.searchQuery = query;
+    this.renderNotes();
+  }
+
+  /**
+   * Sort notes
+   */
+  sortNotes(sort) {
+    this.currentSort = sort;
+    this.renderNotes();
+  }
+
+  /**
+   * Toggle view
+   */
+  toggleView(view) {
+    // Update active button
+    document.querySelectorAll('.view-btn').forEach(btn => {
+      btn.classList.remove('active');
+      btn.style.background = '#64748b';
+      btn.style.borderColor = '#475569';
+      btn.style.color = '#cbd5e1';
+    });
+
+    const activeBtn = document.querySelector(`[data-view="${view}"]`);
+    if (activeBtn) {
+      activeBtn.classList.add('active');
+      activeBtn.style.background = '#3b82f6';
+      activeBtn.style.borderColor = '#1d4ed8';
+      activeBtn.style.color = 'white';
     }
 
-    /**
-     * Create new note
-     */
-    newNote() {
-        const note = window.robustNotesSystem.createNote({
-            title: 'New Note',
-            content: '',
-            category: 'personal'
-        });
-        this.currentNote = note;
-        this.renderNoteEditor();
-        this.renderNotes();
-        this.renderStats();
-    }
+    // TODO: Implement grid view
+    this.renderNotes();
+  }
 
-    /**
-     * Create note from template
-     */
-    createFromTemplate(templateId) {
-        const note = window.robustNotesSystem.createFromTemplate(templateId);
-        if (note) {
-            this.currentNote = note;
-            this.renderNoteEditor();
-            this.renderNotes();
-            this.renderStats();
-        }
-    }
+  /**
+   * Load notes
+   */
+  loadNotes() {
+    this.renderNotes();
+    this.renderStats();
+  }
 
-    /**
-     * Update note title
-     */
-    updateNoteTitle(title) {
-        if (this.currentNote) {
-            window.robustNotesSystem.updateNote(this.currentNote.id, { title });
-            this.currentNote.title = title;
-        }
+  /**
+   * Open brainstorming
+   */
+  openBrainstorming() {
+    if (window.recipeBrainstorming) {
+      window.recipeBrainstorming.openWorkspace();
     }
+  }
 
-    /**
-     * Update note category
-     */
-    updateNoteCategory(category) {
-        if (this.currentNote) {
-            window.robustNotesSystem.updateNote(this.currentNote.id, { category });
-            this.currentNote.category = category;
-        }
+  /**
+   * Open napkin brainstorming
+   */
+  openNapkin() {
+    if (window.napkinBrainstorming) {
+      window.napkinBrainstorming.openNapkinWorkspace();
     }
+  }
 
-    /**
-     * Update note priority
-     */
-    updateNotePriority(priority) {
-        if (this.currentNote) {
-            window.robustNotesSystem.updateNote(this.currentNote.id, { priority });
-            this.currentNote.priority = priority;
-        }
+  /**
+   * Close interface
+   */
+  closeInterface() {
+    const panel = document.getElementById('enhanced-notes-interface');
+    if (panel) {
+      panel.style.display = 'none';
     }
+  }
 
-    /**
-     * Update note tags
-     */
-    updateNoteTags(tags) {
-        if (this.currentNote) {
-            const tagArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag);
-            window.robustNotesSystem.updateNote(this.currentNote.id, { tags: tagArray });
-            this.currentNote.tags = tagArray;
-        }
+  /**
+   * Show notification
+   */
+  showNotification(message, type = 'info') {
+    if (window.showToast) {
+      window.showToast(message, type);
+    } else {
+      console.log(`[${type.toUpperCase()}] ${message}`);
     }
+  }
 
-    /**
-     * Update note content
-     */
-    updateNoteContent(content) {
-        if (this.currentNote) {
-            window.robustNotesSystem.updateNote(this.currentNote.id, { content });
-            this.currentNote.content = content;
-        }
-    }
+  /**
+   * Setup event listeners
+   */
+  setupEventListeners() {
+    // Keyboard shortcuts
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey && e.key === 'n') {
+        e.preventDefault();
+        this.openInterface();
+      }
+    });
+  }
 
-    /**
-     * Save note
-     */
-    saveNote() {
-        if (this.currentNote) {
-            window.robustNotesSystem.updateNote(this.currentNote.id, {
-                title: document.getElementById('note-title').value,
-                content: document.getElementById('note-content').value,
-                category: document.getElementById('note-category').value,
-                priority: document.getElementById('note-priority').value,
-                tags: document.getElementById('note-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag)
-            });
-            this.renderNotes();
-            this.renderStats();
-            this.showNotification('Note saved!', 'success');
-        }
+  /**
+   * Open interface
+   */
+  openInterface() {
+    const panel = document.getElementById('enhanced-notes-interface');
+    if (panel) {
+      panel.style.display = 'flex';
+    } else {
+      this.createNotesInterface();
+      document.getElementById('enhanced-notes-interface').style.display =
+        'flex';
     }
-
-    /**
-     * Delete note
-     */
-    deleteNote() {
-        if (this.currentNote && confirm('Are you sure you want to delete this note?')) {
-            window.robustNotesSystem.deleteNote(this.currentNote.id);
-            this.currentNote = null;
-            this.renderNoteEditor();
-            this.renderNotes();
-            this.renderStats();
-            this.showNotification('Note deleted!', 'info');
-        }
-    }
-
-    /**
-     * Duplicate note
-     */
-    duplicateNote() {
-        if (this.currentNote) {
-            const newNote = window.robustNotesSystem.createNote({
-                title: `${this.currentNote.title} (Copy)`,
-                content: this.currentNote.content,
-                category: this.currentNote.category,
-                tags: this.currentNote.tags,
-                priority: this.currentNote.priority
-            });
-            this.currentNote = newNote;
-            this.renderNoteEditor();
-            this.renderNotes();
-            this.renderStats();
-            this.showNotification('Note duplicated!', 'success');
-        }
-    }
-
-    /**
-     * Filter notes
-     */
-    filterNotes(category) {
-        this.currentFilter = category;
-        this.renderNotes();
-    }
-
-    /**
-     * Search notes
-     */
-    searchNotes(query) {
-        this.searchQuery = query;
-        this.renderNotes();
-    }
-
-    /**
-     * Sort notes
-     */
-    sortNotes(sort) {
-        this.currentSort = sort;
-        this.renderNotes();
-    }
-
-    /**
-     * Toggle view
-     */
-    toggleView(view) {
-        // Update active button
-        document.querySelectorAll('.view-btn').forEach(btn => {
-            btn.classList.remove('active');
-            btn.style.background = '#64748b';
-            btn.style.borderColor = '#475569';
-            btn.style.color = '#cbd5e1';
-        });
-        
-        const activeBtn = document.querySelector(`[data-view="${view}"]`);
-        if (activeBtn) {
-            activeBtn.classList.add('active');
-            activeBtn.style.background = '#3b82f6';
-            activeBtn.style.borderColor = '#1d4ed8';
-            activeBtn.style.color = 'white';
-        }
-        
-        // TODO: Implement grid view
-        this.renderNotes();
-    }
-
-    /**
-     * Load notes
-     */
-    loadNotes() {
-        this.renderNotes();
-        this.renderStats();
-    }
-
-    /**
-     * Open brainstorming
-     */
-    openBrainstorming() {
-        if (window.recipeBrainstorming) {
-            window.recipeBrainstorming.openWorkspace();
-        }
-    }
-
-    /**
-     * Open napkin brainstorming
-     */
-    openNapkin() {
-        if (window.napkinBrainstorming) {
-            window.napkinBrainstorming.openNapkinWorkspace();
-        }
-    }
-
-    /**
-     * Close interface
-     */
-    closeInterface() {
-        const interface = document.getElementById('enhanced-notes-interface');
-        if (interface) {
-            interface.style.display = 'none';
-        }
-    }
-
-    /**
-     * Show notification
-     */
-    showNotification(message, type = 'info') {
-        if (window.showToast) {
-            window.showToast(message, type);
-        } else {
-            console.log(`[${type.toUpperCase()}] ${message}`);
-        }
-    }
-
-    /**
-     * Setup event listeners
-     */
-    setupEventListeners() {
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'n') {
-                e.preventDefault();
-                this.openInterface();
-            }
-        });
-    }
-
-    /**
-     * Open interface
-     */
-    openInterface() {
-        const interface = document.getElementById('enhanced-notes-interface');
-        if (interface) {
-            interface.style.display = 'flex';
-        } else {
-            this.createNotesInterface();
-            document.getElementById('enhanced-notes-interface').style.display = 'flex';
-        }
-    }
+  }
 }
 
 // Initialize global instance

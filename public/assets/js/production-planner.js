@@ -18,7 +18,7 @@ class ProductionPlanner {
    */
   scaleRecipe(recipe, targetServings) {
     const scaleFactor = targetServings / (recipe.servings || 1);
-    
+
     return {
       ...recipe,
       originalServings: recipe.servings,
@@ -32,7 +32,9 @@ class ProductionPlanner {
       })),
       prepTime: Math.ceil(recipe.prepTime * Math.sqrt(scaleFactor)), // Scales less than linear
       cookTime: Math.ceil(recipe.cookTime * Math.sqrt(scaleFactor)),
-      totalTime: Math.ceil((recipe.prepTime + recipe.cookTime) * Math.sqrt(scaleFactor))
+      totalTime: Math.ceil(
+        (recipe.prepTime + recipe.cookTime) * Math.sqrt(scaleFactor)
+      )
     };
   }
 
@@ -53,22 +55,30 @@ class ProductionPlanner {
     };
 
     // Scale all recipes
-    plan.scaledRecipes = plan.recipes.map(recipeRef => {
-      const recipe = this.getRecipeById(recipeRef.recipeId);
-      if (recipe) {
-        return this.scaleRecipe(recipe, recipeRef.servings);
-      }
-      return null;
-    }).filter(Boolean);
+    plan.scaledRecipes = plan.recipes
+      .map(recipeRef => {
+        const recipe = this.getRecipeById(recipeRef.recipeId);
+        if (recipe) {
+          return this.scaleRecipe(recipe, recipeRef.servings);
+        }
+        return null;
+      })
+      .filter(Boolean);
 
     // Generate shopping list
     plan.shoppingList = this.generateShoppingList(plan.scaledRecipes);
 
     // Generate prep list
-    plan.prepList = this.generatePrepList(plan.scaledRecipes, planData.eventDate);
+    plan.prepList = this.generatePrepList(
+      plan.scaledRecipes,
+      planData.eventDate
+    );
 
     // Calculate timeline
-    plan.timeline = this.generateTimeline(plan.scaledRecipes, planData.eventDate);
+    plan.timeline = this.generateTimeline(
+      plan.scaledRecipes,
+      planData.eventDate
+    );
 
     // Save plan
     this.savePlan(plan);
@@ -86,7 +96,7 @@ class ProductionPlanner {
     scaledRecipes.forEach(recipe => {
       recipe.ingredients.forEach(ing => {
         const key = `${ing.name}_${ing.unit}`;
-        
+
         if (!ingredientMap[key]) {
           ingredientMap[key] = {
             name: ing.name,
@@ -146,7 +156,9 @@ class ProductionPlanner {
               taskName: this.extractTaskName(instruction),
               servings: recipe.servings,
               station: this.getStationForRecipe(recipe),
-              estimatedTime: Math.ceil(recipe.prepTime / recipe.instructions.length),
+              estimatedTime: Math.ceil(
+                recipe.prepTime / recipe.instructions.length
+              ),
               priority: this.calculatePriority(recipe, eventDate),
               step: stepIndex + 1,
               instruction: instruction,
@@ -177,14 +189,18 @@ class ProductionPlanner {
         startTime: startTime.toISOString(),
         prepStart: startTime,
         prepEnd: new Date(startTime.getTime() + (recipe.prepTime || 0) * 60000),
-        cookStart: new Date(startTime.getTime() + (recipe.prepTime || 0) * 60000),
+        cookStart: new Date(
+          startTime.getTime() + (recipe.prepTime || 0) * 60000
+        ),
         cookEnd: eventTime,
         totalMinutes: totalTime,
         servings: recipe.servings
       });
     });
 
-    return timeline.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+    return timeline.sort(
+      (a, b) => new Date(a.startTime) - new Date(b.startTime)
+    );
   }
 
   /**
@@ -192,12 +208,20 @@ class ProductionPlanner {
    */
   getStationForRecipe(recipe) {
     const category = (recipe.category || '').toLowerCase();
-    
-    if (category.includes('dessert') || category.includes('baking')) return 'Pastry';
-    if (category.includes('salad') || category.includes('cold')) return 'Garde Manger';
-    if (category.includes('grill') || category.includes('meat')) return 'Grill';
-    if (category.includes('sauce') || category.includes('soup')) return 'Sauté';
-    
+
+    if (category.includes('dessert') || category.includes('baking')) {
+      return 'Pastry';
+    }
+    if (category.includes('salad') || category.includes('cold')) {
+      return 'Garde Manger';
+    }
+    if (category.includes('grill') || category.includes('meat')) {
+      return 'Grill';
+    }
+    if (category.includes('sauce') || category.includes('soup')) {
+      return 'Sauté';
+    }
+
     return 'Hot Line';
   }
 
@@ -205,9 +229,10 @@ class ProductionPlanner {
    * Helper: Calculate priority
    */
   calculatePriority(recipe, eventDate) {
-    const hoursUntilEvent = (new Date(eventDate) - new Date()) / (1000 * 60 * 60);
+    const hoursUntilEvent =
+      (new Date(eventDate) - new Date()) / (1000 * 60 * 60);
     const totalTime = (recipe.prepTime || 0) + (recipe.cookTime || 0);
-    
+
     // Higher priority if less time until event and longer prep time
     return Math.round((totalTime / hoursUntilEvent) * 100);
   }
@@ -216,7 +241,17 @@ class ProductionPlanner {
    * Helper: Check if step is significant
    */
   isSignificantStep(instruction) {
-    const significantWords = ['chop', 'dice', 'mince', 'sauté', 'roast', 'boil', 'mix', 'prepare', 'marinate'];
+    const significantWords = [
+      'chop',
+      'dice',
+      'mince',
+      'sauté',
+      'roast',
+      'boil',
+      'mix',
+      'prepare',
+      'marinate'
+    ];
     const lowerInstruction = instruction.toLowerCase();
     return significantWords.some(word => lowerInstruction.includes(word));
   }
@@ -227,9 +262,9 @@ class ProductionPlanner {
   extractTaskName(instruction) {
     // Take first sentence or up to 50 chars
     const firstSentence = instruction.split('.')[0];
-    return firstSentence.length > 50 ? 
-      firstSentence.substring(0, 47) + '...' : 
-      firstSentence;
+    return firstSentence.length > 50
+      ? firstSentence.substring(0, 47) + '...'
+      : firstSentence;
   }
 
   /**
@@ -248,7 +283,7 @@ class ProductionPlanner {
     }
 
     localStorage.setItem(this.plansKey, JSON.stringify(plans));
-    
+
     // Track analytics
     if (window.analyticsTracker) {
       window.analyticsTracker.trackCustomEvent('production_plan_created', {
@@ -348,7 +383,9 @@ class ProductionPlanner {
    */
   exportPlanToPrint(planId) {
     const plan = this.getPlanById(planId);
-    if (!plan) return null;
+    if (!plan) {
+      return null;
+    }
 
     // Generate printable HTML
     const html = `
@@ -386,14 +423,18 @@ class ProductionPlanner {
             </tr>
           </thead>
           <tbody>
-            ${plan.shoppingList.map(item => `
+            ${plan.shoppingList
+              .map(
+                item => `
               <tr>
                 <td class="checkbox">☐</td>
                 <td>${item.name}</td>
                 <td>${item.displayAmount}</td>
                 <td>${item.recipes.map(r => r.recipeName).join(', ')}</td>
               </tr>
-            `).join('')}
+            `
+              )
+              .join('')}
           </tbody>
         </table>
 
@@ -410,7 +451,9 @@ class ProductionPlanner {
             </tr>
           </thead>
           <tbody>
-            ${plan.prepList.map(task => `
+            ${plan.prepList
+              .map(
+                task => `
               <tr>
                 <td class="checkbox">☐</td>
                 <td>${task.taskName}</td>
@@ -419,7 +462,9 @@ class ProductionPlanner {
                 <td>${task.estimatedTime} min</td>
                 <td>_________</td>
               </tr>
-            `).join('')}
+            `
+              )
+              .join('')}
           </tbody>
         </table>
 
@@ -434,7 +479,9 @@ class ProductionPlanner {
             </tr>
           </thead>
           <tbody>
-            ${plan.timeline.map(item => `
+            ${plan.timeline
+              .map(
+                item => `
               <tr>
                 <td>${new Date(item.startTime).toLocaleTimeString()}</td>
                 <td>${item.recipeName}</td>
@@ -447,7 +494,9 @@ class ProductionPlanner {
                 <td>Start Cooking</td>
                 <td>${item.servings}</td>
               </tr>
-            `).join('')}
+            `
+              )
+              .join('')}
           </tbody>
         </table>
 
@@ -467,4 +516,3 @@ class ProductionPlanner {
 window.productionPlanner = new ProductionPlanner();
 
 console.log('📋 Production Planner loaded');
-

@@ -1,8 +1,8 @@
 /**
  * User Data Isolator
- * Ensures that user-specific data (menus, recipes, ingredients) 
+ * Ensures that user-specific data (menus, recipes, ingredients)
  * is isolated per user and not visible to others
- * 
+ *
  * Special handling for chefmcpherson@gmail.com and 89 Charles content
  */
 
@@ -19,7 +19,7 @@ class UserDataIsolator {
   init(userId, userEmail) {
     this.currentUserId = userId;
     this.currentUserEmail = userEmail;
-    
+
     console.log(`🔒 Data Isolator initialized for ${userEmail}`);
   }
 
@@ -31,11 +31,11 @@ class UserDataIsolator {
     if (this.currentUserId === dataOwnerId) {
       return true;
     }
-    
+
     if (this.currentUserEmail === dataOwnerEmail) {
       return true;
     }
-    
+
     // No access to other users' data
     return false;
   }
@@ -53,17 +53,17 @@ class UserDataIsolator {
       if (recipe.userId === this.currentUserId) {
         return true;
       }
-      
+
       // Filter by userEmail
       if (recipe.userEmail === this.currentUserEmail) {
         return true;
       }
-      
+
       // If no user info, allow for backwards compatibility
       if (!recipe.userId && !recipe.userEmail) {
         return true;
       }
-      
+
       return false;
     });
   }
@@ -80,15 +80,15 @@ class UserDataIsolator {
       if (menu.userId === this.currentUserId) {
         return true;
       }
-      
+
       if (menu.userEmail === this.currentUserEmail) {
         return true;
       }
-      
+
       if (!menu.userId && !menu.userEmail) {
         return true;
       }
-      
+
       return false;
     });
   }
@@ -106,16 +106,16 @@ class UserDataIsolator {
       if (!ing.userId && !ing.userEmail) {
         return true;
       }
-      
+
       // User's custom ingredients
       if (ing.userId === this.currentUserId) {
         return true;
       }
-      
+
       if (ing.userEmail === this.currentUserEmail) {
         return true;
       }
-      
+
       return false;
     });
   }
@@ -138,27 +138,27 @@ class UserDataIsolator {
    */
   saveRecipe(recipe) {
     const taggedRecipe = this.tagData(recipe);
-    
+
     // Use universal recipe manager if available
     if (window.universalRecipeManager) {
       window.universalRecipeManager.addToLibrary(taggedRecipe);
     }
-    
+
     // Also save to user-specific localStorage key
     const userKey = `recipes_${this.currentUserId}`;
     let userRecipes = JSON.parse(localStorage.getItem(userKey) || '[]');
-    
+
     const existingIndex = userRecipes.findIndex(r => r.id === recipe.id);
     if (existingIndex !== -1) {
       userRecipes[existingIndex] = taggedRecipe;
     } else {
       userRecipes.push(taggedRecipe);
     }
-    
+
     localStorage.setItem(userKey, JSON.stringify(userRecipes));
-    
+
     console.log(`✅ Recipe saved for user ${this.currentUserEmail}`);
-    
+
     return taggedRecipe;
   }
 
@@ -167,22 +167,22 @@ class UserDataIsolator {
    */
   saveMenu(menu) {
     const taggedMenu = this.tagData(menu);
-    
+
     // Save to user-specific key
     const userKey = `menus_${this.currentUserId}`;
     let userMenus = JSON.parse(localStorage.getItem(userKey) || '[]');
-    
+
     const existingIndex = userMenus.findIndex(m => m.id === menu.id);
     if (existingIndex !== -1) {
       userMenus[existingIndex] = taggedMenu;
     } else {
       userMenus.push(taggedMenu);
     }
-    
+
     localStorage.setItem(userKey, JSON.stringify(userMenus));
-    
+
     console.log(`✅ Menu saved for user ${this.currentUserEmail}`);
-    
+
     return taggedMenu;
   }
 
@@ -192,28 +192,28 @@ class UserDataIsolator {
   loadUserRecipes() {
     const userKey = `recipes_${this.currentUserId}`;
     const userRecipes = JSON.parse(localStorage.getItem(userKey) || '[]');
-    
+
     // Also get from universal manager
     let allRecipes = [];
     if (window.universalRecipeManager) {
       allRecipes = window.universalRecipeManager.getAllRecipes();
     }
-    
+
     // Combine and filter
     const combined = [...userRecipes, ...allRecipes];
     const filtered = this.filterRecipes(combined);
-    
+
     // Remove duplicates by id
     const uniqueRecipes = [];
     const seenIds = new Set();
-    
+
     filtered.forEach(recipe => {
       if (!seenIds.has(recipe.id)) {
         seenIds.add(recipe.id);
         uniqueRecipes.push(recipe);
       }
     });
-    
+
     return uniqueRecipes;
   }
 
@@ -223,7 +223,7 @@ class UserDataIsolator {
   loadUserMenus() {
     const userKey = `menus_${this.currentUserId}`;
     const userMenus = JSON.parse(localStorage.getItem(userKey) || '[]');
-    
+
     return this.filterMenus(userMenus);
   }
 }
@@ -232,7 +232,7 @@ class UserDataIsolator {
 window.userDataIsolator = new UserDataIsolator();
 
 // Auto-initialize when user authenticates
-window.addEventListener('userAuthenticated', (event) => {
+window.addEventListener('userAuthenticated', event => {
   if (event.detail && event.detail.userId) {
     window.userDataIsolator.init(
       event.detail.userId,
@@ -242,4 +242,3 @@ window.addEventListener('userAuthenticated', (event) => {
 });
 
 console.log('🔒 User Data Isolator loaded');
-

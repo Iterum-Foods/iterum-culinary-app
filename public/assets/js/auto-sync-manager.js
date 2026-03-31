@@ -14,16 +14,16 @@ class AutoSyncManager {
 
   init() {
     console.log('🔄 Auto-Sync Manager initialized');
-    
+
     // Load last sync times
     this.loadLastSyncTimes();
-    
+
     // Start periodic sync
     this.startPeriodicSync();
-    
+
     // Sync on page unload
     window.addEventListener('beforeunload', () => this.syncAll());
-    
+
     // Sync when coming back online
     window.addEventListener('online', () => {
       console.log('🌐 Back online - syncing data...');
@@ -37,7 +37,7 @@ class AutoSyncManager {
   startPeriodicSync() {
     // Initial sync after 30 seconds
     setTimeout(() => this.syncAll(), 30000);
-    
+
     // Then sync every 5 minutes
     setInterval(() => this.syncAll(), this.syncInterval);
   }
@@ -57,11 +57,11 @@ class AutoSyncManager {
     }
 
     console.log('🔄 Starting auto-sync...');
-    
+
     await this.syncMenus();
     await this.syncDailyNotes();
     await this.syncRecipeIdeas();
-    
+
     console.log('✅ Auto-sync complete');
   }
 
@@ -78,11 +78,11 @@ class AutoSyncManager {
         if (key.startsWith('menu_data_')) {
           const projectId = key.replace('menu_data_', '');
           const menuData = JSON.parse(localStorage.getItem(key) || '{}');
-          
+
           // Check if needs sync
           const lastSync = this.lastSyncTimes[`menu_${projectId}`];
           const lastModified = menuData.lastModified || 0;
-          
+
           if (!lastSync || lastModified > lastSync) {
             await this.syncMenuToBackend(projectId, menuData);
             this.lastSyncTimes[`menu_${projectId}`] = Date.now();
@@ -95,7 +95,6 @@ class AutoSyncManager {
         console.log(`✅ Synced ${syncedCount} menus to backend`);
         this.saveLastSyncTimes();
       }
-
     } catch (error) {
       console.error('❌ Error syncing menus:', error);
     }
@@ -115,7 +114,7 @@ class AutoSyncManager {
         project_id: projectId,
         menu_data: menuData
       });
-      
+
       console.log(`✅ Menu synced for project: ${projectId}`);
     } catch (error) {
       console.error(`❌ Failed to sync menu for project ${projectId}:`, error);
@@ -134,7 +133,7 @@ class AutoSyncManager {
         // Check if needs sync
         const lastSync = this.lastSyncTimes[`note_${date}`];
         const lastModified = notesData.lastModified || 0;
-        
+
         if (!lastSync || lastModified > lastSync) {
           await this.syncNoteToBackend(date, notesData);
           this.lastSyncTimes[`note_${date}`] = Date.now();
@@ -146,7 +145,6 @@ class AutoSyncManager {
         console.log(`✅ Synced ${syncedCount} daily notes to backend`);
         this.saveLastSyncTimes();
       }
-
     } catch (error) {
       console.error('❌ Error syncing daily notes:', error);
     }
@@ -166,7 +164,7 @@ class AutoSyncManager {
         date: date,
         notes_data: notesData
       });
-      
+
       console.log(`✅ Note synced for date: ${date}`);
     } catch (error) {
       console.error(`❌ Failed to sync note for ${date}:`, error);
@@ -183,12 +181,14 @@ class AutoSyncManager {
 
       for (const idea of ideas) {
         // Skip if already synced to backend (has backendId)
-        if (idea.backendId) continue;
+        if (idea.backendId) {
+          continue;
+        }
 
         // Check if needs sync
         const lastSync = this.lastSyncTimes[`idea_${idea.id}`];
         const lastModified = idea.lastModified || idea.createdAt || 0;
-        
+
         if (!lastSync || lastModified > lastSync) {
           const backendId = await this.syncIdeaToBackend(idea);
           if (backendId) {
@@ -205,7 +205,6 @@ class AutoSyncManager {
         console.log(`✅ Synced ${syncedCount} recipe ideas to backend`);
         this.saveLastSyncTimes();
       }
-
     } catch (error) {
       console.error('❌ Error syncing recipe ideas:', error);
     }
@@ -229,7 +228,7 @@ class AutoSyncManager {
         tags: idea.tags || [],
         status: idea.status || 'idea'
       });
-      
+
       console.log(`✅ Idea synced: ${idea.title}`);
       return response.id;
     } catch (error) {
@@ -286,7 +285,7 @@ class AutoSyncManager {
   getSyncStatus() {
     const now = Date.now();
     const syncTimes = Object.values(this.lastSyncTimes);
-    
+
     if (syncTimes.length === 0) {
       return {
         status: 'never',
@@ -324,4 +323,3 @@ class AutoSyncManager {
 window.autoSyncManager = new AutoSyncManager();
 
 console.log('🔄 Auto-Sync Manager loaded');
-

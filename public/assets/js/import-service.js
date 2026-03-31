@@ -33,12 +33,20 @@ class ImportService {
       fields: [
         { key: 'name', label: 'Ingredient Name', required: true },
         { key: 'category', label: 'Category', required: true },
-        { key: 'subcategory', label: 'Subcategory / Type / Brand', required: false },
+        {
+          key: 'subcategory',
+          label: 'Subcategory / Type / Brand',
+          required: false
+        },
         { key: 'unit', label: 'Base Unit (e.g. g, kg, ml, l)', required: true },
         { key: 'cost', label: 'Cost', required: false },
         { key: 'costPer', label: 'Cost Per (unit)', required: false },
         { key: 'supplier', label: 'Supplier', required: false },
-        { key: 'storage', label: 'Storage (dry/refrigerated/frozen)', required: false },
+        {
+          key: 'storage',
+          label: 'Storage (dry/refrigerated/frozen)',
+          required: false
+        },
         { key: 'shelfLifeDays', label: 'Shelf Life (days)', required: false },
         { key: 'notes', label: 'Notes', required: false }
       ]
@@ -89,8 +97,10 @@ https://example.com/product-2"></textarea>
       </div>
     `;
 
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal) this.closeModal();
+    modal.addEventListener('click', event => {
+      if (event.target === modal) {
+        this.closeModal();
+      }
     });
 
     document.body.appendChild(modal);
@@ -99,7 +109,9 @@ https://example.com/product-2"></textarea>
 
   async executeBulkUrlImport() {
     const textarea = document.getElementById('bulk-ingredient-urls');
-    if (!textarea) return;
+    if (!textarea) {
+      return;
+    }
 
     const progressEl = document.getElementById('bulk-import-progress');
     const raw = textarea.value.trim();
@@ -108,7 +120,14 @@ https://example.com/product-2"></textarea>
       return;
     }
 
-    const urls = Array.from(new Set(raw.split(/\n+/).map(line => line.trim()).filter(Boolean)));
+    const urls = Array.from(
+      new Set(
+        raw
+          .split(/\n+/)
+          .map(line => line.trim())
+          .filter(Boolean)
+      )
+    );
     if (!urls.length) {
       alert('Please paste valid URLs.');
       return;
@@ -138,12 +157,16 @@ https://example.com/product-2"></textarea>
     }
 
     this.closeModal();
-    alert(`Bulk URL import finished. Added ${successCount} ingredient(s). ${failureCount ? failureCount + ' failed/skipped.' : ''}`);
+    alert(
+      `Bulk URL import finished. Added ${successCount} ingredient(s). ${failureCount ? failureCount + ' failed/skipped.' : ''}`
+    );
     window.refreshIngredientsView?.();
   }
 
   createIngredientFromMetadata(metadata) {
-    if (!metadata || !metadata.name) return null;
+    if (!metadata || !metadata.name) {
+      return null;
+    }
     const now = new Date().toISOString();
     return {
       id: `ing_url_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
@@ -213,17 +236,21 @@ https://example.com/product-2"></textarea>
       </div>
     `;
 
-    modal.addEventListener('click', (event) => {
-      if (event.target === modal) this.closeModal();
+    modal.addEventListener('click', event => {
+      if (event.target === modal) {
+        this.closeModal();
+      }
     });
 
     document.body.appendChild(modal);
     this.modal = modal;
 
     const fileInput = modal.querySelector('#csv-import-file');
-    fileInput.addEventListener('change', (event) => {
+    fileInput.addEventListener('change', event => {
       const file = event.target.files?.[0];
-      if (!file) return;
+      if (!file) {
+        return;
+      }
       const lower = (file.name || '').toLowerCase();
       // Excel path
       if (lower.endsWith('.xlsx') || lower.endsWith('.xls')) {
@@ -232,7 +259,7 @@ https://example.com/product-2"></textarea>
           return;
         }
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = e => {
           try {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, { type: 'array' });
@@ -248,12 +275,16 @@ https://example.com/product-2"></textarea>
             const rawRows = [];
             for (let i = 1; i < raw.length; i++) {
               const arr = raw[i];
-              if (!arr || !arr.length) continue;
+              if (!arr || !arr.length) {
+                continue;
+              }
               const record = {};
               headers.forEach((h, idx) => {
-                if (!h) return;
+                if (!h) {
+                  return;
+                }
                 const cell = arr[idx];
-                record[h] = (cell == null ? '' : String(cell));
+                record[h] = cell == null ? '' : String(cell);
               });
               rawRows.push((arr || []).map(v => (v == null ? '' : String(v))));
               rows.push(record);
@@ -262,14 +293,16 @@ https://example.com/product-2"></textarea>
             this.handleParsedTable(parsed, config);
           } catch (err) {
             console.error('Excel parse error:', err);
-            alert('Unable to parse Excel file. Try saving as CSV and re-importing.');
+            alert(
+              'Unable to parse Excel file. Try saving as CSV and re-importing.'
+            );
           }
         };
         reader.readAsArrayBuffer(file);
       } else {
         // CSV/TSV path
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = e => {
           try {
             const text = e.target?.result;
             this.handleCSVText(text, config);
@@ -313,14 +346,21 @@ https://example.com/product-2"></textarea>
     mappingSection.style.display = 'block';
     previewSection.style.display = 'block';
 
-    mappingGrid.innerHTML = config.fields.map(field => {
-      const defaultHeader = this.findBestHeaderMatch(field.key, this.csvHeaders);
-      this.mappings[field.key] = defaultHeader || '';
-      const options = [
-        `<option value="">-- Not Mapped --</option>`,
-        ...this.csvHeaders.map(header => `<option value="${header}" ${header === defaultHeader ? 'selected' : ''}>${header}</option>`)
-      ];
-      return `
+    mappingGrid.innerHTML = config.fields
+      .map(field => {
+        const defaultHeader = this.findBestHeaderMatch(
+          field.key,
+          this.csvHeaders
+        );
+        this.mappings[field.key] = defaultHeader || '';
+        const options = [
+          `<option value="">-- Not Mapped --</option>`,
+          ...this.csvHeaders.map(
+            header =>
+              `<option value="${header}" ${header === defaultHeader ? 'selected' : ''}>${header}</option>`
+          )
+        ];
+        return `
         <label style="display:flex;flex-direction:column;gap:6px;">
           <span style="font-size:0.85rem;font-weight:600;color:#1f2937;">
             ${field.label}${field.required ? ' *' : ''}
@@ -330,10 +370,11 @@ https://example.com/product-2"></textarea>
           </select>
         </label>
       `;
-    }).join('');
+      })
+      .join('');
 
     mappingGrid.querySelectorAll('.csv-mapping-select').forEach(select => {
-      select.addEventListener('change', (event) => {
+      select.addEventListener('change', event => {
         const field = event.target.dataset.field;
         this.mappings[field] = event.target.value;
         submitButton.disabled = !this.validateMappings(config.fields);
@@ -397,12 +438,18 @@ https://example.com/product-2"></textarea>
     }
 
     this.closeModal();
-    alert(`✅ Imported ${imported} ${this.currentType === 'equipment' ? 'equipment items' : 'ingredients'} from file.`);
+    alert(
+      `✅ Imported ${imported} ${this.currentType === 'equipment' ? 'equipment items' : 'ingredients'} from file.`
+    );
 
     if (this.currentType === 'equipment') {
       try {
-        window.dispatchEvent(new CustomEvent('equipmentUpdated', { detail: { count: imported } }));
-      } catch (e) {}
+        window.dispatchEvent(
+          new CustomEvent('equipmentUpdated', { detail: { count: imported } })
+        );
+      } catch (e) {
+        void e;
+      }
       if (typeof loadEquipment === 'function') {
         loadEquipment();
       } else {
@@ -421,7 +468,9 @@ https://example.com/product-2"></textarea>
 
     let count = 0;
     rows.forEach(row => {
-      if (!row.name) return;
+      if (!row.name) {
+        return;
+      }
       const quantity = parseInt(row.quantity, 10);
       const payload = {
         name: row.name,
@@ -435,20 +484,30 @@ https://example.com/product-2"></textarea>
         createdVia: 'csv-import',
         importBatchId: this.importBatchId
       };
-      const added = window.equipmentManager.addEquipment(payload, { skipDuplicateCheck: false });
-      if (added) count++;
+      const added = window.equipmentManager.addEquipment(payload, {
+        skipDuplicateCheck: false
+      });
+      if (added) {
+        count++;
+      }
     });
     return count;
   }
 
   importIngredientRows(rows) {
-    const existing = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
-    const byName = new Map(existing.map(item => [item.name.toLowerCase(), item]));
+    const existing = JSON.parse(
+      localStorage.getItem('ingredients_database') || '[]'
+    );
+    const byName = new Map(
+      existing.map(item => [item.name.toLowerCase(), item])
+    );
     const now = new Date().toISOString();
 
     let count = 0;
     rows.forEach(row => {
-      if (!row.name) return;
+      if (!row.name) {
+        return;
+      }
       if (byName.has(row.name.toLowerCase())) {
         console.log('Skipping duplicate ingredient:', row.name);
         return;
@@ -484,7 +543,9 @@ https://example.com/product-2"></textarea>
   parseCSV(text) {
     const delimiter = this.detectDelimiter(text);
     const lines = text.split(/\r?\n/).filter(line => line.trim().length);
-    if (!lines.length) return null;
+    if (!lines.length) {
+      return null;
+    }
 
     const headers = this.parseCSVLine(lines[0], delimiter);
     const rows = [];
@@ -492,7 +553,9 @@ https://example.com/product-2"></textarea>
 
     for (let i = 1; i < lines.length; i++) {
       const rawRow = this.parseCSVLine(lines[i], delimiter);
-      if (!rawRow.length) continue;
+      if (!rawRow.length) {
+        continue;
+      }
       rawRows.push(rawRow);
       const record = {};
       headers.forEach((header, index) => {
@@ -530,22 +593,36 @@ https://example.com/product-2"></textarea>
     const commaCount = (text.match(/,/g) || []).length;
     const semicolonCount = (text.match(/;/g) || []).length;
     const tabCount = (text.match(/\t/g) || []).length;
-    if (tabCount > commaCount && tabCount > semicolonCount) return '\t';
-    if (semicolonCount > commaCount) return ';';
+    if (tabCount > commaCount && tabCount > semicolonCount) {
+      return '\t';
+    }
+    if (semicolonCount > commaCount) {
+      return ';';
+    }
     return ',';
   }
 
   findBestHeaderMatch(fieldKey, headers) {
     const normalizedField = fieldKey.toLowerCase();
-    const match = headers.find(header => header.toLowerCase() === normalizedField);
-    if (match) return match;
-    const looseMatch = headers.find(header => header.toLowerCase().includes(normalizedField));
+    const match = headers.find(
+      header => header.toLowerCase() === normalizedField
+    );
+    if (match) {
+      return match;
+    }
+    const looseMatch = headers.find(header =>
+      header.toLowerCase().includes(normalizedField)
+    );
     return looseMatch || '';
   }
 
   saveIngredientRecord(ingredient) {
-    const existing = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
-    const duplicate = existing.some(item => item.name.toLowerCase() === ingredient.name.toLowerCase());
+    const existing = JSON.parse(
+      localStorage.getItem('ingredients_database') || '[]'
+    );
+    const duplicate = existing.some(
+      item => item.name.toLowerCase() === ingredient.name.toLowerCase()
+    );
     if (duplicate) {
       console.log('Skipping duplicate ingredient:', ingredient.name);
       return false;
@@ -565,4 +642,3 @@ https://example.com/product-2"></textarea>
 }
 
 window.importService = new ImportService();
-

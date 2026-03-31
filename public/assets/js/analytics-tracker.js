@@ -4,434 +4,444 @@
  * Tracks user actions, conversions, errors, and feature usage
  */
 
-import { getAnalytics, logEvent, setUserProperties, setUserId } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
+import {
+  getAnalytics,
+  logEvent,
+  setUserProperties,
+  setUserId
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
 
 class AnalyticsTracker {
-    constructor() {
-        this.analytics = null;
-        this.isInitialized = false;
-        this.userId = null;
-        this.sessionStartTime = Date.now();
-        
-        console.log('📊 Analytics Tracker initializing...');
+  constructor() {
+    this.analytics = null;
+    this.isInitialized = false;
+    this.userId = null;
+    this.sessionStartTime = Date.now();
+
+    console.log('📊 Analytics Tracker initializing...');
+  }
+
+  /**
+   * Initialize analytics
+   */
+  async init(firebaseApp) {
+    try {
+      if (!firebaseApp) {
+        console.warn('⚠️ Firebase app not provided to Analytics');
+        return false;
+      }
+
+      this.analytics = getAnalytics(firebaseApp);
+      this.isInitialized = true;
+
+      // Track session start
+      this.trackEvent('session_start', {
+        timestamp: new Date().toISOString(),
+        page: window.location.pathname
+      });
+
+      console.log('✅ Analytics Tracker initialized');
+      return true;
+    } catch (error) {
+      console.error('❌ Analytics initialization failed:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Track a custom event
+   */
+  trackEvent(eventName, eventParams = {}) {
+    if (!this.isInitialized || !this.analytics) {
+      console.warn(
+        '⚠️ Analytics not initialized, event not tracked:',
+        eventName
+      );
+      return;
     }
 
-    /**
-     * Initialize analytics
-     */
-    async init(firebaseApp) {
-        try {
-            if (!firebaseApp) {
-                console.warn('⚠️ Firebase app not provided to Analytics');
-                return false;
-            }
+    try {
+      // Add common parameters
+      const enrichedParams = {
+        ...eventParams,
+        page: window.location.pathname,
+        timestamp: new Date().toISOString()
+      };
 
-            this.analytics = getAnalytics(firebaseApp);
-            this.isInitialized = true;
-            
-            // Track session start
-            this.trackEvent('session_start', {
-                timestamp: new Date().toISOString(),
-                page: window.location.pathname
-            });
-            
-            console.log('✅ Analytics Tracker initialized');
-            return true;
-        } catch (error) {
-            console.error('❌ Analytics initialization failed:', error);
-            return false;
-        }
+      logEvent(this.analytics, eventName, enrichedParams);
+      console.log('📊 Event tracked:', eventName, enrichedParams);
+    } catch (error) {
+      console.error('❌ Failed to track event:', eventName, error);
+    }
+  }
+
+  /**
+   * Set user ID for tracking
+   */
+  setUser(userId, userProperties = {}) {
+    if (!this.isInitialized || !this.analytics) {
+      return;
     }
 
-    /**
-     * Track a custom event
-     */
-    trackEvent(eventName, eventParams = {}) {
-        if (!this.isInitialized || !this.analytics) {
-            console.warn('⚠️ Analytics not initialized, event not tracked:', eventName);
-            return;
-        }
+    try {
+      this.userId = userId;
+      setUserId(this.analytics, userId);
 
-        try {
-            // Add common parameters
-            const enrichedParams = {
-                ...eventParams,
-                page: window.location.pathname,
-                timestamp: new Date().toISOString()
-            };
+      if (Object.keys(userProperties).length > 0) {
+        setUserProperties(this.analytics, userProperties);
+      }
 
-            logEvent(this.analytics, eventName, enrichedParams);
-            console.log('📊 Event tracked:', eventName, enrichedParams);
-        } catch (error) {
-            console.error('❌ Failed to track event:', eventName, error);
-        }
+      console.log('📊 User ID set:', userId);
+    } catch (error) {
+      console.error('❌ Failed to set user:', error);
     }
+  }
 
-    /**
-     * Set user ID for tracking
-     */
-    setUser(userId, userProperties = {}) {
-        if (!this.isInitialized || !this.analytics) return;
+  // ========================================
+  // AUTHENTICATION EVENTS
+  // ========================================
 
-        try {
-            this.userId = userId;
-            setUserId(this.analytics, userId);
-            
-            if (Object.keys(userProperties).length > 0) {
-                setUserProperties(this.analytics, userProperties);
-            }
-            
-            console.log('📊 User ID set:', userId);
-        } catch (error) {
-            console.error('❌ Failed to set user:', error);
-        }
-    }
+  trackSignUp(method, userName = null) {
+    this.trackEvent('sign_up', {
+      method: method, // 'google', 'email', 'trial'
+      user_name: userName
+    });
+  }
 
-    // ========================================
-    // AUTHENTICATION EVENTS
-    // ========================================
+  trackLogin(method, userId = null) {
+    this.trackEvent('login', {
+      method: method,
+      user_id: userId
+    });
+  }
 
-    trackSignUp(method, userName = null) {
-        this.trackEvent('sign_up', {
-            method: method, // 'google', 'email', 'trial'
-            user_name: userName
-        });
-    }
+  trackSignOut() {
+    this.trackEvent('sign_out', {
+      session_duration: Date.now() - this.sessionStartTime
+    });
+  }
 
-    trackLogin(method, userId = null) {
-        this.trackEvent('login', {
-            method: method,
-            user_id: userId
-        });
-    }
+  trackPasswordReset(email) {
+    this.trackEvent('password_reset_requested', {
+      email_domain: email.split('@')[1]
+    });
+  }
 
-    trackSignOut() {
-        this.trackEvent('sign_out', {
-            session_duration: Date.now() - this.sessionStartTime
-        });
-    }
+  trackEmailVerification(sent = true) {
+    this.trackEvent('email_verification', {
+      action: sent ? 'sent' : 'verified'
+    });
+  }
 
-    trackPasswordReset(email) {
-        this.trackEvent('password_reset_requested', {
-            email_domain: email.split('@')[1]
-        });
-    }
+  trackProfileUpdate(fields = []) {
+    this.trackEvent('profile_updated', {
+      fields_updated: fields.join(',')
+    });
+  }
 
-    trackEmailVerification(sent = true) {
-        this.trackEvent('email_verification', {
-            action: sent ? 'sent' : 'verified'
-        });
-    }
+  // ========================================
+  // TRIAL & CONVERSION EVENTS
+  // ========================================
 
-    trackProfileUpdate(fields = []) {
-        this.trackEvent('profile_updated', {
-            fields_updated: fields.join(',')
-        });
-    }
+  trackTrialStart(userName, trialDays = 14) {
+    this.trackEvent('trial_started', {
+      trial_days: trialDays,
+      user_name: userName
+    });
+  }
 
-    // ========================================
-    // TRIAL & CONVERSION EVENTS
-    // ========================================
+  trackTrialExpiring(daysRemaining) {
+    this.trackEvent('trial_expiring_soon', {
+      days_remaining: daysRemaining
+    });
+  }
 
-    trackTrialStart(userName, trialDays = 14) {
-        this.trackEvent('trial_started', {
-            trial_days: trialDays,
-            user_name: userName
-        });
-    }
+  trackTrialExpired() {
+    this.trackEvent('trial_expired');
+  }
 
-    trackTrialExpiring(daysRemaining) {
-        this.trackEvent('trial_expiring_soon', {
-            days_remaining: daysRemaining
-        });
-    }
+  trackUpgradeIntent(fromPlan = 'trial') {
+    this.trackEvent('upgrade_intent', {
+      from_plan: fromPlan
+    });
+  }
 
-    trackTrialExpired() {
-        this.trackEvent('trial_expired');
-    }
+  // ========================================
+  // RECIPE EVENTS
+  // ========================================
 
-    trackUpgradeIntent(fromPlan = 'trial') {
-        this.trackEvent('upgrade_intent', {
-            from_plan: fromPlan
-        });
-    }
+  trackRecipeCreated(method, recipeName = null) {
+    this.trackEvent('recipe_created', {
+      method: method, // 'upload', 'manual', 'url'
+      recipe_name: recipeName
+    });
+  }
 
-    // ========================================
-    // RECIPE EVENTS
-    // ========================================
+  trackRecipeUploaded(fileType, fileSize = null) {
+    this.trackEvent('recipe_uploaded', {
+      file_type: fileType,
+      file_size_kb: fileSize ? Math.round(fileSize / 1024) : null
+    });
+  }
 
-    trackRecipeCreated(method, recipeName = null) {
-        this.trackEvent('recipe_created', {
-            method: method, // 'upload', 'manual', 'url'
-            recipe_name: recipeName
-        });
-    }
+  trackRecipeViewed(recipeId, recipeName = null) {
+    this.trackEvent('recipe_viewed', {
+      recipe_id: recipeId,
+      recipe_name: recipeName
+    });
+  }
 
-    trackRecipeUploaded(fileType, fileSize = null) {
-        this.trackEvent('recipe_uploaded', {
-            file_type: fileType,
-            file_size_kb: fileSize ? Math.round(fileSize / 1024) : null
-        });
-    }
+  trackRecipeEdited(recipeId) {
+    this.trackEvent('recipe_edited', {
+      recipe_id: recipeId
+    });
+  }
 
-    trackRecipeViewed(recipeId, recipeName = null) {
-        this.trackEvent('recipe_viewed', {
-            recipe_id: recipeId,
-            recipe_name: recipeName
-        });
-    }
+  trackRecipeDeleted(recipeId) {
+    this.trackEvent('recipe_deleted', {
+      recipe_id: recipeId
+    });
+  }
 
-    trackRecipeEdited(recipeId) {
-        this.trackEvent('recipe_edited', {
-            recipe_id: recipeId
-        });
-    }
+  trackRecipeScaled(recipeId, scaleFactor) {
+    this.trackEvent('recipe_scaled', {
+      recipe_id: recipeId,
+      scale_factor: scaleFactor
+    });
+  }
 
-    trackRecipeDeleted(recipeId) {
-        this.trackEvent('recipe_deleted', {
-            recipe_id: recipeId
-        });
-    }
+  trackRecipeSearch(searchTerm, resultsCount = null) {
+    this.trackEvent('recipe_searched', {
+      search_term: searchTerm,
+      results_count: resultsCount
+    });
+  }
 
-    trackRecipeScaled(recipeId, scaleFactor) {
-        this.trackEvent('recipe_scaled', {
-            recipe_id: recipeId,
-            scale_factor: scaleFactor
-        });
-    }
+  // ========================================
+  // MENU EVENTS
+  // ========================================
 
-    trackRecipeSearch(searchTerm, resultsCount = null) {
-        this.trackEvent('recipe_searched', {
-            search_term: searchTerm,
-            results_count: resultsCount
-        });
-    }
+  trackMenuCreated(menuName, itemCount = null) {
+    this.trackEvent('menu_created', {
+      menu_name: menuName,
+      item_count: itemCount
+    });
+  }
 
-    // ========================================
-    // MENU EVENTS
-    // ========================================
+  trackMenuViewed(menuId, menuName = null) {
+    this.trackEvent('menu_viewed', {
+      menu_id: menuId,
+      menu_name: menuName
+    });
+  }
 
-    trackMenuCreated(menuName, itemCount = null) {
-        this.trackEvent('menu_created', {
-            menu_name: menuName,
-            item_count: itemCount
-        });
-    }
+  trackMenuEdited(menuId) {
+    this.trackEvent('menu_edited', {
+      menu_id: menuId
+    });
+  }
 
-    trackMenuViewed(menuId, menuName = null) {
-        this.trackEvent('menu_viewed', {
-            menu_id: menuId,
-            menu_name: menuName
-        });
-    }
+  trackMenuDeleted(menuId) {
+    this.trackEvent('menu_deleted', {
+      menu_id: menuId
+    });
+  }
 
-    trackMenuEdited(menuId) {
-        this.trackEvent('menu_edited', {
-            menu_id: menuId
-        });
-    }
+  // ========================================
+  // INGREDIENT EVENTS
+  // ========================================
 
-    trackMenuDeleted(menuId) {
-        this.trackEvent('menu_deleted', {
-            menu_id: menuId
-        });
-    }
+  trackIngredientSearch(searchTerm, resultsCount = null) {
+    this.trackEvent('ingredient_searched', {
+      search_term: searchTerm,
+      results_count: resultsCount
+    });
+  }
 
-    // ========================================
-    // INGREDIENT EVENTS
-    // ========================================
+  trackIngredientAdded(ingredientName) {
+    this.trackEvent('ingredient_added', {
+      ingredient_name: ingredientName
+    });
+  }
 
-    trackIngredientSearch(searchTerm, resultsCount = null) {
-        this.trackEvent('ingredient_searched', {
-            search_term: searchTerm,
-            results_count: resultsCount
-        });
-    }
+  trackIngredientEdited(ingredientId) {
+    this.trackEvent('ingredient_edited', {
+      ingredient_id: ingredientId
+    });
+  }
 
-    trackIngredientAdded(ingredientName) {
-        this.trackEvent('ingredient_added', {
-            ingredient_name: ingredientName
-        });
-    }
+  // ========================================
+  // PROJECT EVENTS
+  // ========================================
 
-    trackIngredientEdited(ingredientId) {
-        this.trackEvent('ingredient_edited', {
-            ingredient_id: ingredientId
-        });
-    }
+  trackProjectCreated(projectName) {
+    this.trackEvent('project_created', {
+      project_name: projectName
+    });
+  }
 
-    // ========================================
-    // PROJECT EVENTS
-    // ========================================
+  trackProjectSwitched(projectId, projectName = null) {
+    this.trackEvent('project_switched', {
+      project_id: projectId,
+      project_name: projectName
+    });
+  }
 
-    trackProjectCreated(projectName) {
-        this.trackEvent('project_created', {
-            project_name: projectName
-        });
-    }
+  trackProjectEdited(projectId) {
+    this.trackEvent('project_edited', {
+      project_id: projectId
+    });
+  }
 
-    trackProjectSwitched(projectId, projectName = null) {
-        this.trackEvent('project_switched', {
-            project_id: projectId,
-            project_name: projectName
-        });
-    }
+  trackProjectDeleted(projectId) {
+    this.trackEvent('project_deleted', {
+      project_id: projectId
+    });
+  }
 
-    trackProjectEdited(projectId) {
-        this.trackEvent('project_edited', {
-            project_id: projectId
-        });
-    }
+  // ========================================
+  // NAVIGATION EVENTS
+  // ========================================
 
-    trackProjectDeleted(projectId) {
-        this.trackEvent('project_deleted', {
-            project_id: projectId
-        });
-    }
+  trackPageView(pageName, pageTitle = null) {
+    this.trackEvent('page_view', {
+      page_name: pageName,
+      page_title: pageTitle || document.title
+    });
+  }
 
-    // ========================================
-    // NAVIGATION EVENTS
-    // ========================================
+  trackNavigationClick(destination, source = null) {
+    this.trackEvent('navigation_click', {
+      destination: destination,
+      source: source
+    });
+  }
 
-    trackPageView(pageName, pageTitle = null) {
-        this.trackEvent('page_view', {
-            page_name: pageName,
-            page_title: pageTitle || document.title
-        });
-    }
+  // ========================================
+  // UI INTERACTION EVENTS
+  // ========================================
 
-    trackNavigationClick(destination, source = null) {
-        this.trackEvent('navigation_click', {
-            destination: destination,
-            source: source
-        });
-    }
+  trackButtonClick(buttonName, context = null) {
+    this.trackEvent('button_click', {
+      button_name: buttonName,
+      context: context
+    });
+  }
 
-    // ========================================
-    // UI INTERACTION EVENTS
-    // ========================================
+  trackModalOpened(modalName) {
+    this.trackEvent('modal_opened', {
+      modal_name: modalName
+    });
+  }
 
-    trackButtonClick(buttonName, context = null) {
-        this.trackEvent('button_click', {
-            button_name: buttonName,
-            context: context
-        });
-    }
+  trackModalClosed(modalName, action = null) {
+    this.trackEvent('modal_closed', {
+      modal_name: modalName,
+      action: action // 'submit', 'cancel', 'close'
+    });
+  }
 
-    trackModalOpened(modalName) {
-        this.trackEvent('modal_opened', {
-            modal_name: modalName
-        });
-    }
+  trackFormSubmitted(formName, success = true) {
+    this.trackEvent('form_submitted', {
+      form_name: formName,
+      success: success
+    });
+  }
 
-    trackModalClosed(modalName, action = null) {
-        this.trackEvent('modal_closed', {
-            modal_name: modalName,
-            action: action // 'submit', 'cancel', 'close'
-        });
-    }
+  trackDropdownOpened(dropdownName) {
+    this.trackEvent('dropdown_opened', {
+      dropdown_name: dropdownName
+    });
+  }
 
-    trackFormSubmitted(formName, success = true) {
-        this.trackEvent('form_submitted', {
-            form_name: formName,
-            success: success
-        });
-    }
+  // ========================================
+  // ERROR & PERFORMANCE EVENTS
+  // ========================================
 
-    trackDropdownOpened(dropdownName) {
-        this.trackEvent('dropdown_opened', {
-            dropdown_name: dropdownName
-        });
-    }
+  trackError(errorType, errorMessage = null, errorContext = null) {
+    this.trackEvent('error_occurred', {
+      error_type: errorType,
+      error_message: errorMessage,
+      error_context: errorContext
+    });
+  }
 
-    // ========================================
-    // ERROR & PERFORMANCE EVENTS
-    // ========================================
+  trackAPICall(endpoint, method, success = true, duration = null) {
+    this.trackEvent('api_call', {
+      endpoint: endpoint,
+      method: method,
+      success: success,
+      duration_ms: duration
+    });
+  }
 
-    trackError(errorType, errorMessage = null, errorContext = null) {
-        this.trackEvent('error_occurred', {
-            error_type: errorType,
-            error_message: errorMessage,
-            error_context: errorContext
-        });
-    }
+  trackLoadTime(pageName, loadTime) {
+    this.trackEvent('page_load_time', {
+      page_name: pageName,
+      load_time_ms: loadTime
+    });
+  }
 
-    trackAPICall(endpoint, method, success = true, duration = null) {
-        this.trackEvent('api_call', {
-            endpoint: endpoint,
-            method: method,
-            success: success,
-            duration_ms: duration
-        });
-    }
+  // ========================================
+  // FEATURE USAGE EVENTS
+  // ========================================
 
-    trackLoadTime(pageName, loadTime) {
-        this.trackEvent('page_load_time', {
-            page_name: pageName,
-            load_time_ms: loadTime
-        });
-    }
+  trackFeatureUsed(featureName, featureContext = null) {
+    this.trackEvent('feature_used', {
+      feature_name: featureName,
+      feature_context: featureContext
+    });
+  }
 
-    // ========================================
-    // FEATURE USAGE EVENTS
-    // ========================================
+  trackExportData(exportType, format = null) {
+    this.trackEvent('data_exported', {
+      export_type: exportType, // 'recipe', 'menu', 'inventory'
+      format: format // 'pdf', 'csv', 'json'
+    });
+  }
 
-    trackFeatureUsed(featureName, featureContext = null) {
-        this.trackEvent('feature_used', {
-            feature_name: featureName,
-            feature_context: featureContext
-        });
-    }
+  trackPrintAction(contentType) {
+    this.trackEvent('print_action', {
+      content_type: contentType
+    });
+  }
 
-    trackExportData(exportType, format = null) {
-        this.trackEvent('data_exported', {
-            export_type: exportType, // 'recipe', 'menu', 'inventory'
-            format: format // 'pdf', 'csv', 'json'
-        });
-    }
+  // ========================================
+  // ENGAGEMENT EVENTS
+  // ========================================
 
-    trackPrintAction(contentType) {
-        this.trackEvent('print_action', {
-            content_type: contentType
-        });
-    }
+  trackHelpViewed(helpTopic) {
+    this.trackEvent('help_viewed', {
+      help_topic: helpTopic
+    });
+  }
 
-    // ========================================
-    // ENGAGEMENT EVENTS
-    // ========================================
+  trackTutorialStarted(tutorialName) {
+    this.trackEvent('tutorial_started', {
+      tutorial_name: tutorialName
+    });
+  }
 
-    trackHelpViewed(helpTopic) {
-        this.trackEvent('help_viewed', {
-            help_topic: helpTopic
-        });
-    }
+  trackTutorialCompleted(tutorialName) {
+    this.trackEvent('tutorial_completed', {
+      tutorial_name: tutorialName
+    });
+  }
 
-    trackTutorialStarted(tutorialName) {
-        this.trackEvent('tutorial_started', {
-            tutorial_name: tutorialName
-        });
-    }
+  trackFeedbackSubmitted(feedbackType, rating = null) {
+    this.trackEvent('feedback_submitted', {
+      feedback_type: feedbackType,
+      rating: rating
+    });
+  }
 
-    trackTutorialCompleted(tutorialName) {
-        this.trackEvent('tutorial_completed', {
-            tutorial_name: tutorialName
-        });
-    }
+  // ========================================
+  // CUSTOM EVENTS
+  // ========================================
 
-    trackFeedbackSubmitted(feedbackType, rating = null) {
-        this.trackEvent('feedback_submitted', {
-            feedback_type: feedbackType,
-            rating: rating
-        });
-    }
-
-    // ========================================
-    // CUSTOM EVENTS
-    // ========================================
-
-    trackCustomEvent(eventName, eventParams = {}) {
-        this.trackEvent(eventName, eventParams);
-    }
+  trackCustomEvent(eventName, eventParams = {}) {
+    this.trackEvent(eventName, eventParams);
+  }
 }
 
 // Create and export singleton instance
@@ -441,4 +451,3 @@ const analyticsTracker = new AnalyticsTracker();
 window.analyticsTracker = analyticsTracker;
 
 export default analyticsTracker;
-

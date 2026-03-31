@@ -4,49 +4,49 @@
  */
 
 class MenuCreationWizard {
-    constructor() {
-        this.currentStep = 1;
-        this.totalSteps = 5;
-        this.menuData = {
-            name: '',
-            type: '',
-            occasion: '',
-            cuisine: '',
-            season: '',
-            description: '',
-            dishes: [],
-            targetPrice: null,
-            servings: null
-        };
-        this.templates = this.loadMenuTemplates();
-        this.init();
-    }
+  constructor() {
+    this.currentStep = 1;
+    this.totalSteps = 5;
+    this.menuData = {
+      name: '',
+      type: '',
+      occasion: '',
+      cuisine: '',
+      season: '',
+      description: '',
+      dishes: [],
+      targetPrice: null,
+      servings: null
+    };
+    this.templates = this.loadMenuTemplates();
+    this.init();
+  }
 
-    /**
-     * Initialize the wizard
-     */
-    init() {
-        console.log('🧙 Initializing Menu Creation Wizard...');
-    }
+  /**
+   * Initialize the wizard
+   */
+  init() {
+    console.log('🧙 Initializing Menu Creation Wizard...');
+  }
 
-    /**
-     * Show the Menu Creation Wizard
-     */
-    showWizard() {
-        console.log('🧙 Showing Menu Creation Wizard...');
-        this.renderWizardModal();
-        this.showStep(1);
-    }
+  /**
+   * Show the Menu Creation Wizard
+   */
+  showWizard() {
+    console.log('🧙 Showing Menu Creation Wizard...');
+    this.renderWizardModal();
+    this.showStep(1);
+  }
 
-    /**
-     * Render the wizard modal
-     */
-    renderWizardModal() {
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.id = 'menu-creation-wizard-modal';
-        
-        modal.innerHTML = `
+  /**
+   * Render the wizard modal
+   */
+  renderWizardModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'menu-creation-wizard-modal';
+
+    modal.innerHTML = `
             <div class="modal-content modal-extra-large">
                 <div class="modal-header">
                     <h3>🧙 Menu Creation Wizard</h3>
@@ -373,21 +373,23 @@ class MenuCreationWizard {
                 </div>
             </div>
         `;
-        
-        document.body.appendChild(modal);
-        this.addWizardStyles();
-        this.initializeWizard();
+
+    document.body.appendChild(modal);
+    this.addWizardStyles();
+    this.initializeWizard();
+  }
+
+  /**
+   * Add styles for the wizard
+   */
+  addWizardStyles() {
+    if (document.getElementById('menu-wizard-styles')) {
+      return;
     }
 
-    /**
-     * Add styles for the wizard
-     */
-    addWizardStyles() {
-        if (document.getElementById('menu-wizard-styles')) return;
-        
-        const styles = document.createElement('style');
-        styles.id = 'menu-wizard-styles';
-        styles.textContent = `
+    const styles = document.createElement('style');
+    styles.id = 'menu-wizard-styles';
+    styles.textContent = `
             .wizard-progress {
                 margin-bottom: 30px;
             }
@@ -659,298 +661,319 @@ class MenuCreationWizard {
                 width: auto;
             }
         `;
-        
-        document.head.appendChild(styles);
+
+    document.head.appendChild(styles);
+  }
+
+  /**
+   * Initialize the wizard
+   */
+  initializeWizard() {
+    // Setup form validation
+    this.setupFormValidation();
+  }
+
+  /**
+   * Show specific step
+   */
+  showStep(stepNumber) {
+    // Hide all steps
+    for (let i = 1; i <= this.totalSteps; i++) {
+      document.getElementById(`step-${i}`).style.display = 'none';
+      document
+        .querySelector(`[data-step="${i}"]`)
+        .classList.remove('active', 'completed');
     }
 
-    /**
-     * Initialize the wizard
-     */
-    initializeWizard() {
-        // Setup form validation
-        this.setupFormValidation();
+    // Show current step
+    document.getElementById(`step-${stepNumber}`).style.display = 'block';
+    document
+      .querySelector(`[data-step="${stepNumber}"]`)
+      .classList.add('active');
+
+    // Mark previous steps as completed
+    for (let i = 1; i < stepNumber; i++) {
+      document.querySelector(`[data-step="${i}"]`).classList.add('completed');
     }
 
-    /**
-     * Show specific step
-     */
-    showStep(stepNumber) {
-        // Hide all steps
-        for (let i = 1; i <= this.totalSteps; i++) {
-            document.getElementById(`step-${i}`).style.display = 'none';
-            document.querySelector(`[data-step="${i}"]`).classList.remove('active', 'completed');
+    // Update progress bar
+    const progress = (stepNumber / this.totalSteps) * 100;
+    document.getElementById('progress-fill').style.width = `${progress}%`;
+
+    // Update navigation buttons
+    this.updateNavigationButtons(stepNumber);
+
+    this.currentStep = stepNumber;
+  }
+
+  /**
+   * Update navigation buttons
+   */
+  updateNavigationButtons(stepNumber) {
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const finishBtn = document.getElementById('finish-btn');
+
+    // Show/hide previous button
+    prevBtn.style.display = stepNumber > 1 ? 'block' : 'none';
+
+    // Show/hide next/finish buttons
+    if (stepNumber === this.totalSteps) {
+      nextBtn.style.display = 'none';
+      finishBtn.style.display = 'block';
+    } else {
+      nextBtn.style.display = 'block';
+      finishBtn.style.display = 'none';
+    }
+  }
+
+  /**
+   * Go to next step
+   */
+  nextStep() {
+    if (this.validateCurrentStep()) {
+      if (this.currentStep < this.totalSteps) {
+        this.showStep(this.currentStep + 1);
+
+        // Initialize step-specific content
+        this.initializeStepContent(this.currentStep);
+      }
+    }
+  }
+
+  /**
+   * Go to previous step
+   */
+  previousStep() {
+    if (this.currentStep > 1) {
+      this.showStep(this.currentStep - 1);
+    }
+  }
+
+  /**
+   * Validate current step
+   */
+  validateCurrentStep() {
+    switch (this.currentStep) {
+      case 1:
+        const name = document.getElementById('menu-name').value.trim();
+        const type = document.getElementById('menu-type').value;
+        if (!name || !type) {
+          alert('Please fill in menu name and type.');
+          return false;
         }
-        
-        // Show current step
-        document.getElementById(`step-${stepNumber}`).style.display = 'block';
-        document.querySelector(`[data-step="${stepNumber}"]`).classList.add('active');
-        
-        // Mark previous steps as completed
-        for (let i = 1; i < stepNumber; i++) {
-            document.querySelector(`[data-step="${i}"]`).classList.add('completed');
+        break;
+      case 2:
+        // Validation for planning step
+        break;
+      case 3:
+        if (this.menuData.dishes.length === 0) {
+          alert('Please add at least one dish to your menu.');
+          return false;
         }
-        
-        // Update progress bar
-        const progress = (stepNumber / this.totalSteps) * 100;
-        document.getElementById('progress-fill').style.width = `${progress}%`;
-        
-        // Update navigation buttons
-        this.updateNavigationButtons(stepNumber);
-        
-        this.currentStep = stepNumber;
+        break;
+      case 4:
+        // Validation for pricing step
+        break;
+      case 5:
+        // Validation for review step
+        break;
+    }
+    return true;
+  }
+
+  /**
+   * Initialize step-specific content
+   */
+  initializeStepContent(stepNumber) {
+    switch (stepNumber) {
+      case 2:
+        this.initializePlanningStep();
+        break;
+      case 3:
+        this.initializeDishesStep();
+        break;
+      case 4:
+        this.initializePricingStep();
+        break;
+      case 5:
+        this.initializeReviewStep();
+        break;
+    }
+  }
+
+  /**
+   * Initialize planning step
+   */
+  initializePlanningStep() {
+    // Auto-suggest structure based on menu type
+    this.autoSuggestStructure();
+  }
+
+  /**
+   * Initialize dishes step
+   */
+  initializeDishesStep() {
+    this.renderDishesList();
+  }
+
+  /**
+   * Initialize pricing step
+   */
+  initializePricingStep() {
+    this.calculatePricing();
+  }
+
+  /**
+   * Initialize review step
+   */
+  initializeReviewStep() {
+    this.generateMenuPreview();
+  }
+
+  /**
+   * Update menu data
+   */
+  updateMenuData(field, value) {
+    this.menuData[field] = value;
+    console.log('Menu data updated:', field, value);
+  }
+
+  /**
+   * Select template
+   */
+  selectTemplate(templateType) {
+    console.log('Selected template:', templateType);
+
+    if (templateType === 'custom') {
+      // Let user build custom structure
+      return;
     }
 
-    /**
-     * Update navigation buttons
-     */
-    updateNavigationButtons(stepNumber) {
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const finishBtn = document.getElementById('finish-btn');
-        
-        // Show/hide previous button
-        prevBtn.style.display = stepNumber > 1 ? 'block' : 'none';
-        
-        // Show/hide next/finish buttons
-        if (stepNumber === this.totalSteps) {
-            nextBtn.style.display = 'none';
-            finishBtn.style.display = 'block';
-        } else {
-            nextBtn.style.display = 'block';
-            finishBtn.style.display = 'none';
-        }
+    const template = this.templates[templateType];
+    if (template) {
+      // Apply template structure
+      this.applyTemplate(template);
     }
+  }
 
-    /**
-     * Go to next step
-     */
-    nextStep() {
-        if (this.validateCurrentStep()) {
-            if (this.currentStep < this.totalSteps) {
-                this.showStep(this.currentStep + 1);
-                
-                // Initialize step-specific content
-                this.initializeStepContent(this.currentStep);
-            }
-        }
-    }
+  /**
+   * Apply template
+   */
+  applyTemplate(template) {
+    // Clear existing structure
+    document.getElementById('structure-builder').innerHTML = '';
 
-    /**
-     * Go to previous step
-     */
-    previousStep() {
-        if (this.currentStep > 1) {
-            this.showStep(this.currentStep - 1);
-        }
-    }
+    // Add template categories
+    template.categories.forEach((category, index) => {
+      this.addCategory(category.name, category.dishes);
+    });
+  }
 
-    /**
-     * Validate current step
-     */
-    validateCurrentStep() {
-        switch (this.currentStep) {
-            case 1:
-                const name = document.getElementById('menu-name').value.trim();
-                const type = document.getElementById('menu-type').value;
-                if (!name || !type) {
-                    alert('Please fill in menu name and type.');
-                    return false;
-                }
-                break;
-            case 2:
-                // Validation for planning step
-                break;
-            case 3:
-                if (this.menuData.dishes.length === 0) {
-                    alert('Please add at least one dish to your menu.');
-                    return false;
-                }
-                break;
-            case 4:
-                // Validation for pricing step
-                break;
-            case 5:
-                // Validation for review step
-                break;
-        }
-        return true;
-    }
-
-    /**
-     * Initialize step-specific content
-     */
-    initializeStepContent(stepNumber) {
-        switch (stepNumber) {
-            case 2:
-                this.initializePlanningStep();
-                break;
-            case 3:
-                this.initializeDishesStep();
-                break;
-            case 4:
-                this.initializePricingStep();
-                break;
-            case 5:
-                this.initializeReviewStep();
-                break;
-        }
-    }
-
-    /**
-     * Initialize planning step
-     */
-    initializePlanningStep() {
-        // Auto-suggest structure based on menu type
-        this.autoSuggestStructure();
-    }
-
-    /**
-     * Initialize dishes step
-     */
-    initializeDishesStep() {
-        this.renderDishesList();
-    }
-
-    /**
-     * Initialize pricing step
-     */
-    initializePricingStep() {
-        this.calculatePricing();
-    }
-
-    /**
-     * Initialize review step
-     */
-    initializeReviewStep() {
-        this.generateMenuPreview();
-    }
-
-    /**
-     * Update menu data
-     */
-    updateMenuData(field, value) {
-        this.menuData[field] = value;
-        console.log('Menu data updated:', field, value);
-    }
-
-    /**
-     * Select template
-     */
-    selectTemplate(templateType) {
-        console.log('Selected template:', templateType);
-        
-        if (templateType === 'custom') {
-            // Let user build custom structure
-            return;
-        }
-        
-        const template = this.templates[templateType];
-        if (template) {
-            // Apply template structure
-            this.applyTemplate(template);
-        }
-    }
-
-    /**
-     * Apply template
-     */
-    applyTemplate(template) {
-        // Clear existing structure
-        document.getElementById('structure-builder').innerHTML = '';
-        
-        // Add template categories
-        template.categories.forEach((category, index) => {
-            this.addCategory(category.name, category.dishes);
-        });
-    }
-
-    /**
-     * Add category
-     */
-    addCategory(name = '', dishes = []) {
-        const container = document.getElementById('structure-builder');
-        const categoryDiv = document.createElement('div');
-        categoryDiv.className = 'structure-category';
-        categoryDiv.innerHTML = `
+  /**
+   * Add category
+   */
+  addCategory(name = '', dishes = []) {
+    const container = document.getElementById('structure-builder');
+    const categoryDiv = document.createElement('div');
+    categoryDiv.className = 'structure-category';
+    categoryDiv.innerHTML = `
             <div class="category-header">
                 <input type="text" placeholder="Category name..." value="${name}">
                 <span class="drag-handle">⋮⋮</span>
                 <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">×</button>
             </div>
             <div class="category-dishes">
-                ${dishes.map(dish => `
+                ${dishes
+                  .map(
+                    dish => `
                     <div class="dish-item">
                         <span>${dish}</span>
                         <button class="remove-btn" onclick="this.parentElement.remove()">×</button>
                     </div>
-                `).join('')}
+                `
+                  )
+                  .join('')}
             </div>
             <button class="btn btn-sm btn-secondary" onclick="this.previousElementSibling.appendChild(quickDishCreator.addDishItem())">
                 + Add Dish
             </button>
         `;
-        
-        container.appendChild(categoryDiv);
-    }
 
-    /**
-     * Auto-suggest structure
-     */
-    autoSuggestStructure() {
-        const menuType = this.menuData.type;
-        const cuisine = this.menuData.cuisine;
-        
-        let suggestedStructure = [];
-        
-        if (menuType === 'restaurant') {
-            suggestedStructure = [
-                { name: 'Appetizers', dishes: ['House Salad', 'Soup of the Day', 'Bruschetta'] },
-                { name: 'Main Courses', dishes: ['Grilled Salmon', 'Beef Tenderloin', 'Vegetarian Pasta'] },
-                { name: 'Desserts', dishes: ['Tiramisu', 'Chocolate Cake', 'Ice Cream'] }
-            ];
-        } else if (menuType === 'tasting') {
-            suggestedStructure = [
-                { name: 'Amuse Bouche', dishes: ['Seasonal Bite'] },
-                { name: 'First Course', dishes: ['Soup or Salad'] },
-                { name: 'Second Course', dishes: ['Fish or Seafood'] },
-                { name: 'Main Course', dishes: ['Meat or Poultry'] },
-                { name: 'Dessert', dishes: ['Sweet Finish'] }
-            ];
+    container.appendChild(categoryDiv);
+  }
+
+  /**
+   * Auto-suggest structure
+   */
+  autoSuggestStructure() {
+    const menuType = this.menuData.type;
+    const cuisine = this.menuData.cuisine;
+
+    let suggestedStructure = [];
+
+    if (menuType === 'restaurant') {
+      suggestedStructure = [
+        {
+          name: 'Appetizers',
+          dishes: ['House Salad', 'Soup of the Day', 'Bruschetta']
+        },
+        {
+          name: 'Main Courses',
+          dishes: ['Grilled Salmon', 'Beef Tenderloin', 'Vegetarian Pasta']
+        },
+        {
+          name: 'Desserts',
+          dishes: ['Tiramisu', 'Chocolate Cake', 'Ice Cream']
         }
-        
-        // Apply suggested structure
-        suggestedStructure.forEach(category => {
-            this.addCategory(category.name, category.dishes);
-        });
+      ];
+    } else if (menuType === 'tasting') {
+      suggestedStructure = [
+        { name: 'Amuse Bouche', dishes: ['Seasonal Bite'] },
+        { name: 'First Course', dishes: ['Soup or Salad'] },
+        { name: 'Second Course', dishes: ['Fish or Seafood'] },
+        { name: 'Main Course', dishes: ['Meat or Poultry'] },
+        { name: 'Dessert', dishes: ['Sweet Finish'] }
+      ];
     }
 
-    /**
-     * Open dish creator
-     */
-    openDishCreator() {
-        if (window.quickDishCreator) {
-            window.quickDishCreator.showCreator();
-        } else {
-            alert('Quick Dish Creator not available. Please use the regular dish selection.');
-        }
-    }
+    // Apply suggested structure
+    suggestedStructure.forEach(category => {
+      this.addCategory(category.name, category.dishes);
+    });
+  }
 
-    /**
-     * Render dishes list
-     */
-    renderDishesList() {
-        const container = document.getElementById('dishes-list');
-        
-        if (this.menuData.dishes.length === 0) {
-            container.innerHTML = `
+  /**
+   * Open dish creator
+   */
+  openDishCreator() {
+    if (window.quickDishCreator) {
+      window.quickDishCreator.showCreator();
+    } else {
+      alert(
+        'Quick Dish Creator not available. Please use the regular dish selection.'
+      );
+    }
+  }
+
+  /**
+   * Render dishes list
+   */
+  renderDishesList() {
+    const container = document.getElementById('dishes-list');
+
+    if (this.menuData.dishes.length === 0) {
+      container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">🍽️</div>
                     <h4>No Dishes Yet</h4>
                     <p>Add your first dish to get started</p>
                 </div>
             `;
-        } else {
-            container.innerHTML = this.menuData.dishes.map((dish, index) => `
+    } else {
+      container.innerHTML = this.menuData.dishes
+        .map(
+          (dish, index) => `
                 <div class="dish-item">
                     <div class="dish-info">
                         <h6>${dish.name}</h6>
@@ -965,219 +988,242 @@ class MenuCreationWizard {
                         </button>
                     </div>
                 </div>
-            `).join('');
-        }
+            `
+        )
+        .join('');
     }
+  }
 
-    /**
-     * Batch create dishes
-     */
-    batchCreateDishes() {
-        alert('Batch dish creation feature coming soon!');
+  /**
+   * Batch create dishes
+   */
+  batchCreateDishes() {
+    alert('Batch dish creation feature coming soon!');
+  }
+
+  /**
+   * Import from library
+   */
+  importFromLibrary() {
+    alert('Import from library feature coming soon!');
+  }
+
+  /**
+   * Calculate pricing
+   */
+  calculatePricing() {
+    // Calculate total cost
+    const totalCost = this.menuData.dishes.reduce((sum, dish) => {
+      return sum + (dish.cost || 0);
+    }, 0);
+
+    // Calculate suggested price
+    const profitMargin =
+      parseInt(document.getElementById('profit-margin').value) || 30;
+    const suggestedPrice = totalCost * (1 + profitMargin / 100);
+
+    // Update display
+    document.getElementById('total-cost').textContent =
+      `$${totalCost.toFixed(2)}`;
+    document.getElementById('suggested-price').textContent =
+      `$${suggestedPrice.toFixed(2)}`;
+    document.getElementById('profit-margin-display').textContent =
+      `${profitMargin}%`;
+
+    // Update category and dish counts
+    const categories = [
+      ...new Set(this.menuData.dishes.map(dish => dish.category))
+    ];
+    document.getElementById('category-count').textContent = categories.length;
+    document.getElementById('dish-count').textContent =
+      this.menuData.dishes.length;
+
+    // Calculate price range
+    const prices = this.menuData.dishes.map(dish => dish.price).filter(p => p);
+    if (prices.length > 0) {
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      document.getElementById('price-range').textContent =
+        `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
     }
+  }
 
-    /**
-     * Import from library
-     */
-    importFromLibrary() {
-        alert('Import from library feature coming soon!');
-    }
+  /**
+   * Generate menu preview
+   */
+  generateMenuPreview() {
+    const container = document.querySelector('#menu-preview .preview-content');
 
-    /**
-     * Calculate pricing
-     */
-    calculatePricing() {
-        // Calculate total cost
-        const totalCost = this.menuData.dishes.reduce((sum, dish) => {
-            return sum + (dish.cost || 0);
-        }, 0);
-        
-        // Calculate suggested price
-        const profitMargin = parseInt(document.getElementById('profit-margin').value) || 30;
-        const suggestedPrice = totalCost * (1 + profitMargin / 100);
-        
-        // Update display
-        document.getElementById('total-cost').textContent = `$${totalCost.toFixed(2)}`;
-        document.getElementById('suggested-price').textContent = `$${suggestedPrice.toFixed(2)}`;
-        document.getElementById('profit-margin-display').textContent = `${profitMargin}%`;
-        
-        // Update category and dish counts
-        const categories = [...new Set(this.menuData.dishes.map(dish => dish.category))];
-        document.getElementById('category-count').textContent = categories.length;
-        document.getElementById('dish-count').textContent = this.menuData.dishes.length;
-        
-        // Calculate price range
-        const prices = this.menuData.dishes.map(dish => dish.price).filter(p => p);
-        if (prices.length > 0) {
-            const minPrice = Math.min(...prices);
-            const maxPrice = Math.max(...prices);
-            document.getElementById('price-range').textContent = `$${minPrice.toFixed(2)} - $${maxPrice.toFixed(2)}`;
-        }
-    }
-
-    /**
-     * Generate menu preview
-     */
-    generateMenuPreview() {
-        const container = document.querySelector('#menu-preview .preview-content');
-        
-        let previewHTML = `
+    let previewHTML = `
             <div class="preview-header">
                 <h3>${this.menuData.name || 'Untitled Menu'}</h3>
                 <p>${this.menuData.description || 'No description provided'}</p>
             </div>
         `;
-        
-        // Group dishes by category
-        const categories = {};
-        this.menuData.dishes.forEach(dish => {
-            if (!categories[dish.category]) {
-                categories[dish.category] = [];
-            }
-            categories[dish.category].push(dish);
-        });
-        
-        // Render categories
-        Object.entries(categories).forEach(([categoryName, dishes]) => {
-            previewHTML += `
+
+    // Group dishes by category
+    const categories = {};
+    this.menuData.dishes.forEach(dish => {
+      if (!categories[dish.category]) {
+        categories[dish.category] = [];
+      }
+      categories[dish.category].push(dish);
+    });
+
+    // Render categories
+    Object.entries(categories).forEach(([categoryName, dishes]) => {
+      previewHTML += `
                 <div class="preview-category">
                     <h4>${categoryName}</h4>
                     <div class="preview-dishes">
-                        ${dishes.map(dish => `
+                        ${dishes
+                          .map(
+                            dish => `
                             <div class="preview-dish">
                                 <div class="dish-name">${dish.name}</div>
                                 <div class="dish-price">${dish.price ? '$' + dish.price : ''}</div>
                             </div>
-                        `).join('')}
+                        `
+                          )
+                          .join('')}
                     </div>
                 </div>
             `;
+    });
+
+    container.innerHTML = previewHTML;
+  }
+
+  /**
+   * Finish wizard
+   */
+  finishWizard() {
+    // Collect all data
+    const finalMenuData = {
+      ...this.menuData,
+      createdAt: new Date().toISOString(),
+      status: 'draft'
+    };
+
+    // Save to localStorage or send to backend
+    const menus = JSON.parse(localStorage.getItem('menus') || '[]');
+    menus.push({
+      id: Date.now(),
+      ...finalMenuData
+    });
+    localStorage.setItem('menus', JSON.stringify(menus));
+
+    // Add to current menu manager if available
+    if (window.menuManager) {
+      // Transfer dishes to menu manager
+      this.menuData.dishes.forEach(dish => {
+        const category = window.menuManager.ensureDefaultCategory();
+        window.menuManager.addItem(category.id, dish);
+      });
+    }
+
+    this.closeWizard();
+    alert('Menu created successfully!');
+  }
+
+  /**
+   * Close wizard
+   */
+  closeWizard() {
+    const modal = document.getElementById('menu-creation-wizard-modal');
+    if (modal) {
+      modal.remove();
+    }
+
+    // Clean up styles
+    const styles = document.getElementById('menu-wizard-styles');
+    if (styles) {
+      styles.remove();
+    }
+
+    // Reset wizard state
+    this.currentStep = 1;
+    this.menuData = {
+      name: '',
+      type: '',
+      occasion: '',
+      cuisine: '',
+      season: '',
+      description: '',
+      dishes: [],
+      targetPrice: null,
+      servings: null
+    };
+  }
+
+  /**
+   * Setup form validation
+   */
+  setupFormValidation() {
+    // Add real-time validation
+    const requiredFields = ['menu-name', 'menu-type'];
+    requiredFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.addEventListener('blur', () => {
+          this.validateField(field);
         });
-        
-        container.innerHTML = previewHTML;
-    }
+      }
+    });
+  }
 
-    /**
-     * Finish wizard
-     */
-    finishWizard() {
-        // Collect all data
-        const finalMenuData = {
-            ...this.menuData,
-            createdAt: new Date().toISOString(),
-            status: 'draft'
-        };
-        
-        // Save to localStorage or send to backend
-        const menus = JSON.parse(localStorage.getItem('menus') || '[]');
-        menus.push({
-            id: Date.now(),
-            ...finalMenuData
-        });
-        localStorage.setItem('menus', JSON.stringify(menus));
-        
-        // Add to current menu manager if available
-        if (window.menuManager) {
-            // Transfer dishes to menu manager
-            this.menuData.dishes.forEach(dish => {
-                const category = window.menuManager.ensureDefaultCategory();
-                window.menuManager.addItem(category.id, dish);
-            });
-        }
-        
-        this.closeWizard();
-        alert('Menu created successfully!');
+  /**
+   * Validate individual field
+   */
+  validateField(field) {
+    if (field.hasAttribute('required') && !field.value.trim()) {
+      field.style.borderColor = '#ef4444';
+      return false;
+    } else {
+      field.style.borderColor = '#e5e7eb';
+      return true;
     }
+  }
 
-    /**
-     * Close wizard
-     */
-    closeWizard() {
-        const modal = document.getElementById('menu-creation-wizard-modal');
-        if (modal) {
-            modal.remove();
-        }
-        
-        // Clean up styles
-        const styles = document.getElementById('menu-wizard-styles');
-        if (styles) {
-            styles.remove();
-        }
-        
-        // Reset wizard state
-        this.currentStep = 1;
-        this.menuData = {
-            name: '',
-            type: '',
-            occasion: '',
-            cuisine: '',
-            season: '',
-            description: '',
-            dishes: [],
-            targetPrice: null,
-            servings: null
-        };
-    }
-
-    /**
-     * Setup form validation
-     */
-    setupFormValidation() {
-        // Add real-time validation
-        const requiredFields = ['menu-name', 'menu-type'];
-        requiredFields.forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            if (field) {
-                field.addEventListener('blur', () => {
-                    this.validateField(field);
-                });
-            }
-        });
-    }
-
-    /**
-     * Validate individual field
-     */
-    validateField(field) {
-        if (field.hasAttribute('required') && !field.value.trim()) {
-            field.style.borderColor = '#ef4444';
-            return false;
-        } else {
-            field.style.borderColor = '#e5e7eb';
-            return true;
-        }
-    }
-
-    /**
-     * Load menu templates
-     */
-    loadMenuTemplates() {
-        return {
-            classic: {
-                categories: [
-                    { name: 'Appetizers', dishes: ['House Salad', 'Soup of the Day'] },
-                    { name: 'Main Courses', dishes: ['Grilled Salmon', 'Beef Tenderloin'] },
-                    { name: 'Desserts', dishes: ['Tiramisu', 'Chocolate Cake'] }
-                ]
-            },
-            tasting: {
-                categories: [
-                    { name: 'Amuse Bouche', dishes: ['Seasonal Bite'] },
-                    { name: 'First Course', dishes: ['Soup or Salad'] },
-                    { name: 'Second Course', dishes: ['Fish or Seafood'] },
-                    { name: 'Main Course', dishes: ['Meat or Poultry'] },
-                    { name: 'Dessert', dishes: ['Sweet Finish'] }
-                ]
-            },
-            family: {
-                categories: [
-                    { name: 'Shared Appetizers', dishes: ['Cheese Board', 'Charcuterie'] },
-                    { name: 'Family Style Mains', dishes: ['Roast Chicken', 'Pasta', 'Vegetables'] },
-                    { name: 'Desserts', dishes: ['Ice Cream', 'Cookies'] }
-                ]
-            }
-        };
-    }
+  /**
+   * Load menu templates
+   */
+  loadMenuTemplates() {
+    return {
+      classic: {
+        categories: [
+          { name: 'Appetizers', dishes: ['House Salad', 'Soup of the Day'] },
+          {
+            name: 'Main Courses',
+            dishes: ['Grilled Salmon', 'Beef Tenderloin']
+          },
+          { name: 'Desserts', dishes: ['Tiramisu', 'Chocolate Cake'] }
+        ]
+      },
+      tasting: {
+        categories: [
+          { name: 'Amuse Bouche', dishes: ['Seasonal Bite'] },
+          { name: 'First Course', dishes: ['Soup or Salad'] },
+          { name: 'Second Course', dishes: ['Fish or Seafood'] },
+          { name: 'Main Course', dishes: ['Meat or Poultry'] },
+          { name: 'Dessert', dishes: ['Sweet Finish'] }
+        ]
+      },
+      family: {
+        categories: [
+          {
+            name: 'Shared Appetizers',
+            dishes: ['Cheese Board', 'Charcuterie']
+          },
+          {
+            name: 'Family Style Mains',
+            dishes: ['Roast Chicken', 'Pasta', 'Vegetables']
+          },
+          { name: 'Desserts', dishes: ['Ice Cream', 'Cookies'] }
+        ]
+      }
+    };
+  }
 }
 
 // Initialize global instance

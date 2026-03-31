@@ -4,241 +4,283 @@
  */
 
 class VendorManager {
-    constructor() {
-        this.vendors = [];
-        this.selectedVendors = new Set();
-        this.currentView = 'list';
-        this.currentFilters = {
-            search: '',
-            company: '',
-            city: '',
-            state: '',
-            status: 'all'
-        };
-        
-        this.init();
+  constructor() {
+    this.vendors = [];
+    this.selectedVendors = new Set();
+    this.currentView = 'list';
+    this.currentFilters = {
+      search: '',
+      company: '',
+      city: '',
+      state: '',
+      status: 'all'
+    };
+
+    this.init();
+  }
+
+  init() {
+    console.log('🏪 Initializing Vendor Manager...');
+    this.setupEventListeners();
+    this.loadVendors();
+    this.updateVendorCount();
+  }
+
+  setupEventListeners() {
+    // Add vendor button
+    const addVendorBtn = document.getElementById('add-vendor-btn');
+    if (addVendorBtn) {
+      addVendorBtn.addEventListener('click', () => this.showAddVendorModal());
     }
-    
-    init() {
-        console.log('🏪 Initializing Vendor Manager...');
-        this.setupEventListeners();
-        this.loadVendors();
-        this.updateVendorCount();
+
+    // Import vendors button
+    const importVendorsBtn = document.getElementById('import-vendors-btn');
+    if (importVendorsBtn) {
+      importVendorsBtn.addEventListener('click', () => this.showImportModal());
     }
-    
-    setupEventListeners() {
-        // Add vendor button
-        const addVendorBtn = document.getElementById('add-vendor-btn');
-        if (addVendorBtn) {
-            addVendorBtn.addEventListener('click', () => this.showAddVendorModal());
-        }
-        
-        // Import vendors button
-        const importVendorsBtn = document.getElementById('import-vendors-btn');
-        if (importVendorsBtn) {
-            importVendorsBtn.addEventListener('click', () => this.showImportModal());
-        }
-        
-        // Export vendors button
-        const exportVendorsBtn = document.getElementById('export-vendors-btn');
-        if (exportVendorsBtn) {
-            exportVendorsBtn.addEventListener('click', () => this.exportVendors());
-        }
-        
-        // Bulk actions
-        const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
-        if (bulkDeleteBtn) {
-            bulkDeleteBtn.addEventListener('click', () => this.bulkDeleteVendors());
-        }
-        
-        const bulkEditBtn = document.getElementById('bulk-edit-btn');
-        if (bulkEditBtn) {
-            bulkEditBtn.addEventListener('click', () => this.bulkEditVendors());
-        }
-        
-        // Search and filters
-        const searchInput = document.getElementById('vendor-search');
-        if (searchInput) {
-            searchInput.addEventListener('input', debounce(() => this.filterVendors(), 300));
-        }
-        
-        const companyFilter = document.getElementById('company-filter');
-        if (companyFilter) {
-            companyFilter.addEventListener('change', () => this.filterVendors());
-        }
-        
-        const cityFilter = document.getElementById('city-filter');
-        if (cityFilter) {
-            cityFilter.addEventListener('change', () => this.filterVendors());
-        }
-        
-        const stateFilter = document.getElementById('state-filter');
-        if (stateFilter) {
-            stateFilter.addEventListener('change', () => this.filterVendors());
-        }
-        
-        const statusFilter = document.getElementById('status-filter');
-        if (statusFilter) {
-            statusFilter.addEventListener('change', () => this.filterVendors());
-        }
-        
-        // Select all checkbox
-        const selectAllCheckbox = document.getElementById('select-all-vendors');
-        if (selectAllCheckbox) {
-            selectAllCheckbox.addEventListener('change', (e) => this.toggleSelectAll(e.target.checked));
-        }
+
+    // Export vendors button
+    const exportVendorsBtn = document.getElementById('export-vendors-btn');
+    if (exportVendorsBtn) {
+      exportVendorsBtn.addEventListener('click', () => this.exportVendors());
     }
-    
-    async loadVendors() {
-        try {
-            console.log('🔍 Loading vendors...');
-            
-            // Try to load from backend API first
-            const response = await fetch('/api/vendors/');
-            if (response.ok) {
-                const data = await response.json();
-                this.vendors = data.vendors || [];
-                console.log(`✅ Loaded ${this.vendors.length} vendors from API`);
-            } else {
-                console.log('⚠️ API not available, trying user file storage');
-                // Try to load from user file storage
-                if (!this.loadVendorsFromFile()) {
-                    console.log('📁 No user file found, using sample data');
-                    this.loadSampleVendors();
-                }
-            }
-            
-            this.updateVendorCount();
-            this.displayVendors();
-            this.updateFilters();
-            
-        } catch (error) {
-            console.error('❌ Error loading vendors:', error);
-            // Try to load from user file storage
-            if (!this.loadVendorsFromFile()) {
-                console.log('📁 No user file found, using sample data');
-                this.loadSampleVendors();
-            }
-        }
+
+    // Bulk actions
+    const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+    if (bulkDeleteBtn) {
+      bulkDeleteBtn.addEventListener('click', () => this.bulkDeleteVendors());
     }
-    
-    loadSampleVendors() {
-        // Sample vendor data for demonstration
-        this.vendors = [
-            {
-                id: 1,
-                name: 'John Smith',
-                company: 'Fresh Foods Inc',
-                email: 'john@freshfoods.com',
-                phone: '555-1234',
-                mobile: '555-5678',
-                city: 'Boston',
-                state: 'MA',
-                zip_code: '02101',
-                specialties: ['produce', 'dairy'],
-                notes: 'Reliable supplier for fresh produce',
-                products: [
-                    { name: 'Heirloom Tomatoes', packSize: '10 lb flat', unitCost: 36.5, sku: 'PRD-HT10', notes: 'Peak season June-Aug' },
-                    { name: 'European Butter', packSize: '1 lb blocks (case of 12)', unitCost: 54.0, sku: 'DRY-EB12', notes: 'Plugra unsalted' }
-                ],
-                invoiceAttachment: null,
-                is_active: true,
-                created_at: new Date().toISOString()
-            },
-            {
-                id: 2,
-                name: 'Sarah Johnson',
-                company: 'Quality Meats Co',
-                email: 'sarah@qualitymeats.com',
-                phone: '555-2345',
-                mobile: '555-6789',
-                city: 'Chicago',
-                state: 'IL',
-                zip_code: '60601',
-                specialties: ['meat', 'poultry'],
-                notes: 'Premium meat supplier',
-                products: [
-                    { name: 'Prime Ribeye', packSize: '15 lb case', unitCost: 198.0, sku: 'MEAT-PR15', notes: 'Aged 21 days' },
-                    { name: 'Airline Chicken Breast', packSize: '10 lb case', unitCost: 62.5, sku: 'POUL-AL10', notes: '8 oz portions' }
-                ],
-                invoiceAttachment: null,
-                is_active: true,
-                created_at: new Date().toISOString()
-            },
-            {
-                id: 3,
-                name: 'Mike Chen',
-                company: 'Asian Spices Ltd',
-                email: 'mike@asianspices.com',
-                phone: '555-3456',
-                mobile: '555-7890',
-                city: 'Los Angeles',
-                state: 'CA',
-                zip_code: '90001',
-                specialties: ['spices', 'asian ingredients'],
-                notes: 'Specialized in Asian ingredients',
-                products: [
-                    { name: 'Szechuan Peppercorn', packSize: '2 lb bag', unitCost: 24.0, sku: 'SPC-SZ2', notes: 'High-voltage heat' },
-                    { name: 'Yuzu Juice', packSize: '6 x 720ml', unitCost: 78.0, sku: 'SPC-YZ6', notes: 'Frozen, keep chilled' }
-                ],
-                invoiceAttachment: null,
-                is_active: true,
-                created_at: new Date().toISOString()
-            }
-        ];
-        
-        // Save sample vendors to user file
-        this.saveVendorsToFile();
+
+    const bulkEditBtn = document.getElementById('bulk-edit-btn');
+    if (bulkEditBtn) {
+      bulkEditBtn.addEventListener('click', () => this.bulkEditVendors());
     }
-    
-    saveVendorsToFile() {
-        // Use user-specific file storage first, fallback to localStorage
-        if (window.userDataManager && window.userDataManager.isUserLoggedIn()) {
-            const userId = window.userDataManager.getCurrentUserId();
-            const filename = `user_${userId}_vendors.json`;
-            window.userDataManager.saveUserFile(filename, this.vendors);
-            console.log(`💾 Saved ${this.vendors.length} vendors to user file`);
-        } else {
-            // Fallback to localStorage
-            localStorage.setItem('iterum_vendors', JSON.stringify(this.vendors));
-            console.log(`💾 Saved ${this.vendors.length} vendors to localStorage`);
-        }
+
+    // Search and filters
+    const searchInput = document.getElementById('vendor-search');
+    if (searchInput) {
+      searchInput.addEventListener(
+        'input',
+        debounce(() => this.filterVendors(), 300)
+      );
     }
-    
-    loadVendorsFromFile() {
-        // Use user-specific file storage first, fallback to localStorage
-        if (window.userDataManager && window.userDataManager.isUserLoggedIn()) {
-            const userId = window.userDataManager.getCurrentUserId();
-            const filename = `user_${userId}_vendors.json`;
-            const loadedVendors = window.userDataManager.loadUserFile(filename);
-            if (loadedVendors && Array.isArray(loadedVendors)) {
-                this.vendors = loadedVendors;
-                console.log(`📖 Loaded ${this.vendors.length} vendors from user file`);
-                return true;
-            }
-        } else {
-            // Fallback to localStorage
-            const storedVendors = localStorage.getItem('iterum_vendors');
-            if (storedVendors) {
-                this.vendors = JSON.parse(storedVendors);
-                console.log(`📖 Loaded ${this.vendors.length} vendors from localStorage`);
-                return true;
-            }
-        }
-        return false;
+
+    const companyFilter = document.getElementById('company-filter');
+    if (companyFilter) {
+      companyFilter.addEventListener('change', () => this.filterVendors());
     }
-    
-    displayVendors() {
-        const container = document.getElementById('vendors-container');
-        if (!container) {
-            console.error('❌ Vendors container not found!');
-            return;
+
+    const cityFilter = document.getElementById('city-filter');
+    if (cityFilter) {
+      cityFilter.addEventListener('change', () => this.filterVendors());
+    }
+
+    const stateFilter = document.getElementById('state-filter');
+    if (stateFilter) {
+      stateFilter.addEventListener('change', () => this.filterVendors());
+    }
+
+    const statusFilter = document.getElementById('status-filter');
+    if (statusFilter) {
+      statusFilter.addEventListener('change', () => this.filterVendors());
+    }
+
+    // Select all checkbox
+    const selectAllCheckbox = document.getElementById('select-all-vendors');
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener('change', e =>
+        this.toggleSelectAll(e.target.checked)
+      );
+    }
+  }
+
+  async loadVendors() {
+    try {
+      console.log('🔍 Loading vendors...');
+
+      // Try to load from backend API first
+      const response = await fetch('/api/vendors/');
+      if (response.ok) {
+        const data = await response.json();
+        this.vendors = data.vendors || [];
+        console.log(`✅ Loaded ${this.vendors.length} vendors from API`);
+      } else {
+        console.log('⚠️ API not available, trying user file storage');
+        // Try to load from user file storage
+        if (!this.loadVendorsFromFile()) {
+          console.log('📁 No user file found, using sample data');
+          this.loadSampleVendors();
         }
-        
-        console.log(`📊 Displaying ${this.vendors.length} vendors`);
-        
-        if (this.vendors.length === 0) {
-            container.innerHTML = `
+      }
+
+      this.updateVendorCount();
+      this.displayVendors();
+      this.updateFilters();
+    } catch (error) {
+      console.error('❌ Error loading vendors:', error);
+      // Try to load from user file storage
+      if (!this.loadVendorsFromFile()) {
+        console.log('📁 No user file found, using sample data');
+        this.loadSampleVendors();
+      }
+    }
+  }
+
+  loadSampleVendors() {
+    // Sample vendor data for demonstration
+    this.vendors = [
+      {
+        id: 1,
+        name: 'John Smith',
+        company: 'Fresh Foods Inc',
+        email: 'john@freshfoods.com',
+        phone: '555-1234',
+        mobile: '555-5678',
+        city: 'Boston',
+        state: 'MA',
+        zip_code: '02101',
+        specialties: ['produce', 'dairy'],
+        notes: 'Reliable supplier for fresh produce',
+        products: [
+          {
+            name: 'Heirloom Tomatoes',
+            packSize: '10 lb flat',
+            unitCost: 36.5,
+            sku: 'PRD-HT10',
+            notes: 'Peak season June-Aug'
+          },
+          {
+            name: 'European Butter',
+            packSize: '1 lb blocks (case of 12)',
+            unitCost: 54.0,
+            sku: 'DRY-EB12',
+            notes: 'Plugra unsalted'
+          }
+        ],
+        invoiceAttachment: null,
+        is_active: true,
+        created_at: new Date().toISOString()
+      },
+      {
+        id: 2,
+        name: 'Sarah Johnson',
+        company: 'Quality Meats Co',
+        email: 'sarah@qualitymeats.com',
+        phone: '555-2345',
+        mobile: '555-6789',
+        city: 'Chicago',
+        state: 'IL',
+        zip_code: '60601',
+        specialties: ['meat', 'poultry'],
+        notes: 'Premium meat supplier',
+        products: [
+          {
+            name: 'Prime Ribeye',
+            packSize: '15 lb case',
+            unitCost: 198.0,
+            sku: 'MEAT-PR15',
+            notes: 'Aged 21 days'
+          },
+          {
+            name: 'Airline Chicken Breast',
+            packSize: '10 lb case',
+            unitCost: 62.5,
+            sku: 'POUL-AL10',
+            notes: '8 oz portions'
+          }
+        ],
+        invoiceAttachment: null,
+        is_active: true,
+        created_at: new Date().toISOString()
+      },
+      {
+        id: 3,
+        name: 'Mike Chen',
+        company: 'Asian Spices Ltd',
+        email: 'mike@asianspices.com',
+        phone: '555-3456',
+        mobile: '555-7890',
+        city: 'Los Angeles',
+        state: 'CA',
+        zip_code: '90001',
+        specialties: ['spices', 'asian ingredients'],
+        notes: 'Specialized in Asian ingredients',
+        products: [
+          {
+            name: 'Szechuan Peppercorn',
+            packSize: '2 lb bag',
+            unitCost: 24.0,
+            sku: 'SPC-SZ2',
+            notes: 'High-voltage heat'
+          },
+          {
+            name: 'Yuzu Juice',
+            packSize: '6 x 720ml',
+            unitCost: 78.0,
+            sku: 'SPC-YZ6',
+            notes: 'Frozen, keep chilled'
+          }
+        ],
+        invoiceAttachment: null,
+        is_active: true,
+        created_at: new Date().toISOString()
+      }
+    ];
+
+    // Save sample vendors to user file
+    this.saveVendorsToFile();
+  }
+
+  saveVendorsToFile() {
+    // Use user-specific file storage first, fallback to localStorage
+    if (window.userDataManager && window.userDataManager.isUserLoggedIn()) {
+      const userId = window.userDataManager.getCurrentUserId();
+      const filename = `user_${userId}_vendors.json`;
+      window.userDataManager.saveUserFile(filename, this.vendors);
+      console.log(`💾 Saved ${this.vendors.length} vendors to user file`);
+    } else {
+      // Fallback to localStorage
+      localStorage.setItem('iterum_vendors', JSON.stringify(this.vendors));
+      console.log(`💾 Saved ${this.vendors.length} vendors to localStorage`);
+    }
+  }
+
+  loadVendorsFromFile() {
+    // Use user-specific file storage first, fallback to localStorage
+    if (window.userDataManager && window.userDataManager.isUserLoggedIn()) {
+      const userId = window.userDataManager.getCurrentUserId();
+      const filename = `user_${userId}_vendors.json`;
+      const loadedVendors = window.userDataManager.loadUserFile(filename);
+      if (loadedVendors && Array.isArray(loadedVendors)) {
+        this.vendors = loadedVendors;
+        console.log(`📖 Loaded ${this.vendors.length} vendors from user file`);
+        return true;
+      }
+    } else {
+      // Fallback to localStorage
+      const storedVendors = localStorage.getItem('iterum_vendors');
+      if (storedVendors) {
+        this.vendors = JSON.parse(storedVendors);
+        console.log(
+          `📖 Loaded ${this.vendors.length} vendors from localStorage`
+        );
+        return true;
+      }
+    }
+    return false;
+  }
+
+  displayVendors() {
+    const container = document.getElementById('vendors-container');
+    if (!container) {
+      console.error('❌ Vendors container not found!');
+      return;
+    }
+
+    console.log(`📊 Displaying ${this.vendors.length} vendors`);
+
+    if (this.vendors.length === 0) {
+      container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">🏪</div>
                     <h3 class="empty-state-title">No Vendors Found</h3>
@@ -253,12 +295,12 @@ class VendorManager {
                     </div>
                 </div>
             `;
-            return;
-        }
-        
-        const filteredVendors = this.getFilteredVendors();
-        
-        container.innerHTML = `
+      return;
+    }
+
+    const filteredVendors = this.getFilteredVendors();
+
+    container.innerHTML = `
             <div class="vendors-table-container">
                 <table class="vendors-table">
                     <thead>
@@ -281,27 +323,35 @@ class VendorManager {
                 </table>
             </div>
         `;
-        
-        // Re-attach event listeners
-        this.attachRowEventListeners();
-    }
-    
-    renderVendorRow(vendor) {
-        const isSelected = this.selectedVendors.has(vendor.id);
-        const specialties = Array.isArray(vendor.specialties) ? vendor.specialties : [];
-        const specialtyBadges = specialties.length
-            ? specialties.map((item) => `<span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">${this.escapeHtml(item)}</span>`).join('')
-            : '<span class="text-xs text-slate-400">No specialties</span>';
-        const productBadge = Array.isArray(vendor.products) && vendor.products.length
-            ? `<span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700">🧾 ${vendor.products.length} item${vendor.products.length === 1 ? '' : 's'}</span>`
-            : '';
-        const invoiceBadge = vendor.invoiceAttachment
-            ? '<span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700">📎 Invoice</span>'
-            : '';
-        const statusClass = vendor.is_active ? 'status-active' : 'status-inactive';
-        const statusText = vendor.is_active ? 'Active' : 'Inactive';
-        
-        return `
+
+    // Re-attach event listeners
+    this.attachRowEventListeners();
+  }
+
+  renderVendorRow(vendor) {
+    const isSelected = this.selectedVendors.has(vendor.id);
+    const specialties = Array.isArray(vendor.specialties)
+      ? vendor.specialties
+      : [];
+    const specialtyBadges = specialties.length
+      ? specialties
+          .map(
+            item =>
+              `<span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">${this.escapeHtml(item)}</span>`
+          )
+          .join('')
+      : '<span class="text-xs text-slate-400">No specialties</span>';
+    const productBadge =
+      Array.isArray(vendor.products) && vendor.products.length
+        ? `<span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700">🧾 ${vendor.products.length} item${vendor.products.length === 1 ? '' : 's'}</span>`
+        : '';
+    const invoiceBadge = vendor.invoiceAttachment
+      ? '<span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700">📎 Invoice</span>'
+      : '';
+    const statusClass = vendor.is_active ? 'status-active' : 'status-inactive';
+    const statusText = vendor.is_active ? 'Active' : 'Inactive';
+
+    return `
             <tr class="vendor-row ${isSelected ? 'selected' : ''}" data-vendor-id="${vendor.id}">
                 <td>
                     <input type="checkbox" class="vendor-checkbox" value="${vendor.id}" ${isSelected ? 'checked' : ''}>
@@ -355,212 +405,228 @@ class VendorManager {
                 </td>
             </tr>
         `;
-    }
-    
-    attachRowEventListeners() {
-        // Checkbox selection
-        document.querySelectorAll('.vendor-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', (e) => {
-                const vendorId = parseInt(e.target.value);
-                if (e.target.checked) {
-                    this.selectedVendors.add(vendorId);
-                } else {
-                    this.selectedVendors.delete(vendorId);
-                }
-                this.updateBulkActions();
-                this.updateRowSelection(vendorId, e.target.checked);
-            });
-        });
-        
-        // Select all functionality
-        const selectAllCheckbox = document.getElementById('select-all-vendors');
-        if (selectAllCheckbox) {
-            selectAllCheckbox.addEventListener('change', (e) => {
-                this.toggleSelectAll(e.target.checked);
-            });
+  }
+
+  attachRowEventListeners() {
+    // Checkbox selection
+    document.querySelectorAll('.vendor-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', e => {
+        const vendorId = parseInt(e.target.value);
+        if (e.target.checked) {
+          this.selectedVendors.add(vendorId);
+        } else {
+          this.selectedVendors.delete(vendorId);
         }
-    }
-    
-    toggleSelectAll(checked) {
-        const checkboxes = document.querySelectorAll('.vendor-checkbox');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = checked;
-            const vendorId = parseInt(checkbox.value);
-            if (checked) {
-                this.selectedVendors.add(vendorId);
-            } else {
-                this.selectedVendors.delete(vendorId);
-            }
-            this.updateRowSelection(vendorId, checked);
-        });
         this.updateBulkActions();
+        this.updateRowSelection(vendorId, e.target.checked);
+      });
+    });
+
+    // Select all functionality
+    const selectAllCheckbox = document.getElementById('select-all-vendors');
+    if (selectAllCheckbox) {
+      selectAllCheckbox.addEventListener('change', e => {
+        this.toggleSelectAll(e.target.checked);
+      });
     }
-    
-    updateRowSelection(vendorId, selected) {
-        const row = document.querySelector(`[data-vendor-id="${vendorId}"]`);
-        if (row) {
-            row.classList.toggle('selected', selected);
-        }
+  }
+
+  toggleSelectAll(checked) {
+    const checkboxes = document.querySelectorAll('.vendor-checkbox');
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = checked;
+      const vendorId = parseInt(checkbox.value);
+      if (checked) {
+        this.selectedVendors.add(vendorId);
+      } else {
+        this.selectedVendors.delete(vendorId);
+      }
+      this.updateRowSelection(vendorId, checked);
+    });
+    this.updateBulkActions();
+  }
+
+  updateRowSelection(vendorId, selected) {
+    const row = document.querySelector(`[data-vendor-id="${vendorId}"]`);
+    if (row) {
+      row.classList.toggle('selected', selected);
     }
-    
-    updateBulkActions() {
-        const bulkActions = document.getElementById('bulk-actions');
-        if (!bulkActions) return;
-        
-        const hasSelection = this.selectedVendors.size > 0;
-        bulkActions.style.display = hasSelection ? 'flex' : 'none';
-        
-        if (hasSelection) {
-            const countElement = document.getElementById('selected-count');
-            if (countElement) {
-                countElement.textContent = this.selectedVendors.size;
-            }
-        }
+  }
+
+  updateBulkActions() {
+    const bulkActions = document.getElementById('bulk-actions');
+    if (!bulkActions) {
+      return;
     }
-    
-    escapeHtml(text) {
-        if (text === null || text === undefined) {
-            return '';
-        }
-        return String(text)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
+
+    const hasSelection = this.selectedVendors.size > 0;
+    bulkActions.style.display = hasSelection ? 'flex' : 'none';
+
+    if (hasSelection) {
+      const countElement = document.getElementById('selected-count');
+      if (countElement) {
+        countElement.textContent = this.selectedVendors.size;
+      }
     }
-    
-    getFilteredVendors() {
-        let filtered = [...this.vendors];
-        
-        // Search filter
-        if (this.currentFilters.search) {
-            const searchTerm = this.currentFilters.search.toLowerCase();
-            filtered = filtered.filter(vendor => 
-                vendor.name.toLowerCase().includes(searchTerm) ||
-                vendor.company?.toLowerCase().includes(searchTerm) ||
-                vendor.email?.toLowerCase().includes(searchTerm) ||
-                vendor.city?.toLowerCase().includes(searchTerm)
-            );
-        }
-        
-        // Company filter
-        if (this.currentFilters.company) {
-            filtered = filtered.filter(vendor => 
-                vendor.company === this.currentFilters.company
-            );
-        }
-        
-        // City filter
-        if (this.currentFilters.city) {
-            filtered = filtered.filter(vendor => 
-                vendor.city === this.currentFilters.city
-            );
-        }
-        
-        // State filter
-        if (this.currentFilters.state) {
-            filtered = filtered.filter(vendor => 
-                vendor.state === this.currentFilters.state
-            );
-        }
-        
-        // Status filter
-        if (this.currentFilters.status !== 'all') {
-            const isActive = this.currentFilters.status === 'active';
-            filtered = filtered.filter(vendor => vendor.is_active === isActive);
-        }
-        
-        return filtered;
+  }
+
+  escapeHtml(text) {
+    if (text === null || text === undefined) {
+      return '';
     }
-    
-    filterVendors() {
-        // Update filters from form inputs
-        const searchInput = document.getElementById('vendor-search');
-        const companyFilter = document.getElementById('company-filter');
-        const cityFilter = document.getElementById('city-filter');
-        const stateFilter = document.getElementById('state-filter');
-        const statusFilter = document.getElementById('status-filter');
-        
-        if (searchInput) this.currentFilters.search = searchInput.value;
-        if (companyFilter) this.currentFilters.company = companyFilter.value;
-        if (cityFilter) this.currentFilters.city = cityFilter.value;
-        if (stateFilter) this.currentFilters.state = stateFilter.value;
-        if (statusFilter) this.currentFilters.status = statusFilter.value;
-        
-        this.displayVendors();
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  getFilteredVendors() {
+    let filtered = [...this.vendors];
+
+    // Search filter
+    if (this.currentFilters.search) {
+      const searchTerm = this.currentFilters.search.toLowerCase();
+      filtered = filtered.filter(
+        vendor =>
+          vendor.name.toLowerCase().includes(searchTerm) ||
+          vendor.company?.toLowerCase().includes(searchTerm) ||
+          vendor.email?.toLowerCase().includes(searchTerm) ||
+          vendor.city?.toLowerCase().includes(searchTerm)
+      );
     }
-    
-    updateFilters() {
-        // Get unique values for filter dropdowns
-        const companies = [...new Set(this.vendors.map(v => v.company).filter(Boolean))];
-        const cities = [...new Set(this.vendors.map(v => v.city).filter(Boolean))];
-        const states = [...new Set(this.vendors.map(v => v.state).filter(Boolean))];
-        
-        // Update company filter
-        const companyFilter = document.getElementById('company-filter');
-        if (companyFilter) {
-            companyFilter.innerHTML = `
+
+    // Company filter
+    if (this.currentFilters.company) {
+      filtered = filtered.filter(
+        vendor => vendor.company === this.currentFilters.company
+      );
+    }
+
+    // City filter
+    if (this.currentFilters.city) {
+      filtered = filtered.filter(
+        vendor => vendor.city === this.currentFilters.city
+      );
+    }
+
+    // State filter
+    if (this.currentFilters.state) {
+      filtered = filtered.filter(
+        vendor => vendor.state === this.currentFilters.state
+      );
+    }
+
+    // Status filter
+    if (this.currentFilters.status !== 'all') {
+      const isActive = this.currentFilters.status === 'active';
+      filtered = filtered.filter(vendor => vendor.is_active === isActive);
+    }
+
+    return filtered;
+  }
+
+  filterVendors() {
+    // Update filters from form inputs
+    const searchInput = document.getElementById('vendor-search');
+    const companyFilter = document.getElementById('company-filter');
+    const cityFilter = document.getElementById('city-filter');
+    const stateFilter = document.getElementById('state-filter');
+    const statusFilter = document.getElementById('status-filter');
+
+    if (searchInput) {
+      this.currentFilters.search = searchInput.value;
+    }
+    if (companyFilter) {
+      this.currentFilters.company = companyFilter.value;
+    }
+    if (cityFilter) {
+      this.currentFilters.city = cityFilter.value;
+    }
+    if (stateFilter) {
+      this.currentFilters.state = stateFilter.value;
+    }
+    if (statusFilter) {
+      this.currentFilters.status = statusFilter.value;
+    }
+
+    this.displayVendors();
+  }
+
+  updateFilters() {
+    // Get unique values for filter dropdowns
+    const companies = [
+      ...new Set(this.vendors.map(v => v.company).filter(Boolean))
+    ];
+    const cities = [...new Set(this.vendors.map(v => v.city).filter(Boolean))];
+    const states = [...new Set(this.vendors.map(v => v.state).filter(Boolean))];
+
+    // Update company filter
+    const companyFilter = document.getElementById('company-filter');
+    if (companyFilter) {
+      companyFilter.innerHTML = `
                 <option value="">All Companies</option>
                 ${companies.map(company => `<option value="${company}">${company}</option>`).join('')}
             `;
-        }
-        
-        // Update city filter
-        const cityFilter = document.getElementById('city-filter');
-        if (cityFilter) {
-            cityFilter.innerHTML = `
+    }
+
+    // Update city filter
+    const cityFilter = document.getElementById('city-filter');
+    if (cityFilter) {
+      cityFilter.innerHTML = `
                 <option value="">All Cities</option>
                 ${cities.map(city => `<option value="${city}">${city}</option>`).join('')}
             `;
-        }
-        
-        // Update state filter
-        const stateFilter = document.getElementById('state-filter');
-        if (stateFilter) {
-            stateFilter.innerHTML = `
+    }
+
+    // Update state filter
+    const stateFilter = document.getElementById('state-filter');
+    if (stateFilter) {
+      stateFilter.innerHTML = `
                 <option value="">All States</option>
                 ${states.map(state => `<option value="${state}">${state}</state>`).join('')}
             `;
-        }
     }
-    
-    updateVendorCount() {
-        const countElement = document.getElementById('vendor-count');
-        if (countElement) {
-            countElement.textContent = this.vendors.length;
-        }
+  }
+
+  updateVendorCount() {
+    const countElement = document.getElementById('vendor-count');
+    if (countElement) {
+      countElement.textContent = this.vendors.length;
     }
-    
-    showAddVendorModal() {
-        this.showVendorModal('add');
+  }
+
+  showAddVendorModal() {
+    this.showVendorModal('add');
+  }
+
+  showVendorModal(mode = 'add', vendor = null) {
+    const modal = this.createVendorModal(mode, vendor);
+    if (modal) {
+      document.body.appendChild(modal);
+      this.initializeVendorModal(modal, vendor);
+
+      // Show modal with animation
+      setTimeout(() => {
+        modal.style.opacity = '1';
+      }, 10);
+
+      console.log(`✅ Vendor ${mode} modal displayed`);
     }
-    
-    showVendorModal(mode = 'add', vendor = null) {
-        const modal = this.createVendorModal(mode, vendor);
-        if (modal) {
-            document.body.appendChild(modal);
-            this.initializeVendorModal(modal, vendor);
-            
-            // Show modal with animation
-            setTimeout(() => {
-                modal.style.opacity = '1';
-            }, 10);
-            
-            console.log(`✅ Vendor ${mode} modal displayed`);
-        }
-    }
-    
-    createVendorModal(mode, vendor) {
-        const isEdit = mode === 'edit';
-        const title = isEdit ? 'Edit Vendor' : 'Add New Vendor';
-        const buttonText = isEdit ? 'Update Vendor' : 'Add Vendor';
-        
-        const modal = document.createElement('div');
-        modal.className = 'vendor-modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] opacity-0 transition-opacity duration-300';
-        modal.setAttribute('data-modal', 'vendor');
-        
-        modal.innerHTML = `
+  }
+
+  createVendorModal(mode, vendor) {
+    const isEdit = mode === 'edit';
+    const title = isEdit ? 'Edit Vendor' : 'Add New Vendor';
+    const buttonText = isEdit ? 'Update Vendor' : 'Add Vendor';
+
+    const modal = document.createElement('div');
+    modal.className =
+      'vendor-modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] opacity-0 transition-opacity duration-300';
+    modal.setAttribute('data-modal', 'vendor');
+
+    modal.innerHTML = `
             <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
                     <h2 class="text-xl font-semibold text-gray-900">${title}</h2>
@@ -746,61 +812,76 @@ class VendorManager {
                 </div>
             </div>
         `;
-        
-        return modal;
-    }
-    
-    initializeVendorModal(modal, vendor = {}) {
-        if (!modal) {
-            return;
-        }
-        if (vendor?.id) {
-            modal.dataset.vendorId = vendor.id;
-        }
-        const productContainer = modal.querySelector('#vendor-products-list');
-        const addProductButton = modal.querySelector('[data-action="add-product"]');
-        const existingProducts = Array.isArray(vendor?.products) ? vendor.products : [];
-        if (productContainer) {
-            productContainer.innerHTML = '';
-            if (existingProducts.length) {
-                existingProducts.forEach(product => this.addProductRow(productContainer, product));
-            } else {
-                this.addProductRow(productContainer);
-            }
-            productContainer.addEventListener('click', (event) => {
-                const removeButton = event.target.closest('[data-action="remove-product"]');
-                if (!removeButton) return;
-                event.preventDefault();
-                const row = removeButton.closest('.vendor-product-row');
-                if (!row) return;
-                if (productContainer.querySelectorAll('.vendor-product-row').length > 1) {
-                    row.remove();
-                } else {
-                    row.querySelectorAll('input, textarea').forEach((input) => {
-                        input.value = '';
-                    });
-                }
-            });
-        }
-        if (addProductButton && productContainer) {
-            addProductButton.addEventListener('click', (event) => {
-                event.preventDefault();
-                this.addProductRow(productContainer);
-            });
-        }
-        this.setupInvoiceCapture(modal, vendor);
-    }
 
-    addProductRow(container, product = {}) {
-        if (!container) return;
-        const row = document.createElement('div');
-        row.className = 'vendor-product-row space-y-3 rounded-xl border border-gray-200 bg-white shadow-sm p-4';
-        const safeName = this.escapeHtml(product?.name || '');
-        const safePack = this.escapeHtml(product?.packSize || '');
-        const safeSku = this.escapeHtml(product?.sku || '');
-        const safeNotes = this.escapeHtml(product?.notes || '');
-        const priceValue = product?.unitCost ?? '';
-        row.innerHTML = `
+    return modal;
+  }
+
+  initializeVendorModal(modal, vendor = {}) {
+    if (!modal) {
+      return;
+    }
+    if (vendor?.id) {
+      modal.dataset.vendorId = vendor.id;
+    }
+    const productContainer = modal.querySelector('#vendor-products-list');
+    const addProductButton = modal.querySelector('[data-action="add-product"]');
+    const existingProducts = Array.isArray(vendor?.products)
+      ? vendor.products
+      : [];
+    if (productContainer) {
+      productContainer.innerHTML = '';
+      if (existingProducts.length) {
+        existingProducts.forEach(product =>
+          this.addProductRow(productContainer, product)
+        );
+      } else {
+        this.addProductRow(productContainer);
+      }
+      productContainer.addEventListener('click', event => {
+        const removeButton = event.target.closest(
+          '[data-action="remove-product"]'
+        );
+        if (!removeButton) {
+          return;
+        }
+        event.preventDefault();
+        const row = removeButton.closest('.vendor-product-row');
+        if (!row) {
+          return;
+        }
+        if (
+          productContainer.querySelectorAll('.vendor-product-row').length > 1
+        ) {
+          row.remove();
+        } else {
+          row.querySelectorAll('input, textarea').forEach(input => {
+            input.value = '';
+          });
+        }
+      });
+    }
+    if (addProductButton && productContainer) {
+      addProductButton.addEventListener('click', event => {
+        event.preventDefault();
+        this.addProductRow(productContainer);
+      });
+    }
+    this.setupInvoiceCapture(modal, vendor);
+  }
+
+  addProductRow(container, product = {}) {
+    if (!container) {
+      return;
+    }
+    const row = document.createElement('div');
+    row.className =
+      'vendor-product-row space-y-3 rounded-xl border border-gray-200 bg-white shadow-sm p-4';
+    const safeName = this.escapeHtml(product?.name || '');
+    const safePack = this.escapeHtml(product?.packSize || '');
+    const safeSku = this.escapeHtml(product?.sku || '');
+    const safeNotes = this.escapeHtml(product?.notes || '');
+    const priceValue = product?.unitCost ?? '';
+    row.innerHTML = `
             <div class="grid gap-3 md:grid-cols-4">
                 <div class="md:col-span-2">
                     <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Item</label>
@@ -834,124 +915,140 @@ class VendorManager {
                 </div>
             </div>
         `;
-        container.appendChild(row);
-    }
+    container.appendChild(row);
+  }
 
-    collectProductData(container) {
-        if (!container) return [];
-        const rows = Array.from(container.querySelectorAll('.vendor-product-row'));
-        return rows.map((row) => {
-            const name = row.querySelector('[data-field="name"]')?.value.trim() || '';
-            const packSize = row.querySelector('[data-field="pack"]')?.value.trim() || '';
-            const sku = row.querySelector('[data-field="sku"]')?.value.trim() || '';
-            const notes = row.querySelector('[data-field="notes"]')?.value.trim() || '';
-            const priceRaw = row.querySelector('[data-field="price"]')?.value;
-            const hasContent = name || packSize || sku || notes || priceRaw;
-            if (!hasContent) {
-                return null;
-            }
-            const unitCost = priceRaw !== '' && priceRaw !== null ? parseFloat(priceRaw) : null;
-            return {
-                name,
-                packSize,
-                sku,
-                notes,
-                unitCost: Number.isFinite(unitCost) ? unitCost : null
-            };
-        }).filter(Boolean);
+  collectProductData(container) {
+    if (!container) {
+      return [];
     }
-
-    setupInvoiceCapture(modal, vendor = {}) {
-        const dropzone = modal.querySelector('#vendor-invoice-dropzone');
-        const fileInput = modal.querySelector('#vendor-invoice-file');
-        const preview = modal.querySelector('#vendor-invoice-preview');
-        if (!dropzone || !fileInput || !preview) {
-            return;
+    const rows = Array.from(container.querySelectorAll('.vendor-product-row'));
+    return rows
+      .map(row => {
+        const name =
+          row.querySelector('[data-field="name"]')?.value.trim() || '';
+        const packSize =
+          row.querySelector('[data-field="pack"]')?.value.trim() || '';
+        const sku = row.querySelector('[data-field="sku"]')?.value.trim() || '';
+        const notes =
+          row.querySelector('[data-field="notes"]')?.value.trim() || '';
+        const priceRaw = row.querySelector('[data-field="price"]')?.value;
+        const hasContent = name || packSize || sku || notes || priceRaw;
+        if (!hasContent) {
+          return null;
         }
-        const attachment = vendor?.invoiceAttachment || null;
-        if (attachment) {
-            try {
-                modal.dataset.invoiceAttachment = JSON.stringify(attachment);
-                this.renderInvoicePreview(preview, attachment);
-            } catch (error) {
-                console.warn('⚠️ Unable to load existing invoice attachment:', error);
-                modal.dataset.invoiceAttachment = '';
-                preview.innerHTML = '<p class="text-sm text-gray-500">No file attached yet.</p>';
-            }
-        } else {
-            modal.dataset.invoiceAttachment = '';
-            preview.innerHTML = '<p class="text-sm text-gray-500">No file attached yet.</p>';
-        }
-        dropzone.addEventListener('click', (event) => {
-            event.preventDefault();
-            fileInput.click();
-        });
-        dropzone.addEventListener('dragover', (event) => {
-            event.preventDefault();
-            dropzone.classList.add('border-indigo-400', 'bg-indigo-50');
-        });
-        dropzone.addEventListener('dragleave', () => {
-            dropzone.classList.remove('border-indigo-400', 'bg-indigo-50');
-        });
-        dropzone.addEventListener('drop', (event) => {
-            event.preventDefault();
-            dropzone.classList.remove('border-indigo-400', 'bg-indigo-50');
-            if (event.dataTransfer?.files?.length) {
-                const file = event.dataTransfer.files[0];
-                this.processInvoiceFile(modal, file, preview);
-            }
-        });
-        fileInput.addEventListener('change', (event) => {
-            const file = event.target.files?.[0];
-            if (file) {
-                this.processInvoiceFile(modal, file, preview);
-            }
-        });
-        preview.addEventListener('click', (event) => {
-            const removeBtn = event.target.closest('[data-action="remove-invoice"]');
-            if (removeBtn) {
-                event.preventDefault();
-                modal.dataset.invoiceAttachment = '';
-                fileInput.value = '';
-                preview.innerHTML = '<p class="text-sm text-gray-500">No file attached yet.</p>';
-            }
-        });
-    }
-
-    processInvoiceFile(modal, file, preview) {
-        if (!file) return;
-        const maxSize = 8 * 1024 * 1024; // 8MB safety guard
-        if (file.size > maxSize) {
-            alert('Please choose a file under 8MB.');
-            return;
-        }
-        const reader = new FileReader();
-        reader.onload = () => {
-            const attachment = {
-                name: file.name,
-                type: file.type || 'application/octet-stream',
-                data: reader.result
-            };
-            modal.dataset.invoiceAttachment = JSON.stringify(attachment);
-            this.renderInvoicePreview(preview, attachment);
+        const unitCost =
+          priceRaw !== '' && priceRaw !== null ? parseFloat(priceRaw) : null;
+        return {
+          name,
+          packSize,
+          sku,
+          notes,
+          unitCost: Number.isFinite(unitCost) ? unitCost : null
         };
-        reader.onerror = () => {
-            alert('We could not read that file. Please try again.');
-        };
-        reader.readAsDataURL(file);
-    }
+      })
+      .filter(Boolean);
+  }
 
-    renderInvoicePreview(preview, attachment) {
-        if (!preview) return;
-        if (!attachment) {
-            preview.innerHTML = '<p class="text-sm text-gray-500">No file attached yet.</p>';
-            return;
-        }
-        const safeName = this.escapeHtml(attachment.name || 'Invoice');
-        const fileHref = attachment.data ? `href="${attachment.data}"` : 'href="#"';
-        const isImage = attachment.type?.startsWith('image/');
-        if (isImage) {
-            preview.innerHTML = `
+  setupInvoiceCapture(modal, vendor = {}) {
+    const dropzone = modal.querySelector('#vendor-invoice-dropzone');
+    const fileInput = modal.querySelector('#vendor-invoice-file');
+    const preview = modal.querySelector('#vendor-invoice-preview');
+    if (!dropzone || !fileInput || !preview) {
+      return;
+    }
+    const attachment = vendor?.invoiceAttachment || null;
+    if (attachment) {
+      try {
+        modal.dataset.invoiceAttachment = JSON.stringify(attachment);
+        this.renderInvoicePreview(preview, attachment);
+      } catch (error) {
+        console.warn('⚠️ Unable to load existing invoice attachment:', error);
+        modal.dataset.invoiceAttachment = '';
+        preview.innerHTML =
+          '<p class="text-sm text-gray-500">No file attached yet.</p>';
+      }
+    } else {
+      modal.dataset.invoiceAttachment = '';
+      preview.innerHTML =
+        '<p class="text-sm text-gray-500">No file attached yet.</p>';
+    }
+    dropzone.addEventListener('click', event => {
+      event.preventDefault();
+      fileInput.click();
+    });
+    dropzone.addEventListener('dragover', event => {
+      event.preventDefault();
+      dropzone.classList.add('border-indigo-400', 'bg-indigo-50');
+    });
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('border-indigo-400', 'bg-indigo-50');
+    });
+    dropzone.addEventListener('drop', event => {
+      event.preventDefault();
+      dropzone.classList.remove('border-indigo-400', 'bg-indigo-50');
+      if (event.dataTransfer?.files?.length) {
+        const file = event.dataTransfer.files[0];
+        this.processInvoiceFile(modal, file, preview);
+      }
+    });
+    fileInput.addEventListener('change', event => {
+      const file = event.target.files?.[0];
+      if (file) {
+        this.processInvoiceFile(modal, file, preview);
+      }
+    });
+    preview.addEventListener('click', event => {
+      const removeBtn = event.target.closest('[data-action="remove-invoice"]');
+      if (removeBtn) {
+        event.preventDefault();
+        modal.dataset.invoiceAttachment = '';
+        fileInput.value = '';
+        preview.innerHTML =
+          '<p class="text-sm text-gray-500">No file attached yet.</p>';
+      }
+    });
+  }
+
+  processInvoiceFile(modal, file, preview) {
+    if (!file) {
+      return;
+    }
+    const maxSize = 8 * 1024 * 1024; // 8MB safety guard
+    if (file.size > maxSize) {
+      alert('Please choose a file under 8MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const attachment = {
+        name: file.name,
+        type: file.type || 'application/octet-stream',
+        data: reader.result
+      };
+      modal.dataset.invoiceAttachment = JSON.stringify(attachment);
+      this.renderInvoicePreview(preview, attachment);
+    };
+    reader.onerror = () => {
+      alert('We could not read that file. Please try again.');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  renderInvoicePreview(preview, attachment) {
+    if (!preview) {
+      return;
+    }
+    if (!attachment) {
+      preview.innerHTML =
+        '<p class="text-sm text-gray-500">No file attached yet.</p>';
+      return;
+    }
+    const safeName = this.escapeHtml(attachment.name || 'Invoice');
+    const fileHref = attachment.data ? `href="${attachment.data}"` : 'href="#"';
+    const isImage = attachment.type?.startsWith('image/');
+    if (isImage) {
+      preview.innerHTML = `
                 <div class="rounded-xl border border-gray-200 overflow-hidden bg-white shadow-sm">
                     <img src="${attachment.data}" alt="${safeName}" class="w-full object-cover max-h-60">
                     <div class="flex items-center justify-between px-3 py-2 text-sm bg-gray-50">
@@ -963,9 +1060,9 @@ class VendorManager {
                     </div>
                 </div>
             `;
-        } else {
-            const descriptor = this.escapeHtml(attachment.type || 'Document');
-            preview.innerHTML = `
+    } else {
+      const descriptor = this.escapeHtml(attachment.type || 'Document');
+      preview.innerHTML = `
                 <div class="flex items-center justify-between px-3 py-2 rounded-xl border border-gray-200 bg-white shadow-sm">
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">📄</span>
@@ -980,237 +1077,254 @@ class VendorManager {
                     </div>
                 </div>
             `;
-        }
     }
-    
-    async saveVendor() {
-        const form = document.getElementById('vendor-form');
-        if (!form) {
-            console.error('❌ Vendor form not found!');
-            return;
-        }
-        
-        console.log('💾 Saving vendor...');
-        
-        const modal = document.querySelector('.vendor-modal-overlay[data-modal="vendor"]');
-        
-        const formData = {
-            name: document.getElementById('vendor-name').value.trim(),
-            company: document.getElementById('vendor-company').value.trim(),
-            email: document.getElementById('vendor-email').value.trim(),
-            phone: document.getElementById('vendor-phone').value.trim(),
-            mobile: document.getElementById('vendor-mobile').value.trim(),
-            website: document.getElementById('vendor-website').value.trim(),
-            street: document.getElementById('vendor-street').value.trim(),
-            city: document.getElementById('vendor-city').value.trim(),
-            state: document.getElementById('vendor-state').value.trim(),
-            zip_code: document.getElementById('vendor-zip').value.trim(),
-            specialties: document.getElementById('vendor-specialties').value.trim().split(',').map(s => s.trim()).filter(Boolean),
-            notes: document.getElementById('vendor-notes').value.trim(),
-            is_active: document.getElementById('vendor-active').checked
-        };
-        
-        const productsContainer = modal ? modal.querySelector('#vendor-products-list') : null;
-        formData.products = this.collectProductData(productsContainer);
-        
-        let invoiceAttachment = null;
-        if (modal?.dataset?.invoiceAttachment) {
-            try {
-                invoiceAttachment = JSON.parse(modal.dataset.invoiceAttachment);
-            } catch (error) {
-                console.warn('⚠️ Failed to parse invoice attachment data:', error);
-            }
-        }
-        formData.invoiceAttachment = invoiceAttachment;
-        
-        if (!formData.name) {
-            alert('Please enter a vendor name');
-            return;
-        }
-        
-        // Check if we're editing or adding
-        const isEdit = modal && modal.dataset.vendorId;
-        
-        try {
-            if (isEdit) {
-                // UPDATE existing vendor
-                const response = await fetch(`/api/vendors/${formData.id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
-                
-                if (response.ok) {
-                    const updatedVendor = await response.json();
-                    const index = this.vendors.findIndex(v => v.id === formData.id);
-                    if (index !== -1) {
-                        this.vendors[index] = {
-                            ...this.vendors[index],
-                            ...formData,
-                            ...updatedVendor,
-                            id: formData.id,
-                            updated_at: new Date().toISOString()
-                        };
-                    }
-                    console.log('✅ Vendor updated in API:', formData.name);
-                } else {
-                    // Fallback to local storage
-                    const index = this.vendors.findIndex(v => v.id === formData.id);
-                    if (index !== -1) {
-                        this.vendors[index] = {
-                            ...this.vendors[index],
-                            ...formData,
-                            updated_at: new Date().toISOString()
-                        };
-                    }
-                    console.log('✅ Vendor updated locally:', formData.name);
-                }
-            } else {
-                // ADD new vendor
-                const response = await fetch('/api/vendors/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
-                
-                if (response.ok) {
-                    const savedVendor = await response.json();
-                    const newVendor = {
-                        ...formData,
-                        ...savedVendor,
-                        id: savedVendor.id || Date.now(),
-                        created_at: savedVendor.created_at || new Date().toISOString()
-                    };
-                    this.vendors.push(newVendor);
-                    console.log('✅ Vendor saved to API:', newVendor.name);
-                } else {
-                    // Fallback to local storage
-                    const newVendor = {
-                        id: Date.now(),
-                        ...formData,
-                        created_at: new Date().toISOString()
-                    };
-                    this.vendors.push(newVendor);
-                    console.log('✅ Vendor saved locally:', newVendor.name);
-                }
-            }
-            
-            // Save to user file storage
-            this.saveVendorsToFile();
-            
-            console.log(`✅ Vendor "${formData.name}" saved. Total vendors: ${this.vendors.length}`);
-            
-            // Close modal first
-            this.closeVendorModal();
-            
-            // Then update display with a small delay to ensure modal is closed
-            setTimeout(() => {
-                this.updateVendorCount();
-                this.displayVendors();
-                this.updateFilters();
-                this.showNotification(`Vendor "${formData.name}" saved successfully!`, 'success');
-                
-                // Also reload the page if display still empty
-                setTimeout(() => {
-                    const container = document.getElementById('vendors-container');
-                    if (container && container.children.length === 0) {
-                        console.log('⚠️ Display still empty, forcing reload');
-                        this.displayVendors();
-                    }
-                }, 500);
-            }, 100);
-            
-        } catch (error) {
-            console.error('❌ Error saving vendor:', error);
-            alert('Error saving vendor. Please try again.');
-        }
+  }
+
+  async saveVendor() {
+    const form = document.getElementById('vendor-form');
+    if (!form) {
+      console.error('❌ Vendor form not found!');
+      return;
     }
-    
-    editVendor(vendorId) {
-        const vendor = this.vendors.find(v => v.id === vendorId);
-        if (vendor) {
-            const modal = this.showVendorModal('edit', vendor);
-            // Store vendor ID for editing
-            setTimeout(() => {
-                const modalElement = document.querySelector('.vendor-modal-overlay[data-modal="vendor"]');
-                if (modalElement) {
-                    modalElement.dataset.vendorId = vendorId;
-                }
-            }, 50);
-        }
+
+    console.log('💾 Saving vendor...');
+
+    const modal = document.querySelector(
+      '.vendor-modal-overlay[data-modal="vendor"]'
+    );
+
+    const formData = {
+      name: document.getElementById('vendor-name').value.trim(),
+      company: document.getElementById('vendor-company').value.trim(),
+      email: document.getElementById('vendor-email').value.trim(),
+      phone: document.getElementById('vendor-phone').value.trim(),
+      mobile: document.getElementById('vendor-mobile').value.trim(),
+      website: document.getElementById('vendor-website').value.trim(),
+      street: document.getElementById('vendor-street').value.trim(),
+      city: document.getElementById('vendor-city').value.trim(),
+      state: document.getElementById('vendor-state').value.trim(),
+      zip_code: document.getElementById('vendor-zip').value.trim(),
+      specialties: document
+        .getElementById('vendor-specialties')
+        .value.trim()
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean),
+      notes: document.getElementById('vendor-notes').value.trim(),
+      is_active: document.getElementById('vendor-active').checked
+    };
+
+    const productsContainer = modal
+      ? modal.querySelector('#vendor-products-list')
+      : null;
+    formData.products = this.collectProductData(productsContainer);
+
+    let invoiceAttachment = null;
+    if (modal?.dataset?.invoiceAttachment) {
+      try {
+        invoiceAttachment = JSON.parse(modal.dataset.invoiceAttachment);
+      } catch (error) {
+        console.warn('⚠️ Failed to parse invoice attachment data:', error);
+      }
     }
-    
-    async deleteVendor(vendorId) {
-        if (!confirm('Are you sure you want to delete this vendor?')) {
-            return;
+    formData.invoiceAttachment = invoiceAttachment;
+
+    if (!formData.name) {
+      alert('Please enter a vendor name');
+      return;
+    }
+
+    // Check if we're editing or adding
+    const isEdit = modal && modal.dataset.vendorId;
+
+    try {
+      if (isEdit) {
+        // UPDATE existing vendor
+        const response = await fetch(`/api/vendors/${formData.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+          const updatedVendor = await response.json();
+          const index = this.vendors.findIndex(v => v.id === formData.id);
+          if (index !== -1) {
+            this.vendors[index] = {
+              ...this.vendors[index],
+              ...formData,
+              ...updatedVendor,
+              id: formData.id,
+              updated_at: new Date().toISOString()
+            };
+          }
+          console.log('✅ Vendor updated in API:', formData.name);
+        } else {
+          // Fallback to local storage
+          const index = this.vendors.findIndex(v => v.id === formData.id);
+          if (index !== -1) {
+            this.vendors[index] = {
+              ...this.vendors[index],
+              ...formData,
+              updated_at: new Date().toISOString()
+            };
+          }
+          console.log('✅ Vendor updated locally:', formData.name);
         }
-        
-        try {
-            // Try to delete from backend API
-            const response = await fetch(`/api/vendors/${vendorId}`, {
-                method: 'DELETE'
-            });
-            
-            if (response.ok) {
-                console.log('✅ Vendor deleted from API');
-            } else {
-                console.log('⚠️ API not available, deleting locally');
-            }
-            
-            // Remove from local array
-            this.vendors = this.vendors.filter(v => v.id !== vendorId);
-            this.selectedVendors.delete(vendorId);
-            
-            // Save to user file storage
-            this.saveVendorsToFile();
-            
-            this.updateVendorCount();
+      } else {
+        // ADD new vendor
+        const response = await fetch('/api/vendors/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+          const savedVendor = await response.json();
+          const newVendor = {
+            ...formData,
+            ...savedVendor,
+            id: savedVendor.id || Date.now(),
+            created_at: savedVendor.created_at || new Date().toISOString()
+          };
+          this.vendors.push(newVendor);
+          console.log('✅ Vendor saved to API:', newVendor.name);
+        } else {
+          // Fallback to local storage
+          const newVendor = {
+            id: Date.now(),
+            ...formData,
+            created_at: new Date().toISOString()
+          };
+          this.vendors.push(newVendor);
+          console.log('✅ Vendor saved locally:', newVendor.name);
+        }
+      }
+
+      // Save to user file storage
+      this.saveVendorsToFile();
+
+      console.log(
+        `✅ Vendor "${formData.name}" saved. Total vendors: ${this.vendors.length}`
+      );
+
+      // Close modal first
+      this.closeVendorModal();
+
+      // Then update display with a small delay to ensure modal is closed
+      setTimeout(() => {
+        this.updateVendorCount();
+        this.displayVendors();
+        this.updateFilters();
+        this.showNotification(
+          `Vendor "${formData.name}" saved successfully!`,
+          'success'
+        );
+
+        // Also reload the page if display still empty
+        setTimeout(() => {
+          const container = document.getElementById('vendors-container');
+          if (container && container.children.length === 0) {
+            console.log('⚠️ Display still empty, forcing reload');
             this.displayVendors();
-            this.updateFilters();
-            this.updateBulkActions();
-            
-            this.showNotification('Vendor deleted successfully!', 'success');
-            
-        } catch (error) {
-            console.error('❌ Error deleting vendor:', error);
-            alert('Error deleting vendor. Please try again.');
-        }
+          }
+        }, 500);
+      }, 100);
+    } catch (error) {
+      console.error('❌ Error saving vendor:', error);
+      alert('Error saving vendor. Please try again.');
     }
-    
-    closeVendorModal() {
-        const modal = document.querySelector('.vendor-modal-overlay[data-modal="vendor"]');
-        if (modal) {
-            modal.style.opacity = '0';
-            setTimeout(() => {
-                modal.remove();
-                console.log('✅ Vendor modal closed');
-            }, 300);
+  }
+
+  editVendor(vendorId) {
+    const vendor = this.vendors.find(v => v.id === vendorId);
+    if (vendor) {
+      const modal = this.showVendorModal('edit', vendor);
+      // Store vendor ID for editing
+      setTimeout(() => {
+        const modalElement = document.querySelector(
+          '.vendor-modal-overlay[data-modal="vendor"]'
+        );
+        if (modalElement) {
+          modalElement.dataset.vendorId = vendorId;
         }
+      }, 50);
     }
-    
-    showImportModal() {
-        const modal = this.createImportModal();
-        if (modal) {
-            document.body.appendChild(modal);
-            
-            setTimeout(() => {
-                modal.style.opacity = '1';
-            }, 10);
-            
-            console.log('✅ Import modal displayed');
-        }
+  }
+
+  async deleteVendor(vendorId) {
+    if (!confirm('Are you sure you want to delete this vendor?')) {
+      return;
     }
-    
-    createImportModal() {
-        const modal = document.createElement('div');
-        modal.className = 'import-modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] opacity-0 transition-opacity duration-300';
-        modal.setAttribute('data-modal', 'import');
-        
-        modal.innerHTML = `
+
+    try {
+      // Try to delete from backend API
+      const response = await fetch(`/api/vendors/${vendorId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        console.log('✅ Vendor deleted from API');
+      } else {
+        console.log('⚠️ API not available, deleting locally');
+      }
+
+      // Remove from local array
+      this.vendors = this.vendors.filter(v => v.id !== vendorId);
+      this.selectedVendors.delete(vendorId);
+
+      // Save to user file storage
+      this.saveVendorsToFile();
+
+      this.updateVendorCount();
+      this.displayVendors();
+      this.updateFilters();
+      this.updateBulkActions();
+
+      this.showNotification('Vendor deleted successfully!', 'success');
+    } catch (error) {
+      console.error('❌ Error deleting vendor:', error);
+      alert('Error deleting vendor. Please try again.');
+    }
+  }
+
+  closeVendorModal() {
+    const modal = document.querySelector(
+      '.vendor-modal-overlay[data-modal="vendor"]'
+    );
+    if (modal) {
+      modal.style.opacity = '0';
+      setTimeout(() => {
+        modal.remove();
+        console.log('✅ Vendor modal closed');
+      }, 300);
+    }
+  }
+
+  showImportModal() {
+    const modal = this.createImportModal();
+    if (modal) {
+      document.body.appendChild(modal);
+
+      setTimeout(() => {
+        modal.style.opacity = '1';
+      }, 10);
+
+      console.log('✅ Import modal displayed');
+    }
+  }
+
+  createImportModal() {
+    const modal = document.createElement('div');
+    modal.className =
+      'import-modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] opacity-0 transition-opacity duration-300';
+    modal.setAttribute('data-modal', 'import');
+
+    modal.innerHTML = `
             <div style="background: white; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto;">
                 <!-- Header -->
                 <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 25px; border-radius: 16px 16px 0 0; color: white;">
@@ -1325,240 +1439,255 @@ class VendorManager {
                 </div>
             </div>
         `;
-        
-        // Add drag and drop functionality
-        const dropZone = modal.querySelector('#drop-zone');
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = '#10b981';
-            dropZone.style.background = '#f0fdf4';
-        });
-        
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.style.borderColor = '#d1d5db';
-            dropZone.style.background = '#f9fafb';
-        });
-        
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = '#d1d5db';
-            dropZone.style.background = '#f9fafb';
-            
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                this.handleFileSelect({ target: { files: [files[0]] } });
-            }
-        });
-        
-        return modal;
+
+    // Add drag and drop functionality
+    const dropZone = modal.querySelector('#drop-zone');
+    dropZone.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#10b981';
+      dropZone.style.background = '#f0fdf4';
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.style.borderColor = '#d1d5db';
+      dropZone.style.background = '#f9fafb';
+    });
+
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#d1d5db';
+      dropZone.style.background = '#f9fafb';
+
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        this.handleFileSelect({ target: { files: [files[0]] } });
+      }
+    });
+
+    return modal;
+  }
+
+  selectedFile = null;
+
+  clearSelectedFile() {
+    this.selectedFile = null;
+    const fileDisplay = document.getElementById('selected-file-display');
+    const startBtn = document.getElementById('start-import-btn');
+
+    if (fileDisplay) {
+      fileDisplay.style.display = 'none';
     }
-    
-    selectedFile = null;
-    
-    clearSelectedFile() {
-        this.selectedFile = null;
-        const fileDisplay = document.getElementById('selected-file-display');
-        const startBtn = document.getElementById('start-import-btn');
-        
-        if (fileDisplay) fileDisplay.style.display = 'none';
-        if (startBtn) {
-            startBtn.disabled = true;
-            startBtn.style.background = '#d1d5db';
-            startBtn.style.color = '#9ca3af';
-            startBtn.style.cursor = 'not-allowed';
-        }
+    if (startBtn) {
+      startBtn.disabled = true;
+      startBtn.style.background = '#d1d5db';
+      startBtn.style.color = '#9ca3af';
+      startBtn.style.cursor = 'not-allowed';
     }
-    
-    startImport() {
-        if (!this.selectedFile) {
-            alert('Please select a file first');
-            return;
-        }
-        
-        this.processFile(this.selectedFile);
+  }
+
+  startImport() {
+    if (!this.selectedFile) {
+      alert('Please select a file first');
+      return;
     }
-    
-    handleFileSelect(event) {
-        const file = event.target.files[0];
-        if (file) {
-            this.selectedFile = file;
-            
-            // Show file info
-            const fileDisplay = document.getElementById('selected-file-display');
-            const fileName = document.getElementById('file-name');
-            const fileSize = document.getElementById('file-size');
-            const startBtn = document.getElementById('start-import-btn');
-            
-            if (fileDisplay && fileName && fileSize) {
-                fileName.textContent = file.name;
-                fileSize.textContent = `${(file.size / 1024).toFixed(2)} KB`;
-                fileDisplay.style.display = 'block';
-            }
-            
-            // Enable start button
-            if (startBtn) {
-                startBtn.disabled = false;
-                startBtn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-                startBtn.style.color = 'white';
-                startBtn.style.cursor = 'pointer';
-            }
-        }
+
+    this.processFile(this.selectedFile);
+  }
+
+  handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+
+      // Show file info
+      const fileDisplay = document.getElementById('selected-file-display');
+      const fileName = document.getElementById('file-name');
+      const fileSize = document.getElementById('file-size');
+      const startBtn = document.getElementById('start-import-btn');
+
+      if (fileDisplay && fileName && fileSize) {
+        fileName.textContent = file.name;
+        fileSize.textContent = `${(file.size / 1024).toFixed(2)} KB`;
+        fileDisplay.style.display = 'block';
+      }
+
+      // Enable start button
+      if (startBtn) {
+        startBtn.disabled = false;
+        startBtn.style.background =
+          'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+        startBtn.style.color = 'white';
+        startBtn.style.cursor = 'pointer';
+      }
     }
-    
-    async processFile(file) {
-        console.log('🔍 Processing file:', file.name);
-        
-        try {
-            let csvContent = '';
-            
-            if (file.name.endsWith('.csv')) {
-                // Process CSV directly
-                csvContent = await file.text();
-            } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-                // Convert Excel to CSV
-                csvContent = await this.convertExcelToCSV(file);
-            } else {
-                throw new Error('Unsupported file format');
-            }
-            
-            // Process the CSV content
-            await this.processCSVContent(csvContent);
-            
-        } catch (error) {
-            console.error('❌ Error processing file:', error);
-            alert('Error processing file: ' + error.message);
-        }
+  }
+
+  async processFile(file) {
+    console.log('🔍 Processing file:', file.name);
+
+    try {
+      let csvContent = '';
+
+      if (file.name.endsWith('.csv')) {
+        // Process CSV directly
+        csvContent = await file.text();
+      } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+        // Convert Excel to CSV
+        csvContent = await this.convertExcelToCSV(file);
+      } else {
+        throw new Error('Unsupported file format');
+      }
+
+      // Process the CSV content
+      await this.processCSVContent(csvContent);
+    } catch (error) {
+      console.error('❌ Error processing file:', error);
+      alert('Error processing file: ' + error.message);
     }
-    
-    async convertExcelToCSV(file) {
-        // For now, we'll use a simple approach
-        // In a production environment, you'd want to use a library like SheetJS
-        console.log('⚠️ Excel conversion not fully implemented - please use CSV format for now');
-        throw new Error('Excel conversion requires additional setup. Please convert to CSV format.');
+  }
+
+  async convertExcelToCSV(file) {
+    // For now, we'll use a simple approach
+    // In a production environment, you'd want to use a library like SheetJS
+    console.log(
+      '⚠️ Excel conversion not fully implemented - please use CSV format for now'
+    );
+    throw new Error(
+      'Excel conversion requires additional setup. Please convert to CSV format.'
+    );
+  }
+
+  async processCSVContent(csvContent) {
+    try {
+      // Try to import via API
+      const response = await fetch('/api/vendors/import-csv', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ csv_content: csvContent })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Import successful:', result);
+
+        // Reload vendors
+        await this.loadVendors();
+
+        this.showNotification(
+          `Successfully imported ${result.imported_count} vendors!`,
+          'success'
+        );
+        this.closeImportModal();
+      } else {
+        throw new Error('API import failed');
+      }
+    } catch (error) {
+      console.log('⚠️ API import failed, processing locally:', error.message);
+
+      // Fallback to local processing
+      const importedVendors = this.parseCSVLocally(csvContent);
+      this.vendors.push(...importedVendors);
+
+      this.updateVendorCount();
+      this.displayVendors();
+      this.updateFilters();
+
+      this.showNotification(
+        `Successfully imported ${importedVendors.length} vendors locally!`,
+        'success'
+      );
+      this.closeImportModal();
     }
-    
-    async processCSVContent(csvContent) {
-        try {
-            // Try to import via API
-            const response = await fetch('/api/vendors/import-csv', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ csv_content: csvContent })
-            });
-            
-            if (response.ok) {
-                const result = await response.json();
-                console.log('✅ Import successful:', result);
-                
-                // Reload vendors
-                await this.loadVendors();
-                
-                this.showNotification(`Successfully imported ${result.imported_count} vendors!`, 'success');
-                this.closeImportModal();
-                
-            } else {
-                throw new Error('API import failed');
-            }
-            
-        } catch (error) {
-            console.log('⚠️ API import failed, processing locally:', error.message);
-            
-            // Fallback to local processing
-            const importedVendors = this.parseCSVLocally(csvContent);
-            this.vendors.push(...importedVendors);
-            
-            this.updateVendorCount();
-            this.displayVendors();
-            this.updateFilters();
-            
-            this.showNotification(`Successfully imported ${importedVendors.length} vendors locally!`, 'success');
-            this.closeImportModal();
-        }
+  }
+
+  parseCSVLocally(csvContent) {
+    const lines = csvContent.split('\n');
+    const headers = lines[0].split(',').map(h => h.trim());
+    const vendors = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) {
+        continue;
+      }
+
+      const values = line.split(',').map(v => v.trim());
+      const vendor = {
+        id: Date.now() + i,
+        name: values[0] || '',
+        company: values[1] || '',
+        email: values[2] || '',
+        phone: values[3] || '',
+        mobile: values[4] || '',
+        fax: values[5] || '',
+        website: values[6] || '',
+        street: values[7] || '',
+        city: values[8] || '',
+        state: values[9] || '',
+        zip_code: values[10] || '',
+        specialties: values[11] ? values[11].split(';').map(s => s.trim()) : [],
+        notes: values[12] || '',
+        is_active: true,
+        created_at: new Date().toISOString()
+      };
+
+      if (vendor.name) {
+        vendors.push(vendor);
+      }
     }
-    
-    parseCSVLocally(csvContent) {
-        const lines = csvContent.split('\n');
-        const headers = lines[0].split(',').map(h => h.trim());
-        const vendors = [];
-        
-        for (let i = 1; i < lines.length; i++) {
-            const line = lines[i].trim();
-            if (!line) continue;
-            
-            const values = line.split(',').map(v => v.trim());
-            const vendor = {
-                id: Date.now() + i,
-                name: values[0] || '',
-                company: values[1] || '',
-                email: values[2] || '',
-                phone: values[3] || '',
-                mobile: values[4] || '',
-                fax: values[5] || '',
-                website: values[6] || '',
-                street: values[7] || '',
-                city: values[8] || '',
-                state: values[9] || '',
-                zip_code: values[10] || '',
-                specialties: values[11] ? values[11].split(';').map(s => s.trim()) : [],
-                notes: values[12] || '',
-                is_active: true,
-                created_at: new Date().toISOString()
-            };
-            
-            if (vendor.name) {
-                vendors.push(vendor);
-            }
-        }
-        
-        return vendors;
-    }
-    
-    downloadTemplate() {
-        const template = `Name,Company,Email,Phone,Mobile,Fax,Website,Street,City,State,ZIP,Specialties,Notes
+
+    return vendors;
+  }
+
+  downloadTemplate() {
+    const template = `Name,Company,Email,Phone,Mobile,Fax,Website,Street,City,State,ZIP,Specialties,Notes
 John Smith,Fresh Foods Inc,john@freshfoods.com,555-1234,555-5678,,https://freshfoods.com,123 Main St,Boston,MA,02101,"produce;dairy",Reliable supplier
 Sarah Johnson,Quality Meats Co,sarah@qualitymeats.com,555-2345,555-6789,,https://qualitymeats.com,456 Oak Ave,Chicago,IL,60601,"meat;poultry",Premium meat supplier`;
-        
-        const blob = new Blob([template], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'vendor-import-template.csv';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        console.log('✅ Template downloaded');
+
+    const blob = new Blob([template], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'vendor-import-template.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    console.log('✅ Template downloaded');
+  }
+
+  closeImportModal() {
+    const modal = document.querySelector(
+      '.import-modal-overlay[data-modal="import"]'
+    );
+    if (modal) {
+      modal.style.opacity = '0';
+      setTimeout(() => {
+        modal.remove();
+        console.log('✅ Import modal closed');
+      }, 300);
     }
-    
-    closeImportModal() {
-        const modal = document.querySelector('.import-modal-overlay[data-modal="import"]');
-        if (modal) {
-            modal.style.opacity = '0';
-            setTimeout(() => {
-                modal.remove();
-                console.log('✅ Import modal closed');
-            }, 300);
-        }
+  }
+
+  exportVendors() {
+    if (this.vendors.length === 0) {
+      alert('No vendors to export');
+      return;
     }
-    
-    exportVendors() {
-        if (this.vendors.length === 0) {
-            alert('No vendors to export');
-            return;
-        }
-        
-        this.showExportModal();
-    }
-    
-    showExportModal() {
-        const modal = document.createElement('div');
-        modal.className = 'export-modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] opacity-0 transition-opacity duration-300';
-        modal.setAttribute('data-modal', 'export');
-        
-        modal.innerHTML = `
+
+    this.showExportModal();
+  }
+
+  showExportModal() {
+    const modal = document.createElement('div');
+    modal.className =
+      'export-modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] opacity-0 transition-opacity duration-300';
+    modal.setAttribute('data-modal', 'export');
+
+    modal.innerHTML = `
             <div style="background: white; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 600px; width: 90%;">
                 <!-- Header -->
                 <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 25px; border-radius: 16px 16px 0 0; color: white;">
@@ -1631,143 +1760,174 @@ Sarah Johnson,Quality Meats Co,sarah@qualitymeats.com,555-2345,555-6789,,https:/
                 </div>
             </div>
         `;
-        
-        document.body.appendChild(modal);
-        
-        setTimeout(() => {
-            modal.style.opacity = '1';
-        }, 10);
+
+    document.body.appendChild(modal);
+
+    setTimeout(() => {
+      modal.style.opacity = '1';
+    }, 10);
+  }
+
+  executeExport() {
+    // Get selected status filter
+    const statusFilter = document.querySelector(
+      'input[name="export-status"]:checked'
+    ).value;
+    const filename =
+      document.getElementById('export-filename').value || 'vendors-export';
+
+    // Filter vendors based on selection
+    let vendorsToExport = this.vendors;
+    if (statusFilter === 'active') {
+      vendorsToExport = this.vendors.filter(v => v.is_active);
+    } else if (statusFilter === 'inactive') {
+      vendorsToExport = this.vendors.filter(v => !v.is_active);
     }
-    
-    executeExport() {
-        // Get selected status filter
-        const statusFilter = document.querySelector('input[name="export-status"]:checked').value;
-        const filename = document.getElementById('export-filename').value || 'vendors-export';
-        
-        // Filter vendors based on selection
-        let vendorsToExport = this.vendors;
-        if (statusFilter === 'active') {
-            vendorsToExport = this.vendors.filter(v => v.is_active);
-        } else if (statusFilter === 'inactive') {
-            vendorsToExport = this.vendors.filter(v => !v.is_active);
-        }
-        
-        // Convert vendors to CSV
-        const headers = ['Name', 'Company', 'Email', 'Phone', 'Mobile', 'Fax', 'Website', 'Street', 'City', 'State', 'ZIP', 'Specialties', 'Notes', 'Status'];
-        const csvContent = [
-            headers.join(','),
-            ...vendorsToExport.map(vendor => [
-                vendor.name,
-                vendor.company || '',
-                vendor.email || '',
-                vendor.phone || '',
-                vendor.mobile || '',
-                vendor.fax || '',
-                vendor.website || '',
-                vendor.street || '',
-                vendor.city || '',
-                vendor.state || '',
-                vendor.zip_code || '',
-                (vendor.specialties || []).join(';'),
-                vendor.notes || '',
-                vendor.is_active ? 'Active' : 'Inactive'
-            ].join(','))
-        ].join('\n');
-        
-        // Download file
-        const blob = new Blob([csvContent], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${filename}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        console.log(`✅ Exported ${vendorsToExport.length} vendors`);
-        this.showNotification(`Successfully exported ${vendorsToExport.length} vendors!`, 'success');
-        
-        this.closeExportModal();
+
+    // Convert vendors to CSV
+    const headers = [
+      'Name',
+      'Company',
+      'Email',
+      'Phone',
+      'Mobile',
+      'Fax',
+      'Website',
+      'Street',
+      'City',
+      'State',
+      'ZIP',
+      'Specialties',
+      'Notes',
+      'Status'
+    ];
+    const csvContent = [
+      headers.join(','),
+      ...vendorsToExport.map(vendor =>
+        [
+          vendor.name,
+          vendor.company || '',
+          vendor.email || '',
+          vendor.phone || '',
+          vendor.mobile || '',
+          vendor.fax || '',
+          vendor.website || '',
+          vendor.street || '',
+          vendor.city || '',
+          vendor.state || '',
+          vendor.zip_code || '',
+          (vendor.specialties || []).join(';'),
+          vendor.notes || '',
+          vendor.is_active ? 'Active' : 'Inactive'
+        ].join(',')
+      )
+    ].join('\n');
+
+    // Download file
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    console.log(`✅ Exported ${vendorsToExport.length} vendors`);
+    this.showNotification(
+      `Successfully exported ${vendorsToExport.length} vendors!`,
+      'success'
+    );
+
+    this.closeExportModal();
+  }
+
+  closeExportModal() {
+    const modal = document.querySelector('[data-modal="export"]');
+    if (modal) {
+      modal.style.opacity = '0';
+      setTimeout(() => {
+        modal.remove();
+      }, 300);
     }
-    
-    closeExportModal() {
-        const modal = document.querySelector('[data-modal="export"]');
-        if (modal) {
-            modal.style.opacity = '0';
-            setTimeout(() => {
-                modal.remove();
-            }, 300);
-        }
+  }
+
+  bulkDeleteVendors() {
+    if (this.selectedVendors.size === 0) {
+      alert('Please select vendors to delete');
+      return;
     }
-    
-    bulkDeleteVendors() {
-        if (this.selectedVendors.size === 0) {
-            alert('Please select vendors to delete');
-            return;
-        }
-        
-        if (!confirm(`Are you sure you want to delete ${this.selectedVendors.size} vendors?`)) {
-            return;
-        }
-        
-        // Delete selected vendors
-        this.selectedVendors.forEach(vendorId => {
-            this.deleteVendor(vendorId);
-        });
-        
-        this.selectedVendors.clear();
-        this.updateBulkActions();
+
+    if (
+      !confirm(
+        `Are you sure you want to delete ${this.selectedVendors.size} vendors?`
+      )
+    ) {
+      return;
     }
-    
-    bulkEditVendors() {
-        if (this.selectedVendors.size === 0) {
-            alert('Please select vendors to edit');
-            return;
-        }
-        
-        // For now, show a simple bulk edit modal
-        // In a more sophisticated implementation, you'd allow editing common fields
-        alert(`Bulk edit for ${this.selectedVendors.size} vendors - Feature coming soon!`);
+
+    // Delete selected vendors
+    this.selectedVendors.forEach(vendorId => {
+      this.deleteVendor(vendorId);
+    });
+
+    this.selectedVendors.clear();
+    this.updateBulkActions();
+  }
+
+  bulkEditVendors() {
+    if (this.selectedVendors.size === 0) {
+      alert('Please select vendors to edit');
+      return;
     }
-    
-    showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-[10000] transform transition-all duration-300 ${
-            type === 'success' ? 'bg-green-500 text-white' : 
-            type === 'error' ? 'bg-red-500 text-white' : 
-            'bg-blue-500 text-white'
-        }`;
-        notification.textContent = message;
-        
-        document.body.appendChild(notification);
-        
-        // Remove after 3 seconds
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
-    }
+
+    // For now, show a simple bulk edit modal
+    // In a more sophisticated implementation, you'd allow editing common fields
+    alert(
+      `Bulk edit for ${this.selectedVendors.size} vendors - Feature coming soon!`
+    );
+  }
+
+  showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-[10000] transform transition-all duration-300 ${
+      type === 'success'
+        ? 'bg-green-500 text-white'
+        : type === 'error'
+          ? 'bg-red-500 text-white'
+          : 'bg-blue-500 text-white'
+    }`;
+    notification.textContent = message;
+
+    document.body.appendChild(notification);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+      notification.remove();
+    }, 3000);
+  }
 }
 
 // View vendor profile with notes
-VendorManager.prototype.viewVendorProfile = function(vendorId) {
-    const vendor = this.vendors.find(v => v.id === vendorId);
-    if (!vendor) {
-        console.error('Vendor not found:', vendorId);
-        return;
-    }
-    
-    console.log(`👁️ Viewing profile for vendor: ${vendor.name}`);
-    
-    // Get notes for this vendor
-    const user = window.authManager?.currentUser;
-    const userId = user?.userId || user?.id;
-    const notesKey = `vendor_notes_${userId}_${vendorId}`;
-    const notes = JSON.parse(localStorage.getItem(notesKey) || '[]');
-    
-    // Create modal
-    const modal = document.createElement('div');
-    modal.style.cssText = `
+VendorManager.prototype.viewVendorProfile = function (vendorId) {
+  const vendor = this.vendors.find(v => v.id === vendorId);
+  if (!vendor) {
+    console.error('Vendor not found:', vendorId);
+    return;
+  }
+
+  console.log(`👁️ Viewing profile for vendor: ${vendor.name}`);
+
+  // Get notes for this vendor
+  const user = window.authManager?.currentUser;
+  const userId = user?.userId || user?.id;
+  const notesKey = `vendor_notes_${userId}_${vendorId}`;
+  const notes = JSON.parse(localStorage.getItem(notesKey) || '[]');
+
+  // Create modal
+  const modal = document.createElement('div');
+  modal.style.cssText = `
         position: fixed;
         top: 0;
         left: 0;
@@ -1781,21 +1941,34 @@ VendorManager.prototype.viewVendorProfile = function(vendorId) {
         padding: 20px;
         backdrop-filter: blur(4px);
     `;
-    
-    // Build specialties badges
-    const specialties = Array.isArray(vendor.specialties) ? vendor.specialties : [];
-    const specialtiesHTML = specialties.length
-        ? specialties.map(s => `<span style="display: inline-flex; align-items: center; gap: 6px; background: #e0e7ff; color: #3730a3; padding: 6px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 600;">⭐ ${this.escapeHtml(s)}</span>`).join(' ')
-        : '<span style="color: #94a3b8;">None specified</span>';
 
-    // Build product list
-    const productItemsHTML = Array.isArray(vendor.products) && vendor.products.length
-        ? vendor.products.map(item => {
+  // Build specialties badges
+  const specialties = Array.isArray(vendor.specialties)
+    ? vendor.specialties
+    : [];
+  const specialtiesHTML = specialties.length
+    ? specialties
+        .map(
+          s =>
+            `<span style="display: inline-flex; align-items: center; gap: 6px; background: #e0e7ff; color: #3730a3; padding: 6px 14px; border-radius: 999px; font-size: 0.85rem; font-weight: 600;">⭐ ${this.escapeHtml(s)}</span>`
+        )
+        .join(' ')
+    : '<span style="color: #94a3b8;">None specified</span>';
+
+  // Build product list
+  const productItemsHTML =
+    Array.isArray(vendor.products) && vendor.products.length
+      ? vendor.products
+          .map(item => {
             const safeName = this.escapeHtml(item?.name || 'Untitled item');
             const safePack = this.escapeHtml(item?.packSize || 'Pack TBD');
             const safeSku = this.escapeHtml(item?.sku || 'No SKU');
-            const safeNotes = this.escapeHtml(item?.notes || 'No additional notes');
-            const price = Number.isFinite(item?.unitCost) ? `$${Number(item.unitCost).toFixed(2)}` : 'Pricing TBD';
+            const safeNotes = this.escapeHtml(
+              item?.notes || 'No additional notes'
+            );
+            const price = Number.isFinite(item?.unitCost)
+              ? `$${Number(item.unitCost).toFixed(2)}`
+              : 'Pricing TBD';
             return `
                 <div style="padding: 18px; border: 1px solid #e2e8f0; border-radius: 16px; background: #f8fafc;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
@@ -1811,10 +1984,11 @@ VendorManager.prototype.viewVendorProfile = function(vendorId) {
                     </div>
                 </div>
             `;
-        }).join('')
-        : `<div style="padding: 20px; border: 2px dashed #cbd5e1; border-radius: 16px; text-align: center; color: #64748b; font-size: 0.9rem; background: #f8fafc;">No products tracked yet. Capture your go-to items directly from the vendor modal.</div>`;
+          })
+          .join('')
+      : `<div style="padding: 20px; border: 2px dashed #cbd5e1; border-radius: 16px; text-align: center; color: #64748b; font-size: 0.9rem; background: #f8fafc;">No products tracked yet. Capture your go-to items directly from the vendor modal.</div>`;
 
-    const productsSectionHTML = `
+  const productsSectionHTML = `
         <div style="padding: 25px; border-bottom: 2px solid #f1f5f9; background: white;">
             <h3 style="font-size: 1.2rem; font-weight: 700; color: #1e293b; margin: 0 0 18px 0; display: flex; align-items: center; gap: 10px;">
                 <span>🍋</span> Product Catalogue <span style="background: #fef3c7; color: #b45309; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 700;">${Array.isArray(vendor.products) ? vendor.products.length : 0}</span>
@@ -1825,13 +1999,13 @@ VendorManager.prototype.viewVendorProfile = function(vendorId) {
         </div>
     `;
 
-    // Build invoice preview
-    let invoiceSectionHTML = '';
-    if (vendor.invoiceAttachment?.data) {
-        const attachment = vendor.invoiceAttachment;
-        const safeName = this.escapeHtml(attachment.name || 'Invoice');
-        if ((attachment.type || '').startsWith('image/')) {
-            invoiceSectionHTML = `
+  // Build invoice preview
+  let invoiceSectionHTML = '';
+  if (vendor.invoiceAttachment?.data) {
+    const attachment = vendor.invoiceAttachment;
+    const safeName = this.escapeHtml(attachment.name || 'Invoice');
+    if ((attachment.type || '').startsWith('image/')) {
+      invoiceSectionHTML = `
                 <div style="padding: 25px; border-bottom: 2px solid #f1f5f9; background: #f8fafc;">
                     <h3 style="font-size: 1.2rem; font-weight: 700; color: #1e293b; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
                         <span>🧾</span> Latest Invoice Snapshot
@@ -1845,9 +2019,9 @@ VendorManager.prototype.viewVendorProfile = function(vendorId) {
                     </div>
                 </div>
             `;
-        } else {
-            const descriptor = this.escapeHtml(attachment.type || 'Document');
-            invoiceSectionHTML = `
+    } else {
+      const descriptor = this.escapeHtml(attachment.type || 'Document');
+      invoiceSectionHTML = `
                 <div style="padding: 25px; border-bottom: 2px solid #f1f5f9; background: #f8fafc;">
                     <h3 style="font-size: 1.2rem; font-weight: 700; color: #1e293b; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
                         <span>🧾</span> Latest Invoice Snapshot
@@ -1861,9 +2035,9 @@ VendorManager.prototype.viewVendorProfile = function(vendorId) {
                     </div>
                 </div>
             `;
-        }
-    } else {
-        invoiceSectionHTML = `
+    }
+  } else {
+    invoiceSectionHTML = `
             <div style="padding: 25px; border-bottom: 2px solid #f1f5f9; background: #f8fafc;">
                 <h3 style="font-size: 1.2rem; font-weight: 700; color: #1e293b; margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
                     <span>🧾</span> Latest Invoice Snapshot
@@ -1873,12 +2047,14 @@ VendorManager.prototype.viewVendorProfile = function(vendorId) {
                 </div>
             </div>
         `;
-    }
-    
-    // Build contact info
-    const contactHTML = `
+  }
+
+  // Build contact info
+  const contactHTML = `
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-            ${vendor.phone ? `
+            ${
+              vendor.phone
+                ? `
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="font-size: 1.5rem;">📞</span>
                     <div>
@@ -1886,8 +2062,12 @@ VendorManager.prototype.viewVendorProfile = function(vendorId) {
                         <a href="tel:${vendor.phone}" style="color: #667eea; text-decoration: none; font-weight: 600;">${vendor.phone}</a>
                     </div>
                 </div>
-            ` : ''}
-            ${vendor.mobile ? `
+            `
+                : ''
+            }
+            ${
+              vendor.mobile
+                ? `
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="font-size: 1.5rem;">📱</span>
                     <div>
@@ -1895,8 +2075,12 @@ VendorManager.prototype.viewVendorProfile = function(vendorId) {
                         <a href="tel:${vendor.mobile}" style="color: #667eea; text-decoration: none; font-weight: 600;">${vendor.mobile}</a>
                     </div>
                 </div>
-            ` : ''}
-            ${vendor.email ? `
+            `
+                : ''
+            }
+            ${
+              vendor.email
+                ? `
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="font-size: 1.5rem;">✉️</span>
                     <div>
@@ -1904,8 +2088,12 @@ VendorManager.prototype.viewVendorProfile = function(vendorId) {
                         <a href="mailto:${vendor.email}" style="color: #667eea; text-decoration: none; font-weight: 600;">${vendor.email}</a>
                     </div>
                 </div>
-            ` : ''}
-            ${vendor.website ? `
+            `
+                : ''
+            }
+            ${
+              vendor.website
+                ? `
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="font-size: 1.5rem;">🌐</span>
                     <div>
@@ -1913,13 +2101,16 @@ VendorManager.prototype.viewVendorProfile = function(vendorId) {
                         <a href="${vendor.website}" target="_blank" style="color: #667eea; text-decoration: none; font-weight: 600;">Visit Site →</a>
                     </div>
                 </div>
-            ` : ''}
+            `
+                : ''
+            }
         </div>
     `;
-    
-    // Build location info
-    const locationHTML = vendor.address || vendor.city || vendor.state || vendor.zip_code
-        ? `
+
+  // Build location info
+  const locationHTML =
+    vendor.address || vendor.city || vendor.state || vendor.zip_code
+      ? `
             <div style="display: flex; align-items: start; gap: 10px;">
                 <span style="font-size: 1.5rem;">📍</span>
                 <div style="line-height: 1.6;">
@@ -1928,30 +2119,32 @@ VendorManager.prototype.viewVendorProfile = function(vendorId) {
                 </div>
             </div>
         `
-        : '<span style="color: #94a3b8;">No address provided</span>';
-    
-    // Build notes section
-    const notesHTML = notes.length === 0 
-        ? `<div style="text-align: center; padding: 40px; background: #f8fafc; border-radius: 12px; border: 2px dashed #cbd5e1;">
+      : '<span style="color: #94a3b8;">No address provided</span>';
+
+  // Build notes section
+  const notesHTML =
+    notes.length === 0
+      ? `<div style="text-align: center; padding: 40px; background: #f8fafc; border-radius: 12px; border: 2px dashed #cbd5e1;">
             <p style="font-size: 2.5rem; margin-bottom: 10px;">📝</p>
             <p style="color: #64748b; margin: 0;">No notes yet for this vendor.</p>
             <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 8px;">Add notes from the Chef's Dashboard!</p>
            </div>`
-        : notes.map(note => {
-            const date = new Date(note.timestamp).toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric', 
-                year: 'numeric' 
+      : notes
+          .map(note => {
+            const date = new Date(note.timestamp).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric'
             });
-            const time = new Date(note.timestamp).toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
+            const time = new Date(note.timestamp).toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit'
             });
-            
-            const photoHTML = note.photo 
-                ? `<img src="${note.photo}" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px; margin-top: 10px; cursor: pointer; border: 2px solid #e5e7eb;" onclick="window.open('${note.photo}', '_blank')" title="Click to view full size">`
-                : '';
-            
+
+            const photoHTML = note.photo
+              ? `<img src="${note.photo}" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px; margin-top: 10px; cursor: pointer; border: 2px solid #e5e7eb;" onclick="window.open('${note.photo}', '_blank')" title="Click to view full size">`
+              : '';
+
             return `
                 <div style="padding: 16px; background: white; border-radius: 12px; margin-bottom: 12px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.2s;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'" onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,0.05)'">
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
@@ -1962,14 +2155,15 @@ VendorManager.prototype.viewVendorProfile = function(vendorId) {
                     ${photoHTML}
                 </div>
             `;
-        }).join('');
-    
-    // Status badge
-    const statusBadge = vendor.is_active 
-        ? '<span style="display: inline-block; background: #dcfce7; color: #15803d; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">✅ Active</span>'
-        : '<span style="display: inline-block; background: #fee2e2; color: #991b1b; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">❌ Inactive</span>';
-    
-    modal.innerHTML = `
+          })
+          .join('');
+
+  // Status badge
+  const statusBadge = vendor.is_active
+    ? '<span style="display: inline-block; background: #dcfce7; color: #15803d; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">✅ Active</span>'
+    : '<span style="display: inline-block; background: #fee2e2; color: #991b1b; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">❌ Inactive</span>';
+
+  modal.innerHTML = `
         <div style="background: white; border-radius: 20px; max-width: 900px; width: 100%; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 25px 80px rgba(0,0,0,0.4);">
             
             <!-- Header -->
@@ -2052,66 +2246,68 @@ VendorManager.prototype.viewVendorProfile = function(vendorId) {
             </div>
         </div>
     `;
-    
-    modal.onclick = (e) => {
-        if (e.target === modal) modal.remove();
-    };
-    
-    document.body.appendChild(modal);
+
+  modal.onclick = e => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  };
+
+  document.body.appendChild(modal);
 };
 
-VendorManager.prototype.promptVendorNote = function(vendorId, triggerElement) {
-    const vendor = this.vendors.find(v => v.id === vendorId);
-    if (!vendor) {
-        console.error('Vendor not found:', vendorId);
-        return;
-    }
+VendorManager.prototype.promptVendorNote = function (vendorId, triggerElement) {
+  const vendor = this.vendors.find(v => v.id === vendorId);
+  if (!vendor) {
+    console.error('Vendor not found:', vendorId);
+    return;
+  }
 
-    const noteText = window.prompt(`Add a note for ${vendor.name}:`);
-    if (!noteText || !noteText.trim()) {
-        return;
-    }
+  const noteText = window.prompt(`Add a note for ${vendor.name}:`);
+  if (!noteText || !noteText.trim()) {
+    return;
+  }
 
-    const user = window.authManager?.currentUser;
-    const userId = user?.userId || user?.id || 'local';
-    const author = user?.email || user?.name || 'Team';
-    const notesKey = `vendor_notes_${userId}_${vendorId}`;
-    const notes = JSON.parse(localStorage.getItem(notesKey) || '[]');
+  const user = window.authManager?.currentUser;
+  const userId = user?.userId || user?.id || 'local';
+  const author = user?.email || user?.name || 'Team';
+  const notesKey = `vendor_notes_${userId}_${vendorId}`;
+  const notes = JSON.parse(localStorage.getItem(notesKey) || '[]');
 
-    notes.unshift({
-        id: `vendor_note_${Date.now()}`,
-        text: noteText.trim(),
-        author,
-        timestamp: new Date().toISOString(),
-    });
+  notes.unshift({
+    id: `vendor_note_${Date.now()}`,
+    text: noteText.trim(),
+    author,
+    timestamp: new Date().toISOString()
+  });
 
-    localStorage.setItem(notesKey, JSON.stringify(notes));
-    this.showNotification('Vendor note captured', 'success');
+  localStorage.setItem(notesKey, JSON.stringify(notes));
+  this.showNotification('Vendor note captured', 'success');
 
-    const modal = triggerElement?.closest('div[style*="position: fixed"]');
-    if (modal) {
-        modal.remove();
-    }
+  const modal = triggerElement?.closest('div[style*="position: fixed"]');
+  if (modal) {
+    modal.remove();
+  }
 
-    this.viewVendorProfile(vendorId);
+  this.viewVendorProfile(vendorId);
 };
 
 // Utility function for debouncing
 function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
     };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 }
 
 // Initialize vendor manager when DOM is loaded
 let vendorManager;
-document.addEventListener('DOMContentLoaded', function() {
-    vendorManager = new VendorManager();
-    window.vendorManager = vendorManager;
+document.addEventListener('DOMContentLoaded', function () {
+  vendorManager = new VendorManager();
+  window.vendorManager = vendorManager;
 });

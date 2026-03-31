@@ -4,41 +4,43 @@
  */
 
 class EnhancedProjectModal {
-    constructor(projectManager) {
-        this.projectManager = projectManager;
-        this.injectStyles();
-    }
+  constructor(projectManager) {
+    this.projectManager = projectManager;
+    this.injectStyles();
+  }
 
-    /**
-     * Show the enhanced project creation modal
-     */
-    show() {
-        const modal = this.createModal();
-        document.body.appendChild(modal);
-        
-        // Animate in
-        requestAnimationFrame(() => {
-            modal.classList.add('active');
-            
-            // Focus first input
-            setTimeout(() => {
-                const nameInput = modal.querySelector('#enhanced-project-name');
-                if (nameInput) nameInput.focus();
-            }, 150);
-        });
-        
-        return modal;
-    }
+  /**
+   * Show the enhanced project creation modal
+   */
+  show() {
+    const modal = this.createModal();
+    document.body.appendChild(modal);
 
-    /**
-     * Create the enhanced modal
-     */
-    createModal() {
-        const modal = document.createElement('div');
-        modal.className = 'enhanced-project-modal';
-        modal.id = 'enhanced-project-modal';
+    // Animate in
+    requestAnimationFrame(() => {
+      modal.classList.add('active');
 
-        modal.innerHTML = `
+      // Focus first input
+      setTimeout(() => {
+        const nameInput = modal.querySelector('#enhanced-project-name');
+        if (nameInput) {
+          nameInput.focus();
+        }
+      }, 150);
+    });
+
+    return modal;
+  }
+
+  /**
+   * Create the enhanced modal
+   */
+  createModal() {
+    const modal = document.createElement('div');
+    modal.className = 'enhanced-project-modal';
+    modal.id = 'enhanced-project-modal';
+
+    modal.innerHTML = `
             <div class="enhanced-modal-backdrop" onclick="this.closest('.enhanced-project-modal').remove()"></div>
             <div class="enhanced-modal-container">
                 <!-- Header -->
@@ -206,113 +208,116 @@ class EnhancedProjectModal {
             </div>
         `;
 
-        this.setupEventHandlers(modal);
-        return modal;
+    this.setupEventHandlers(modal);
+    return modal;
+  }
+
+  /**
+   * Setup event handlers for the modal
+   */
+  setupEventHandlers(modal) {
+    // Color selection
+    const colorOptions = modal.querySelectorAll('.color-option');
+    const colorInput = modal.querySelector('#enhanced-project-color');
+
+    colorOptions.forEach(option => {
+      option.addEventListener('click', e => {
+        e.preventDefault();
+        const color = option.dataset.color;
+        colorInput.value = color;
+
+        // Update active state
+        colorOptions.forEach(opt => opt.classList.remove('active'));
+        option.classList.add('active');
+      });
+    });
+
+    // Custom color input
+    colorInput.addEventListener('change', () => {
+      colorOptions.forEach(opt => opt.classList.remove('active'));
+    });
+
+    // Escape key handler
+    const escapeHandler = e => {
+      if (e.key === 'Escape') {
+        modal.remove();
+        document.removeEventListener('keydown', escapeHandler);
+      }
+    };
+    document.addEventListener('keydown', escapeHandler);
+
+    // Form validation
+    const form = modal.querySelector('#enhanced-project-form');
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      this.createProject();
+    });
+  }
+
+  /**
+   * Create project with enhanced validation
+   */
+  async createProject() {
+    const form = document.getElementById('enhanced-project-form');
+    const formData = new FormData(form);
+    const projectData = Object.fromEntries(formData.entries());
+
+    // Validation
+    if (!projectData.name || projectData.name.trim().length < 2) {
+      this.showError('Project name must be at least 2 characters long');
+      return;
     }
 
-    /**
-     * Setup event handlers for the modal
-     */
-    setupEventHandlers(modal) {
-        // Color selection
-        const colorOptions = modal.querySelectorAll('.color-option');
-        const colorInput = modal.querySelector('#enhanced-project-color');
-        
-        colorOptions.forEach(option => {
-            option.addEventListener('click', (e) => {
-                e.preventDefault();
-                const color = option.dataset.color;
-                colorInput.value = color;
-                
-                // Update active state
-                colorOptions.forEach(opt => opt.classList.remove('active'));
-                option.classList.add('active');
-            });
-        });
+    // Create the project
+    try {
+      const success =
+        await this.projectManager.createProjectFromData(projectData);
+      if (success) {
+        document.getElementById('enhanced-project-modal').remove();
+        this.showSuccess('Project created successfully!');
+      }
+    } catch (error) {
+      this.showError('Failed to create project: ' + error.message);
+    }
+  }
 
-        // Custom color input
-        colorInput.addEventListener('change', () => {
-            colorOptions.forEach(opt => opt.classList.remove('active'));
-        });
+  /**
+   * Show success message
+   */
+  showSuccess(message) {
+    // You can implement a toast notification here
+    console.log('✅', message);
+    if (window.showNotification) {
+      window.showNotification(message, 'success');
+    } else {
+      alert(message);
+    }
+  }
 
-        // Escape key handler
-        const escapeHandler = (e) => {
-            if (e.key === 'Escape') {
-                modal.remove();
-                document.removeEventListener('keydown', escapeHandler);
-            }
-        };
-        document.addEventListener('keydown', escapeHandler);
+  /**
+   * Show error message
+   */
+  showError(message) {
+    // You can implement a toast notification here
+    console.error('❌', message);
+    if (window.showNotification) {
+      window.showNotification(message, 'error');
+    } else {
+      alert(message);
+    }
+  }
 
-        // Form validation
-        const form = modal.querySelector('#enhanced-project-form');
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.createProject();
-        });
+  /**
+   * Inject enhanced modal styles
+   */
+  injectStyles() {
+    if (document.getElementById('enhanced-project-modal-styles')) {
+      return;
     }
 
-    /**
-     * Create project with enhanced validation
-     */
-    async createProject() {
-        const form = document.getElementById('enhanced-project-form');
-        const formData = new FormData(form);
-        const projectData = Object.fromEntries(formData.entries());
-
-        // Validation
-        if (!projectData.name || projectData.name.trim().length < 2) {
-            this.showError('Project name must be at least 2 characters long');
-            return;
-        }
-
-        // Create the project
-        try {
-            const success = await this.projectManager.createProjectFromData(projectData);
-            if (success) {
-                document.getElementById('enhanced-project-modal').remove();
-                this.showSuccess('Project created successfully!');
-            }
-        } catch (error) {
-            this.showError('Failed to create project: ' + error.message);
-        }
-    }
-
-    /**
-     * Show success message
-     */
-    showSuccess(message) {
-        // You can implement a toast notification here
-        console.log('✅', message);
-        if (window.showNotification) {
-            window.showNotification(message, 'success');
-        } else {
-            alert(message);
-        }
-    }
-
-    /**
-     * Show error message
-     */
-    showError(message) {
-        // You can implement a toast notification here
-        console.error('❌', message);
-        if (window.showNotification) {
-            window.showNotification(message, 'error');
-        } else {
-            alert(message);
-        }
-    }
-
-    /**
-     * Inject enhanced modal styles
-     */
-    injectStyles() {
-        if (document.getElementById('enhanced-project-modal-styles')) return;
-
-        const style = document.createElement('style');
-        style.id = 'enhanced-project-modal-styles';
-        style.textContent = `
+    const style = document.createElement('style');
+    style.id = 'enhanced-project-modal-styles';
+    style.textContent = `
             /* Enhanced Project Modal Styles */
             .enhanced-project-modal {
                 position: fixed;
@@ -670,57 +675,61 @@ class EnhancedProjectModal {
             }
         `;
 
-        document.head.appendChild(style);
-    }
+    document.head.appendChild(style);
+  }
 }
 
 // Initialize enhanced project modal when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait for project manager to be available
-    const initEnhancedModal = () => {
-        if (window.projectManager) {
-            window.enhancedProjectModal = new EnhancedProjectModal(window.projectManager);
-            
-            // Replace the original showNewProjectModal method
-            window.projectManager.showNewProjectModal = () => {
-                window.enhancedProjectModal.show();
-            };
-            
-            // Add createProjectFromData method if it doesn't exist
-            if (!window.projectManager.createProjectFromData) {
-                window.projectManager.createProjectFromData = async function(projectData) {
-                    // Use existing createProject logic with the form data
-                    const form = document.createElement('form');
-                    Object.entries(projectData).forEach(([key, value]) => {
-                        const input = document.createElement('input');
-                        input.name = key;
-                        input.value = value;
-                        form.appendChild(input);
-                    });
-                    
-                    // Temporarily replace the form query with our created form
-                    const originalQuery = document.getElementById;
-                    document.getElementById = (id) => {
-                        if (id === 'enhanced-project-form') return form;
-                        return originalQuery.call(document, id);
-                    };
-                    
-                    try {
-                        await this.createProject();
-                        return true;
-                    } catch (error) {
-                        throw error;
-                    } finally {
-                        document.getElementById = originalQuery;
-                    }
-                };
+document.addEventListener('DOMContentLoaded', function () {
+  // Wait for project manager to be available
+  const initEnhancedModal = () => {
+    if (window.projectManager) {
+      window.enhancedProjectModal = new EnhancedProjectModal(
+        window.projectManager
+      );
+
+      // Replace the original showNewProjectModal method
+      window.projectManager.showNewProjectModal = () => {
+        window.enhancedProjectModal.show();
+      };
+
+      // Add createProjectFromData method if it doesn't exist
+      if (!window.projectManager.createProjectFromData) {
+        window.projectManager.createProjectFromData = async function (
+          projectData
+        ) {
+          // Use existing createProject logic with the form data
+          const form = document.createElement('form');
+          Object.entries(projectData).forEach(([key, value]) => {
+            const input = document.createElement('input');
+            input.name = key;
+            input.value = value;
+            form.appendChild(input);
+          });
+
+          // Temporarily replace the form query with our created form
+          const originalQuery = document.getElementById;
+          document.getElementById = id => {
+            if (id === 'enhanced-project-form') {
+              return form;
             }
-            
-            console.log('✅ Enhanced project modal initialized');
-        } else {
-            setTimeout(initEnhancedModal, 100);
-        }
-    };
-    
-    initEnhancedModal();
+            return originalQuery.call(document, id);
+          };
+
+          try {
+            await this.createProject();
+            return true;
+          } finally {
+            document.getElementById = originalQuery;
+          }
+        };
+      }
+
+      console.log('✅ Enhanced project modal initialized');
+    } else {
+      setTimeout(initEnhancedModal, 100);
+    }
+  };
+
+  initEnhancedModal();
 });

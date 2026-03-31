@@ -4,18 +4,20 @@
  */
 
 class LoadingStates {
-    constructor() {
-        this.activeLoaders = new Map();
-        this.injectStyles();
-        console.log('⏳ Loading States utility initialized');
+  constructor() {
+    this.activeLoaders = new Map();
+    this.injectStyles();
+    console.log('⏳ Loading States utility initialized');
+  }
+
+  injectStyles() {
+    if (document.getElementById('loading-states-styles')) {
+      return;
     }
-    
-    injectStyles() {
-        if (document.getElementById('loading-states-styles')) return;
-        
-        const style = document.createElement('style');
-        style.id = 'loading-states-styles';
-        style.textContent = `
+
+    const style = document.createElement('style');
+    style.id = 'loading-states-styles';
+    style.textContent = `
             .loading-spinner {
                 display: inline-block;
                 width: 40px;
@@ -137,76 +139,82 @@ class LoadingStates {
                 border-radius: 12px;
             }
         `;
-        document.head.appendChild(style);
-    }
-    
-    // Show full-page loading overlay
-    showOverlay(message = 'Loading...') {
-        const id = 'loading-overlay-' + Date.now();
-        
-        const overlay = document.createElement('div');
-        overlay.className = 'loading-overlay';
-        overlay.id = id;
-        overlay.innerHTML = `
+    document.head.appendChild(style);
+  }
+
+  // Show full-page loading overlay
+  showOverlay(message = 'Loading...') {
+    const id = 'loading-overlay-' + Date.now();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'loading-overlay';
+    overlay.id = id;
+    overlay.innerHTML = `
             <div style="text-align: center; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
                 <div class="loading-spinner loading-spinner-lg"></div>
                 <div class="loading-text" style="color: #1e293b; margin-top: 20px; font-size: 16px;">${message}</div>
             </div>
         `;
-        
-        document.body.appendChild(overlay);
-        this.activeLoaders.set(id, overlay);
-        
-        return id;
+
+    document.body.appendChild(overlay);
+    this.activeLoaders.set(id, overlay);
+
+    return id;
+  }
+
+  // Hide loading overlay
+  hideOverlay(id) {
+    const overlay = this.activeLoaders.get(id);
+    if (overlay) {
+      overlay.style.animation = 'fadeOut 0.2s ease';
+      setTimeout(() => {
+        overlay.remove();
+        this.activeLoaders.delete(id);
+      }, 200);
     }
-    
-    // Hide loading overlay
-    hideOverlay(id) {
-        const overlay = this.activeLoaders.get(id);
-        if (overlay) {
-            overlay.style.animation = 'fadeOut 0.2s ease';
-            setTimeout(() => {
-                overlay.remove();
-                this.activeLoaders.delete(id);
-            }, 200);
-        }
+  }
+
+  // Hide all overlays
+  hideAllOverlays() {
+    this.activeLoaders.forEach((overlay, id) => {
+      this.hideOverlay(id);
+    });
+  }
+
+  // Show inline loading spinner in an element
+  showInline(element, message = '') {
+    if (typeof element === 'string') {
+      element =
+        document.getElementById(element) || document.querySelector(element);
     }
-    
-    // Hide all overlays
-    hideAllOverlays() {
-        this.activeLoaders.forEach((overlay, id) => {
-            this.hideOverlay(id);
-        });
+
+    if (!element) {
+      return;
     }
-    
-    // Show inline loading spinner in an element
-    showInline(element, message = '') {
-        if (typeof element === 'string') {
-            element = document.getElementById(element) || document.querySelector(element);
-        }
-        
-        if (!element) return;
-        
-        // Store original content
-        element.dataset.originalContent = element.innerHTML;
-        
-        element.innerHTML = `
+
+    // Store original content
+    element.dataset.originalContent = element.innerHTML;
+
+    element.innerHTML = `
             <div class="loading-inline">
                 <div class="loading-spinner"></div>
                 ${message ? `<div class="loading-text">${message}</div>` : ''}
             </div>
         `;
+  }
+
+  // Show loading dots (smaller, less intrusive)
+  showDots(element, message = 'Loading') {
+    if (typeof element === 'string') {
+      element =
+        document.getElementById(element) || document.querySelector(element);
     }
-    
-    // Show loading dots (smaller, less intrusive)
-    showDots(element, message = 'Loading') {
-        if (typeof element === 'string') {
-            element = document.getElementById(element) || document.querySelector(element);
-        }
-        
-        if (!element) return;
-        
-        element.innerHTML = `
+
+    if (!element) {
+      return;
+    }
+
+    element.innerHTML = `
             <div style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 20px;">
                 <span class="loading-text" style="margin: 0;">${message}</span>
                 <div class="loading-dots">
@@ -216,64 +224,73 @@ class LoadingStates {
                 </div>
             </div>
         `;
+  }
+
+  // Restore original content
+  restore(element) {
+    if (typeof element === 'string') {
+      element =
+        document.getElementById(element) || document.querySelector(element);
     }
-    
-    // Restore original content
-    restore(element) {
-        if (typeof element === 'string') {
-            element = document.getElementById(element) || document.querySelector(element);
-        }
-        
-        if (!element) return;
-        
-        if (element.dataset.originalContent) {
-            element.innerHTML = element.dataset.originalContent;
-            delete element.dataset.originalContent;
-        }
+
+    if (!element) {
+      return;
     }
-    
-    // Create skeleton loader
-    createSkeleton(type = 'card', count = 1) {
-        const skeletons = {
-            text: '<div class="skeleton skeleton-text"></div>',
-            title: '<div class="skeleton skeleton-title"></div>',
-            card: '<div class="skeleton skeleton-card"></div>',
-            table: `
+
+    if (element.dataset.originalContent) {
+      element.innerHTML = element.dataset.originalContent;
+      delete element.dataset.originalContent;
+    }
+  }
+
+  // Create skeleton loader
+  createSkeleton(type = 'card', count = 1) {
+    const skeletons = {
+      text: '<div class="skeleton skeleton-text"></div>',
+      title: '<div class="skeleton skeleton-title"></div>',
+      card: '<div class="skeleton skeleton-card"></div>',
+      table: `
                 <div style="padding: 20px;">
                     <div class="skeleton skeleton-title"></div>
                     ${Array(5).fill('<div class="skeleton skeleton-text" style="width: 100%; margin-bottom: 12px;"></div>').join('')}
                 </div>
             `
-        };
-        
-        const skeleton = skeletons[type] || skeletons.card;
-        return Array(count).fill(skeleton).join('');
+    };
+
+    const skeleton = skeletons[type] || skeletons.card;
+    return Array(count).fill(skeleton).join('');
+  }
+
+  // Show skeleton in element
+  showSkeleton(element, type = 'card', count = 3) {
+    if (typeof element === 'string') {
+      element =
+        document.getElementById(element) || document.querySelector(element);
     }
-    
-    // Show skeleton in element
-    showSkeleton(element, type = 'card', count = 3) {
-        if (typeof element === 'string') {
-            element = document.getElementById(element) || document.querySelector(element);
-        }
-        
-        if (!element) return;
-        
-        element.dataset.originalContent = element.innerHTML;
-        element.innerHTML = this.createSkeleton(type, count);
+
+    if (!element) {
+      return;
     }
+
+    element.dataset.originalContent = element.innerHTML;
+    element.innerHTML = this.createSkeleton(type, count);
+  }
 }
 
 // Initialize global loading system
 window.loadingStates = new LoadingStates();
 
 // Convenience functions
-window.showLoading = (message) => window.loadingStates.showOverlay(message);
-window.hideLoading = (id) => window.loadingStates.hideOverlay(id);
-window.showInlineLoading = (element, message) => window.loadingStates.showInline(element, message);
-window.showLoadingDots = (element, message) => window.loadingStates.showDots(element, message);
-window.restoreContent = (element) => window.loadingStates.restore(element);
-window.showSkeleton = (element, type, count) => window.loadingStates.showSkeleton(element, type, count);
+window.showLoading = message => window.loadingStates.showOverlay(message);
+window.hideLoading = id => window.loadingStates.hideOverlay(id);
+window.showInlineLoading = (element, message) =>
+  window.loadingStates.showInline(element, message);
+window.showLoadingDots = (element, message) =>
+  window.loadingStates.showDots(element, message);
+window.restoreContent = element => window.loadingStates.restore(element);
+window.showSkeleton = (element, type, count) =>
+  window.loadingStates.showSkeleton(element, type, count);
 
-console.log('✅ Loading functions available: showLoading(), hideLoading(), showInlineLoading(), showSkeleton()');
-
-
+console.log(
+  '✅ Loading functions available: showLoading(), hideLoading(), showInlineLoading(), showSkeleton()'
+);
