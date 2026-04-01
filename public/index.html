@@ -28,6 +28,16 @@
             --hero-blue-deep: #0f172a;
             --hero-blue-mid: #1e3a8a;
             --hero-blue-glow: #1d4ed8;
+            --accent: #d97706;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-900: #111827;
         }
         * {
             margin: 0;
@@ -92,109 +102,9 @@
             background: linear-gradient(90deg, rgba(96, 165, 250, 0.6), rgba(59, 130, 246, 0));
         }
 
-        .hero-eyebrow {
-            margin-bottom: 24px;
-            opacity: 0.9;
-        }
-
-        .hero-left h1 {
-            font-size: 3.5rem;
-            line-height: 1.05;
-            letter-spacing: -0.035em;
-            margin-bottom: 28px;
-        }
-
-        .hero-left .description {
-            font-size: 1.18rem;
-            max-width: 560px;
-            margin-bottom: 36px;
-            color: rgba(226, 232, 240, 0.88);
-            line-height: 1.75;
-        }
-
-        .hero-nav {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 16px;
-            margin-bottom: 36px;
-        }
-
-        .hero-nav button {
-            background: rgba(15, 23, 42, 0.55);
-            border: 1px solid rgba(148, 163, 184, 0.22);
-            color: rgba(226, 232, 240, 0.9);
-            border-radius: 16px;
-            padding: 14px 20px;
-            font-size: 0.92rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-            transition: all 0.2s ease;
-            backdrop-filter: blur(14px);
-            min-height: 72px;
-            text-align: left;
-        }
-
-        .hero-nav button span {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            opacity: 0.65;
-        }
-
-        .hero-nav button strong {
-            font-size: 1rem;
-            letter-spacing: -0.02em;
-        }
-
-        .hero-nav button:hover,
-        .hero-nav button:focus {
-            border-color: rgba(96, 165, 250, 0.9);
-            color: #e2e8f0;
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(34, 197, 94, 0.08);
-        }
-
-        .hero-cta-group {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            flex-wrap: wrap;
-        }
-
-        .hero-cta-group .btn-primary {
-            font-size: 1.05rem;
-            padding: 16px 32px;
-            border-radius: 999px;
-            background: linear-gradient(135deg, #38bdf8, #2563eb);
-            box-shadow: 0 20px 48px rgba(37, 99, 235, 0.35);
-        }
-
-        .hero-cta-group .text-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            color: rgba(226, 232, 240, 0.9);
-            text-decoration: none;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            transition: color 0.2s ease;
-        }
-
-        .hero-cta-group .text-link:hover {
-            color: #ffffff;
-        }
-
-        .hero-cta-group .text-link::after {
-            content: '→';
-            font-size: 1.1rem;
-            transition: transform 0.2s ease;
-        }
-
-        .hero-cta-group .text-link:hover::after {
-            transform: translateX(4px);
+        .landing-auth-hero .hero-eyebrow {
+            margin-bottom: 0.75rem;
+            opacity: 1;
         }
 
         .section-wrapper {
@@ -477,129 +387,198 @@
         }
 
         @media (max-width: 1024px) {
-            .hero-left h1 {
-                font-size: 3.2rem;
-            }
-
-            .hero-nav {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+            .landing-auth-hero .hero-left h1 {
+                font-size: clamp(1.65rem, 4.5vw, 2.5rem);
             }
         }
 
-        @media (max-width: 768px) {
-            .hero-nav {
-                grid-template-columns: repeat(1, minmax(0, 1fr));
-            }
-
-            .hero-cta-group {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .hero-cta-group .text-link {
-                padding-left: 4px;
-            }
-        }
-
-        .hero {
-            background: radial-gradient(circle at 12% 18%, rgba(59, 130, 246, 0.15), transparent 55%),
-                radial-gradient(circle at 85% 12%, rgba(49, 46, 129, 0.18), transparent 50%),
-                linear-gradient(135deg, #0f172a 0%, #111827 40%, #172554 100%);
+        /* Landing + auth: one card, readable contrast, beats global p / brand-kit / launch-nordic */
+        .landing-auth-hero.hero {
+            background: linear-gradient(160deg, #e8eef0 0%, #f1f5f9 42%, #dbeafe 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px 20px;
+            padding: clamp(1rem, 3vw, 2rem);
             position: relative;
-            overflow: hidden;
-            box-shadow: inset 0 0 140px rgba(15, 23, 42, 0.65);
+            overflow-x: hidden;
+            box-shadow: none;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="1200" height="600" fill="url(%23grid)"/></svg>');
-            opacity: 0.3;
+        .landing-auth-hero.hero::before {
+            display: none;
         }
 
-        .hero-content {
-            max-width: 1200px;
+        .hero-shell {
+            max-width: 1080px;
             width: 100%;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 0;
+            align-items: stretch;
             position: relative;
             z-index: 1;
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 25px 68px rgba(15, 23, 42, 0.1);
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            overflow: hidden;
         }
 
-        .hero-left {
-            color: #f8fafc;
+        .landing-auth-hero .hero-left {
+            padding: clamp(1.75rem, 4vw, 2.75rem);
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            color: #0f172a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        .hero-left h1 {
-            font-size: 3.5rem;
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            text-shadow: 0 10px 45px rgba(15, 23, 42, 0.45);
-            color: #f9fafb;
-            letter-spacing: -1px;
+        .landing-auth-hero .hero-left .mono-heading {
+            color: #64748b !important;
         }
 
-        .hero-left .tagline {
-            font-size: 1.5rem;
-            font-weight: 500;
-            margin-bottom: 16px;
-            opacity: 0.95;
-            color: var(--primary-light);
+        .landing-auth-hero .hero-left .mono-heading::before {
+            background: linear-gradient(90deg, rgba(100, 116, 139, 0.45), rgba(100, 116, 139, 0));
         }
 
-        .hero-left .description {
-            font-size: 1.125rem;
-            line-height: 1.8;
-            margin-bottom: 32px;
-            opacity: 0.92;
-            color: rgba(226, 232, 240, 0.88);
+        .landing-auth-hero .hero-left h1 {
+            font-size: clamp(1.75rem, 4vw, 2.75rem);
+            font-weight: 800;
+            line-height: 1.12;
+            margin-bottom: 1rem;
+            text-shadow: none;
+            color: #0f172a !important;
+            letter-spacing: -0.03em;
         }
 
-        .hero-features {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 32px;
+        .landing-auth-hero .hero-left .description {
+            font-size: 1.0625rem;
+            line-height: 1.75;
+            margin-bottom: 1.25rem;
+            max-width: 36rem;
+            color: #475569 !important;
+            opacity: 1;
         }
 
-        .hero-feature {
+        .hero-benefits {
+            list-style: none;
+            margin: 0 0 1.5rem;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .hero-benefits li {
+            position: relative;
+            padding-left: 1.5rem;
+            font-size: 0.9375rem;
+            line-height: 1.45;
+            color: #334155 !important;
+        }
+
+        .hero-benefits li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #2563eb;
+            font-weight: 700;
+        }
+
+        .hero-left-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .btn-signup-ghost {
+            font: inherit;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: #0f172a;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            border-radius: 12px;
+            padding: 0.65rem 1.1rem;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-signup-ghost:hover {
+            background: #fff;
+            border-color: #94a3b8;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+        }
+
+        .hero-link-explore {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: #1d4ed8;
+        }
+
+        .hero-link-explore:hover {
+            color: #1e40af;
+        }
+
+        .landing-auth-hero .hero-right {
+            background: #fff;
+            border-radius: 0;
+            padding: clamp(1.75rem, 4vw, 2.75rem);
+            box-shadow: none;
+            border-left: 1px solid rgba(148, 163, 184, 0.22);
             display: flex;
             align-items: center;
-            gap: 12px;
-            background: rgba(15, 23, 42, 0.65);
-            padding: 14px 18px;
-            border-radius: 14px;
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(148, 163, 184, 0.24);
+            min-width: 0;
         }
 
-        .hero-feature-icon {
-            font-size: 24px;
-            color: var(--primary-light);
+        .landing-auth-hero .auth-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
         }
 
-        .hero-feature-text {
+        .trial-foot {
+            text-align: center;
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            margin-top: 1.25rem;
+            line-height: 1.5;
+        }
+
+        .link-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
             font-weight: 600;
-            color: rgba(226, 232, 240, 0.95);
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+            font: inherit;
         }
 
-        .hero-right {
-            background: white;
-            border-radius: 24px;
-            padding: 48px;
-            box-shadow: 0 25px 68px rgba(15, 23, 42, 0.25);
+        .link-btn:hover {
+            color: var(--primary-dark);
+        }
+
+        @media (max-width: 968px) {
+            .hero-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .landing-auth-hero .hero-right {
+                border-left: none;
+                border-top: 1px solid rgba(148, 163, 184, 0.22);
+                order: -1;
+            }
+
+            .landing-auth-hero .hero-left {
+                order: 1;
+            }
         }
 
         .auth-container h2 {
@@ -798,15 +777,6 @@
 
         .btn-google:hover {
             background: var(--gray-50);
-        }
-
-        .btn-guest {
-            background: var(--accent);
-            color: white;
-        }
-
-        .btn-guest:hover {
-            background: #d97706;
         }
 
         .divider {
@@ -1090,23 +1060,6 @@
 
         /* Responsive Design */
         @media (max-width: 968px) {
-            .hero-content {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-
-            .hero-left h1 {
-                font-size: 2.5rem;
-            }
-
-            .hero-features {
-                grid-template-columns: 1fr;
-            }
-
-            .hero-right {
-                padding: 32px;
-            }
-
             .features-grid,
             .testimonials-grid {
                 grid-template-columns: 1fr;
@@ -1122,14 +1075,6 @@
         }
 
         @media (max-width: 640px) {
-            .hero-left h1 {
-                font-size: 2rem;
-            }
-
-            .hero-left .tagline {
-                font-size: 1.25rem;
-            }
-
             .section-header h2 {
                 font-size: 2rem;
             }
@@ -1139,49 +1084,35 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
-    <link rel="stylesheet" href="assets/css/header-universal.css">
 </head>
 <body>
-    <!-- Hero Section with Authentication -->
-    <section class="hero">
-        <div class="hero-content">
-            <!-- Left Side - Marketing Copy -->
+    <!-- Hero: single card, clear auth path (see launch-nordic / brand-kit overrides scoped under .landing-auth-hero) -->
+    <section class="hero landing-auth-hero" aria-label="Sign in to Iterum">
+        <div class="hero-shell">
+            <!-- Left: value prop (no competing primary CTAs) -->
             <div class="hero-left">
                 <div class="mono-heading hero-eyebrow">Turning complexity into clarity</div>
                 <h1>Smart systems for modern culinary teams.</h1>
                 <p class="description">
-                    We blend senior-level culinary operations experience with adaptable technology.
-                    From recipe architecture to enterprise-wide intelligence, Iterum keeps every
-                    project remote-ready, data-driven, and aligned with the outcomes you care about.
+                    Recipes, menus, and costs in one workflow—built for professional kitchens.
+                    Sign in to open your workspace, or create an account to get started.
                 </p>
-
-                <div class="hero-nav">
-                    <button type="button">
-                        <span>01</span>
-                        <strong>Digital Competence</strong>
-                    </button>
-                    <button type="button">
-                        <span>02</span>
-                        <strong>Creativity &amp; Problem Solving</strong>
-                    </button>
-                    <button type="button">
-                        <span>03</span>
-                        <strong>Adaptability</strong>
-                    </button>
-                    </div>
-
-                <div class="hero-cta-group">
-                    <button class="btn btn-primary" onclick="scrollToSignUp()">Start Free Trial</button>
-                    <a href="#capabilities" class="text-link">Explore platform</a>
+                <ul class="hero-benefits" aria-label="What Iterum helps you do">
+                    <li>Menu and recipe data tied to real costing</li>
+                    <li>Ops-ready daily tasks and notes in one place</li>
+                    <li>Room to grow as you add locations and vendors</li>
+                </ul>
+                <div class="hero-left-actions">
+                    <button type="button" class="btn-signup-ghost" onclick="scrollToSignUp()">Create an account</button>
+                    <a href="#capabilities" class="hero-link-explore">How Iterum works →</a>
                 </div>
             </div>
 
-            <!-- Right Side - Authentication Form -->
+            <!-- Right: sign in / sign up -->
             <div class="hero-right">
                 <div class="auth-container">
-                    <h2>Get Started Free</h2>
-                    <p class="subtitle">No credit card required • Full access • Cancel anytime</p>
+                    <h2>Welcome back</h2>
+                    <p class="subtitle">No credit card required. Sign in, or open <strong>Sign Up</strong> to create a workspace.</p>
 
                     <div id="success-message" class="success-message"></div>
                     <div id="error-message-global" class="error-message"></div>
@@ -1201,6 +1132,7 @@
                                 id="signin-email" 
                                 class="form-input" 
                                 placeholder="chef@restaurant.com"
+                                autocomplete="email"
                                 required
                             >
                             <div id="signin-email-error" class="error-message"></div>
@@ -1213,6 +1145,7 @@
                                 id="signin-password" 
                                 class="form-input" 
                                 placeholder="Enter your password"
+                                autocomplete="current-password"
                                 required
                             >
                             <div id="signin-password-error" class="error-message"></div>
@@ -1239,6 +1172,7 @@
                                 id="signup-name" 
                                 class="form-input" 
                                 placeholder="Gordon Ramsay"
+                                autocomplete="name"
                                 required
                             >
                             <div id="signup-name-error" class="error-message"></div>
@@ -1251,6 +1185,7 @@
                                 id="signup-email" 
                                 class="form-input" 
                                 placeholder="chef@restaurant.com"
+                                autocomplete="email"
                                 required
                             >
                             <div id="signup-email-error" class="error-message"></div>
@@ -1263,6 +1198,7 @@
                                 id="signup-password" 
                                 class="form-input" 
                                 placeholder="Minimum 6 characters"
+                                autocomplete="new-password"
                                 required
                                 minlength="6"
                             >
@@ -1276,6 +1212,7 @@
                                 id="signup-confirm-password" 
                                 class="form-input" 
                                 placeholder="Re-enter your password"
+                                autocomplete="new-password"
                                 required
                             >
                             <div id="signup-confirm-error" class="error-message"></div>
@@ -1299,10 +1236,10 @@
                         Continue with Google
                     </button>
 
-                    <button class="btn btn-guest" onclick="handleTrialAccess()">
-                        <span>🎁</span>
-                        Start Free 14-Day Trial
-                    </button>
+                    <p class="trial-foot">
+                        Prefer a guided setup?
+                        <button type="button" class="link-btn" onclick="handleTrialAccess()">Start a 14-day trial</button>
+                    </p>
                 </div>
             </div>
         </div>
