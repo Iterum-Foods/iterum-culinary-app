@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- optional dev auto-load logging */
 // Auto-load 89 Charles data for chefmcpherson@gmail.com
 (function () {
   window.addEventListener('userAuthenticated', async function (event) {

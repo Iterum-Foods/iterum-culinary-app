@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- one-shot visibility fix logging */
 /**
  * Project Selector UI Fix
  * Ensures the project selector displays properly in the header

@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- debug logging for AI status */
 /**
  * AI Integration for Iterum R&D Chef Notebook
  * Handles AI-powered recipe and menu parsing, creation, and enhancement
