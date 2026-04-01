@@ -224,7 +224,10 @@ class FirebaseAuthSystem {
       );
       this.syncWithUnifiedAuth(firebaseUser);
     } else {
-      console.log('🔥 Firebase user signed out');
+      // Runs once on every page load when no Firebase session exists — not an error.
+      console.log(
+        'ℹ️ Firebase Auth: no session yet (expected on the sign-in page before you sign in).'
+      );
       this.syncWithUnifiedAuth(null);
     }
   }
