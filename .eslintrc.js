@@ -15,7 +15,8 @@ module.exports = {
   },
   rules: {
     // Code quality (formatting delegated to Prettier)
-    'no-console': 'warn',
+    // Legacy static app: console is used widely for debugging; tighten per-file when refactoring
+    'no-console': 'off',
     'no-debugger': 'error',
     'no-unused-vars': 'warn',
     // Multi-page app: many functions are globals from other script tags

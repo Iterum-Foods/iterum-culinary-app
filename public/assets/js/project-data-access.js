@@ -29,7 +29,8 @@ export async function ensureProjectForCurrentUser(projectId, metadata = {}) {
     console.warn('project-data-access: Firestore not initialized');
     return null;
   }
-  const uid = window.authManager?.currentUser?.uid || metadata.firebaseUid || null;
+  const uid =
+    window.authManager?.currentUser?.uid || metadata.firebaseUid || null;
   return sync.ensureProjectDoc(projectId, { ...metadata, firebaseUid: uid });
 }
 
@@ -42,13 +43,10 @@ export async function saveProjectMenuSnapshot(payload) {
   if (!sync?.initialized) {
     return false;
   }
-  await ensureProjectForCurrentUser(
-    sync.resolveProjectId(payload?.projectId),
-    {
-      ownerId: sync.resolveUserId(payload?.userId),
-      projectName: payload?.menu?.name
-    }
-  );
+  await ensureProjectForCurrentUser(sync.resolveProjectId(payload?.projectId), {
+    ownerId: sync.resolveUserId(payload?.userId),
+    projectName: payload?.menu?.name
+  });
   return sync.saveMenuSnapshot(payload);
 }
 

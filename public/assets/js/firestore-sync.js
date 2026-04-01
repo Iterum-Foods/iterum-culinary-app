@@ -104,9 +104,7 @@ class FirestoreSync {
     }
     const projectRef = doc(this.db, 'projects', projectId);
     const authUid =
-      window.authManager?.currentUser?.uid ||
-      metadata.firebaseUid ||
-      null;
+      window.authManager?.currentUser?.uid || metadata.firebaseUid || null;
     const enriched = {
       projectId,
       updatedAt: serverTimestamp(),
