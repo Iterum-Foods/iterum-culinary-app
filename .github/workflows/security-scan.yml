@@ -22,12 +22,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    # Single security-events key required (YAML forbids duplicate keys)
     permissions:
-      contents: read
-      security-events: write
-      issues: write
       actions: read
-      
+      contents: read
+      issues: write
+      security-events: write
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
