@@ -311,8 +311,12 @@
 
       showSuccess('Opening Google Sign-In...');
 
-      // Use AuthManager to sign in with Google
       const user = await window.authManager.signInWithGoogle();
+
+      if (user == null) {
+        showSuccess('Redirecting to Google…');
+        return;
+      }
 
       console.log('✅ Google sign-in successful:', user.email);
 
@@ -320,9 +324,7 @@
         'Google Sign-In successful! Welcome ' + user.name + '! Redirecting...'
       );
 
-      // Redirect after delay
       setTimeout(() => {
-        console.log('🚀 Redirecting to main app...');
         window.location.href = 'dashboard.html';
       }, 1500);
     } catch (error) {

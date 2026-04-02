@@ -244,58 +244,93 @@ class AuthManager {
   }
 
   /**
+   * Apply Firebase web User after redirect or auth state change (sign-in pages have no unifiedAuthSystem)
+   */
+  async applyFirebaseUserSession(firebaseUser) {
+    if (!firebaseUser || !firebaseUser.email) {
+      return null;
+    }
+
+    this.log('🔗 Syncing Firebase user into AuthManager:', firebaseUser.email);
+
+    const isGoogle = (firebaseUser.providerData || []).some(
+      p => p.providerId === 'google.com'
+    );
+
+    const idToken = await firebaseUser.getIdToken();
+    this.firebaseToken = idToken;
+    localStorage.setItem(this.STORAGE_KEYS.FIREBASE_TOKEN, idToken);
+
+    const user = {
+      id: firebaseUser.uid,
+      userId: firebaseUser.uid,
+      name:
+        firebaseUser.displayName || firebaseUser.email.split('@')[0],
+      email: firebaseUser.email,
+      photoURL: firebaseUser.photoURL,
+      type: isGoogle ? 'google' : 'email',
+      createdAt: new Date().toISOString(),
+      lastLogin: new Date().toISOString()
+    };
+
+    try {
+      await this.syncWithBackend(user, idToken);
+    } catch (e) {
+      this.log('⚠️ Backend sync failed (non-critical):', e?.message || e);
+    }
+
+    await this.saveSession(user);
+
+    if (window.analyticsTracker && isGoogle) {
+      window.analyticsTracker.trackLogin('google', user.userId);
+    }
+
+    const shouldRedirectToApp =
+      sessionStorage.getItem('iterum_oauth_just_completed') === '1' ||
+      sessionStorage.getItem('iterum_oauth_started') === '1';
+
+    if (shouldRedirectToApp) {
+      sessionStorage.removeItem('iterum_oauth_just_completed');
+      sessionStorage.removeItem('iterum_oauth_started');
+      const path = window.location.pathname || '';
+      const page = path.split('/').pop() || '';
+      const onEntry =
+        page === 'signin.html' ||
+        page === 'index.html' ||
+        page === '' ||
+        path.endsWith('/');
+      if (onEntry) {
+        this.log('🚀 OAuth complete — opening dashboard');
+        window.location.replace(
+          new URL('dashboard.html', window.location.href).href
+        );
+      }
+    }
+
+    return user;
+  }
+
+  /**
    * Sign in with Google
    */
   async signInWithGoogle() {
     this.log('🔵 Signing in with Google...');
 
     try {
-      // Wait for Firebase Auth to be ready
       const firebaseAuth = await this.waitForFirebaseAuth();
+      await firebaseAuth.signInWithGoogle();
 
-      // Sign in with Google
-      const result = await firebaseAuth.signInWithGoogle();
-
-      if (!result || !result.user) {
-        throw new Error('Google sign-in failed');
-      }
-
-      this.log('✅ Google authentication successful');
-
-      // Get Firebase ID token
-      const idToken = await result.user.getIdToken();
-      this.firebaseToken = idToken;
-      localStorage.setItem(this.STORAGE_KEYS.FIREBASE_TOKEN, idToken);
-
-      // Create user profile
-      const user = {
-        id: result.user.uid,
-        userId: result.user.uid,
-        name: result.user.displayName || result.user.email.split('@')[0],
-        email: result.user.email,
-        photoURL: result.user.photoURL,
-        type: 'google',
-        createdAt: new Date().toISOString(),
-        lastLogin: new Date().toISOString()
-      };
-
-      // Sync with backend
-      await this.syncWithBackend(user, idToken);
-
-      // Save session
-      await this.saveSession(user);
-
-      // Track Google login
-      if (window.analyticsTracker) {
-        window.analyticsTracker.trackLogin('google', user.userId);
-      }
-
-      this.log('✅ Google sign-in complete');
-      return user;
+      // signInWithRedirect: user completes on Google; session resumes on this URL via getRedirectResult + onAuthStateChanged
+      this.log('ℹ️ Google redirect in progress (if the page does not change, check the console)');
+      return null;
     } catch (error) {
+      try {
+        sessionStorage.removeItem('iterum_oauth_started');
+      } catch (e) {
+        /* ignore */
+      }
       this.error('❌ Google sign-in failed:', error);
 
-      // Track failed Google login
       if (window.analyticsTracker) {
         window.analyticsTracker.trackError(
           'login_failed',

@@ -122,8 +122,8 @@ class FirebaseAuthSystem {
       this.providers.google.addScope('email');
       this.providers.google.addScope('profile');
 
-      // Check for redirect result first
-      this.handleRedirectResult();
+      // Complete OAuth redirect before subscribing (recommended); sets flags for post-login nav
+      await this.handleRedirectResult();
 
       // Listen for auth state changes
       onAuthStateChanged(this.auth, user => {
@@ -172,12 +172,16 @@ class FirebaseAuthSystem {
   async handleRedirectResult() {
     try {
       const result = await getRedirectResult(this.auth);
-      if (result) {
+      if (result && result.user) {
+        try {
+          sessionStorage.setItem('iterum_oauth_just_completed', '1');
+        } catch (e) {
+          /* ignore private mode */
+        }
         console.log(
           '✅ Google redirect sign-in successful:',
           result.user.displayName
         );
-        // The user will be handled by the auth state listener
       }
     } catch (error) {
       console.error('❌ Error handling redirect result:', error);
@@ -222,6 +226,7 @@ class FirebaseAuthSystem {
         '🔥 Firebase user signed in:',
         firebaseUser.displayName || firebaseUser.email
       );
+      this.syncSessionToAuthManager(firebaseUser);
       this.syncWithUnifiedAuth(firebaseUser);
     } else {
       // Runs once on every page load when no Firebase session exists — not an error.
@@ -230,6 +235,22 @@ class FirebaseAuthSystem {
       );
       this.syncWithUnifiedAuth(null);
     }
+  }
+
+  /**
+   * Persist Firebase user to AuthManager (signin/index load this, not unified_auth_system.js)
+   */
+  syncSessionToAuthManager(firebaseUser) {
+    if (
+      !firebaseUser ||
+      !window.authManager ||
+      typeof window.authManager.applyFirebaseUserSession !== 'function'
+    ) {
+      return;
+    }
+    void window.authManager.applyFirebaseUserSession(firebaseUser).catch(err => {
+      console.error('❌ AuthManager session sync failed:', err);
+    });
   }
 
   /**
@@ -285,6 +306,12 @@ class FirebaseAuthSystem {
     try {
       console.log('🔥 Signing in with Google...');
 
+      try {
+        sessionStorage.setItem('iterum_oauth_started', '1');
+      } catch (e) {
+        /* ignore */
+      }
+
       // Use redirect method to avoid COOP issues
       console.log('🔄 Using redirect method to avoid COOP issues...');
       await signInWithRedirect(this.auth, this.providers.google);
@@ -292,6 +319,11 @@ class FirebaseAuthSystem {
       // The redirect will take the user to Google, then back to our app
       // The result will be handled by getRedirectResult() in the auth state listener
     } catch (error) {
+      try {
+        sessionStorage.removeItem('iterum_oauth_started');
+      } catch (e) {
+        /* ignore */
+      }
       console.error('❌ Google sign-in failed:', error);
 
       // Handle specific error cases

@@ -561,9 +561,10 @@
                 }
                 
                 const user = await window.authManager.signInWithGoogle();
+                if (user == null) {
+                    return;
+                }
                 console.log('✅ Google sign-in successful:', user.email);
-                
-                // Redirect to dashboard after successful sign-in
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
                 }, 500);

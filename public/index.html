@@ -1779,81 +1779,10 @@
                 // Show loading state (optional - Google popup is fast)
                 showSuccess('Opening Google Sign-In...');
 
-                // Trigger Google Sign-In
-                const result = await window.firebaseAuth.signInWithGoogle();
-                
-                if (result && result.user) {
-                    console.log('✅ Google Sign-In successful:', result.user.email);
-                    
-                    // Create user profile from Google account
-                    const user = {
-                        id: result.user.uid,
-                        userId: result.user.uid,
-                        name: result.user.displayName || result.user.email.split('@')[0],
-                        email: result.user.email,
-                        photoURL: result.user.photoURL,
-                        type: 'google',
-                        createdAt: new Date().toISOString()
-                    };
-
-                    // Save to localStorage
-                    console.log('💾 Saving to localStorage...');
-                    localStorage.setItem('current_user', JSON.stringify(user));
-                    localStorage.setItem('session_active', 'true');
-                    localStorage.setItem('last_login', new Date().toISOString());
-                    
-                    // Force a small delay to ensure localStorage write completes
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    console.log('✅ localStorage write completed');
-
-                    // Save to profiles
-                    let savedUsers = [];
-                    try {
-                        const existing = localStorage.getItem('saved_users');
-                        if (existing) {
-                            savedUsers = JSON.parse(existing);
-                        }
-                    } catch (e) {}
-
-                    const existingIndex = savedUsers.findIndex(u => u.email === result.user.email);
-                    if (existingIndex >= 0) {
-                        savedUsers[existingIndex] = user;
-                    } else {
-                        savedUsers.push(user);
-                    }
-                    localStorage.setItem('saved_users', JSON.stringify(savedUsers));
-
-                    // Save to Firestore (cloud backup - async, don't wait)
-                    saveToFirestore(user);
-                    
-                    showSuccess('Google Sign-In successful! Welcome ' + user.name + '! Redirecting...');
-                    
-                    console.log('✅ Google sign-in complete, user data saved');
-                    
-                    // Verify data one more time before redirect
-                    const finalCheck = localStorage.getItem('session_active');
-                    const finalUser = localStorage.getItem('current_user');
-                    console.log('🔍 Final verification before redirect:');
-                    console.log('  session_active:', finalCheck);
-                    console.log('  current_user exists:', !!finalUser);
-                    
-                    if (finalCheck !== 'true' || !finalUser) {
-                        console.error('❌ Data not saved properly! Aborting redirect.');
-                        const errorEl = document.getElementById('error-message-global');
-                        errorEl.textContent = '❌ Session error. Please try signing in again.';
-                        errorEl.classList.add('show');
-                        return;
-                    }
-                    
-                    console.log('Redirecting to main app in 3 seconds...');
-
-                    setTimeout(() => {
-                        console.log('🚀 Redirecting now...');
-                        window.location.href = 'dashboard.html';
-                    }, 3000); // Increased to 3 seconds
-                } else {
-                    throw new Error('Google Sign-In was cancelled or failed.');
-                }
+                // Redirect-based OAuth: session + navigation complete on return URL (firebase-auth + AuthManager)
+                await window.firebaseAuth.signInWithGoogle();
+                showSuccess('Redirecting to Google…');
+                return;
 
             } catch (error) {
                 console.error('❌ Google Sign-In error:', error);
