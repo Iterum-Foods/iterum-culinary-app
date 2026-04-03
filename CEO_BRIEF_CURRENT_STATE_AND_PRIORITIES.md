@@ -15,7 +15,7 @@
 
 **Iterum Culinary** is a web application for professional kitchens and culinary teams. It supports recipe development, menu building with costing and margins, ingredient and inventory management, vendor tracking and price comparison, equipment, production planning, and front-of-house tools (e.g. server sheets, allergens).
 
-The application is **live** on Firebase Hosting and is designed for **chef and operator** workflows—not generic inventory software, but a culinary R&D and operations companion.
+The application is **live** on **Vercel** (static hosting), with **Firebase** used for authentication and cloud data (Firestore / Storage), and is designed for **chef and operator** workflows—not generic inventory software, but a culinary R&D and operations companion.
 
 **Strategic fit:** As we pursue operators who run **multiple locations** and shared supply bases, the product’s natural direction is: *one account, many “restaurants” (venues), many menus, shared vendor lists, and apples-to-apples price comparison across sites.*
 

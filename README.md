@@ -1,13 +1,13 @@
 # 🍳 Iterum Culinary R&D App
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Firebase Hosting](https://img.shields.io/badge/Firebase-Hosting-orange)](https://iterum-culinary-app.web.app)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?logo=vercel)](https://iterum-culinary-app.vercel.app)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green)](https://nodejs.org/)
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
 A comprehensive culinary research and development application for chefs, food service professionals, and culinary enthusiasts.
 
-🌐 **Live Site**: [https://iterum-culinary-app.web.app](https://iterum-culinary-app.web.app)
+🌐 **Live Site (Vercel)**: [https://iterum-culinary-app.vercel.app](https://iterum-culinary-app.vercel.app)
 
 ## 🚀 Features
 
@@ -49,10 +49,10 @@ A comprehensive culinary research and development application for chefs, food se
 
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
 - **Styling**: Tailwind CSS, Custom Design System
-- **Backend**: Firebase (Authentication, Firestore, Hosting)
+- **Backend**: Firebase (Authentication, Firestore, Cloud Storage rules)
 - **Storage**: LocalStorage, IndexedDB, Firebase Firestore
 - **Build Tools**: Modern JavaScript with ES6 modules
-- **Deployment**: Firebase Hosting
+- **Deployment**: **Vercel** (static hosting); Firebase for auth + data rules
 - **Compatibility**: Modern browsers (Chrome, Firefox, Safari, Edge)
 
 ## 📋 Prerequisites
@@ -99,18 +99,18 @@ php -S localhost:8080
 4. Open `http://localhost:8080` in your browser
 5. Create your first user profile and start using the app
 
-### **Option 3: Deploy to Firebase Hosting**
-1. Install Firebase CLI: `npm install -g firebase-tools`
-2. Login: `firebase login`
-3. Deploy: `firebase deploy --only hosting`
-4. Visit: https://iterum-culinary-app.web.app
+### **Option 3: Deploy frontend (Vercel)**
+Connect the repo to Vercel with root **`public`** as the static output (or your team’s Vercel project settings). Production URL: **https://iterum-culinary-app.vercel.app**
+
+### **Option 4: Deploy Firebase rules only (not hosting)**
+Firestore + Storage security rules: `firebase deploy --only firestore:rules,storage --project iterum-culinary-app2`
 
 ## 🔧 Development Setup
 
 ### **Project Structure**
 ```
 iterum-culinary-app/
-├── public/                    # Deployed files (Firebase Hosting)
+├── public/                    # Static app (deployed via Vercel)
 │   ├── index.html            # Landing/login page
 │   ├── dashboard.html        # Main dashboard
 │   ├── assets/               # Static assets

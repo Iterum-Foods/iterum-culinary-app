@@ -1,8 +1,8 @@
-# Deploy Firebase Hosting, Firestore rules, and Storage rules when production assets change.
+# Deploy Firebase Firestore + Storage rules only.
+# Production static hosting is on Vercel (see vercel.json); do not rely on Firebase Hosting for the app URL.
 #
 # Required repo secret:
 #   FIREBASE_TOKEN — generate locally: npx firebase-tools login:ci
-#   (Firebase Console → use an account with deploy permissions on project iterum-culinary-app2)
 #
 name: Deploy Firebase
 
@@ -10,7 +10,6 @@ on:
   push:
     branches: [main]
     paths:
-      - 'public/**'
       - 'firebase.json'
       - '.firebaserc'
       - 'firestore.rules'
@@ -37,15 +36,15 @@ jobs:
         with:
           node-version: '24.x'
 
-      - name: Deploy to Firebase
-        run: npx firebase-tools@15.12.0 deploy --only "hosting,firestore:rules,storage" --project iterum-culinary-app2 --non-interactive
+      - name: Deploy Firestore + Storage rules
+        run: npx firebase-tools@15.12.0 deploy --only "firestore:rules,storage" --project iterum-culinary-app2 --non-interactive
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 
       - name: Deployment summary
         if: success()
         run: |
-          echo "## Firebase deploy" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Firebase rules deploy" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Project**: iterum-culinary-app2" >> "$GITHUB_STEP_SUMMARY"
-          echo "- **Targets**: hosting, firestore:rules, storage" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Targets**: firestore:rules, storage (hosting = Vercel)" >> "$GITHUB_STEP_SUMMARY"
           echo "- **Trigger**: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
