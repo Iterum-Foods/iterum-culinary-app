@@ -6,6 +6,7 @@
 
 import {
   getAnalytics,
+  isSupported,
   logEvent,
   setUserProperties,
   setUserId
@@ -17,8 +18,6 @@ class AnalyticsTracker {
     this.isInitialized = false;
     this.userId = null;
     this.sessionStartTime = Date.now();
-
-    console.log('📊 Analytics Tracker initializing...');
   }
 
   /**
@@ -31,10 +30,16 @@ class AnalyticsTracker {
         return false;
       }
 
+      if (!(await isSupported())) {
+        console.warn(
+          '⚠️ Analytics off: IndexedDB/storage blocked or unsupported in this environment.'
+        );
+        return false;
+      }
+
       this.analytics = getAnalytics(firebaseApp);
       this.isInitialized = true;
 
-      // Track session start
       this.trackEvent('session_start', {
         timestamp: new Date().toISOString(),
         page: window.location.pathname
@@ -53,10 +58,6 @@ class AnalyticsTracker {
    */
   trackEvent(eventName, eventParams = {}) {
     if (!this.isInitialized || !this.analytics) {
-      console.warn(
-        '⚠️ Analytics not initialized, event not tracked:',
-        eventName
-      );
       return;
     }
 

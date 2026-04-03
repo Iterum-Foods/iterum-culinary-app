@@ -17,7 +17,10 @@ const firebaseConfig = window.firebaseConfig || {
 };
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-import { getAnalytics } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js';
+import {
+  getAnalytics,
+  isSupported
+} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js';
 import {
   getAuth,
   signInWithPopup,
@@ -88,22 +91,27 @@ class FirebaseAuthSystem {
       this.app = initializeApp(firebaseConfig);
       this.auth = getAuth(this.app);
 
-      // Initialize Analytics (optional - don't fail if it doesn't work)
+      // Initialize Analytics only when supported (IndexedDB may be blocked in strict privacy / IFRAME)
       if (firebaseConfig.measurementId) {
         try {
-          this.analytics = getAnalytics(this.app);
-          console.log('📊 Firebase Analytics initialized');
+          if (await isSupported()) {
+            this.analytics = getAnalytics(this.app);
+            console.log('📊 Firebase Analytics initialized');
 
-          // Initialize Analytics Tracker (if available)
-          if (analyticsTracker && typeof analyticsTracker.init === 'function') {
-            try {
-              await analyticsTracker.init(this.app);
-            } catch (analyticsError) {
-              console.warn(
-                '⚠️ Analytics tracker init failed (non-critical):',
-                analyticsError
-              );
+            if (analyticsTracker && typeof analyticsTracker.init === 'function') {
+              try {
+                await analyticsTracker.init(this.app);
+              } catch (analyticsError) {
+                console.warn(
+                  '⚠️ Analytics tracker init failed (non-critical):',
+                  analyticsError
+                );
+              }
             }
+          } else {
+            console.warn(
+              '⚠️ Firebase Analytics skipped (browser blocked storage or unsupported environment).'
+            );
           }
         } catch (analyticsError) {
           console.warn(
