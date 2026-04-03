@@ -5,6 +5,50 @@
 
 ---
 
+## 2026-03-27 — Google OAuth redirect → dashboard (shipped)
+
+**Commits:** `2e6e2d2` (AuthManager sync + post-OAuth redirect); hosting deploy to **`iterum-culinary-app2`**.
+
+### Summary
+
+- **Bug:** After **Google** sign-in (`signInWithRedirect`), users returned to **`/`** or **`signin.html`** and never reached **`dashboard.html`** — Firebase session existed but **`unifiedAuthSystem` is not loaded** on those pages, so **`authManager` local session was never written**.
+- **Fix:** `firebase-auth.js` calls **`authManager.applyFirebaseUserSession()`** on sign-in; **`sessionStorage`** flags (`iterum_oauth_started` / `iterum_oauth_just_completed`) gate **`location.replace('dashboard.html')`** from entry pages only; **`getRedirectResult`** is **awaited** before **`onAuthStateChanged`**; **`signInWithGoogle`** no longer assumes a `UserCredential` on the same navigation.
+
+### For CTO / engineering
+
+- Touch points: `public/assets/js/firebase-auth.js`, `public/assets/js/auth-manager.js`, `auth-ui.js`, `index.html`, `signin.html`.
+- Keep **`unifiedAuthSystem` vs `authManager`** straight on pages that load one but not the other.
+
+### For COO / QA
+
+- Prod smoke: **Google** from **`/`** and **`signin.html`** → **dashboard** + header user; email/password unchanged path.
+
+---
+
+## 2026-04-01 — Firebase auth console on first load (committed)
+
+**Canonical file:** `public/assets/js/firebase-auth.js` (commit `4e9c2ec`).
+
+### Summary
+
+- Initial `onAuthStateChanged(null)` on `/`, `signin.html`, or any entry page **before** sign-in is **expected**; the previous console message read like a hard “signed out” event and confused support and debugging.
+- **Change:** log copy explains that no session on first load is normal, not an error.
+
+### For CTO / engineering
+
+- No auth behavior change—**observability only**. When triaging login issues, success still shows **“Firebase user signed in”** after valid credentials.
+- Same bundle is used for embedded auth on **`/`** (`index.html`) and **`signin.html`**; keep messaging aligned if auth init moves.
+
+### For CEO / product
+
+- Demos and UAT are less noisy in DevTools—fewer false “something broke” moments.
+
+### For COO / QA
+
+- Smoke: open DevTools on production **`/`** and **`/signin.html`** before sign-in—expect one **informational** line, not an alarming sign-out.
+
+---
+
 ## 2026-03-29 — Root landing (`/`) UX redesign (committed)
 
 **Canonical file:** `public/index.html` (Vercel root — **not** `signin.html`).
