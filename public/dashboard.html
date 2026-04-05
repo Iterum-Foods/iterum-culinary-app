@@ -5,20 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iterum Operations & Food Safety Dashboard</title>
   
-  <!-- Auth check -->
-  <script>
-    (function () {
-      const sessionActive = localStorage.getItem('session_active');
-      const currentUser = localStorage.getItem('current_user');
-      if (!sessionActive || !currentUser) {
-        console.log('🔒 No active session - redirecting to sign-in page');
-        window.location.href = '/signin.html';
-      }
-    })();
-  </script>
-  
-  <!-- Firebase Config -->
+  <!-- Session gate runs at end of body so Firebase can restore Google/email auth into localStorage first -->
+  <!-- Firebase Config + shared auth (must match sign-in flow for Vercel and other hosts) -->
   <script src="assets/js/firebase-config.js"></script>
+  <script type="module" src="assets/js/firebase-auth.js"></script>
   <script src="assets/js/auth-manager.js"></script>
   <script src="assets/js/auth-api-helper.js"></script>
   <script src="assets/js/auth-diagnostics.js"></script>
@@ -518,8 +508,8 @@
   
   <!-- Firebase Firestore for Temperature and Sanitizer Logs -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInTryAnonymously, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, addDoc, onSnapshot, collection, query, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     
     // Get Firebase config
@@ -531,10 +521,10 @@
     async function initFirebase() {
       try {
         if (window.firebaseConfig) {
-          app = initializeApp(window.firebaseConfig);
+          app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
           db = getFirestore(app);
           auth = getAuth(app);
-          
+
           onAuthStateChanged(auth, async (user) => {
             if (user) {
               userId = user.uid;
@@ -543,12 +533,15 @@
               tempLogManager.startListener();
               sanitizerLogManager.startListener();
             } else {
-              // Try anonymous sign-in
-              try {
-                await signInAnonymously(auth);
-              } catch (error) {
-                console.warn('⚠️ Anonymous sign-in failed:', error);
-              }
+              // Wait for persisted Google/email session before anonymous (avoids racing auth restore)
+              setTimeout(async () => {
+                if (auth.currentUser) return;
+                try {
+                  await signInAnonymously(auth);
+                } catch (error) {
+                  console.warn('⚠️ Anonymous sign-in failed:', error);
+                }
+              }, 3000);
             }
           });
         } else {

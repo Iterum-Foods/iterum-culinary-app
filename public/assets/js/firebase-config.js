@@ -11,6 +11,10 @@
  *    - Go to Authentication > Sign-in method
  *    - Enable Email/Password
  *    - Enable Google
+ *
+ * 7. Authorized domains (required for Google sign-in on Vercel):
+ *    Authentication → Settings → Authorized domains — add your host(s), e.g.
+ *    iterum-culinary-app.vercel.app and any custom domain (not only *.web.app).
  */
 
 // Firebase configuration - Your actual Firebase project config

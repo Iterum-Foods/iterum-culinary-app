@@ -102,6 +102,8 @@ php -S localhost:8080
 ### **Option 3: Deploy frontend (Vercel)**
 Connect the repo to Vercel with root **`public`** as the static output (or your team’s Vercel project settings). Production URL: **https://iterum-culinary-app.vercel.app**
 
+**Firebase Auth (Google / email):** In [Firebase Console](https://console.firebase.google.com/) → Authentication → **Settings** → **Authorized domains**, add your Vercel hostname (e.g. `iterum-culinary-app.vercel.app`) and any custom domain. OAuth will loop or fail if this is missing.
+
 ### **Option 4: Deploy Firebase rules only (not hosting)**
 Firestore + Storage security rules: `firebase deploy --only firestore:rules,storage --project iterum-culinary-app2`
 
