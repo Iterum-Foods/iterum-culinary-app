@@ -848,5 +848,64 @@
       }, 500);
     });
   </script>
+
+  <!-- Wait for Firebase persistence before sending users to sign-in (fixes Vercel / OAuth timing) -->
+  <script>
+    (function () {
+      function hasLocalSession() {
+        try {
+          return (
+            localStorage.getItem('session_active') === 'true' &&
+            !!localStorage.getItem('current_user')
+          );
+        } catch (e) {
+          return false;
+        }
+      }
+
+      async function gateDashboardAccess() {
+        if (hasLocalSession()) return;
+
+        var signinUrl = new URL('signin.html', window.location.href).href;
+        var deadline = Date.now() + 8000;
+
+        while (Date.now() < deadline) {
+          if (hasLocalSession()) return;
+
+          var fa = window.firebaseAuth;
+          var u = fa && fa.auth ? fa.auth.currentUser : null;
+          if (
+            u &&
+            !u.isAnonymous &&
+            u.email &&
+            window.authManager &&
+            typeof window.authManager.applyFirebaseUserSession === 'function'
+          ) {
+            try {
+              await window.authManager.applyFirebaseUserSession(u);
+            } catch (e) {
+              console.warn('Dashboard: AuthManager hydrate failed', e);
+            }
+            if (hasLocalSession()) return;
+          }
+
+          await new Promise(function (r) {
+            setTimeout(r, 120);
+          });
+        }
+
+        if (!hasLocalSession()) {
+          console.warn('Dashboard: no session after Firebase wait — sending to sign-in');
+          window.location.replace(signinUrl);
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', gateDashboardAccess);
+      } else {
+        gateDashboardAccess();
+      }
+    })();
+  </script>
 </body>
 </html>
