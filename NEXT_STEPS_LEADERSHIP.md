@@ -46,7 +46,7 @@
 
 ## Prep (5 minutes before the meeting)
 
-- **Before each leadership sync:** open [EXEC_CHECKLIST_AND_NEXT_STEPS.md](./EXEC_CHECKLIST_AND_NEXT_STEPS.md) and read **## Leadership log (CEO / CTO)** — including the **2026-03-29** analytics & pilot reporting entry — then scan checklist `[~]` / `[ ]` rows.  
+- **Before each leadership sync:** open [EXEC_CHECKLIST_AND_NEXT_STEPS.md](./EXEC_CHECKLIST_AND_NEXT_STEPS.md), read **Leadership log (CEO / CTO)**, especially **2026-03-29** (project vs location on `projectId`, margin/food cost & **tax** clarity, recipe cost & missing-price handling, **UOM-normalized** vendor drift, MVP **Firestore/CSV + definitions sheet** without a warehouse, pilot signals: adoption, costing completeness, margin before/after) — then skim checklist `[~]` / `[ ]` rows.  
 - If deploy is pending: confirm who runs `firebase deploy` and who runs the smoke script or manual checklist.  
 - Note any customer pilot dates that would force Week 1 completion.
 

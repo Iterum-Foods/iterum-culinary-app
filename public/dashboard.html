@@ -206,9 +206,231 @@
     .btn-ghost:hover {
       background-color: var(--brand-bg-primary);
     }
+
+    /* —— Dashboard UX: focus, cards, mobile —— */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .dash-mobile-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.65rem 0;
+      margin: -0.25rem 0 1rem;
+      border-bottom: 1px solid var(--brand-border-light);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: linear-gradient(180deg, var(--brand-bg-secondary) 88%, transparent);
+    }
+    @media (min-width: 768px) {
+      .dash-mobile-strip { display: none; }
+    }
+    .dash-menu-btn {
+      min-width: 44px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--brand-border-light);
+      background: var(--brand-card-bg);
+      color: var(--brand-text-primary);
+      cursor: pointer;
+    }
+    .dash-menu-btn:focus-visible {
+      outline: 2px solid var(--brand-primary-accent);
+      outline-offset: 2px;
+    }
+    .dash-drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 46, 53, 0.35);
+      z-index: 40;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s;
+    }
+    .dash-drawer-overlay.is-open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .dash-drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: min(18rem, 88vw);
+      height: 100%;
+      z-index: 41;
+      background: var(--brand-bg-primary);
+      border-right: 1px solid var(--brand-border-light);
+      box-shadow: var(--shadow-md);
+      transform: translateX(-100%);
+      transition: transform 0.22s ease;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+    .dash-drawer.is-open {
+      transform: translateX(0);
+    }
+    .dash-drawer nav a {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: var(--radius-md);
+      color: var(--brand-text-primary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    .dash-drawer nav a:hover {
+      background: var(--brand-bg-secondary);
+    }
+    .dash-drawer nav a.is-active {
+      background: rgba(107, 142, 111, 0.15);
+      color: var(--brand-moss-dark);
+      font-weight: 600;
+    }
+    .dash-drawer nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .dash-drawer .drawer-footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    header.dash-page-header {
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .dash-card-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.65rem;
+    }
+    .dash-card-icon {
+      width: 2.25rem;
+      height: 2.25rem;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: rgba(107, 142, 111, 0.12);
+      color: var(--brand-primary-accent);
+    }
+    .dash-list-well {
+      border-radius: var(--radius-md);
+      background: var(--brand-bg-secondary);
+      border: 1px solid var(--brand-border-light);
+      padding: 0.35rem;
+      max-height: 15rem;
+      overflow-y: auto;
+    }
+    .dash-hint {
+      font-size: 0.75rem;
+      line-height: 1.45;
+      padding: 0.5rem 0.65rem;
+      border-radius: var(--radius-md);
+      background: rgba(91, 155, 173, 0.1);
+      color: var(--brand-text-secondary);
+      margin-bottom: 0.75rem;
+    }
+    .dash-stat-grid {
+      display: grid;
+      gap: 0.75rem;
+    }
+    .dash-stat-grid.cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .dash-stat-grid.cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .dash-stat-tile {
+      text-align: center;
+      padding: 0.65rem 0.35rem;
+      border-radius: var(--radius-md);
+      background: var(--brand-bg-secondary);
+      border: 1px solid var(--brand-border-light);
+    }
+    .purchasing-tile {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      border-radius: var(--radius-md);
+      background: var(--brand-bg-primary);
+      border: 1px solid var(--brand-border-light);
+      text-decoration: none;
+      color: var(--brand-text-primary);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .purchasing-tile:hover {
+      border-color: var(--brand-primary-accent);
+      box-shadow: 0 2px 8px rgba(26, 46, 53, 0.06);
+    }
+    .purchasing-tile:focus-visible {
+      outline: 2px solid var(--brand-primary-accent);
+      outline-offset: 2px;
+    }
+    .dash-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    #dash-header-primary-cta:focus-visible {
+      outline: 2px solid var(--brand-secondary-accent);
+      outline-offset: 2px;
+    }
+    #task-form {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      align-items: stretch;
+    }
+    #task-form input[type="text"] {
+      flex: 1;
+      min-width: 0;
+    }
+    #idea-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin-bottom: 0.75rem;
+    }
+    #idea-form .idea-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Scrollable left nav: long link lists must not clip above the user block */
+    .dashboard-sidebar-nav {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding-right: 2px;
+    }
   </style>
 </head>
-  <body class="flex h-screen text-primary bg-secondary" style="padding-top: 0;">
+  <body class="flex h-screen text-primary bg-secondary" style="padding-top: 0;" data-no-unified-nav="true">
 
   <!-- LEFT SIDEBAR (Notebook Spine) -->
   <aside class="w-56 flex-shrink-0 border-r p-4 hidden md:block bg-primary border-brand" style="background-color: var(--brand-bg-primary); border-color: var(--brand-border-light);">
@@ -219,7 +441,7 @@
       </div>
 
       <!-- Navigation Links -->
-      <nav class="flex-grow space-y-1">
+      <nav class="flex-grow space-y-1 dashboard-sidebar-nav">
         <div class="text-xs uppercase font-semibold mb-3 px-2" style="color: var(--brand-text-muted);">Main</div>
         
         <!-- Dashboard Link (Active) -->
@@ -307,6 +529,10 @@
           <div class="ml-2.5 flex-1 min-w-0">
             <div class="text-sm font-semibold truncate" id="user-name" style="color: var(--brand-text-primary);">Chef</div>
             <div class="text-xs truncate" style="color: var(--brand-text-muted);" id="user-email">Loading...</div>
+            <div class="mt-1 flex flex-col gap-0.5">
+              <a href="user-profile.html" class="text-xs font-medium hover:underline" style="color: var(--brand-text-secondary);">Profile &amp; settings</a>
+              <a href="setup.html" class="text-xs font-medium hover:underline" style="color: var(--brand-primary-accent);">Workspace setup</a>
+            </div>
           </div>
         </div>
       </div>
@@ -316,13 +542,25 @@
   <!-- MAIN CONTENT AREA (Notebook Page) -->
   <section class="flex-grow main-content-area min-h-full" style="flex: 1 1 auto; min-width: 0;">
     <div class="w-full px-5 py-4" style="max-width: none; width: 100%; margin-right: 0;">
+
+      <div class="dash-mobile-strip">
+        <span class="text-lg font-bold tracking-tight" style="color: var(--brand-primary-accent);">Iterum</span>
+        <button type="button" class="dash-menu-btn" id="dash-menu-toggle" aria-expanded="false" aria-controls="dash-mobile-drawer">
+          <i class="fa-solid fa-bars text-lg" aria-hidden="true"></i>
+          <span class="sr-only">Open menu</span>
+        </button>
+      </div>
       
       <!-- Header -->
-      <header class="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sticky top-0 z-10 pb-4 pt-1 -mt-1 border-b" style="background-color: var(--brand-bg-secondary); border-color: var(--brand-border-light);">
+      <header class="dash-page-header mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sticky top-0 z-10 pb-4 pt-1 -mt-1 border-b" style="background-color: rgba(240, 244, 242, 0.92); border-color: var(--brand-border-light);">
         <div class="flex-1 min-w-0">
-          <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight mb-2" style="color: var(--brand-text-primary);">Daily Ops Board</h1>
-          <p class="text-sm mb-3 max-w-2xl" style="color: var(--brand-text-muted);">Today’s priorities, ideas, and compliance checks in one view.</p>
+          <div class="flex flex-wrap items-center gap-2 mb-2">
+            <h1 id="dash-header-title" class="text-2xl sm:text-3xl font-semibold tracking-tight" style="color: var(--brand-text-primary);">Daily Ops Board</h1>
+            <span id="dash-role-badge" class="text-xs font-semibold px-2.5 py-1 rounded-md border" style="display:none;border-color: var(--brand-border-light); background: var(--brand-bg-primary); color: var(--brand-text-secondary);" title="Your workspace role"></span>
+          </div>
+          <p id="dash-header-subtitle" class="text-sm mb-3 max-w-2xl leading-relaxed" style="color: var(--brand-text-muted);">Today’s priorities, ideas, and compliance checks in one view.</p>
           <div class="flex items-center gap-3 flex-wrap">
+            <div id="dash-scope-chip" class="text-xs font-semibold px-3 py-1.5 rounded-full border" style="display:none;background-color: var(--brand-bg-tertiary); color: var(--brand-text-secondary); border-color: var(--brand-border-light);" title="From workspace setup"></div>
             <div id="header-project-chip" class="text-xs font-semibold px-3 py-1.5 rounded-full border" style="background-color: var(--brand-bg-primary); color: var(--brand-text-secondary); border-color: var(--brand-border-light);">Project: Master Project</div>
             <div class="date-picker">
               <label for="dashboard-date" class="text-xs font-medium block mb-1" style="color: var(--brand-text-secondary);">Working date</label>
@@ -330,7 +568,7 @@
             </div>
           </div>
         </div>
-        <button type="button" onclick="window.location.href='recipe-developer.html'" class="py-2.5 px-4 rounded-lg text-sm font-semibold shadow-sm text-white hover:opacity-95 transition-opacity whitespace-nowrap shrink-0 self-start" style="background-color: var(--brand-primary-accent);">
+        <button type="button" id="dash-header-primary-cta" class="py-2.5 px-4 rounded-lg text-sm font-semibold shadow-sm text-white hover:opacity-95 transition-opacity whitespace-nowrap shrink-0 self-start" style="background-color: var(--brand-primary-accent);">
           <i class="fa-solid fa-plus mr-2" aria-hidden="true"></i>New experiment
         </button>
       </header>
@@ -342,19 +580,22 @@
         <div class="space-y-5">
           
           <!-- Card 1.1: Idea Pad (Recipe Ideas - Existing Feature) -->
-          <div class="card-style">
-            <h2 class="text-base sm:text-lg font-semibold mb-2 flex items-center gap-2" style="color: var(--brand-text-primary);">
-              <i class="fa-solid fa-lightbulb mr-2.5" style="color: var(--brand-secondary-accent); font-size: 1rem;"></i>Culinary Idea Pad
-            </h2>
+          <div class="card-style" data-dash-roles="chef_leadership,consultant_rd">
+            <div class="dash-card-head">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
+                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></span>
+                Culinary Idea Pad
+              </h2>
+            </div>
             <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
               Sketch out concepts for new dishes or menu themes.
             </p>
             
             <!-- Idea Form -->
-            <form id="idea-form" class="space-y-2.5 mb-3">
+            <form id="idea-form">
               <input type="text" id="idea-title" placeholder="Idea title" class="w-full text-sm">
               <textarea id="idea-notes" class="w-full h-28 resize-none text-sm" placeholder="Concept: Deconstructed Beet Wellington. Components: Smoked beet puree, puff pastry shard, foie gras mousse, reduced port wine jus. Theme: Late Autumn Menu."></textarea>
-              <div class="flex gap-2">
+              <div class="idea-actions">
                 <button type="submit" class="btn-secondary flex-1">
                   <i class="fa-solid fa-floppy-disk mr-2"></i>Save Idea
                 </button>
@@ -365,36 +606,79 @@
             </form>
             
             <!-- Idea List -->
-            <div id="idea-list" class="space-y-2 max-h-64 overflow-y-auto"></div>
+            <div id="idea-list" class="space-y-2 max-h-64 overflow-y-auto dash-list-well"></div>
             <div id="idea-status" class="text-xs mt-2" style="color: var(--brand-text-muted);">No ideas yet</div>
           </div>
 
           <!-- Card 1.2: R&D Success Rate (Doughnut Chart) -->
-          <div class="card-style">
-            <h2 class="text-base sm:text-lg font-semibold mb-2" style="color: var(--brand-text-primary);">R&D Success Rate (Q3)</h2>
-            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Percentage of experiments reaching Final/Approved status.
+          <div class="card-style" data-dash-roles="chef_leadership,consultant_rd">
+            <div class="dash-card-head">
+              <h2 class="text-base sm:text-lg font-semibold m-0" style="color: var(--brand-text-primary);">R&amp;D pipeline</h2>
+            </div>
+            <p class="text-sm mb-2 leading-relaxed" style="color: var(--brand-text-muted);">
+              Snapshot of experiments by status (replace with live recipe data when connected).
             </p>
+            <p class="text-xs mb-3" style="color: var(--brand-text-muted); opacity: 0.9;">Sample breakdown for orientation—not live production KPIs.</p>
             <div class="chart-container">
               <canvas id="successRateChart"></canvas>
             </div>
           </div>
 
+          <!-- Consultant: deep-work links -->
+          <div class="card-style" data-dash-roles="consultant_rd">
+            <div class="dash-card-head">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
+                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-compass"></i></span>
+                R&amp;D shortcuts
+              </h2>
+            </div>
+            <p class="text-sm mb-4 leading-relaxed" style="color: var(--brand-text-muted);">Open tools for documentation and experimentation.</p>
+            <div class="dash-stack">
+              <a href="recipe-developer.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-flask mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Recipe developer</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
+              <a href="recipe-library.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-book-open mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Recipe index</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
+              <a href="menu-builder.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-utensils mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Menu builder</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
+            </div>
+          </div>
+
+          <!-- Purchasing shortcuts (role: purchasing only) -->
+          <div class="card-style" data-dash-roles="purchasing">
+            <div class="dash-card-head">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
+                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-cart-shopping"></i></span>
+                Purchasing &amp; costing
+              </h2>
+            </div>
+            <p class="text-sm mb-4 leading-relaxed" style="color: var(--brand-text-muted);">
+              Cost and supply workflows in fewer taps. Inventory counts live on the Inventory page.
+            </p>
+            <div class="dash-stack">
+              <a href="vendor-management.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-store mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Vendors &amp; pricing</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
+              <a href="ingredients.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-carrot mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Ingredients library</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
+              <a href="inventory.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-boxes-stacked mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Inventory</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
+              <a href="menu-builder.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-utensils mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Menu builder &amp; margins</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
+            </div>
+          </div>
+
           <!-- Card 1.3: Daily Tasks (Existing Feature) -->
           <div class="card-style">
-            <h2 class="text-base sm:text-lg font-semibold mb-2" style="color: var(--brand-text-primary);">Daily Tasks</h2>
+            <div class="dash-card-head">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
+                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-list-check"></i></span>
+                Daily tasks
+              </h2>
+            </div>
             <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
               Capture the must-do items for today and check them off as you go.
             </p>
             
             <!-- Task Form -->
-            <form id="task-form" class="flex gap-2 mb-3">
-              <input type="text" id="task-input" placeholder="Add a task and press Enter" class="flex-1 text-sm">
+            <form id="task-form">
+              <input type="text" id="task-input" placeholder="Add a task and press Enter" class="text-sm">
               <button type="submit" class="btn-primary text-sm px-3">Add</button>
             </form>
             
             <!-- Task List -->
-            <ul id="task-list" class="space-y-1 max-h-56 overflow-y-auto"></ul>
+            <ul id="task-list" class="space-y-1 max-h-56 overflow-y-auto dash-list-well"></ul>
             <div id="task-status" class="text-xs mt-2" style="color: var(--brand-text-muted);">Nothing queued</div>
             
             <!-- Task Actions -->
@@ -403,72 +687,92 @@
               <button id="reset-tasks" class="btn-ghost flex-1 text-xs py-1.5">Reset List</button>
             </div>
           </div>
-        
+        </div>
+
         <!-- COLUMN 2: DAILY OPERATIONS, LOGGING, AND EXECUTION (Right Column) -->
         <div class="space-y-5">
           
           <!-- Card 2.1: Dynamic Temperature Log -->
-          <div class="card-style">
-            <div class="flex justify-between items-center mb-3">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2" style="color: var(--brand-text-primary);">
-                <i class="fa-solid fa-thermometer-three-quarters mr-2.5" style="color: var(--brand-primary-accent); font-size: 1rem;"></i>Critical Temperature Log
+          <div class="card-style" data-dash-roles="chef_leadership,operations_gm">
+            <div class="dash-hint">
+              <strong style="color: var(--brand-text-primary);">HACCP-friendly logging.</strong> Log actual readings on the line; full history sync is expanding—use this board as your daily cue.
+            </div>
+            <div class="flex justify-between items-center mb-3 gap-2">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
+                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-temperature-low"></i></span>
+                Temperature log
               </h2>
-              <button onclick="tempLogManager.addUnit()" class="text-xs py-1 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
-                <i class="fa-solid fa-plus mr-1"></i> Add Unit
+              <button type="button" onclick="tempLogManager.addUnit()" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
+                <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i>Add unit
               </button>
             </div>
             <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Refrigeration units from your Equipment List. Target ≤ 5°C (≤ 41°F).
+              Refrigeration units. Cold-holding target ≤ 5°C (≤ 41°F) unless your HACCP plan differs.
             </p>
-            <ul id="refrigeration-unit-list" class="space-y-1">
+            <ul id="refrigeration-unit-list" class="space-y-1 dash-list-well">
               <li class="text-center p-4" style="color: var(--brand-text-muted);">Loading Units...</li>
             </ul>
           </div>
           
           <!-- Card 2.2: Dynamic Sanitizer Check Log -->
-          <div class="card-style">
-            <div class="flex justify-between items-center mb-3">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2" style="color: var(--brand-text-primary);">
-                <i class="fa-solid fa-vial-circle-check mr-2.5" style="color: var(--brand-primary-accent); font-size: 1rem;"></i>Sanitizer Check Log
+          <div class="card-style" data-dash-roles="chef_leadership,operations_gm">
+            <div class="flex justify-between items-center mb-3 gap-2">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
+                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-vial-circle-check"></i></span>
+                Sanitizer checks
               </h2>
-              <button onclick="sanitizerLogManager.addLocation()" class="text-xs py-1 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
-                <i class="fa-solid fa-plus mr-1"></i> Add Location
+              <button type="button" onclick="sanitizerLogManager.addLocation()" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
+                <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i>Add station
               </button>
             </div>
             <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              All required check points. Target typically 150-200 PPM (varies by agent).
+              Check stations you define. Typical test strip range 150–200 PPM—follow your chemical label and health plan.
             </p>
-            <ul id="sanitizer-location-list" class="space-y-1">
+            <ul id="sanitizer-location-list" class="space-y-1 dash-list-well">
               <li class="text-center p-4" style="color: var(--brand-text-muted);">Loading Locations...</li>
             </ul>
           </div>
           
           <!-- Card 2.3: Today's Operations Focus & Checklists -->
-          <div class="card-style">
-            <h2 class="text-base sm:text-lg font-semibold mb-2 flex items-center gap-2" style="color: var(--brand-text-primary);">
-              <i class="fa-solid fa-bullseye mr-2.5" style="color: var(--brand-primary-accent); font-size: 1rem;"></i>Daily Operational Focus
-            </h2>
-            
-            <p class="font-semibold mt-3 mb-2 text-sm" style="color: var(--brand-text-secondary);">Operational Checklists:</p>
+          <div class="card-style" data-dash-roles="chef_leadership,operations_gm">
+            <div class="dash-card-head">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
+                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-bullseye"></i></span>
+                Shift focus
+              </h2>
+            </div>
+            <p class="text-sm mb-3 mt-1 leading-relaxed" style="color: var(--brand-text-muted);">Full checklists live in Kitchen management.</p>
+            <p class="font-semibold mb-2 text-sm" style="color: var(--brand-text-secondary);">Quick links</p>
             <div class="space-y-2">
-              <a href="#opening-checklist" class="op-link justify-between py-2">
+              <a href="kitchen-management.html" class="op-link justify-between py-2.5">
                 <span class="font-medium text-sm">
-                  <i class="fa-solid fa-door-open text-center mr-2" style="color: var(--brand-secondary-accent); width: 16px;"></i>Opening Checklist
+                  <i class="fa-solid fa-door-open text-center mr-2" style="color: var(--brand-secondary-accent); width: 16px;" aria-hidden="true"></i>Opening / prep
                 </span>
-                <span class="text-xs px-2 py-0.5 rounded-full" style="background-color: var(--brand-bg-tertiary); color: var(--brand-text-secondary);">Due 10:00 AM</span>
+                <span class="text-xs px-2 py-0.5 rounded-full" style="background-color: var(--brand-bg-tertiary); color: var(--brand-text-secondary);">Kitchen hub</span>
               </a>
-              <a href="#closing-checklist" class="op-link justify-between py-2">
+              <a href="kitchen-management.html" class="op-link justify-between py-2.5">
                 <span class="font-medium text-sm">
-                  <i class="fa-solid fa-door-closed text-center mr-2" style="color: var(--brand-secondary-accent); width: 16px;"></i>Closing Checklist
+                  <i class="fa-solid fa-door-closed text-center mr-2" style="color: var(--brand-secondary-accent); width: 16px;" aria-hidden="true"></i>Closing / breakdown
                 </span>
-                <span class="text-xs px-2 py-0.5 rounded-full text-white" style="background-color: var(--brand-primary-accent);">Due 11:30 PM</span>
+                <span class="text-xs px-2 py-0.5 rounded-full text-white" style="background-color: var(--brand-primary-accent);">Kitchen hub</span>
+              </a>
+              <a href="calendar.html" class="op-link justify-between py-2.5">
+                <span class="font-medium text-sm">
+                  <i class="fa-solid fa-calendar-days text-center mr-2" style="color: var(--brand-secondary-accent); width: 16px;" aria-hidden="true"></i>Calendar
+                </span>
+                <i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i>
               </a>
             </div>
           </div>
 
           <!-- Card 2.4: Notes (Existing Feature) -->
           <div class="card-style">
-            <h2 class="text-base sm:text-lg font-semibold mb-2" style="color: var(--brand-text-primary);">Notes</h2>
+            <div class="dash-card-head">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
+                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-note-sticky"></i></span>
+                Shift notes
+              </h2>
+            </div>
             <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
               Kitchen pulse, service feedback, or anything the team should remember.
             </p>
@@ -482,35 +786,69 @@
 
           <!-- Card 2.5: Quick Stats -->
           <div class="card-style">
-            <h2 class="text-base sm:text-lg font-semibold mb-2" style="color: var(--brand-text-primary);">Quick Stats</h2>
-            <div class="grid grid-cols-3 gap-3">
-              <div class="text-center">
+            <div class="dash-card-head">
+              <h2 class="text-base sm:text-lg font-semibold m-0" style="color: var(--brand-text-primary);">At a glance</h2>
+            </div>
+            <p class="text-xs mb-3" style="color: var(--brand-text-muted);">Local to this browser until cloud summaries land everywhere.</p>
+            <div id="quick-stat-grid" class="dash-stat-grid cols-3">
+              <div class="dash-stat-tile">
                 <div class="text-xl font-bold" style="color: var(--brand-primary-accent);" id="quick-stat-tasks">0</div>
-                <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Open Tasks</div>
+                <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Open tasks</div>
               </div>
-              <div class="text-center">
+              <div id="quick-stat-ideas-col" class="dash-stat-tile">
                 <div class="text-xl font-bold" style="color: var(--brand-secondary-accent);" id="quick-stat-ideas">0</div>
-                <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Ideas Queued</div>
+                <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Ideas queued</div>
               </div>
-              <div class="text-center">
+              <div class="dash-stat-tile">
                 <div class="text-xl font-bold" style="color: var(--brand-primary-accent);" id="quick-stat-notes">0</div>
-                <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Days Logged</div>
+                <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Days logged</div>
               </div>
             </div>
           </div>
 
-    </div>
+        </div>
       </div>
+    </div>
   </section>
 
+  <div id="dash-drawer-overlay" class="dash-drawer-overlay" aria-hidden="true" tabindex="-1"></div>
+  <aside id="dash-mobile-drawer" class="dash-drawer" aria-hidden="true" aria-label="Mobile menu" role="dialog">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; padding-bottom:0.75rem; border-bottom:1px solid var(--brand-border-light);">
+      <span class="text-lg font-bold" style="color: var(--brand-primary-accent);">Iterum</span>
+      <button type="button" class="dash-menu-btn" id="dash-drawer-close" aria-label="Close menu">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+    <nav aria-label="Primary">
+      <a href="dashboard.html" class="is-active"><i class="fa-solid fa-gauge-high" style="width:1.25rem" aria-hidden="true"></i> Dashboard</a>
+      <a href="project-hub.html"><i class="fa-solid fa-folder-tree" style="width:1.25rem" aria-hidden="true"></i> Projects</a>
+      <a href="menu-builder.html"><i class="fa-solid fa-utensils" style="width:1.25rem" aria-hidden="true"></i> Menu Builder</a>
+      <a href="recipe-library.html"><i class="fa-solid fa-book-open" style="width:1.25rem" aria-hidden="true"></i> Recipe Index</a>
+      <a href="ingredients.html"><i class="fa-solid fa-carrot" style="width:1.25rem" aria-hidden="true"></i> Ingredients</a>
+      <a href="recipe-developer.html"><i class="fa-solid fa-flask" style="width:1.25rem" aria-hidden="true"></i> Recipe Developer</a>
+      <a href="calendar.html"><i class="fa-solid fa-calendar-days" style="width:1.25rem" aria-hidden="true"></i> Calendar</a>
+      <a href="kitchen-management.html"><i class="fa-solid fa-kitchen-set" style="width:1.25rem" aria-hidden="true"></i> Kitchen</a>
+      <a href="inventory.html"><i class="fa-solid fa-boxes-stacked" style="width:1.25rem" aria-hidden="true"></i> Inventory</a>
+      <a href="vendor-management.html"><i class="fa-solid fa-store" style="width:1.25rem" aria-hidden="true"></i> Vendors</a>
+      <div class="text-xs uppercase font-semibold mt-4 mb-2 pt-3 border-t" style="border-color: var(--brand-border-light); color: var(--brand-text-muted);">Tools</div>
+      <a href="recipe-photo-studio.html"><i class="fa-solid fa-camera" style="width:1.25rem" aria-hidden="true"></i> Photo Studio</a>
+      <a href="recipe-scaling-tool.html"><i class="fa-solid fa-calculator" style="width:1.25rem" aria-hidden="true"></i> Recipe Scaling</a>
+    </nav>
+    <div class="drawer-footer-links" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--brand-border-light);">
+      <a href="user-profile.html" class="text-sm font-semibold block" style="color: var(--brand-text-primary);">Profile &amp; settings</a>
+      <a href="setup.html" class="text-sm font-semibold block mt-2" style="color: var(--brand-primary-accent);">Workspace setup</a>
+    </div>
+  </aside>
+
+  <script src="assets/js/user-role-setup.js"></script>
   <!-- Load existing Dashboard functionality -->
   <script src="assets/js/dashboard-core.js"></script>
   
   <!-- Firebase Firestore for Temperature and Sanitizer Logs -->
   <script type="module">
     import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInTryAnonymously, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, addDoc, onSnapshot, collection, query, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, addDoc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     
     // Get Firebase config
     let app, db, auth;
@@ -654,8 +992,8 @@
       
       if (units.length === 0) {
         container.innerHTML = '<li class="text-sm text-center py-4" style="color: var(--brand-text-muted);">No units found. Add one to begin logging temperatures.</li>';
-            return;
-          }
+        return;
+      }
 
       // Render units from Firestore
       units.sort((a, b) => a.name.localeCompare(b.name)).forEach(unit => {
@@ -693,8 +1031,8 @@
       
       if (locations.length === 0) {
         container.innerHTML = '<li class="text-sm text-center py-4" style="color: var(--brand-text-muted);">No check locations defined. Add one to begin checks.</li>';
-            return;
-          }
+        return;
+      }
 
       // Render locations from Firestore
       locations.sort((a, b) => a.name.localeCompare(b.name)).forEach(location => {
@@ -751,16 +1089,15 @@
     renderSanitizerLocations([]);
   </script>
 
-  <!-- Chart Initialization -->
+  <!-- User, project, chart (single DOMContentLoaded) -->
   <script>
-      document.addEventListener('DOMContentLoaded', () => {
-      // Initialize R&D Success Rate Chart
+    document.addEventListener('DOMContentLoaded', () => {
+      // R&D pipeline doughnut (sample data until live KPIs)
       const ctx = document.getElementById('successRateChart');
-      if (ctx) {
+      if (ctx && typeof Chart !== 'undefined') {
         const rAndDData = {
-          successRate: { approved: 55, inProgress: 30, archived: 15 },
+          successRate: { approved: 55, inProgress: 30, archived: 15 }
         };
-
         new Chart(ctx.getContext('2d'), {
           type: 'doughnut',
           data: {
@@ -770,10 +1107,10 @@
               backgroundColor: [
                 'var(--brand-primary-accent)',
                 'var(--brand-secondary-accent)',
-                'var(--brand-text-muted)',
+                'var(--brand-text-muted)'
               ],
               hoverOffset: 15,
-              borderWidth: 0,
+              borderWidth: 0
             }]
           },
           options: {
@@ -781,30 +1118,25 @@
             maintainAspectRatio: false,
             cutout: '75%',
             plugins: {
-              legend: { 
-                position: 'bottom', 
-                labels: { 
+              legend: {
+                position: 'bottom',
+                labels: {
                   color: 'var(--brand-text-secondary)',
                   font: { family: 'Inter' }
-                } 
+                }
               },
-              tooltip: { 
-                callbacks: { 
-                  label: function(context) { 
-                    return context.label + ': ' + context.formattedValue + '%'; 
-                  } 
-                } 
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    return context.label + ': ' + context.formattedValue + '%';
+                  }
+                }
               }
             }
           }
         });
       }
-    });
-  </script>
 
-  <!-- User and Project Info Initialization -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
       // Load user info
       try {
         const currentUser = JSON.parse(localStorage.getItem('current_user') || '{}');
@@ -818,6 +1150,47 @@
       } catch (e) {
         console.warn('Failed to load user info:', e);
       }
+
+      if (typeof window.applyDashboardLayoutForRole === 'function') {
+        try {
+          window.applyDashboardLayoutForRole();
+        } catch (e) {
+          console.warn('Dashboard role layout:', e);
+        }
+      }
+
+      (function setupDashDrawer() {
+        var toggle = document.getElementById('dash-menu-toggle');
+        var drawer = document.getElementById('dash-mobile-drawer');
+        var overlay = document.getElementById('dash-drawer-overlay');
+        var closeBtn = document.getElementById('dash-drawer-close');
+        if (!toggle || !drawer || !overlay) return;
+        function openNav() {
+          drawer.classList.add('is-open');
+          overlay.classList.add('is-open');
+          drawer.setAttribute('aria-hidden', 'false');
+          overlay.setAttribute('aria-hidden', 'false');
+          toggle.setAttribute('aria-expanded', 'true');
+          document.body.style.overflow = 'hidden';
+        }
+        function closeNav() {
+          drawer.classList.remove('is-open');
+          overlay.classList.remove('is-open');
+          drawer.setAttribute('aria-hidden', 'true');
+          overlay.setAttribute('aria-hidden', 'true');
+          toggle.setAttribute('aria-expanded', 'false');
+          document.body.style.overflow = '';
+        }
+        toggle.addEventListener('click', function () {
+          if (drawer.classList.contains('is-open')) closeNav();
+          else openNav();
+        });
+        if (closeBtn) closeBtn.addEventListener('click', closeNav);
+        overlay.addEventListener('click', closeNav);
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') closeNav();
+        });
+      })();
 
       // Load project info
       function updateProjectChips(projectName) {
@@ -864,7 +1237,13 @@
       }
 
       async function gateDashboardAccess() {
-        if (hasLocalSession()) return;
+        if (hasLocalSession()) {
+          if (typeof window.needsOperatorSetup === 'function' && window.needsOperatorSetup()) {
+            window.location.replace(new URL('setup.html', window.location.href).href);
+            return;
+          }
+          return;
+        }
 
         var signinUrl = new URL('signin.html', window.location.href).href;
         var deadline = Date.now() + 8000;

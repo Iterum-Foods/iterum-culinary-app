@@ -14,6 +14,9 @@ class UnifiedNavHeader {
     if (path.includes('index')) {
       return 'dashboard';
     }
+    if (path.includes('dashboard')) {
+      return 'dashboard';
+    }
     if (path.includes('recipe-library')) {
       return 'recipes';
     }
@@ -53,10 +56,33 @@ class UnifiedNavHeader {
     return 'other';
   }
 
+  /**
+   * Notebook-style pages ship their own shell (aside + layout). Injecting the
+   * legacy unified sidebar here duplicates nav, breaks flex, and hides links.
+   */
+  shouldSkipUnifiedNav() {
+    if (document.body?.getAttribute('data-no-unified-nav') === 'true') {
+      return true;
+    }
+    const path = (window.location.pathname || '').toLowerCase();
+    // Matches dashboard.html, /dashboard, pretty URLs on static hosts
+    if (path.includes('dashboard')) {
+      return true;
+    }
+    return false;
+  }
+
   init() {
     // Check if sidebar already exists
     if (document.querySelector('.unified-nav-sidebar')) {
       console.log('Navigation sidebar already exists');
+      return;
+    }
+
+    if (this.shouldSkipUnifiedNav()) {
+      console.log(
+        'Unified nav: skipped (page has custom shell — e.g. dashboard.html)'
+      );
       return;
     }
 
@@ -67,6 +93,10 @@ class UnifiedNavHeader {
     // Check if sidebar already exists
     if (document.querySelector('.unified-nav-sidebar')) {
       console.log('Navigation sidebar already exists');
+      return;
+    }
+
+    if (this.shouldSkipUnifiedNav()) {
       return;
     }
 
@@ -102,10 +132,43 @@ class UnifiedNavHeader {
     // Setup dropdown hover delay
     this.setupDropdownHover();
 
+    // Touch / click: open Settings & More menus (hover alone fails on mobile)
+    this.setupDropdownClickToggle();
+
     // Setup mobile toggle
     this.setupMobileToggle();
 
     console.log('✅ Navigation sidebar injected');
+  }
+
+  setupDropdownClickToggle() {
+    const sidebar = document.querySelector('.unified-nav-sidebar');
+    if (!sidebar) return;
+
+    sidebar.querySelectorAll('.nav-dropdown').forEach(dropdown => {
+      const btn = dropdown.querySelector(
+        '.nav-dropdown-btn, .nav-user-menu-btn'
+      );
+      const content = dropdown.querySelector('.nav-dropdown-content');
+      if (!btn || !content) return;
+
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isShown = content.classList.contains('show');
+        sidebar
+          .querySelectorAll('.nav-dropdown-content.show')
+          .forEach(c => c.classList.remove('show'));
+        if (!isShown) content.classList.add('show');
+      });
+    });
+
+    document.addEventListener('click', e => {
+      if (e.target.closest('.unified-nav-sidebar .nav-dropdown')) return;
+      sidebar
+        .querySelectorAll('.nav-dropdown-content.show')
+        .forEach(c => c.classList.remove('show'));
+    });
   }
 
   setupDropdownHover() {
@@ -676,14 +739,6 @@ document.addEventListener('projectChanged', event => {
 
 document.addEventListener('iterumAppReady', () => {
   updateHeaderProjectChip();
-});
-
-// Also listen for project changes
-document.addEventListener('projectChanged', event => {
-  const detail = event.detail || {};
-  const projectName =
-    detail.project?.name || detail.projectName || 'Master Project';
-  window.unifiedNavHeader?.updateProjectChip(projectName);
 });
 
 // Function to update header project chip

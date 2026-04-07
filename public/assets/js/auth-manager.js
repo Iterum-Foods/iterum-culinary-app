@@ -14,11 +14,21 @@ class AuthManager {
     this.backendUser = null; // Backend user data
     this.firebaseToken = null; // Firebase ID token
 
-    // Backend API URL
-    this.API_BASE_URL =
-      window.location.hostname === 'localhost'
-        ? 'http://localhost:8000'
-        : 'https://your-backend-url.com'; // Update with your production URL
+    // Optional Node/custom API (Firebase auth still works without this).
+    // Set before loading this script: window.ITERUM_API_BASE_URL = 'https://api.example.com' (no trailing slash)
+    this.API_BASE_URL = (() => {
+      const fromWin =
+        typeof window.ITERUM_API_BASE_URL === 'string'
+          ? window.ITERUM_API_BASE_URL.trim().replace(/\/$/, '')
+          : '';
+      if (fromWin) {
+        return fromWin;
+      }
+      if (window.location.hostname === 'localhost') {
+        return 'http://localhost:8000';
+      }
+      return '';
+    })();
 
     // State keys
     this.STORAGE_KEYS = {
@@ -295,9 +305,13 @@ class AuthManager {
         page === '' ||
         path.endsWith('/');
       if (onEntry) {
-        this.log('🚀 OAuth complete — opening dashboard');
+        this.log('🚀 OAuth complete — opening app');
+        var dest =
+          typeof window.getPostAuthDestination === 'function'
+            ? window.getPostAuthDestination()
+            : 'dashboard.html';
         window.location.replace(
-          new URL('dashboard.html', window.location.href).href
+          new URL(dest, window.location.href).href
         );
       }
     }
@@ -586,6 +600,13 @@ class AuthManager {
    * Sync user with backend database
    */
   async syncWithBackend(user, idToken) {
+    if (!this.API_BASE_URL) {
+      this.log(
+        'ℹ️ Backend sync skipped (no API base URL). Static/Firebase-only deploys omit ITERUM_API_BASE_URL.'
+      );
+      return null;
+    }
+
     this.log('🔄 Syncing user with backend...');
 
     try {
@@ -768,6 +789,9 @@ class AuthManager {
 
     localStorage.removeItem(this.STORAGE_KEYS.CURRENT_USER);
     localStorage.removeItem(this.STORAGE_KEYS.SESSION_ACTIVE);
+    try {
+      localStorage.removeItem('iterum_operator_profile');
+    } catch (e) {}
 
     this.notifyListeners('session_cleared');
     this.log('✅ Session cleared');

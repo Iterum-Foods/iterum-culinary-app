@@ -8,19 +8,21 @@
 
 ## Leadership log (CEO / CTO)
 
+<a id="leadership-log-ceo-cto"></a>
+
 _Use this section for short, dated notes that do not belong in a checkbox row._
 
 **2026-03-29 — Analytics & pilot reporting (Data Analyst proxy; no warehouse assumed)**  
-Recorded for consistent definitions once Firestore/export data is trusted:
+Recorded so exports and decks use one set of definitions (see paths/keys in [docs/DATA_ACCESS_INVENTORY.md](./docs/DATA_ACCESS_INVENTORY.md)):
 
-- **Project vs location:** Today’s primary segment is **`projectId`** (workspace). Do not label it “location” in reports until the product ships a stable **restaurant / site** key; document that gap on every margin or vendor comparison deck.
-- **Margin:** Pick one formula org-wide — e.g. **gross margin %** = (price − allocated recipe cost) / price, or **food cost %** = recipe cost / price — and define whether **selling price** is pre- or post-tax per what the app stores.
-- **Recipe cost:** Ingredient quantities × normalized unit costs, including sub-recipes where modeled. Treat **missing/zero vendor price** as a **data-quality flag**, not as real margin.
-- **Vendor price drift:** Compare **unit price in a standard UOM** over time for **vendor × SKU (or ingredient key)**; across “locations” use **project** until site IDs exist.
-- **MVP reporting path:** Scheduled **Firestore export** or **manual CSV/JSON export** + a one-page **definitions sheet** (Sheets/notebook is enough); expand to event funnels only when the product logs anonymized usage.
-- **Pilot success signals (examples):** Adoption = projects with ≥1 menu saved/synced in window; quality = % menu lines with recipe link + non-imputed costs; economics = item-level margin distribution before/after a pricing or vendor change (same formula both sides).
+- **Project vs location:** Segment everything on **`projectId`** until first-class **restaurant/site IDs** exist in the product. Do not call `projectId` “location” in external reporting; label the gap on every margin or vendor comparison.
+- **Margin & food cost:** Adopt one org-wide pair of definitions—e.g. **gross margin %** = (price − allocated recipe cost) / price and/or **food cost %** = recipe cost / price. **Tax:** document whether **menu/selling price** and **vendor/ingredient costs** in the app are **pre-tax or post-tax** (or mixed) so reports do not mix bases.
+- **Recipe cost & missing price:** Ingredient quantities × **unit costs in a normalized UOM**, including sub-recipes where modeled. **Missing or zero vendor price** = **data-quality flag** only—do not treat as trustworthy margin.
+- **Vendor price drift:** Track **UOM-normalized** unit price over time per **vendor × SKU (or canonical ingredient key)**; cross-venue splits use **project** until site IDs exist.
+- **MVP reporting:** **Firestore export** and/or **manual CSV/JSON** plus a **definitions sheet** (one page in Sheets/notebook); **no data warehouse** required for MVP. Expand to event funnels only when the product logs anonymized usage.
+- **Pilot success signals (examples):** **Adoption** — projects with ≥1 menu saved/synced in window; **costing completeness** — % menu lines with recipe link and non-imputed costs; **economics** — item-level margin (same formula) **before vs after** a pricing or vendor change.
 
-_Companion inventory:_ [docs/DATA_ACCESS_INVENTORY.md](./docs/DATA_ACCESS_INVENTORY.md). _Data analyst prompt (role block):_ [LEADERSHIP_ROLE_ASSIGNMENTS.md → Data analyst agent](./LEADERSHIP_ROLE_ASSIGNMENTS.md#data-analyst-agent-nice-to-have).
+_Data paths / keys:_ [docs/DATA_ACCESS_INVENTORY.md](./docs/DATA_ACCESS_INVENTORY.md). _Data analyst role block:_ [LEADERSHIP_ROLE_ASSIGNMENTS.md → Data analyst agent](./LEADERSHIP_ROLE_ASSIGNMENTS.md#data-analyst-agent-nice-to-have).
 
 ---
 

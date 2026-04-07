@@ -257,7 +257,10 @@
       // Redirect after delay
       setTimeout(() => {
         console.log('🚀 Redirecting to main app...');
-        window.location.href = 'dashboard.html';
+        window.location.href =
+          typeof window.getPostAuthDestination === 'function'
+            ? window.getPostAuthDestination()
+            : 'dashboard.html';
       }, 1500);
     } catch (error) {
       console.error('❌ Sign-in error:', error);
@@ -350,7 +353,10 @@
       // Redirect after delay
       setTimeout(() => {
         console.log('🚀 Redirecting to main app...');
-        window.location.href = 'dashboard.html';
+        window.location.href =
+          typeof window.getPostAuthDestination === 'function'
+            ? window.getPostAuthDestination()
+            : 'dashboard.html';
       }, 1500);
     } catch (error) {
       console.error('❌ Sign-up error:', error);
@@ -400,7 +406,10 @@
       );
 
       setTimeout(() => {
-        window.location.href = 'dashboard.html';
+        window.location.href =
+          typeof window.getPostAuthDestination === 'function'
+            ? window.getPostAuthDestination()
+            : 'dashboard.html';
       }, 1500);
     } catch (error) {
       console.error('❌ Google sign-in error:', error);
@@ -648,7 +657,10 @@
       // Redirect after delay
       setTimeout(() => {
         console.log('🚀 Redirecting to main app...');
-        window.location.href = 'dashboard.html';
+        window.location.href =
+          typeof window.getPostAuthDestination === 'function'
+            ? window.getPostAuthDestination()
+            : 'dashboard.html';
       }, 2000);
     } catch (error) {
       console.error('❌ Trial sign-up error:', error);

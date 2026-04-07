@@ -1434,6 +1434,7 @@
     <script type="module" src="assets/js/firestore-sync.js"></script>
     
     <!-- Load Auth System (v2.0) -->
+    <script src="assets/js/user-role-setup.js"></script>
     <script src="assets/js/auth-manager.js"></script>
     <script src="assets/js/auth-api-helper.js"></script>
     <script src="assets/js/auth-ui.js"></script>
@@ -1619,7 +1620,8 @@
                     console.log('🚀 Redirecting now...');
                     // Final verification before redirect
                     if (localStorage.getItem('session_active') === 'true' && localStorage.getItem('current_user')) {
-                        window.location.href = 'dashboard.html';
+                        var _dest = typeof getPostAuthDestination === 'function' ? getPostAuthDestination() : 'dashboard.html';
+                        window.location.href = _dest;
                     } else {
                         console.error('❌ Session lost before redirect! Showing manual link.');
                         showError('signin-password-error', 'Sign-in successful! <a href="dashboard.html" style="color: #3b82f6; text-decoration: underline; font-weight: 600;">Click here to continue</a>');
@@ -1750,7 +1752,8 @@
 
                 setTimeout(() => {
                     console.log('🚀 Redirecting now...');
-                    window.location.href = 'dashboard.html';
+                    window.location.href = typeof getPostAuthDestination === 'function'
+                        ? getPostAuthDestination() : 'dashboard.html';
                 }, 3000); // Increased to 3 seconds to match sign-in
 
             } catch (error) {
@@ -2106,9 +2109,9 @@
 
                 setTimeout(() => {
                     console.log('🚀 Redirecting now...');
-                    // One final check before redirect
                     if (localStorage.getItem('session_active') === 'true') {
-                        window.location.href = 'dashboard.html';
+                        window.location.href = typeof getPostAuthDestination === 'function'
+                            ? getPostAuthDestination() : 'dashboard.html';
                     } else {
                         console.error('❌ Session lost before redirect!');
                         alert('Session error. Please try signing in again.');
@@ -2251,8 +2254,9 @@
                 try {
                     const user = JSON.parse(currentUser);
                     console.log('✅ Existing session found for:', user.email);
-                    console.log('🚀 Redirecting to dashboard...');
-                    window.location.href = 'dashboard.html';
+                    console.log('🚀 Redirecting to app...');
+                    window.location.href = typeof getPostAuthDestination === 'function'
+                        ? getPostAuthDestination() : 'dashboard.html';
                     return true;
                 } catch (e) {
                     console.warn('⚠️ Invalid session data, ignoring redirect');

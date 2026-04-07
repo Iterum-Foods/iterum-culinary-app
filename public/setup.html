@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Set up your workspace | Iterum</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            moss: '#6b8e6f',
+            'moss-dark': '#5b7c5f',
+            pine: '#3d5348',
+            ink: '#1a2e35',
+            slate: '#5a6d75',
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
+</head>
+<body class="min-h-screen bg-[#f0f4f2] text-ink antialiased font-[Inter,system-ui,sans-serif]">
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem('session_active') !== 'true' || !localStorage.getItem('current_user')) {
+          window.location.replace('signin.html');
+        }
+      } catch (e) {
+        window.location.replace('signin.html');
+      }
+    })();
+  </script>
+
+  <div class="max-w-lg mx-auto px-4 py-10 sm:py-14">
+    <div class="mb-8">
+      <div class="flex items-center gap-2 text-moss-dark font-semibold text-lg mb-1">
+        <span aria-hidden="true">◇</span> Iterum
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-semibold text-ink tracking-tight">Set up your workspace</h1>
+      <p class="text-slate mt-2 text-base leading-relaxed">
+        Tell us how you operate and your role so we can tailor your dashboard.
+      </p>
+    </div>
+
+    <form id="setup-form" class="bg-white rounded-2xl border border-slate-200/90 shadow-lg shadow-slate-900/5 p-6 sm:p-8 space-y-8">
+      <fieldset>
+        <legend class="text-sm font-semibold text-ink mb-3 block">Where do you work?</legend>
+        <div class="space-y-3" role="radiogroup" aria-label="Organization type">
+          <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-200 p-4 has-[:checked]:border-moss has-[:checked]:bg-emerald-50/50 transition-colors">
+            <input type="radio" name="scope" value="single_restaurant" class="mt-1 text-moss focus:ring-moss" checked>
+            <span>
+              <span class="font-medium text-ink block">Single restaurant</span>
+              <span class="text-sm text-slate">One kitchen, one cost center, one menu set.</span>
+            </span>
+          </label>
+          <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-200 p-4 has-[:checked]:border-moss has-[:checked]:bg-emerald-50/50 transition-colors">
+            <input type="radio" name="scope" value="restaurant_group" class="mt-1 text-moss focus:ring-moss">
+            <span>
+              <span class="font-medium text-ink block">Restaurant group</span>
+              <span class="text-sm text-slate">Multiple venues, shared vendors, or central oversight.</span>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend class="text-sm font-semibold text-ink mb-3 block">What best describes your role?</legend>
+        <div class="space-y-3">
+          <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-200 p-4 has-[:checked]:border-moss has-[:checked]:bg-emerald-50/50 transition-colors">
+            <input type="radio" name="roleKey" value="chef_leadership" class="mt-1 text-moss focus:ring-moss" checked>
+            <span>
+              <span class="font-medium text-ink block">Executive chef / Kitchen lead</span>
+              <span class="text-sm text-slate">Menus, recipes, R&amp;D, and compliance together.</span>
+            </span>
+          </label>
+          <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-200 p-4 has-[:checked]:border-moss has-[:checked]:bg-emerald-50/50 transition-colors">
+            <input type="radio" name="roleKey" value="operations_gm" class="mt-1 text-moss focus:ring-moss">
+            <span>
+              <span class="font-medium text-ink block">GM &amp; operations</span>
+              <span class="text-sm text-slate">Shifts, tasks, checklists, and food-safety rhythm.</span>
+            </span>
+          </label>
+          <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-200 p-4 has-[:checked]:border-moss has-[:checked]:bg-emerald-50/50 transition-colors">
+            <input type="radio" name="roleKey" value="purchasing" class="mt-1 text-moss focus:ring-moss">
+            <span>
+              <span class="font-medium text-ink block">Purchasing &amp; costing</span>
+              <span class="text-sm text-slate">Vendors, ingredients, and menu math—less creative clutter.</span>
+            </span>
+          </label>
+          <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-200 p-4 has-[:checked]:border-moss has-[:checked]:bg-emerald-50/50 transition-colors">
+            <input type="radio" name="roleKey" value="consultant_rd" class="mt-1 text-moss focus:ring-moss">
+            <span>
+              <span class="font-medium text-ink block">Consultant / R&amp;D</span>
+              <span class="text-sm text-slate">Experiments and ideas; lighter daily ops surface.</span>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div id="setup-error" class="hidden text-sm text-red-600 font-medium" role="alert"></div>
+
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <button type="submit" id="setup-submit" class="flex-1 min-h-[48px] rounded-xl bg-moss text-white font-semibold hover:bg-moss-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-moss focus-visible:ring-offset-2">
+          Continue to dashboard
+        </button>
+      </div>
+      <p class="text-center text-sm text-slate">
+        <button type="button" id="setup-skip" class="text-moss-dark font-medium underline hover:text-pine">Skip — use default kitchen dashboard</button>
+      </p>
+    </form>
+
+    <p class="text-center text-xs text-slate mt-8">
+      You can change this anytime from the dashboard sidebar under your profile.
+    </p>
+  </div>
+
+  <script src="assets/js/user-role-setup.js"></script>
+  <script>
+    (function () {
+      try {
+        var existing = typeof getOperatorProfile === 'function' ? getOperatorProfile() : null;
+        if (existing && existing.scope) {
+          var s = document.querySelector('input[name="scope"][value="' + existing.scope + '"]');
+          if (s) s.checked = true;
+        }
+        if (existing && existing.roleKey) {
+          var r = document.querySelector('input[name="roleKey"][value="' + existing.roleKey + '"]');
+          if (r) r.checked = true;
+        }
+      } catch (e) {}
+
+      var form = document.getElementById('setup-form');
+      var errEl = document.getElementById('setup-error');
+      var submitBtn = document.getElementById('setup-submit');
+
+      function labelForRole(key) {
+        var map = {
+          chef_leadership: 'Executive chef / Kitchen lead',
+          operations_gm: 'GM & operations',
+          purchasing: 'Purchasing & costing',
+          consultant_rd: 'Consultant / R&D'
+        };
+        return map[key] || key;
+      }
+
+      function labelForScope(scope) {
+        return scope === 'restaurant_group' ? 'Restaurant group' : 'Single restaurant';
+      }
+
+      function saveAndGo(profile) {
+        if (typeof saveOperatorProfile === 'function') {
+          saveOperatorProfile(profile);
+        }
+        window.location.href = 'dashboard.html';
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        errEl.classList.add('hidden');
+        var scope = (form.querySelector('input[name="scope"]:checked') || {}).value;
+        var roleKey = (form.querySelector('input[name="roleKey"]:checked') || {}).value;
+        if (!scope || !roleKey) {
+          errEl.textContent = 'Please select both options.';
+          errEl.classList.remove('hidden');
+          return;
+        }
+        submitBtn.disabled = true;
+        saveAndGo({
+          scope: scope,
+          roleKey: roleKey,
+          label: labelForRole(roleKey) + ' — ' + labelForScope(scope)
+        });
+      });
+
+      document.getElementById('setup-skip').addEventListener('click', function () {
+        saveAndGo({
+          scope: 'single_restaurant',
+          roleKey: 'chef_leadership',
+          label: 'Default kitchen dashboard (skipped)'
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
