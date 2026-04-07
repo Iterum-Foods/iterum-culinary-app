@@ -1,6 +1,7 @@
 # Data access inventory (storage keys & Firestore)
 
-Snapshot for supply-chain / security review. Regenerate diffs with ripgrep as code changes.
+Snapshot for supply-chain / security review. Regenerate diffs with ripgrep as code changes.  
+**Operator UI roles** (not Firestore): [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md).
 
 ## Firestore paths (client: `public/assets/js/firestore-sync.js`)
 

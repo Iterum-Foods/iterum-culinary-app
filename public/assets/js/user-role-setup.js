@@ -7,6 +7,67 @@
 
   var PROFILE_KEY = 'iterum_operator_profile';
 
+  /**
+   * UI-level capability flags by roleKey (dashboard + header CTA). Mirrors docs/ROLES_AND_PERMISSIONS.md.
+   * Not enforced by Firestore — server rules are separate.
+   */
+  global.ITERUM_ROLE_PERMISSIONS = {
+    chef_leadership: {
+      dashboard_idea_pad: true,
+      dashboard_rd_pipeline: true,
+      dashboard_rd_shortcuts: false,
+      dashboard_purchasing_tile: false,
+      dashboard_compliance_block: true,
+      dashboard_daily_tasks: true,
+      dashboard_shift_notes: true,
+      dashboard_quick_stats: true,
+      quick_stats_ideas_column: true,
+      header_cta: 'recipe_experiment'
+    },
+    operations_gm: {
+      dashboard_idea_pad: false,
+      dashboard_rd_pipeline: false,
+      dashboard_rd_shortcuts: false,
+      dashboard_purchasing_tile: false,
+      dashboard_compliance_block: true,
+      dashboard_daily_tasks: true,
+      dashboard_shift_notes: true,
+      dashboard_quick_stats: true,
+      quick_stats_ideas_column: false,
+      header_cta: 'kitchen_hub'
+    },
+    purchasing: {
+      dashboard_idea_pad: false,
+      dashboard_rd_pipeline: false,
+      dashboard_rd_shortcuts: false,
+      dashboard_purchasing_tile: true,
+      dashboard_compliance_block: false,
+      dashboard_daily_tasks: true,
+      dashboard_shift_notes: true,
+      dashboard_quick_stats: true,
+      quick_stats_ideas_column: false,
+      header_cta: 'vendors'
+    },
+    consultant_rd: {
+      dashboard_idea_pad: true,
+      dashboard_rd_pipeline: true,
+      dashboard_rd_shortcuts: true,
+      dashboard_purchasing_tile: false,
+      dashboard_compliance_block: false,
+      dashboard_daily_tasks: true,
+      dashboard_shift_notes: true,
+      dashboard_quick_stats: true,
+      quick_stats_ideas_column: true,
+      header_cta: 'recipe_experiment'
+    }
+  };
+
+  global.iterumGetRolePermissions = function (roleKey) {
+    var p = global.ITERUM_ROLE_PERMISSIONS;
+    var k = roleKey && p[roleKey] ? roleKey : 'chef_leadership';
+    return p[k];
+  };
+
   function parseProfile() {
     try {
       var raw = global.localStorage.getItem(PROFILE_KEY);
