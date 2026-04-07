@@ -12,19 +12,17 @@ on:
 jobs:
   update-dependencies:
     runs-on: ubuntu-latest
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     permissions:
       contents: read
-      
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '24.x'
+        node-version: '20.x'
         cache: 'npm'
         
     - name: Check current dependencies
