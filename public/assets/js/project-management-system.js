@@ -344,7 +344,11 @@ class ProjectManagementSystem {
    * Set current project
    */
   setCurrentProject(projectId) {
-    const project = this.projects.find(p => p.id === projectId);
+    let project = this.projects.find(p => p.id === projectId);
+    if (!project) {
+      this.loadProjects();
+      project = this.projects.find(p => p.id === projectId);
+    }
     if (project) {
       this.currentProject = project;
       const userCurrentProjectKey = this.getUserStorageKey(

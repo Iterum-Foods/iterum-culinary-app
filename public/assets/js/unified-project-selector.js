@@ -10,10 +10,10 @@ class UnifiedProjectSelector {
     this.currentProjectId = null;
     this.projects = [];
 
-    // Storage keys with user ID
+    // Must match project-management-system.js getUserStorageKey('iterum_projects')
     this.STORAGE_KEYS = {
-      PROJECTS: 'iterum_projects_', // Will append user ID
-      CURRENT_PROJECT: 'iterum_current_project_user_' // Will append user ID
+      PROJECTS: 'iterum_projects_user_', // + userId — canonical list (was iterum_projects_ which broke sync)
+      CURRENT_PROJECT: 'iterum_current_project_user_' // + userId
     };
 
     this.init();
@@ -77,17 +77,16 @@ class UnifiedProjectSelector {
       return;
     }
 
-    // Try new storage key first
+    // Canonical key (same as ProjectManagementSystem)
     let projectsKey = `${this.STORAGE_KEYS.PROJECTS}${this.currentUserId}`;
     let projectsJson = localStorage.getItem(projectsKey);
 
-    // If not found, try old storage key for migration
+    // Legacy: unified selector used iterum_projects_${uid} without _user_
     if (!projectsJson) {
-      const oldKey = `iterum_projects_${this.currentUserId}`;
-      projectsJson = localStorage.getItem(oldKey);
+      const legacyUnifiedKey = `iterum_projects_${this.currentUserId}`;
+      projectsJson = localStorage.getItem(legacyUnifiedKey);
       if (projectsJson) {
-        console.log('📦 Migrating projects from old storage key');
-        // Migrate to new key
+        console.log('📦 Migrating projects from legacy unified key → iterum_projects_user_*');
         localStorage.setItem(projectsKey, projectsJson);
       }
     }
