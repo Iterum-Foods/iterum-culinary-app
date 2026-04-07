@@ -1,3 +1,5 @@
+# Use "Run workflow" on latest main. Re-running an old failed job re-executes that job's
+# commit — it will not pick up workflow fixes merged later.
 name: Automated Dependency Updates
 
 on:
@@ -15,12 +17,12 @@ jobs:
       issues: write
 
     steps:
-    # Default token is github.token; do not set FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 — it forces
-    # Node 24 for actions/checkout (built for Node 20) and can break git HTTPS auth.
+    # v6 matches GitHub forcing Node 24 for JS actions (v4 targeted Node 20; auth/git could break).
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
+        token: ${{ github.token }}
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
