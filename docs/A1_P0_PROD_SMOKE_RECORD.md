@@ -27,6 +27,7 @@
 | **2. Sign-in** | Real test account authenticates successfully; **session persists** after **one** full browser refresh (still signed in). | | | | |
 | **3. Menu / project data** | Main operator surface opens (e.g. **dashboard** or **menu builder**). Data appears **or** empty state is **coherent** (clear UX, no dead end). **No** persistent “permission denied,” broken auth loop, or stuck sync spinner—if any appear, capture **exact** message here. | | | | |
 | **4. Recipe photo** | **Either** upload a small image on a recipe **or** open a recipe that already has a photo—**image renders** in UI. _(Failure often indicates Storage rules or path mismatch.)_ | | | | |
+| **5. Team access (optional)** | If testing **company membership:** a second account with `projects/{projectId}/members/{uid}` in Firestore (valid `role`) opens **dashboard** and project-backed flows **without** persistent “permission denied.” Skip if not in scope for this run. | | | | |
 
 ---
 

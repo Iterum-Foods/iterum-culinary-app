@@ -34,6 +34,19 @@ _Data paths / keys:_ [docs/DATA_ACCESS_INVENTORY.md](./docs/DATA_ACCESS_INVENTOR
 
 ---
 
+## Ship & verify (after each rules / membership change)
+
+Run this block whenever `firestore.rules`, `storage.rules`, or membership-related client code ships to `main`.
+
+| Status | Step | Owner | Notes |
+|--------|------|-------|--------|
+| [ ] | **CI:** Workflow **Deploy Firebase** succeeded on `main` ([Actions · Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml)). | Eng / CTO | Requires repo secret `FIREBASE_TOKEN`. Deploys **Firestore + Storage** rules to `iterum-culinary-app2`. |
+| [ ] | **App URL:** Smoke on **Vercel** production (`https://iterum-culinary-app.vercel.app/`) — not only localhost. | Eng | Confirms what pilots hit. |
+| [ ] | **A1 record:** [docs/A1_P0_PROD_SMOKE_RECORD.md](./docs/A1_P0_PROD_SMOKE_RECORD.md) completed → **GO** (all required steps). | Ops / COO | Fills evidence for executive sign-off row below. |
+| [ ] | **(Optional)** In Firebase Console → Firestore, confirm `projects/{projectId}/members/{yourUid}` exists with `role` after owner sync (see [docs/ROLES_AND_PERMISSIONS.md](./docs/ROLES_AND_PERMISSIONS.md)). | Eng | Verifies **company membership** rules are live. |
+
+---
+
 ## P0 — Security, data contract, trust
 
 | Status | Item | Owner | Notes |
@@ -41,7 +54,7 @@ _Data paths / keys:_ [docs/DATA_ACCESS_INVENTORY.md](./docs/DATA_ACCESS_INVENTOR
 | [x] | Document Firestore paths + localStorage keys (technical inventory) | Eng | See [docs/DATA_ACCESS_INVENTORY.md](./docs/DATA_ACCESS_INVENTORY.md) |
 | [x] | Align Firestore rules with real client usage (projects, snapshots, checklists) | Eng | `firestore.rules` — deploy to production when ready |
 | [x] | Align Storage rules with client paths (incl. legacy recipe photo path) | Eng | `storage.rules` — deploy with Firestore |
-| [x] | **Deploy** updated rules to production + smoke-test app (sign-in, menu sync, photos) | CTO + Eng / Ops | **2026-03-27:** Rules released to **`iterum-culinary-app2`** — Firestore (`firebase deploy --only firestore:rules`) + Storage (`firebase deploy --only storage`). Confirm prod smoke (sign-in, menu sync, recipe photo) on your side, then exec sign-off row. |
+| [x] | **Deploy** updated rules to production + smoke-test app (sign-in, menu sync, photos) | CTO + Eng / Ops | **2026-03-27:** Rules released to **`iterum-culinary-app2`**. **2026-03-29+:** `projects/.../members/{uid}` + company roles — redeploy via **Deploy Firebase** CI whenever `firestore.rules` changes; complete **Ship & verify** above. |
 | [x] | Confirm no production code relies on **listing** all `projects` in a way that breaks under tightened rules | CTO + Eng | **Pass:** `firestore-sync.js` uses **`doc('projects', id)` only**. Root `projects` **query** only in `cloud-data-sync.js` (`where('userId','==',...)`). Rules now use **`allow read`** (not `list: false`) so filtered queries can be evaluated; `ensureProjectDoc` fields are `ownerId` / `firebaseUid` (legacy query may no-op). |
 | [ ] | Executive sign-off: “Rules deployed + spot-check OK” | COO (package for CEO) | **Smoke record:** [docs/A1_P0_PROD_SMOKE_RECORD.md](./docs/A1_P0_PROD_SMOKE_RECORD.md) must show **GO** (all steps); then CEO OK. |
 
