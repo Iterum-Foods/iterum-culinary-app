@@ -115,7 +115,56 @@ class FirestoreSync {
       ...enriched
     };
     await setDoc(projectRef, payload, { merge: true });
+    try {
+      await this.ensureProjectMemberDoc(projectId, {
+        role: 'account_admin',
+        firebaseUid: authUid
+      });
+    } catch (e) {
+      console.warn('ensureProjectDoc: membership bootstrap skipped', e);
+    }
     return projectRef;
+  }
+
+  /**
+   * Upsert `projects/{projectId}/members/{authUid}` for company permissions (see firestore.rules).
+   * Owner bootstrap uses role `account_admin`; admins can add other roles later.
+   * @param {string} projectId
+   * @param {{ role?: string, firebaseUid?: string, email?: string|null }} [opts]
+   */
+  async ensureProjectMemberDoc(projectId, opts = {}) {
+    if (!this.initialized || !projectId) {
+      return null;
+    }
+    const authUid =
+      opts.firebaseUid ||
+      window.authManager?.currentUser?.uid ||
+      null;
+    if (!authUid) {
+      return null;
+    }
+    const role = opts.role || 'account_admin';
+    const memberRef = doc(
+      this.db,
+      'projects',
+      projectId,
+      'members',
+      authUid
+    );
+    const email =
+      opts.email !== undefined
+        ? opts.email
+        : window.authManager?.currentUser?.email || null;
+    await setDoc(
+      memberRef,
+      {
+        role,
+        email,
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+    return memberRef;
   }
 
   async init() {

@@ -10,6 +10,8 @@ export const ProjectFirestorePaths = Object.freeze({
   collection: 'projects',
   /** @param {string} projectId */
   doc: projectId => `projects/${projectId}`,
+  /** Company permissions: projects/{projectId}/members/{uid} */
+  member: (projectId, uid) => `projects/${projectId}/members/${uid}`,
   /** @param {string} projectId */
   menus: projectId => `projects/${projectId}/menus`,
   /** @param {string} projectId */

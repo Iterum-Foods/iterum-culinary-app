@@ -21,20 +21,6 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/projects/$(projectId)).data;
     }
 
-    function canAccessProjectDoc(projectId) {
-      return isAuthenticated()
-        && exists(/databases/$(database)/documents/projects/$(projectId))
-        && (
-          projectDocData(projectId).firebaseUid == request.auth.uid
-          || projectDocData(projectId).ownerId == request.auth.uid
-          || (
-            projectDocData(projectId).keys().hasAny(['ownerEmail'])
-            && projectDocData(projectId).ownerEmail == request.auth.token.email
-          )
-          || projectOwnerSlugMatchesAuth(projectId)
-        );
-    }
-
     function canCreateProjectDoc() {
       return isAuthenticated()
         && request.resource.data.keys().hasAny(['firebaseUid'])
@@ -92,6 +78,53 @@ service cloud.firestore {
     function projectOwnerSlugMatchesAuth(projectId) {
       return projectDocData(projectId).keys().hasAny(['ownerId'])
         && userProfileEmailMatches(projectDocData(projectId).ownerId);
+    }
+
+    // Project owner only (legacy project doc fields) — not a members/{uid} row
+    function isProjectOwnerOnly(projectId) {
+      return isAuthenticated()
+        && exists(/databases/$(database)/documents/projects/$(projectId))
+        && (
+          projectDocData(projectId).firebaseUid == request.auth.uid
+          || projectDocData(projectId).ownerId == request.auth.uid
+          || (
+            projectDocData(projectId).keys().hasAny(['ownerEmail'])
+            && projectDocData(projectId).ownerEmail == request.auth.token.email
+          )
+          || projectOwnerSlugMatchesAuth(projectId)
+        );
+    }
+
+    function projectMemberDocPath(projectId, uid) {
+      return /databases/$(database)/documents/projects/$(projectId)/members/$(uid);
+    }
+
+    function isProjectMember(projectId) {
+      return isAuthenticated()
+        && exists(projectMemberDocPath(projectId, request.auth.uid));
+    }
+
+    function projectMemberRole(projectId) {
+      return get(projectMemberDocPath(projectId, request.auth.uid)).data.role;
+    }
+
+    function isAccountAdminMember(projectId) {
+      return isProjectMember(projectId) && projectMemberRole(projectId) == 'account_admin';
+    }
+
+    function isValidMemberRole(r) {
+      return r == 'account_admin'
+        || r == 'location_manager'
+        || r == 'employee_line'
+        || r == 'chef_leadership'
+        || r == 'operations_gm'
+        || r == 'purchasing'
+        || r == 'consultant_rd';
+    }
+
+    // Owner OR invited member (company / workspace access)
+    function canAccessProjectDoc(projectId) {
+      return isProjectOwnerOnly(projectId) || isProjectMember(projectId);
     }
 
     // ============================================
@@ -246,6 +279,30 @@ service cloud.firestore {
 
       match /checklists/{checklistId} {
         allow read, write: if canAccessProjectDoc(projectId) && isValidSize();
+      }
+
+      // Company / workspace membership (uid = Firebase Auth uid)
+      match /members/{memberId} {
+        allow read: if canAccessProjectDoc(projectId);
+
+        allow create: if isValidSize()
+          && request.resource.data.keys().hasAny(['role'])
+          && request.resource.data.role is string
+          && isValidMemberRole(request.resource.data.role)
+          && (
+            isProjectOwnerOnly(projectId)
+            || isAccountAdminMember(projectId)
+          );
+
+        allow update: if isValidSize()
+          && request.resource.data.role is string
+          && isValidMemberRole(request.resource.data.role)
+          && (
+            isProjectOwnerOnly(projectId)
+            || isAccountAdminMember(projectId)
+          );
+
+        allow delete: if isProjectOwnerOnly(projectId) || isAccountAdminMember(projectId);
       }
     }
     

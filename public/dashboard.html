@@ -693,7 +693,7 @@
         <div class="space-y-5">
           
           <!-- Card 2.1: Dynamic Temperature Log -->
-          <div class="card-style" data-dash-roles="chef_leadership,operations_gm">
+          <div class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line">
             <div class="dash-hint">
               <strong style="color: var(--brand-text-primary);">HACCP-friendly logging.</strong> Log actual readings on the line; full history sync is expanding—use this board as your daily cue.
             </div>
@@ -715,7 +715,7 @@
           </div>
           
           <!-- Card 2.2: Dynamic Sanitizer Check Log -->
-          <div class="card-style" data-dash-roles="chef_leadership,operations_gm">
+          <div class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line">
             <div class="flex justify-between items-center mb-3 gap-2">
               <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
                 <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-vial-circle-check"></i></span>
@@ -734,7 +734,7 @@
           </div>
 
           <!-- Health inspection rounds (areas, schedules, checklist → saved to calendar) -->
-          <div class="card-style" data-dash-roles="chef_leadership,operations_gm">
+          <div class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line">
             <div class="flex justify-between items-center mb-3 gap-2">
               <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
                 <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-clipboard-check"></i></span>
@@ -753,7 +753,7 @@
           </div>
           
           <!-- Card 2.3: Today's Operations Focus & Checklists -->
-          <div class="card-style" data-dash-roles="chef_leadership,operations_gm">
+          <div class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line">
             <div class="dash-card-head">
               <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
                 <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-bullseye"></i></span>
@@ -859,7 +859,9 @@
     </div>
   </aside>
 
+  <script type="module" src="assets/js/firestore-sync.js"></script>
   <script src="assets/js/user-role-setup.js"></script>
+  <script src="assets/js/project-membership.js"></script>
   <!-- Load existing Dashboard functionality -->
   <script src="assets/js/dashboard-core.js"></script>
   
@@ -1420,6 +1422,26 @@
           console.warn('Dashboard role layout:', e);
         }
       }
+
+      (function scheduleMembershipRefresh() {
+        function tryRefresh() {
+          if (typeof window.iterumRefreshMembershipForActiveProject === 'function') {
+            window.iterumRefreshMembershipForActiveProject().catch(function () {});
+          }
+        }
+        tryRefresh();
+        setTimeout(tryRefresh, 500);
+        setTimeout(tryRefresh, 2000);
+      })();
+
+      window.addEventListener('storage', function (e) {
+        if (
+          e.key === 'active_project' &&
+          typeof window.iterumRefreshMembershipForActiveProject === 'function'
+        ) {
+          window.iterumRefreshMembershipForActiveProject();
+        }
+      });
 
       (function setupDashDrawer() {
         var toggle = document.getElementById('dash-menu-toggle');

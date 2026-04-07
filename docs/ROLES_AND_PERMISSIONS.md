@@ -11,10 +11,25 @@
 
 | Layer | What it does |
 |--------|----------------|
-| **`roleKey` + `scope` in localStorage** (`iterum_operator_profile`) | Tailors **dashboard cards**, header CTA, and copy — **not** cryptographic security. |
-| **Firestore rules** | Enforce **who may read/write** project data (`ownerId`, `firebaseUid`, etc.). Today rules are **owner-centric**; **team / employee** access requires membership docs + rule updates (see *Planned*). |
+| **`roleKey` + `scope` in localStorage** (`iterum_operator_profile`) | Tailors **dashboard cards**, header CTA, and copy when **no** server membership row exists. |
+| **Firestore `projects/{projectId}/members/{uid}`** | **Company role** for that workspace (`role` field). Loaded by [`project-membership.js`](../public/assets/js/project-membership.js); **overrides** local `roleKey` for UI when present. |
+| **Firestore rules** | Project access = **project owner** (existing fields) **or** **member doc** with a valid `role`. Members inherit read/write on project subcollections (menus, checklists, etc.); **project root doc** update/delete stays **owner-only**. Member docs: create/update/delete by **owner** or **`account_admin`** member. |
 
-Operators should treat **server rules** as the source of truth for data; UI role is **UX + routing**.
+---
+
+## Server membership (company role per project)
+
+| Path | Fields (typical) | Notes |
+|------|------------------|--------|
+| `projects/{projectId}/members/{userId}` | `role`, `email`, `updatedAt` | `userId` = Firebase Auth UID. |
+
+**Valid `role` values:** `account_admin`, `location_manager`, `employee_line`, `chef_leadership`, `operations_gm`, `purchasing`, `consultant_rd`.
+
+**Bootstrap:** When [`ensureProjectDoc`](../public/assets/js/firestore-sync.js) runs, the current user gets `members/{uid}` with `role: account_admin` (owner/org admin).
+
+**UI mapping** (server → dashboard `roleKey`): `account_admin` → `chef_leadership`; `location_manager` → `operations_gm`; others map 1:1 including `employee_line`.
+
+**Invite / add teammates:** Owner or `account_admin` may create other `members/{uid}` docs (requires that user’s UID — e.g. after they sign up). No email-invite UI in this PR.
 
 ---
 
@@ -48,42 +63,50 @@ Set in [`public/setup.html`](../public/setup.html); persisted with `saveOperator
 
 Legend: **Y** = visible for that role, **—** = hidden by `data-dash-roles` or layout rules.
 
-| Capability / surface | chef_leadership | operations_gm | purchasing | consultant_rd |
-|------------------------|:---:|:---:|:---:|:---:|
-| **Culinary Idea Pad** | Y | — | — | Y |
-| **R&D pipeline** (chart) | Y | — | — | Y |
-| **R&D shortcuts** (recipe dev, library, menu) | — | — | — | Y |
-| **Purchasing & costing** tile (vendors, ingredients, inventory, menu) | — | — | Y | — |
-| **Daily tasks** | Y | Y | Y | Y |
-| **Temperature log** | Y | Y | — | — |
-| **Sanitizer checks** | Y | Y | — | — |
-| **Health inspection rounds** | Y | Y | — | — |
-| **Shift focus** (kitchen hub links) | Y | Y | — | — |
-| **Shift notes** | Y | Y | Y | Y |
-| **At a glance** stats | Y | Y | Y | Y |
-| **Ideas column** in “At a glance” | Y | — | — | Y |
+| Capability / surface | chef_leadership | operations_gm | purchasing | consultant_rd | employee_line |
+|------------------------|:---:|:---:|:---:|:---:|:---:|
+| **Culinary Idea Pad** | Y | — | — | Y | — |
+| **R&D pipeline** (chart) | Y | — | — | Y | — |
+| **R&D shortcuts** (recipe dev, library, menu) | — | — | — | Y | — |
+| **Purchasing & costing** tile (vendors, ingredients, inventory, menu) | — | — | Y | — | — |
+| **Daily tasks** | Y | Y | Y | Y | Y |
+| **Temperature log** | Y | Y | — | — | Y |
+| **Sanitizer checks** | Y | Y | — | — | Y |
+| **Health inspection rounds** | Y | Y | — | — | Y |
+| **Shift focus** (kitchen hub links) | Y | Y | — | — | Y |
+| **Shift notes** | Y | Y | Y | Y | Y |
+| **At a glance** stats | Y | Y | Y | Y | Y |
+| **Ideas column** in “At a glance” | Y | — | — | Y | — |
 
 ### Header primary CTA (role-specific)
 
 | `roleKey` | Default CTA |
 |-----------|-------------|
 | `purchasing` | Open **Vendors** (`vendor-management.html`) |
-| `operations_gm` | **Kitchen hub** (`kitchen-management.html`) |
+| `operations_gm`, `employee_line` | **Kitchen hub** (`kitchen-management.html`) |
 | `chef_leadership`, `consultant_rd` (and fallback) | **New experiment** (`recipe-developer.html`) |
 
 ---
 
-## Planned roles (not yet in setup UI)
+## Server-only roles (no setup.html radio)
 
-Use these keys in product/docs so engineering and Firestore line up.
+Stored only on `projects/{projectId}/members/{uid}.role` (not in `iterum_operator_profile`).
 
-| Planned `roleKey` | Intent | Target permissions (summary) |
-|-------------------|--------|-------------------------------|
-| `employee_line` | Line staff / hourly | Submit **admin-defined** logs only (temps, times, actions); **signature** on submit; **offline queue** then sync; **no** template admin, **no** vendor/costing. |
-| `location_manager` | Store-level lead | Same project as employees; **read** team logs; **resolve/flag** conflicts; optional **edit** templates if product allows. |
-| `account_admin` | Org owner / delegated admin | **Invite** users to project; **assign** roles; **define** log/SOP templates; **receive** conflict / sync alerts. |
+| Server `role` | Maps to UI `roleKey` | Notes |
+|----------------|----------------------|--------|
+| `account_admin` | `chef_leadership` | Full operator-style board; can manage **members** (with owner). |
+| `location_manager` | `operations_gm` | Ops / shift focus. |
+| `employee_line` | `employee_line` | Compliance + tasks + notes; no idea pad / R&D / purchasing tile. |
 
-Until these exist in Auth + Firestore membership, treat them as **requirements**, not live checks.
+---
+
+## Planned product (not fully built)
+
+| Item | Notes |
+|------|--------|
+| **Invite-by-email UI** | Today: owner/admin writes `members/{targetUid}` in Console or a future admin screen. |
+| **Offline log queue + conflict flagging** | See leadership / product threads; not in this change. |
+| **Granular writes** (e.g. employee cannot edit menus) | Rules today allow member write on project subcollections; tighten per-collection when ready. |
 
 ---
 
@@ -98,3 +121,4 @@ Until these exist in Auth + Firestore membership, treat them as **requirements**
 | Date | Change |
 |------|--------|
 | 2026-03-29 | Initial matrix: four operator roles + scope; planned employee/admin rows; trust boundary note. |
+| 2026-03-29 | Firestore `members` + rules; `project-membership.js`; `employee_line` UI; owner bootstrap `account_admin`. |
