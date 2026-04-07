@@ -844,146 +844,52 @@
   <!-- Load existing Dashboard functionality -->
   <script src="assets/js/dashboard-core.js"></script>
   
-  <!-- Firebase Firestore for Temperature and Sanitizer Logs -->
+  <!-- Firebase Firestore: user-scoped HACCP (users/{userId}/...) — matches firestore.rules -->
   <script type="module">
     import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, addDoc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    
-    // Get Firebase config
-    let app, db, auth;
-    let userId = null;
-    let isAuthReady = false;
-    
-    // Initialize Firebase
-    async function initFirebase() {
-      try {
-        if (window.firebaseConfig) {
-          app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
-          db = getFirestore(app);
-          auth = getAuth(app);
+    import {
+      addDoc,
+      collection,
+      doc,
+      getFirestore,
+      onSnapshot,
+      query,
+      serverTimestamp,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-          onAuthStateChanged(auth, async (user) => {
-            if (user) {
-              userId = user.uid;
-              isAuthReady = true;
-              console.log('🔥 Firebase Auth Ready. User ID:', userId);
-              tempLogManager.startListener();
-              sanitizerLogManager.startListener();
-            } else {
-              // Wait for persisted Google/email session before anonymous (avoids racing auth restore)
-              setTimeout(async () => {
-                if (auth.currentUser) return;
-                try {
-                  await signInAnonymously(auth);
-                } catch (error) {
-                  console.warn('⚠️ Anonymous sign-in failed:', error);
-                }
-              }, 3000);
-            }
-          });
-        } else {
-          console.warn('⚠️ Firebase config not available');
-        }
-      } catch (error) {
-        console.error('❌ Firebase initialization error:', error);
+    let app;
+    let db;
+    let auth;
+    let isAuthReady = false;
+
+    const REF_UNITS = 'refrigeration_units';
+    const SAN_LOCS = 'sanitizer_locations';
+
+    function getProjectId() {
+      try {
+        return (
+          localStorage.getItem('iterum_current_project') ||
+          localStorage.getItem('userCurrentProjectKey') ||
+          'master'
+        );
+      } catch {
+        return 'master';
       }
     }
-    
-    // Temperature Log Manager
-    const REFRIGERATION_PATH = 'refrigeration_units';
-    window.tempLogManager = {
-      addUnit: async function() {
-        const name = prompt("Enter the Name of the New Refrigeration Unit (e.g., Walk-In Cooler 1, Line Fridge):");
-        if (name && name.trim()) {
-          if (!db) {
-            console.error('Firestore not initialized');
-            alert('Database not ready. Please wait a moment and try again.');
-            return;
-          }
-          try {
-            await addDoc(collection(db, REFRIGERATION_PATH), {
-              name: name.trim(),
-              type: 'Refrigerator',
-              minTemp: 0,
-              maxTemp: 5,
-              createdAt: new Date()
-            });
-            console.log('✅ New unit added:', name);
-          } catch (error) {
-            console.error('❌ Error adding unit:', error);
-            alert('Failed to add unit. Please try again.');
-          }
-        }
-      },
-      startListener: function() {
-        if (!db || !isAuthReady) {
-          setTimeout(() => this.startListener(), 500);
-          return;
-        }
-        const q = query(collection(db, REFRIGERATION_PATH));
-        onSnapshot(q, (snapshot) => {
-          const units = [];
-          snapshot.forEach((doc) => {
-            units.push({ id: doc.id, ...doc.data() });
-          });
-          renderRefrigerationUnits(units);
-        }, (error) => {
-          console.error('❌ Temp log listener error:', error);
-        });
-      }
-    };
 
-    // Sanitizer Log Manager
-    const SANITIZER_PATH = 'sanitizer_locations';
-    window.sanitizerLogManager = {
-      addLocation: async function() {
-        const name = prompt("Enter the Name of the New Sanitizer Checkpoint (e.g., 3-Bay Sink, Dish Machine, Mop Sink):");
-        if (name && name.trim()) {
-          if (!db) {
-            console.error('Firestore not initialized');
-            alert('Database not ready. Please wait a moment and try again.');
-            return;
-          }
-          try {
-            await addDoc(collection(db, SANITIZER_PATH), {
-              name: name.trim(),
-              requiredPPM: 150,
-              createdAt: new Date()
-            });
-            console.log('✅ New location added:', name);
-          } catch (error) {
-            console.error('❌ Error adding location:', error);
-            alert('Failed to add location. Please try again.');
-          }
-        }
-      },
-      startListener: function() {
-        if (!db || !isAuthReady) {
-          setTimeout(() => this.startListener(), 500);
-          return;
-        }
-        const q = query(collection(db, SANITIZER_PATH));
-        onSnapshot(q, (snapshot) => {
-          const locations = [];
-          snapshot.forEach((doc) => {
-            locations.push({ id: doc.id, ...doc.data() });
-          });
-          renderSanitizerLocations(locations);
-        }, (error) => {
-          console.error('❌ Sanitizer log listener error:', error);
-        });
+    function getComplianceUserId() {
+      const u = auth?.currentUser;
+      if (!u) return null;
+      const am = window.authManager?.currentUser;
+      const slug = am?.userId || am?.id;
+      if (slug && typeof slug === 'string' && slug !== u.uid) {
+        return slug;
       }
-    };
-    
-    // Initialize Firebase on load
-    initFirebase();
-  </script>
-  
-  <!-- Temperature and Sanitizer Log Rendering -->
-  <script>
+      return u.uid;
+    }
 
-    // Render empty states for temperature and sanitizer logs
     function renderRefrigerationUnits(units) {
       const container = document.getElementById('refrigeration-unit-list');
       if (!container) return;
@@ -1013,7 +919,7 @@
                 <i class="fa-solid ${statusIcon} w-5 mr-1"></i>
                 ${displayTemp}
               </span>
-              <button title="Record Reading" onclick="recordTemperatureReading('${unit.id}', '${unit.name}')" class="text-xs py-1 px-3 rounded-md text-white hover:opacity-90 transition-opacity" style="background-color: var(--brand-secondary-accent);">
+              <button title="Record Reading" onclick="recordTemperatureReading(${JSON.stringify(unit.id)}, ${JSON.stringify(unit.name)})" class="text-xs py-1 px-3 rounded-md text-white hover:opacity-90 transition-opacity" style="background-color: var(--brand-secondary-accent);">
                 <i class="fa-solid fa-file-pen"></i> Log
               </button>
             </div>
@@ -1053,7 +959,7 @@
                 ${displayPPM}
               </span>
               <span class="text-xs px-2 py-1 rounded-full font-semibold ${hasReading ? (passed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700') : 'bg-gray-100 text-gray-700'}">${statusText}</span>
-              <button title="Record Check" onclick="recordSanitizerCheck('${location.id}', '${location.name}')" class="text-xs py-1 px-3 rounded-md text-white hover:opacity-90 transition-opacity" style="background-color: var(--brand-secondary-accent);">
+              <button title="Record Check" onclick="recordSanitizerCheck(${JSON.stringify(location.id)}, ${JSON.stringify(location.name)})" class="text-xs py-1 px-3 rounded-md text-white hover:opacity-90 transition-opacity" style="background-color: var(--brand-secondary-accent);">
                 <i class="fa-solid fa-vial"></i> Check
               </button>
             </div>
@@ -1063,28 +969,191 @@
       });
     }
 
-    // Helper functions for recording readings
-    window.recordTemperatureReading = async function(unitId, unitName) {
-      const tempInput = prompt(`Enter temperature reading for ${unitName} (in Celsius):`);
-      if (tempInput && !isNaN(tempInput)) {
-        const tempC = parseFloat(tempInput);
-        // TODO: Save to Firestore temperature_readings collection
-        console.log(`Recording temperature: ${tempC}°C for ${unitName}`);
-        alert(`Temperature ${tempC}°C recorded for ${unitName}. Full logging feature coming soon!`);
+    window.tempLogManager = {
+      addUnit: async function () {
+        const name = prompt(
+          'Enter the Name of the New Refrigeration Unit (e.g., Walk-In Cooler 1, Line Fridge):'
+        );
+        if (!name || !name.trim()) return;
+        const uid = getComplianceUserId();
+        if (!db || !uid) {
+          alert('Sign in required to save units.');
+          return;
+        }
+        try {
+          await addDoc(collection(db, 'users', uid, REF_UNITS), {
+            name: name.trim(),
+            type: 'Refrigerator',
+            minTemp: 0,
+            maxTemp: 5,
+            projectId: getProjectId(),
+            createdAt: serverTimestamp()
+          });
+        } catch (error) {
+          console.error('❌ Error adding unit:', error);
+          alert('Failed to add unit. Deploy Firestore rules if this persists.');
+        }
+      },
+      startListener: function () {
+        if (!db) {
+          setTimeout(() => this.startListener(), 400);
+          return;
+        }
+        const uid = getComplianceUserId();
+        if (!uid) {
+          setTimeout(() => this.startListener(), 400);
+          return;
+        }
+        onSnapshot(
+          query(collection(db, 'users', uid, REF_UNITS)),
+          snapshot => {
+            const units = [];
+            snapshot.forEach(d => units.push({ id: d.id, ...d.data() }));
+            renderRefrigerationUnits(units);
+          },
+          err => console.error('❌ Temp log listener error:', err)
+        );
       }
     };
 
-    window.recordSanitizerCheck = async function(locationId, locationName) {
+    window.sanitizerLogManager = {
+      addLocation: async function () {
+        const name = prompt(
+          'Enter the Name of the New Sanitizer Checkpoint (e.g., 3-Bay Sink, Dish Machine, Mop Sink):'
+        );
+        if (!name || !name.trim()) return;
+        const uid = getComplianceUserId();
+        if (!db || !uid) {
+          alert('Sign in required to save locations.');
+          return;
+        }
+        try {
+          await addDoc(collection(db, 'users', uid, SAN_LOCS), {
+            name: name.trim(),
+            requiredPPM: 150,
+            projectId: getProjectId(),
+            createdAt: serverTimestamp()
+          });
+        } catch (error) {
+          console.error('❌ Error adding location:', error);
+          alert('Failed to add location. Deploy Firestore rules if this persists.');
+        }
+      },
+      startListener: function () {
+        if (!db) {
+          setTimeout(() => this.startListener(), 400);
+          return;
+        }
+        const uid = getComplianceUserId();
+        if (!uid) {
+          setTimeout(() => this.startListener(), 400);
+          return;
+        }
+        onSnapshot(
+          query(collection(db, 'users', uid, SAN_LOCS)),
+          snapshot => {
+            const locations = [];
+            snapshot.forEach(d => locations.push({ id: d.id, ...d.data() }));
+            renderSanitizerLocations(locations);
+          },
+          err => console.error('❌ Sanitizer log listener error:', err)
+        );
+      }
+    };
+
+    window.recordTemperatureReading = async function (unitId, unitName) {
+      const uid = getComplianceUserId();
+      if (!db || !uid) {
+        alert('Sign in required to log temperatures.');
+        return;
+      }
+      const tempInput = prompt(
+        `Enter temperature reading for ${unitName} (in Celsius):`
+      );
+      if (tempInput == null || tempInput === '' || isNaN(tempInput)) return;
+      const tempC = parseFloat(tempInput);
+      try {
+        await addDoc(collection(db, 'users', uid, 'temperature_readings'), {
+          unitId,
+          unitName,
+          tempC,
+          temperature: tempC,
+          projectId: getProjectId(),
+          timestamp: serverTimestamp()
+        });
+        await updateDoc(doc(db, 'users', uid, REF_UNITS, unitId), {
+          lastReading: tempC,
+          lastReadingAt: serverTimestamp()
+        });
+        alert(`Saved ${tempC}°C for ${unitName}. Open Calendar to browse by day.`);
+      } catch (e) {
+        console.error(e);
+        alert('Could not save reading. Deploy latest Firestore rules if this persists.');
+      }
+    };
+
+    window.recordSanitizerCheck = async function (locationId, locationName) {
+      const uid = getComplianceUserId();
+      if (!db || !uid) {
+        alert('Sign in required to log sanitizer checks.');
+        return;
+      }
       const ppmInput = prompt(`Enter PPM reading for ${locationName}:`);
-      if (ppmInput && !isNaN(ppmInput)) {
-        const ppm = parseFloat(ppmInput);
-        // TODO: Save to Firestore sanitizer_readings collection
-        console.log(`Recording PPM: ${ppm} for ${locationName}`);
-        alert(`PPM ${ppm} recorded for ${locationName}. Full logging feature coming soon!`);
+      if (ppmInput == null || ppmInput === '' || isNaN(ppmInput)) return;
+      const ppm = parseFloat(ppmInput);
+      const passed = ppm >= 100 && ppm <= 200;
+      try {
+        await addDoc(collection(db, 'users', uid, 'sanitizer_readings'), {
+          locationId,
+          locationName,
+          ppm,
+          passed,
+          projectId: getProjectId(),
+          timestamp: serverTimestamp()
+        });
+        await updateDoc(doc(db, 'users', uid, SAN_LOCS, locationId), {
+          lastReading: ppm,
+          lastReadingAt: serverTimestamp()
+        });
+        alert(`Saved ${ppm} PPM for ${locationName}. Open Calendar to browse by day.`);
+      } catch (e) {
+        console.error(e);
+        alert('Could not save check. Deploy latest Firestore rules if this persists.');
       }
     };
 
-    // Initialize empty lists (will be populated by Firestore listeners)
+    async function initFirebase() {
+      try {
+        if (!window.firebaseConfig) {
+          console.warn('⚠️ Firebase config not available');
+          return;
+        }
+        app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+
+        onAuthStateChanged(auth, async user => {
+          if (user) {
+            isAuthReady = true;
+            window.tempLogManager.startListener();
+            window.sanitizerLogManager.startListener();
+          } else {
+            setTimeout(async () => {
+              if (auth.currentUser) return;
+              try {
+                await signInAnonymously(auth);
+              } catch (error) {
+                console.warn('⚠️ Anonymous sign-in failed:', error);
+              }
+            }, 3000);
+          }
+        });
+      } catch (error) {
+        console.error('❌ Firebase initialization error:', error);
+      }
+    }
+
+    initFirebase();
     renderRefrigerationUnits([]);
     renderSanitizerLocations([]);
   </script>

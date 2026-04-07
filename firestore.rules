@@ -176,6 +176,32 @@ service cloud.firestore {
         allow write: if isAuthenticated() && isValidSize()
           && (isOwner(userId) || userProfileEmailMatches(userId));
       }
+
+      // HACCP / compliance (dashboard + calendar; userId = Firebase uid or slug with email match)
+      match /refrigeration_units/{unitId} {
+        allow read: if isAuthenticated()
+          && (isOwner(userId) || userProfileEmailMatches(userId));
+        allow write: if isAuthenticated() && isValidSize()
+          && (isOwner(userId) || userProfileEmailMatches(userId));
+      }
+      match /sanitizer_locations/{locId} {
+        allow read: if isAuthenticated()
+          && (isOwner(userId) || userProfileEmailMatches(userId));
+        allow write: if isAuthenticated() && isValidSize()
+          && (isOwner(userId) || userProfileEmailMatches(userId));
+      }
+      match /temperature_readings/{readingId} {
+        allow read: if isAuthenticated()
+          && (isOwner(userId) || userProfileEmailMatches(userId));
+        allow write: if isAuthenticated() && isValidSize()
+          && (isOwner(userId) || userProfileEmailMatches(userId));
+      }
+      match /sanitizer_readings/{readingId} {
+        allow read: if isAuthenticated()
+          && (isOwner(userId) || userProfileEmailMatches(userId));
+        allow write: if isAuthenticated() && isValidSize()
+          && (isOwner(userId) || userProfileEmailMatches(userId));
+      }
     }
     
     // ============================================
