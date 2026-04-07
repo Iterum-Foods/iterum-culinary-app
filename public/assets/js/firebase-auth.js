@@ -75,88 +75,49 @@ class FirebaseAuthSystem {
     try {
       console.log('🔥 Initializing Firebase Authentication...');
 
-      // Use embedded config instead of waiting for global config
       console.log(
-        '🔥 Using embedded Firebase config:',
+        '🔥 Using Firebase config project:',
         firebaseConfig.projectId
       );
 
-      // Check if Firebase functions are available
       if (typeof initializeApp === 'undefined') {
         console.error('❌ Firebase initializeApp not available');
         throw new Error('Firebase SDK not loaded properly');
       }
 
-      // Initialize Firebase app with embedded config
       this.app = initializeApp(firebaseConfig);
       this.auth = getAuth(this.app);
 
-      // Initialize Analytics only when supported (IndexedDB may be blocked in strict privacy / IFRAME)
-      if (firebaseConfig.measurementId) {
-        try {
-          if (await isSupported()) {
-            this.analytics = getAnalytics(this.app);
-            console.log('📊 Firebase Analytics initialized');
-
-            if (analyticsTracker && typeof analyticsTracker.init === 'function') {
-              try {
-                await analyticsTracker.init(this.app);
-              } catch (analyticsError) {
-                console.warn(
-                  '⚠️ Analytics tracker init failed (non-critical):',
-                  analyticsError
-                );
-              }
-            }
-          } else {
-            console.warn(
-              '⚠️ Firebase Analytics skipped (browser blocked storage or unsupported environment).'
-            );
-          }
-        } catch (analyticsError) {
-          console.warn(
-            '⚠️ Firebase Analytics initialization failed (non-critical):',
-            analyticsError
-          );
-        }
-      }
-
-      // Setup providers
       this.providers = {
         google: new GoogleAuthProvider()
       };
-
-      // Configure Google provider
       this.providers.google.addScope('email');
       this.providers.google.addScope('profile');
 
-      // Complete OAuth redirect before subscribing (recommended); sets flags for post-login nav
+      // OAuth redirect (must run early); do not let this hang forever
       await this.handleRedirectResult();
 
-      // Listen for auth state changes
       onAuthStateChanged(this.auth, user => {
         this.handleAuthStateChange(user);
       });
 
       this.isInitialized = true;
-      console.log(
-        '✅ Firebase Auth initialized successfully for iterum-culinary-app2'
-      );
-
-      // Add alias for backward compatibility
       this.createAccountWithEmail = this.createUserWithEmail;
 
-      // Make sure window.firebaseAuth is set and mark as ready
       window.firebaseAuth = this;
       window.firebaseAuthReady = true;
 
-      // Dispatch event for other scripts
       window.dispatchEvent(
         new CustomEvent('firebaseAuthReady', { detail: this })
       );
 
-      // Connect with unified auth system
+      console.log(
+        '✅ Firebase Auth ready (email/Google); analytics/logging load in background'
+      );
+
       this.connectWithUnifiedAuth();
+
+      void this.initAnalyticsInBackground();
     } catch (error) {
       console.error('❌ Firebase Auth initialization failed:', error);
       this.isInitialized = false;
@@ -175,11 +136,50 @@ class FirebaseAuthSystem {
   }
 
   /**
+   * Analytics only — never block sign-in (was delaying firebaseAuthReady on some browsers).
+   */
+  async initAnalyticsInBackground() {
+    if (!firebaseConfig.measurementId) return;
+    try {
+      if (await isSupported()) {
+        this.analytics = getAnalytics(this.app);
+        console.log('📊 Firebase Analytics initialized');
+
+        if (analyticsTracker && typeof analyticsTracker.init === 'function') {
+          try {
+            await analyticsTracker.init(this.app);
+          } catch (analyticsError) {
+            console.warn(
+              '⚠️ Analytics tracker init failed (non-critical):',
+              analyticsError
+            );
+          }
+        }
+      } else {
+        console.warn(
+          '⚠️ Firebase Analytics skipped (browser blocked storage or unsupported environment).'
+        );
+      }
+    } catch (analyticsError) {
+      console.warn(
+        '⚠️ Firebase Analytics initialization failed (non-critical):',
+        analyticsError
+      );
+    }
+  }
+
+  /**
    * Handle redirect result from Google sign-in
    */
   async handleRedirectResult() {
     try {
-      const result = await getRedirectResult(this.auth);
+      const ms = 12000;
+      const result = await Promise.race([
+        getRedirectResult(this.auth),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('getRedirectResult timeout')), ms)
+        )
+      ]);
       if (result && result.user) {
         try {
           sessionStorage.setItem('iterum_oauth_just_completed', '1');
@@ -192,8 +192,13 @@ class FirebaseAuthSystem {
         );
       }
     } catch (error) {
-      console.error('❌ Error handling redirect result:', error);
-      // Don't throw here as it might be a normal redirect without result
+      if (error && error.message === 'getRedirectResult timeout') {
+        console.warn(
+          '⚠️ getRedirectResult timed out — continuing (try Google sign-in again if stuck)'
+        );
+      } else {
+        console.error('❌ Error handling redirect result:', error);
+      }
     }
   }
 

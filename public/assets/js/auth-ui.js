@@ -24,11 +24,48 @@
         }
       }, 100);
 
-      // Timeout after 5 seconds
       setTimeout(() => {
         clearInterval(checkInterval);
         resolve(null);
       }, 5000);
+    });
+  }
+
+  /** Firebase module must finish before sign-in (otherwise waitForFirebaseAuth times out on Vercel). */
+  function waitForFirebaseAuthReady(maxMs = 25000) {
+    return new Promise(resolve => {
+      if (window.firebaseAuthReady && window.firebaseAuth && window.firebaseAuth.auth) {
+        resolve(true);
+        return;
+      }
+
+      let finished = false;
+      const done = ok => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(failTimer);
+        clearInterval(poll);
+        window.removeEventListener('firebaseAuthReady', onReady);
+        resolve(ok);
+      };
+
+      const onReady = () => {
+        if (window.firebaseAuth && window.firebaseAuth.auth) {
+          done(true);
+        }
+      };
+
+      window.addEventListener('firebaseAuthReady', onReady, { once: true });
+
+      const poll = setInterval(() => {
+        if (window.firebaseAuthReady && window.firebaseAuth && window.firebaseAuth.auth) {
+          done(true);
+        }
+      }, 80);
+
+      const failTimer = setTimeout(() => {
+        done(!!(window.firebaseAuth && window.firebaseAuth.auth));
+      }, maxMs);
     });
   }
 
@@ -42,11 +79,21 @@
   async function init() {
     console.log('🎨 Auth UI initializing DOM handlers...');
 
-    // Wait for AuthManager
     const authManager = await waitForAuthManager();
     if (!authManager) {
       console.error('❌ AuthManager not available');
+      showBootstrapError(
+        'Account services did not load. Refresh the page or try another network.'
+      );
       return;
+    }
+
+    const firebaseOk = await waitForFirebaseAuthReady();
+    if (!firebaseOk) {
+      console.error('❌ Firebase Auth not ready after wait');
+      showBootstrapError(
+        'Firebase Auth did not finish loading. Check your connection, try disabling strict blockers, and refresh. In Google Cloud Console, ensure the Browser API key allows your Vercel domain as an HTTP referrer.'
+      );
     }
 
     console.log('✅ AuthManager available, setting up UI');
@@ -95,6 +142,19 @@
     clearMessages();
   }
 
+  function showBootstrapError(message) {
+    const el =
+      document.getElementById('auth-bootstrap-error') ||
+      document.getElementById('error-message-global');
+    if (!el) {
+      console.error(message);
+      return;
+    }
+    el.textContent = message;
+    el.classList.add('show');
+    el.style.display = el.id === 'auth-bootstrap-error' ? 'block' : '';
+  }
+
   // Clear all error and success messages
   function clearMessages() {
     document.querySelectorAll('.error-message').forEach(el => {
@@ -111,6 +171,11 @@
     const errorMsg = document.getElementById('error-message-global');
     if (errorMsg) {
       errorMsg.classList.remove('show');
+    }
+    const bootErr = document.getElementById('auth-bootstrap-error');
+    if (bootErr) {
+      bootErr.classList.remove('show');
+      bootErr.textContent = '';
     }
   }
 

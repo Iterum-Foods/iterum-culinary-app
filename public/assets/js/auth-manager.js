@@ -132,11 +132,9 @@ class AuthManager {
         lastLogin: new Date().toISOString()
       };
 
-      // Sync with backend
-      await this.syncWithBackend(user, idToken);
-
-      // Save session
       await this.saveSession(user);
+
+      void this.syncWithBackend(user, idToken);
 
       // Track login event
       if (window.analyticsTracker) {
@@ -214,11 +212,9 @@ class AuthManager {
         lastLogin: new Date().toISOString()
       };
 
-      // Sync with backend
-      await this.syncWithBackend(user, idToken);
-
-      // Save session
       await this.saveSession(user);
+
+      void this.syncWithBackend(user, idToken);
 
       // Track signup event
       if (window.analyticsTracker) {

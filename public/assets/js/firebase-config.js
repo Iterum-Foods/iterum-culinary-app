@@ -15,6 +15,10 @@
  * 7. Authorized domains (required for Google sign-in on Vercel):
  *    Authentication → Settings → Authorized domains — add your host(s), e.g.
  *    iterum-culinary-app.vercel.app and any custom domain (not only *.web.app).
+ *
+ * 8. Google Cloud Console → APIs & Services → Credentials → your Browser API key:
+ *    If "HTTP referrers" is restricted, add https://YOUR-VERCEL-Host/* (and localhost for dev).
+ *    Unrestricted key works for debugging only — lock down in production.
  */
 
 // Firebase configuration - Your actual Firebase project config
