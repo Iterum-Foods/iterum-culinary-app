@@ -261,9 +261,11 @@ class FirebaseAuthSystem {
     ) {
       return;
     }
-    void window.authManager.applyFirebaseUserSession(firebaseUser).catch(err => {
-      console.error('❌ AuthManager session sync failed:', err);
-    });
+    void window.authManager
+      .applyFirebaseUserSession(firebaseUser)
+      .catch(err => {
+        console.error('❌ AuthManager session sync failed:', err);
+      });
   }
 
   /**

@@ -53,7 +53,7 @@ class AutoSaveManager {
 
   setupEventListeners() {
     // Save before page unload
-    window.addEventListener('beforeunload', e => {
+    window.addEventListener('beforeunload', () => {
       this.saveAllData(true); // Force immediate save
     });
 

@@ -113,12 +113,13 @@ class BakersPercentageCalculator {
       case 'factor':
         scaleFactor = value;
         break;
-      case 'target_amount':
+      case 'target_amount': {
         // Scale based on desired amount of base ingredient
         const baseWeight = this.getBaseWeight();
         const targetWeight = this.convertToGrams(value, targetUnit);
         scaleFactor = targetWeight / baseWeight;
         break;
+      }
       case 'batch_count':
         // Scale based on number of batches
         scaleFactor = value;
@@ -164,7 +165,7 @@ class BakersPercentageCalculator {
       yields: this.getRecipeYields()
     };
 
-    for (const [name, ingredient] of this.ingredients) {
+    for (const [, ingredient] of this.ingredients) {
       formula.ingredients.push({
         name: ingredient.name,
         percentage: ingredient.percentage,
@@ -269,7 +270,6 @@ class BakersPercentageCalculator {
    * Validate recipe balance (for bread/pastry)
    */
   validateRecipe() {
-    const formula = this.generateFormula();
     const validation = {
       valid: true,
       warnings: [],
@@ -343,15 +343,16 @@ class BakersPercentageCalculator {
       case 'json':
         return JSON.stringify({ formula, validation }, null, 2);
 
-      case 'csv':
+      case 'csv': {
         let csv = 'Ingredient,Percentage,Category,Weight(g)\n';
         formula.ingredients.forEach(ing => {
           const weight = this.ingredients.get(ing.name).weightInGrams;
           csv += `${ing.name},${ing.percentage.toFixed(1)},${ing.category},${weight.toFixed(1)}\n`;
         });
         return csv;
+      }
 
-      case 'readable':
+      case 'readable': {
         let readable = `Baker's Percentage Formula\n`;
         readable += `========================\n\n`;
         readable += `Base: ${formula.baseIngredient} (100%)\n\n`;
@@ -372,6 +373,7 @@ class BakersPercentageCalculator {
         }
 
         return readable;
+      }
 
       default:
         return formula;

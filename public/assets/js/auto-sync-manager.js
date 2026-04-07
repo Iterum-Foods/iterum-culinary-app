@@ -70,7 +70,6 @@ class AutoSyncManager {
    */
   async syncMenus() {
     try {
-      const userId = this.getCurrentUserId();
       const keys = Object.keys(localStorage);
       let syncedCount = 0;
 

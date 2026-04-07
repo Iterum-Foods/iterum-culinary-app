@@ -260,8 +260,7 @@ class AuthManager {
     const user = {
       id: firebaseUser.uid,
       userId: firebaseUser.uid,
-      name:
-        firebaseUser.displayName || firebaseUser.email.split('@')[0],
+      name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
       email: firebaseUser.email,
       photoURL: firebaseUser.photoURL,
       type: isGoogle ? 'google' : 'email',
@@ -317,7 +316,9 @@ class AuthManager {
       await firebaseAuth.signInWithGoogle();
 
       // signInWithRedirect: user completes on Google; session resumes on this URL via getRedirectResult + onAuthStateChanged
-      this.log('ℹ️ Google redirect in progress (if the page does not change, check the console)');
+      this.log(
+        'ℹ️ Google redirect in progress (if the page does not change, check the console)'
+      );
       return null;
     } catch (error) {
       try {

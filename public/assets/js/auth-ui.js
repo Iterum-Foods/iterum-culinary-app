@@ -34,14 +34,20 @@
   /** Firebase module must finish before sign-in (otherwise waitForFirebaseAuth times out on Vercel). */
   function waitForFirebaseAuthReady(maxMs = 25000) {
     return new Promise(resolve => {
-      if (window.firebaseAuthReady && window.firebaseAuth && window.firebaseAuth.auth) {
+      if (
+        window.firebaseAuthReady &&
+        window.firebaseAuth &&
+        window.firebaseAuth.auth
+      ) {
         resolve(true);
         return;
       }
 
       let finished = false;
       const done = ok => {
-        if (finished) return;
+        if (finished) {
+          return;
+        }
         finished = true;
         clearTimeout(failTimer);
         clearInterval(poll);
@@ -58,7 +64,11 @@
       window.addEventListener('firebaseAuthReady', onReady, { once: true });
 
       const poll = setInterval(() => {
-        if (window.firebaseAuthReady && window.firebaseAuth && window.firebaseAuth.auth) {
+        if (
+          window.firebaseAuthReady &&
+          window.firebaseAuth &&
+          window.firebaseAuth.auth
+        ) {
           done(true);
         }
       }, 80);
@@ -378,7 +388,7 @@
 
       const user = await window.authManager.signInWithGoogle();
 
-      if (user == null) {
+      if (user === null) {
         showSuccess('Redirecting to Google…');
         return;
       }

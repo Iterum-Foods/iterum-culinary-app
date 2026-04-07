@@ -592,7 +592,7 @@ class AIIntegration {
     // Clear existing sections
     sectionsContainer.innerHTML = '';
 
-    sections.forEach((section, sectionIndex) => {
+    sections.forEach(section => {
       const sectionDiv = document.createElement('div');
       sectionDiv.className = 'menu-section mb-6 p-4 border rounded';
       sectionDiv.innerHTML = `
@@ -600,7 +600,7 @@ class AIIntegration {
                 <div class="menu-items">
                     ${section.items
                       .map(
-                        (item, itemIndex) => `
+                        item => `
                         <div class="menu-item mb-3 p-3 bg-gray-50 rounded">
                             <div class="flex justify-between items-start mb-2">
                                 <h4 class="font-medium">${item.name}</h4>

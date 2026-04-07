@@ -332,11 +332,7 @@
         spinner.style.display = 'block';
 
         try {
-          // Use AuthManager to sign in
-          const user = await window.authManager.signInWithEmail(
-            email,
-            password
-          );
+          await window.authManager.signInWithEmail(email, password);
 
           // Show success
           successDiv.textContent = '✅ Sign-in successful! Redirecting...';

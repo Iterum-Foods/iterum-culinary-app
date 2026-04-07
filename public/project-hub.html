@@ -272,6 +272,14 @@
             </div>
             
             <div class="templates-grid">
+                <div class="template-card" onclick="window.location.href='restaurant-group-onboarding.html'">
+                    <div class="template-icon">📍</div>
+                    <div class="template-name">Multiple restaurants</div>
+                    <div class="template-desc">Onboard a group—each location gets its own workspace; switch sites from the header</div>
+                    <div class="template-features">✓ Bulk create • ✓ Shared group label • ✓ Same flow as single projects</div>
+                    <button type="button" class="template-btn">Open setup</button>
+                </div>
+
                 <div class="template-card" onclick="createFromTemplate('restaurant-menu')">
                     <div class="template-icon">🍽️</div>
                     <div class="template-name">Restaurant Menu</div>
@@ -350,6 +358,13 @@
 
     <script src="assets/js/project-management-system.js"></script>
     <script>
+        function escapeHtml(text) {
+            if (text == null || text === '') return '';
+            const d = document.createElement('div');
+            d.textContent = text;
+            return d.innerHTML;
+        }
+
         const projectTemplates = {
             'restaurant-menu': {
                 name: 'Restaurant Menu Development',
@@ -643,15 +658,19 @@
             const recipes = getProjectRecipes(project.id);
             const menus = getProjectMenus(project.id);
             const borderColor = project.color || '#667eea';
+            const groupBadge = project.restaurantGroupName
+                ? `<div style="margin-top:10px;font-size:12px;font-weight:600;color:#5b21b6;">📍 Group: ${escapeHtml(project.restaurantGroupName)}</div>`
+                : '';
 
             return `
                 <div class="project-card" style="border-left-color: ${borderColor};">
                     <div class="project-card-header">
                         <div class="project-title">
-                            ${project.icon || '📁'} ${project.name}
+                            ${project.icon || '📁'} ${escapeHtml(project.name)}
                             ${isActive ? ' <span style="color: #22c55e;">✓</span>' : ''}
                         </div>
-                        <div class="project-desc">${project.description || 'No description'}</div>
+                        <div class="project-desc">${escapeHtml(project.description || 'No description')}</div>
+                        ${groupBadge}
                     </div>
                     
                     <div class="project-stats">

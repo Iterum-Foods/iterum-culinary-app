@@ -192,6 +192,7 @@ class UnifiedNavHeader {
                             <hr>
                             <div class="nav-dropdown-category">System</div>
                             <a href="project-hub.html">📂 Project Hub</a>
+                            <a href="restaurant-group-onboarding.html">📍 Add a restaurant group</a>
                             <a href="data-backup-center.html">💾 Backup Center</a>
                             <a href="data-management-dashboard.html">🧠 Data Management</a>
                             <a href="audit-log.html">📜 Audit Log</a>
@@ -221,6 +222,7 @@ class UnifiedNavHeader {
                         <div class="nav-dropdown-content nav-user-menu">
                             <a href="user-profile.html">👤 Profile & Settings</a>
                             <a href="project-hub.html">📂 Project Hub</a>
+                            <a href="restaurant-group-onboarding.html">📍 Add a restaurant group</a>
                             <hr>
                             <a href="#" onclick="event.preventDefault(); if (window.authManager) { window.authManager.signOut(); } window.location.href='index.html';">🚪 Sign Out</a>
                         </div>

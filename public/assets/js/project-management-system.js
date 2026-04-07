@@ -394,8 +394,12 @@ class ProjectManagementSystem {
 
   /**
    * Create a new project
+   * @param {object} projectData
+   * @param {{ setAsCurrent?: boolean }} [options] - Pass setAsCurrent: false for bulk creation
    */
-  createProject(projectData) {
+  createProject(projectData, options = {}) {
+    const setAsCurrent = options.setAsCurrent !== false;
+
     const newProject = {
       id: this.generateProjectId(),
       name: projectData.name || 'New Project',
@@ -418,22 +422,136 @@ class ProjectManagementSystem {
     this.saveProjects();
     console.log('💾 Projects saved, total count:', this.projects.length);
 
-    // AUTO-SET AS CURRENT: Automatically set the new project as current
-    const setSuccess = this.setCurrentProject(newProject.id);
+    if (setAsCurrent) {
+      const setSuccess = this.setCurrentProject(newProject.id);
 
-    if (setSuccess) {
+      if (setSuccess) {
+        console.log(
+          '✅ Created new project:',
+          newProject.name,
+          'and set as current'
+        );
+        console.log('📋 Current project ID:', this.currentProject?.id);
+        console.log('📋 Current project name:', this.currentProject?.name);
+      } else {
+        console.error('❌ Failed to set new project as current');
+      }
+    } else {
       console.log(
         '✅ Created new project:',
         newProject.name,
-        'and set as current'
+        '(not switching current)'
       );
-      console.log('📋 Current project ID:', this.currentProject?.id);
-      console.log('📋 Current project name:', this.currentProject?.name);
-    } else {
-      console.error('❌ Failed to set new project as current');
     }
 
     return newProject;
+  }
+
+  /**
+   * Palette for rotating colors when creating many locations at one time
+   */
+  getProjectColorPalette() {
+    return [
+      '#8b5cf6',
+      '#3b82f6',
+      '#06b6d4',
+      '#22c55e',
+      '#84cc16',
+      '#eab308',
+      '#f97316',
+      '#ef4444',
+      '#ec4899',
+      '#14b8a6'
+    ];
+  }
+
+  /**
+   * Mirror projects to unified header selector storage (keeps dropdown in sync)
+   */
+  mirrorProjectsToUnifiedSelector() {
+    try {
+      if (window.unifiedProjectSelector && this.currentUserId) {
+        window.unifiedProjectSelector.currentUserId = this.currentUserId;
+        window.unifiedProjectSelector.projects = [...this.projects];
+        window.unifiedProjectSelector.saveProjects();
+      }
+    } catch (e) {
+      console.warn('⚠️ Could not mirror projects to unified selector:', e);
+    }
+  }
+
+  /**
+   * Create multiple restaurant "projects" under one group label (multi-location onboarding).
+   * Each location is a separate project today; they share restaurantGroupId for filtering and future multi-site work.
+   * @param {{ groupName: string, restaurantNames: string[], isPrivate?: boolean, sharedDescription?: string }} opts
+   * @returns {{ groupId: string, groupName: string, projects: object[] } | { error: string, groupId: null, projects: [] }}
+   */
+  createRestaurantGroup(opts) {
+    const groupName = (opts.groupName || '').trim() || 'My restaurants';
+    const names = (opts.restaurantNames || [])
+      .map(n => String(n).trim())
+      .filter(n => n.length > 0);
+    const max = opts.maxLocations ?? 50;
+    const limited = names.slice(0, max);
+
+    if (limited.length === 0) {
+      console.warn('⚠️ createRestaurantGroup: no names provided');
+      return { error: 'NO_NAMES', groupId: null, projects: [], groupName };
+    }
+
+    const groupId =
+      'rg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    const colors = this.getProjectColorPalette();
+    const userId = this.currentUserId || 'guest';
+    const userName =
+      window.authManager?.currentUser?.displayName ||
+      window.authManager?.currentUser?.name ||
+      'User';
+    const isPrivate = opts.isPrivate !== false;
+    const restaurantSettings = {
+      enableCosting: true,
+      enableMenuBuilder: true,
+      enableTesting: true
+    };
+
+    const created = [];
+    limited.forEach((name, i) => {
+      const project = this.createProject(
+        {
+          name,
+          description: opts.sharedDescription || `${name} — ${groupName}`,
+          type: 'restaurant',
+          color: colors[i % colors.length],
+          icon: '🍽️',
+          restaurantGroupId: groupId,
+          restaurantGroupName: groupName,
+          tags: ['restaurant-group'],
+          isPrivate,
+          createdBy: userId,
+          createdByName: userName,
+          settings: restaurantSettings
+        },
+        { setAsCurrent: false }
+      );
+      created.push(project);
+    });
+
+    this.saveProjects();
+    this.mirrorProjectsToUnifiedSelector();
+
+    if (created.length) {
+      this.setCurrentProject(created[0].id);
+      if (window.unifiedProjectSelector) {
+        window.unifiedProjectSelector.setCurrentProject(created[0].id);
+      }
+    }
+
+    return {
+      groupId,
+      groupName,
+      projects: created,
+      truncated: names.length > max
+    };
   }
 
   /**
