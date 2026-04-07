@@ -2,7 +2,25 @@
 
 **Purpose:** Single page for leadership to track launch readiness and foundation work.  
 **Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](./NEXT_STEPS_LEADERSHIP.md) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) · [docs/workflows/](./docs/workflows/) (e.g. sign-in UI redesign)  
-**Last updated:** March 2026  
+**Last updated:** 29 March 2026  
+
+---
+
+## Leadership log (CEO / CTO)
+
+_Use this section for short, dated notes that do not belong in a checkbox row._
+
+**2026-03-29 — Analytics & pilot reporting (Data Analyst proxy; no warehouse assumed)**  
+Recorded for consistent definitions once Firestore/export data is trusted:
+
+- **Project vs location:** Today’s primary segment is **`projectId`** (workspace). Do not label it “location” in reports until the product ships a stable **restaurant / site** key; document that gap on every margin or vendor comparison deck.
+- **Margin:** Pick one formula org-wide — e.g. **gross margin %** = (price − allocated recipe cost) / price, or **food cost %** = recipe cost / price — and define whether **selling price** is pre- or post-tax per what the app stores.
+- **Recipe cost:** Ingredient quantities × normalized unit costs, including sub-recipes where modeled. Treat **missing/zero vendor price** as a **data-quality flag**, not as real margin.
+- **Vendor price drift:** Compare **unit price in a standard UOM** over time for **vendor × SKU (or ingredient key)**; across “locations” use **project** until site IDs exist.
+- **MVP reporting path:** Scheduled **Firestore export** or **manual CSV/JSON export** + a one-page **definitions sheet** (Sheets/notebook is enough); expand to event funnels only when the product logs anonymized usage.
+- **Pilot success signals (examples):** Adoption = projects with ≥1 menu saved/synced in window; quality = % menu lines with recipe link + non-imputed costs; economics = item-level margin distribution before/after a pricing or vendor change (same formula both sides).
+
+_Companion inventory:_ [docs/DATA_ACCESS_INVENTORY.md](./docs/DATA_ACCESS_INVENTORY.md). _Data analyst prompt (role block):_ [LEADERSHIP_ROLE_ASSIGNMENTS.md → Data analyst agent](./LEADERSHIP_ROLE_ASSIGNMENTS.md#data-analyst-agent-nice-to-have).
 
 ---
 
