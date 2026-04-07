@@ -112,6 +112,7 @@
     .activity-dot.recipe-created { background-color: #f59e0b; }
     .activity-dot.recipe-changed { background-color: #8b5cf6; }
     .activity-dot.prep-list { background-color: #ec4899; }
+    .activity-dot.inspection { background-color: #0d9488; }
 
     .day-details-section {
       margin-bottom: 1.5rem;
@@ -151,7 +152,7 @@
       <h1 class="text-3xl font-bold mb-2" style="color: var(--brand-text-primary);">
         <i class="fa-solid fa-calendar-days mr-3" style="color: var(--brand-primary-accent);"></i>Activity Calendar
       </h1>
-      <p style="color: var(--brand-text-muted);">View all logs, notes, recipe development, and prep lists by day</p>
+      <p style="color: var(--brand-text-muted);">Temperature, sanitizer, health inspection rounds, notes, recipes, and prep lists by day</p>
       <div id="calendar-project-indicator" class="mt-2 text-sm" style="color: var(--brand-text-secondary);">
         <i class="fa-solid fa-folder mr-2"></i><span id="current-project-name">Loading project...</span>
       </div>
@@ -214,6 +215,17 @@
           Sanitizer Checks
         </h3>
         <div id="day-sanitizer-logs" class="space-y-2">
+          <p class="text-sm" style="color: var(--brand-text-muted);">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Health inspection rounds -->
+      <div class="day-details-section">
+        <h3>
+          <i class="fa-solid fa-clipboard-check" style="color: #0d9488;"></i>
+          Health inspection rounds
+        </h3>
+        <div id="day-inspection-logs" class="space-y-2">
           <p class="text-sm" style="color: var(--brand-text-muted);">Loading...</p>
         </div>
       </div>
@@ -295,6 +307,7 @@
         // Data caches
         this.tempLogs = [];
         this.sanitizerLogs = [];
+        this.inspectionLogs = [];
         this.notes = [];
         this.recipes = [];
         this.prepLists = [];
@@ -529,6 +542,19 @@
             this.updateDayDetails(this.selectedDate);
           },
           err => console.error('Calendar sanitizer logs listener:', err)
+        );
+
+        onSnapshot(
+          query(collection(this.db, 'users', uid, 'inspection_logs')),
+          snapshot => {
+            this.inspectionLogs = [];
+            snapshot.forEach(d => {
+              this.inspectionLogs.push({ id: d.id, ...d.data() });
+            });
+            this.renderCalendar();
+            this.updateDayDetails(this.selectedDate);
+          },
+          err => console.error('Calendar inspection logs listener:', err)
         );
       }
 
@@ -769,6 +795,26 @@
           activities.push({ type: 'sanitizer', title: `${sanitizerCount} sanitizer check${sanitizerCount > 1 ? 's' : ''}` });
         }
 
+        const inspCount = this.inspectionLogs.filter(log => {
+          const projOk =
+            !this.currentProjectId ||
+            !log.projectId ||
+            log.projectId === this.currentProjectId;
+          return (
+            projOk &&
+            this.isSameDate(
+              new Date(log.timestamp?.toDate?.() || log.timestamp || log.date),
+              date
+            )
+          );
+        }).length;
+        if (inspCount > 0) {
+          activities.push({
+            type: 'inspection',
+            title: `${inspCount} inspection round${inspCount > 1 ? 's' : ''}`
+          });
+        }
+
         // Check notes
         const notesCount = this.notes.filter(note => this.isSameDate(new Date(note.date || note.timestamp), date)).length;
         if (notesCount > 0) {
@@ -832,6 +878,8 @@
         
         // Update sanitizer logs
         this.updateSanitizerLogs(date);
+
+        this.updateInspectionLogs(date);
         
         // Update notes
         this.updateNotes(date);
@@ -893,6 +941,40 @@
             <div class="activity-item-time">${this.formatTime(log.timestamp?.toDate?.() || log.timestamp || log.date)}</div>
           </div>
         `).join('');
+      }
+
+      updateInspectionLogs(date) {
+        const container = document.getElementById('day-inspection-logs');
+        if (!container) return;
+
+        const logs = this.inspectionLogs.filter(log => {
+          const projOk =
+            !this.currentProjectId ||
+            !log.projectId ||
+            log.projectId === this.currentProjectId;
+          const logDate = new Date(log.timestamp?.toDate?.() || log.timestamp || log.date);
+          return projOk && this.isSameDate(logDate, date);
+        });
+
+        if (logs.length === 0) {
+          container.innerHTML = '<p class="text-sm" style="color: var(--brand-text-muted);">No health inspection rounds for this date</p>';
+          return;
+        }
+
+        container.innerHTML = logs.map(log => {
+          const results = log.checklistResults || {};
+          const lines = Object.keys(results).map(k => `${k}: ${results[k] ? '✓' : '—'}`).join(' · ');
+          const pass = log.allPassed !== false ? 'All items checked' : 'Some items unchecked';
+          return `
+          <div class="activity-item" style="border-left-color: #0d9488;">
+            <div class="font-medium">${log.areaName || 'Inspection area'}</div>
+            <div class="text-sm" style="color: var(--brand-text-secondary);">${pass}</div>
+            ${lines ? `<div class="text-xs mt-1" style="color: var(--brand-text-muted);">${lines}</div>` : ''}
+            ${log.notes ? `<div class="text-xs mt-1">${log.notes}</div>` : ''}
+            <div class="activity-item-time">${this.formatTime(log.timestamp?.toDate?.() || log.timestamp || log.date)}</div>
+          </div>
+        `;
+        }).join('');
       }
 
       updateNotes(date) {

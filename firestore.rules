@@ -202,6 +202,20 @@ service cloud.firestore {
         allow write: if isAuthenticated() && isValidSize()
           && (isOwner(userId) || userProfileEmailMatches(userId));
       }
+
+      // Health inspection: configurable areas + completed rounds (calendar)
+      match /inspection_areas/{areaId} {
+        allow read: if isAuthenticated()
+          && (isOwner(userId) || userProfileEmailMatches(userId));
+        allow write: if isAuthenticated() && isValidSize()
+          && (isOwner(userId) || userProfileEmailMatches(userId));
+      }
+      match /inspection_logs/{logId} {
+        allow read: if isAuthenticated()
+          && (isOwner(userId) || userProfileEmailMatches(userId));
+        allow write: if isAuthenticated() && isValidSize()
+          && (isOwner(userId) || userProfileEmailMatches(userId));
+      }
     }
     
     // ============================================

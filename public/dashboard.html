@@ -732,6 +732,25 @@
               <li class="text-center p-4" style="color: var(--brand-text-muted);">Loading Locations...</li>
             </ul>
           </div>
+
+          <!-- Health inspection rounds (areas, schedules, checklist → saved to calendar) -->
+          <div class="card-style" data-dash-roles="chef_leadership,operations_gm">
+            <div class="flex justify-between items-center mb-3 gap-2">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
+                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-clipboard-check"></i></span>
+                Health inspection rounds
+              </h2>
+              <button type="button" id="btn-add-inspection-area" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
+                <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i>Add area
+              </button>
+            </div>
+            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
+              Define areas (line, dry storage, restrooms), checklist items, who it’s assigned to, and target times. Saving a completed round records it on <a href="calendar.html" class="underline font-medium" style="color: var(--brand-primary-accent);">Calendar</a> by day.
+            </p>
+            <div id="inspection-area-list" class="space-y-2">
+              <p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">Loading…</p>
+            </div>
+          </div>
           
           <!-- Card 2.3: Today's Operations Focus & Checklists -->
           <div class="card-style" data-dash-roles="chef_leadership,operations_gm">
@@ -866,6 +885,9 @@
 
     const REF_UNITS = 'refrigeration_units';
     const SAN_LOCS = 'sanitizer_locations';
+    const INS_AREAS = 'inspection_areas';
+    const INS_LOGS = 'inspection_logs';
+    let inspectionAreasCache = [];
 
     function getProjectId() {
       try {
@@ -889,6 +911,176 @@
       }
       return u.uid;
     }
+
+    function escapeHtml(s) {
+      if (s == null) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderInspectionAreas(areas) {
+      const container = document.getElementById('inspection-area-list');
+      if (!container) return;
+      container.innerHTML = '';
+      inspectionAreasCache = areas.slice();
+      if (areas.length === 0) {
+        container.innerHTML =
+          '<p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">No inspection areas yet. Click <strong>Add area</strong> to define a zone, checklist, schedule, and assignment.</p>';
+        return;
+      }
+      areas
+        .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+        .forEach(area => {
+          const items = Array.isArray(area.checklistItems) ? area.checklistItems : [];
+          const times = Array.isArray(area.scheduleTimes) ? area.scheduleTimes : [];
+          const div = document.createElement('div');
+          div.className = 'rounded-md border p-3 mb-2';
+          div.style.borderColor = 'var(--brand-border-light)';
+          div.style.background = 'var(--brand-card-bg)';
+          let checks = '';
+          items.forEach((label, i) => {
+            checks += `<label class="flex items-start gap-2 text-sm mb-1.5 cursor-pointer"><input type="checkbox" class="insp-cb mt-0.5" data-insp-area="${area.id}" data-insp-idx="${i}"> <span style="color:var(--brand-text-primary)">${escapeHtml(label)}</span></label>`;
+          });
+          if (!checks) {
+            checks =
+              '<p class="text-xs" style="color: var(--brand-text-muted);">Add checklist items when editing this area (re-create area with items).</p>';
+          }
+          const timeChips = times.length
+            ? `<div class="flex flex-wrap gap-1 mt-1">${times.map(t => `<span class="text-xs px-2 py-0.5 rounded-full" style="background:var(--brand-bg-tertiary);color:var(--brand-text-secondary)">${escapeHtml(t)}</span>`).join('')}</div>`
+            : '';
+          div.innerHTML = `
+            <div class="font-semibold text-sm mb-1" style="color: var(--brand-text-primary);">${escapeHtml(area.name)}</div>
+            ${area.assignedTo ? `<div class="text-xs mb-1" style="color: var(--brand-text-muted);"><i class="fa-solid fa-user-tag mr-1"></i>${escapeHtml(area.assignedTo)}</div>` : ''}
+            ${timeChips}
+            <div class="mt-2 mb-2">${checks}</div>
+            <button type="button" class="btn-primary text-xs w-full py-2 insp-save-btn" data-area-id="${area.id}">
+              <i class="fa-solid fa-floppy-disk mr-1"></i>Save completed round
+            </button>`;
+          container.appendChild(div);
+        });
+      container.querySelectorAll('.insp-save-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-area-id');
+          if (id) window.submitHealthInspectionRound(id);
+        });
+      });
+    }
+
+    window.inspectionManager = {
+      addArea: async function () {
+        const uid = getComplianceUserId();
+        if (!db || !uid) {
+          alert('Sign in required.');
+          return;
+        }
+        const name = prompt('Area name (e.g. Dry storage, Line prep, Restrooms)');
+        if (!name || !name.trim()) return;
+        const checklistRaw = prompt(
+          'Checklist items (comma-separated)',
+          'Floors and drains clean,Equipment stored correctly,No pest activity'
+        );
+        const checklistItems = (checklistRaw || '')
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean);
+        const timesRaw = prompt(
+          'Target check times — 24h format, comma-separated (e.g. 09:00,15:00,21:00)',
+          '09:00,15:00'
+        );
+        const scheduleTimes = (timesRaw || '')
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean);
+        const assignedTo = (prompt('Assigned to (optional — name or role)', '') || '').trim();
+        try {
+          await addDoc(collection(db, 'users', uid, INS_AREAS), {
+            name: name.trim(),
+            checklistItems,
+            scheduleTimes,
+            assignedTo: assignedTo || null,
+            projectId: getProjectId(),
+            createdAt: serverTimestamp()
+          });
+        } catch (e) {
+          console.error(e);
+          alert('Could not save area. Deploy Firestore rules if this persists.');
+        }
+      },
+      startListener: function () {
+        if (!db) {
+          setTimeout(() => this.startListener(), 400);
+          return;
+        }
+        const uid = getComplianceUserId();
+        if (!uid) {
+          setTimeout(() => this.startListener(), 400);
+          return;
+        }
+        onSnapshot(
+          query(collection(db, 'users', uid, INS_AREAS)),
+          snapshot => {
+            const list = [];
+            snapshot.forEach(d => list.push({ id: d.id, ...d.data() }));
+            renderInspectionAreas(list);
+          },
+          err => console.error('❌ Inspection areas listener:', err)
+        );
+      }
+    };
+
+    window.submitHealthInspectionRound = async function (areaId) {
+      const uid = getComplianceUserId();
+      if (!db || !uid) {
+        alert('Sign in required.');
+        return;
+      }
+      const area = inspectionAreasCache.find(a => a.id === areaId);
+      if (!area) {
+        alert('Area not found. Refresh the page.');
+        return;
+      }
+      const items = Array.isArray(area.checklistItems) ? area.checklistItems : [];
+      const checklistResults = {};
+      let allPassed = true;
+      items.forEach((label, i) => {
+        const el = Array.from(document.querySelectorAll('input.insp-cb')).find(
+          inp =>
+            inp.getAttribute('data-insp-area') === areaId &&
+            inp.getAttribute('data-insp-idx') === String(i)
+        );
+        const ok = !!(el && el.checked);
+        checklistResults[label] = ok;
+        if (!ok) allPassed = false;
+      });
+      const notes = (prompt('Optional notes for this round', '') || '').trim();
+      try {
+        await addDoc(collection(db, 'users', uid, INS_LOGS), {
+          areaId,
+          areaName: area.name || 'Area',
+          checklistResults,
+          allPassed,
+          notes: notes || null,
+          projectId: getProjectId(),
+          timestamp: serverTimestamp()
+        });
+        alert(
+          'Inspection round saved. View it on Calendar for this date.'
+        );
+        items.forEach((_, i) => {
+          const el = Array.from(document.querySelectorAll('input.insp-cb')).find(
+            inp =>
+              inp.getAttribute('data-insp-area') === areaId &&
+              inp.getAttribute('data-insp-idx') === String(i)
+          );
+          if (el) el.checked = false;
+        });
+      } catch (e) {
+        console.error(e);
+        alert('Could not save. Deploy Firestore rules if this persists.');
+      }
+    };
 
     function renderRefrigerationUnits(units) {
       const container = document.getElementById('refrigeration-unit-list');
@@ -1137,6 +1329,7 @@
             isAuthReady = true;
             window.tempLogManager.startListener();
             window.sanitizerLogManager.startListener();
+            window.inspectionManager.startListener();
           } else {
             setTimeout(async () => {
               if (auth.currentUser) return;
