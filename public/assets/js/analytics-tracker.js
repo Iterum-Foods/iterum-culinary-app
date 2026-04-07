@@ -10,7 +10,7 @@ import {
   logEvent,
   setUserProperties,
   setUserId
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
+} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js';
 
 class AnalyticsTracker {
   constructor() {
