@@ -278,6 +278,10 @@
       }
     }
 
+    if (typeof global.applyDashboardFeatureVisibility === 'function') {
+      global.applyDashboardFeatureVisibility();
+    }
+
     global.dispatchEvent(
       new CustomEvent('iterumDashboardRoleApplied', { detail: { roleKey: role } })
     );

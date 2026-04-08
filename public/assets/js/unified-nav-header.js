@@ -138,9 +138,28 @@ class UnifiedNavHeader {
     // Setup mobile toggle
     this.setupMobileToggle();
 
+    this.injectWorkspaceFeaturesScript();
     this.injectRestaurantLocationSidebarScript();
 
     console.log('✅ Navigation sidebar injected');
+  }
+
+  injectWorkspaceFeaturesScript() {
+    if (window.__workspaceFeaturesInjected) {
+      if (typeof window.applyWorkspaceFeatureNav === 'function') {
+        window.applyWorkspaceFeatureNav();
+      }
+      return;
+    }
+    window.__workspaceFeaturesInjected = true;
+    const s = document.createElement('script');
+    s.src = 'assets/js/workspace-features.js';
+    s.onload = () => {
+      if (typeof window.applyWorkspaceFeatureNav === 'function') {
+        window.applyWorkspaceFeatureNav();
+      }
+    };
+    document.head.appendChild(s);
   }
 
   injectRestaurantLocationSidebarScript() {
@@ -235,19 +254,19 @@ class UnifiedNavHeader {
                     <a href="index.html" class="nav-link nav-link-emphasis ${this.currentPage === 'dashboard' ? 'active' : ''}">
                         <span>🏠</span> Dashboard
                     </a>
-                    <a href="recipe-library.html" class="nav-link ${this.currentPage === 'recipes' ? 'active' : ''}">
+                    <a href="recipe-library.html" class="nav-link ${this.currentPage === 'recipes' ? 'active' : ''}" data-iterum-feature="recipes">
                         <span>📚</span> Recipes
                     </a>
-                    <a href="menu-builder.html" class="nav-link ${this.currentPage === 'menu' ? 'active' : ''}">
+                    <a href="menu-builder.html" class="nav-link ${this.currentPage === 'menu' ? 'active' : ''}" data-iterum-feature="menus">
                         <span>🍽️</span> Menus
                     </a>
-                    <a href="calendar.html" class="nav-link ${this.currentPage === 'calendar' ? 'active' : ''}">
+                    <a href="calendar.html" class="nav-link ${this.currentPage === 'calendar' ? 'active' : ''}" data-iterum-feature="calendar">
                         <span>📅</span> Calendar
                     </a>
-                    <a href="kitchen-management.html" class="nav-link ${this.currentPage === 'kitchen' ? 'active' : ''}">
+                    <a href="kitchen-management.html" class="nav-link ${this.currentPage === 'kitchen' ? 'active' : ''}" data-iterum-feature="kitchen">
                         <span>🔪</span> Kitchen
                     </a>
-                    <a href="ingredients.html" class="nav-link ${this.currentPage === 'ingredients' ? 'active' : ''}">
+                    <a href="ingredients.html" class="nav-link ${this.currentPage === 'ingredients' ? 'active' : ''}" data-iterum-feature="ingredients">
                         <span>🥬</span> Ingredients
                     </a>
                     <div class="nav-dropdown">
@@ -256,30 +275,30 @@ class UnifiedNavHeader {
                         </button>
                         <div class="nav-dropdown-content">
                             <div class="nav-dropdown-category">Kitchen Tools</div>
-                            <a href="kitchen-management.html">🔪 Kitchen Management</a>
-                            <a href="kitchen-management.html?tab=pdf">📕 Recipe Book PDF</a>
-                            <a href="kitchen-management.html?tab=preplist">📝 Prep Lists</a>
-                            <a href="ingredient-highlights.html">✨ Ingredient Stories</a>
-                            <a href="server-info-sheet.html">🗣️ Server Info</a>
+                            <a href="kitchen-management.html" data-iterum-feature="kitchen">🔪 Kitchen Management</a>
+                            <a href="kitchen-management.html?tab=pdf" data-iterum-feature="kitchen">📕 Recipe Book PDF</a>
+                            <a href="kitchen-management.html?tab=preplist" data-iterum-feature="kitchen">📝 Prep Lists</a>
+                            <a href="ingredient-highlights.html" data-iterum-feature="ingredients">✨ Ingredient Stories</a>
+                            <a href="server-info-sheet.html" data-iterum-feature="kitchen">🗣️ Server Info</a>
                             <hr>
                             <div class="nav-dropdown-category">Inventory</div>
-                            <a href="inventory.html">📦 Inventory</a>
-                            <a href="vendor-management.html">🏪 Vendors</a>
-                            <a href="vendor-price-comparison.html">💰 Price Compare</a>
-                            <a href="equipment-management.html">🔧 Equipment</a>
-                            <a href="production-planning.html">📋 Production</a>
+                            <a href="inventory.html" data-iterum-feature="inventory">📦 Inventory</a>
+                            <a href="vendor-management.html" data-iterum-feature="vendors">🏪 Vendors</a>
+                            <a href="vendor-price-comparison.html" data-iterum-feature="vendors">💰 Price Compare</a>
+                            <a href="equipment-management.html" data-iterum-feature="equipment">🔧 Equipment</a>
+                            <a href="production-planning.html" data-iterum-feature="production">📋 Production</a>
                             <hr>
                             <div class="nav-dropdown-category">Import</div>
-                            <a href="bulk-recipe-import.html">🚀 Recipe Import</a>
-                            <a href="bulk-ingredient-import.html">📥 Ingredient Import</a>
-                            <a href="recipe-photo-studio.html">📸 Photo Studio</a>
+                            <a href="bulk-recipe-import.html" data-iterum-feature="import_export">🚀 Recipe Import</a>
+                            <a href="bulk-ingredient-import.html" data-iterum-feature="import_export">📥 Ingredient Import</a>
+                            <a href="recipe-photo-studio.html" data-iterum-feature="photo_studio">📸 Photo Studio</a>
                             <hr>
                             <div class="nav-dropdown-category">System</div>
-                            <a href="project-hub.html">📂 Project Hub</a>
-                            <a href="restaurant-group-onboarding.html">📍 Add a restaurant group</a>
-                            <a href="data-backup-center.html">💾 Backup Center</a>
-                            <a href="data-management-dashboard.html">🧠 Data Management</a>
-                            <a href="audit-log.html">📜 Audit Log</a>
+                            <a href="project-hub.html" data-iterum-feature="projects">📂 Project Hub</a>
+                            <a href="restaurant-group-onboarding.html" data-iterum-feature="projects">📍 Add a restaurant group</a>
+                            <a href="data-backup-center.html" data-iterum-feature="backup">💾 Backup Center</a>
+                            <a href="data-management-dashboard.html" data-iterum-feature="data_tools">🧠 Data Management</a>
+                            <a href="audit-log.html" data-iterum-feature="data_tools">📜 Audit Log</a>
                         </div>
                     </div>
                 </div>
@@ -310,8 +329,8 @@ class UnifiedNavHeader {
                         </button>
                         <div class="nav-dropdown-content nav-user-menu">
                             <a href="user-profile.html">👤 Profile & Settings</a>
-                            <a href="project-hub.html">📂 Project Hub</a>
-                            <a href="restaurant-group-onboarding.html">📍 Add a restaurant group</a>
+                            <a href="project-hub.html" data-iterum-feature="projects">📂 Project Hub</a>
+                            <a href="restaurant-group-onboarding.html" data-iterum-feature="projects">📍 Add a restaurant group</a>
                             <hr>
                             <a href="#" onclick="event.preventDefault(); if (window.authManager) { window.authManager.signOut(); } window.location.href='index.html';">🚪 Sign Out</a>
                         </div>

@@ -83,6 +83,7 @@ Legend: **UN** = loads `unified-nav-header.js` (injection attempted), **SKIP** =
 | `public/assets/js/restaurant-location-sidebar.js` | `[data-restaurant-location-select]` + `projectManager` APIs |
 | `public/assets/js/project-management-system.js` | Projects, groups, `getEffectiveProjectIds`, location scope |
 | `public/assets/js/unified-project-selector.js` | Second project UI layer; keep storage keys aligned with PM |
+| `public/assets/js/workspace-features.js` | Reads `iterum_operator_profile.features`; hides `[data-iterum-feature]` / `[data-dash-features]` |
 | `public/assets/js/notebook-sidebar-template.js` | HTML helper for notebook nav (not wired to pages today) |
 
 ## Maintenance checklists

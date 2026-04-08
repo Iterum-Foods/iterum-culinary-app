@@ -498,16 +498,40 @@ class ProjectManagementSystem {
   /**
    * Create multiple restaurant "projects" under one group label (multi-location onboarding).
    * Each location is a separate project today; they share restaurantGroupId for filtering and future multi-site work.
-   * @param {{ groupName: string, restaurantNames: string[], isPrivate?: boolean, sharedDescription?: string }} opts
+   * @param {{ groupName: string, restaurantNames?: string[], locations?: Array<{name:string,city?:string,phone?:string,notes?:string}>, isPrivate?: boolean, sharedDescription?: string }} opts
    * @returns {{ groupId: string, groupName: string, projects: object[] } | { error: string, groupId: null, projects: [] }}
    */
   createRestaurantGroup(opts) {
     const groupName = (opts.groupName || '').trim() || 'My restaurants';
-    const names = (opts.restaurantNames || [])
-      .map(n => String(n).trim())
-      .filter(n => n.length > 0);
+    const rawList = opts.locations || opts.restaurantNames || [];
+    const normalized = [];
+    rawList.forEach(entry => {
+      if (typeof entry === 'string') {
+        const n = String(entry).trim();
+        if (n) {
+          normalized.push({
+            name: n,
+            city: '',
+            phone: '',
+            notes: ''
+          });
+        }
+        return;
+      }
+      if (entry && typeof entry === 'object') {
+        const name = String(entry.name || '').trim();
+        if (name) {
+          normalized.push({
+            name,
+            city: String(entry.city || '').trim(),
+            phone: String(entry.phone || '').trim(),
+            notes: String(entry.notes || '').trim()
+          });
+        }
+      }
+    });
     const max = opts.maxLocations ?? 50;
-    const limited = names.slice(0, max);
+    const limited = normalized.slice(0, max);
 
     if (limited.length === 0) {
       console.warn('⚠️ createRestaurantGroup: no names provided');
@@ -530,16 +554,33 @@ class ProjectManagementSystem {
     };
 
     const created = [];
-    limited.forEach((name, i) => {
+    limited.forEach((loc, i) => {
+      const baseLine = `${loc.name} — ${groupName}`;
+      const detailLines = [
+        loc.city ? `City: ${loc.city}` : '',
+        loc.phone ? `Phone: ${loc.phone}` : '',
+        loc.notes ? `Notes: ${loc.notes}` : ''
+      ].filter(Boolean);
+      const description = opts.sharedDescription
+        ? String(opts.sharedDescription).trim()
+        : detailLines.length
+          ? `${baseLine}\n${detailLines.join('\n')}`
+          : baseLine;
+
       const project = this.createProject(
         {
-          name,
-          description: opts.sharedDescription || `${name} — ${groupName}`,
+          name: loc.name,
+          description,
           type: 'restaurant',
           color: colors[i % colors.length],
           icon: '🍽️',
           restaurantGroupId: groupId,
           restaurantGroupName: groupName,
+          restaurantMeta: {
+            city: loc.city,
+            phone: loc.phone,
+            notes: loc.notes
+          },
           tags: ['restaurant-group'],
           isPrivate,
           createdBy: userId,
@@ -565,7 +606,7 @@ class ProjectManagementSystem {
       groupId,
       groupName,
       projects: created,
-      truncated: names.length > max
+      truncated: normalized.length > max
     };
   }
 

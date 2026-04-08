@@ -94,9 +94,9 @@
             </div>
 
             <div id="rgo-panel-1" class="rgo-panel">
-                <label class="rgo-label" for="rgo-names">Restaurant names (one per line)</label>
-                <textarea id="rgo-names" class="rgo-textarea" placeholder="Downtown&#10;Airport&#10;Waterfront"></textarea>
-                <p class="rgo-hint">Paste from a spreadsheet column if you like. Empty lines are ignored. Max 50 locations per run.</p>
+                <label class="rgo-label" for="rgo-names">Locations — names or spreadsheet rows</label>
+                <textarea id="rgo-names" class="rgo-textarea" placeholder="Downtown&#10;Airport&#10;Waterfront&#10;&#10;— Or paste tab-separated columns from Excel:&#10;Name [tab] City [tab] Phone [tab] Notes"></textarea>
+                <p class="rgo-hint"><strong>One per line.</strong> Plain text = location name only. <strong>Tabs</strong> separate columns: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;">Name</code> → then optional City, Phone, Notes (4 columns). Empty lines skipped. Max 50 locations per run.</p>
                 <div id="rgo-names-error" class="rgo-error">Add at least one location name.</div>
             </div>
 
@@ -136,8 +136,21 @@
             const btnNext = document.getElementById('rgo-next');
             const pills = document.querySelectorAll('.rgo-step-pill');
 
-            function parseNames(raw) {
-                return raw.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean);
+            function parseLocationRows(raw) {
+                return raw.split(/\r?\n/).map(function (line) {
+                    line = line.trim();
+                    if (!line) return null;
+                    var parts = line.split('\t').map(function (p) { return p.trim(); });
+                    if (parts.length === 1) {
+                        return { name: parts[0], city: '', phone: '', notes: '' };
+                    }
+                    return {
+                        name: parts[0] || 'Location',
+                        city: parts[1] || '',
+                        phone: parts[2] || '',
+                        notes: parts[3] || ''
+                    };
+                }).filter(Boolean);
             }
 
             function updateUI() {
@@ -179,8 +192,8 @@
                 document.getElementById('rgo-submit-error').classList.remove('show');
 
                 if (step === 1) {
-                    var names = parseNames(document.getElementById('rgo-names').value);
-                    if (names.length === 0) {
+                    var locs = parseLocationRows(document.getElementById('rgo-names').value);
+                    if (locs.length === 0) {
                         document.getElementById('rgo-names-error').classList.add('show');
                         return;
                     }
@@ -189,12 +202,12 @@
                 if (step === 2) {
                     btnNext.disabled = true;
                     var groupName = document.getElementById('rgo-group-name').value.trim() || 'My restaurants';
-                    var restaurantNames = parseNames(document.getElementById('rgo-names').value);
+                    var locations = parseLocationRows(document.getElementById('rgo-names').value);
                     var isPrivate = document.getElementById('rgo-private').checked;
                     waitForProjectManager(function () {
                         var result = window.projectManager.createRestaurantGroup({
                             groupName: groupName,
-                            restaurantNames: restaurantNames,
+                            locations: locations,
                             isPrivate: isPrivate
                         });
                         btnNext.disabled = false;
@@ -223,14 +236,19 @@
                         }
                     }
                     if (step === 1) {
-                        var n = parseNames(document.getElementById('rgo-names').value);
+                        var locs = parseLocationRows(document.getElementById('rgo-names').value);
                         document.getElementById('rgo-review-group').textContent =
                             document.getElementById('rgo-group-name').value.trim() || 'My restaurants';
-                        document.getElementById('rgo-review-count').textContent = String(n.length);
-                        document.getElementById('rgo-review-list').innerHTML = n
-                            .map(function (name) {
+                        document.getElementById('rgo-review-count').textContent = String(locs.length);
+                        document.getElementById('rgo-review-list').innerHTML = locs
+                            .map(function (loc) {
+                                var bits = [loc.name];
+                                if (loc.city) bits.push(loc.city);
+                                if (loc.phone) bits.push(loc.phone);
+                                if (loc.notes) bits.push(loc.notes);
+                                var text = bits.join(' · ');
                                 var d = document.createElement('div');
-                                d.textContent = name;
+                                d.textContent = text;
                                 return '<li>' + d.innerHTML + '</li>';
                             })
                             .join('');
