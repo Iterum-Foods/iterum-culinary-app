@@ -404,6 +404,13 @@
                 console.log('☁️ Cloud sync complete, reloading recipes...');
                 setTimeout(() => loadRecipes(), 500);
             });
+
+            window.addEventListener('projectChanged', function() {
+                setTimeout(() => loadRecipes(), 150);
+            });
+            window.addEventListener('locationScopeChanged', function() {
+                setTimeout(() => loadRecipes(), 150);
+            });
         }
         
         async function waitForDataManagers() {
@@ -485,6 +492,29 @@
             document.getElementById('sort-by').addEventListener('change', searchRecipes);
         }
 
+        /**
+         * Respect master vs project and multi-location "All" from project manager.
+         */
+        function filterRecipesByWorkspaceScope(recipes) {
+            if (!recipes || !recipes.length) return recipes;
+            const user = window.authManager?.currentUser;
+            const userId = user?.userId || user?.id;
+            let out = recipes.filter(r => !r.userId || r.userId === userId);
+            const pm = window.projectManager;
+            if (pm && typeof pm.getEffectiveProjectIds === 'function' &&
+                typeof pm.recipeMatchesEffectiveProjects === 'function') {
+                const ids = pm.getEffectiveProjectIds();
+                if (!ids.includes('master')) {
+                    const before = out.length;
+                    out = out.filter(r => pm.recipeMatchesEffectiveProjects(r));
+                    console.log(`📊 Workspace scope: ${out.length} recipes (from ${before})`);
+                } else {
+                    console.log(`📊 Master scope: ${out.length} user recipes`);
+                }
+            }
+            return out;
+        }
+
         function loadRecipes() {
             console.log('📚 ========== LOADING RECIPES ==========');
             
@@ -505,40 +535,10 @@
             if (window.userDataManager) {
                 recipes = window.userDataManager.loadData('recipes');
                 console.log(`📊 Loaded ${recipes.length} recipes from User Data Manager`);
+                recipes = filterRecipesByWorkspaceScope(recipes);
             } else if (window.universalRecipeManager) {
-                // Fallback to universal recipe manager with manual filtering
                 recipes = window.universalRecipeManager.getAllRecipes();
-                
-                // Get current project
-                const user = window.authManager?.currentUser;
-                const userId = user?.userId || user?.id;
-                let currentProjectId = 'master';
-                
-                if (window.unifiedProjectSelector) {
-                    currentProjectId = window.unifiedProjectSelector.currentProjectId;
-                } else if (window.projectManager?.currentProject) {
-                    currentProjectId = window.projectManager.currentProject.id;
-                } else {
-                    const storedProjectId = localStorage.getItem(`iterum_current_project_user_${userId}`) ||
-                                           localStorage.getItem('iterum_current_project');
-                    if (storedProjectId) currentProjectId = storedProjectId;
-                }
-                
-                // Filter by user
-                recipes = recipes.filter(r => !r.userId || r.userId === userId);
-                
-                // Filter by project (unless master)
-                if (currentProjectId !== 'master') {
-                    const beforeFilter = recipes.length;
-                    recipes = recipes.filter(recipe => 
-                        !recipe.projectId || 
-                        recipe.projectId === currentProjectId || 
-                        recipe.project === currentProjectId
-                    );
-                    console.log(`📊 Filtered to ${recipes.length} recipes for project "${currentProjectId}" (from ${beforeFilter})`);
-                } else {
-                    console.log(`📊 Showing all ${recipes.length} recipes (Master Project)`);
-                }
+                recipes = filterRecipesByWorkspaceScope(recipes);
             } else {
                 // Last resort fallback
                 recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
@@ -649,6 +649,8 @@
             } else {
                 recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
             }
+
+            recipes = filterRecipesByWorkspaceScope(recipes);
 
             // Filter
             recipes = recipes.filter(recipe => {

@@ -11,6 +11,8 @@ class ProjectManagementSystem {
     this.storageKey = 'iterum_projects';
     this.currentProjectKey = 'iterum_current_project';
     this.initialized = false; // Track initialization status
+    /** @type {'single'|'all'} View scope for multi-location restaurant groups */
+    this._restaurantLocationScope = 'single';
     this.init();
   }
 
@@ -102,6 +104,8 @@ class ProjectManagementSystem {
 
       // Load current project (don't force master - use saved selection)
       this.loadCurrentProject();
+
+      this.loadRestaurantLocationScope();
 
       // If no current project found, default to master
       if (!this.currentProject) {
@@ -344,12 +348,19 @@ class ProjectManagementSystem {
    * Set current project
    */
   setCurrentProject(projectId) {
+    const previousProject = this.currentProject;
     let project = this.projects.find(p => p.id === projectId);
     if (!project) {
       this.loadProjects();
       project = this.projects.find(p => p.id === projectId);
     }
     if (project) {
+      const prevG = previousProject?.restaurantGroupId || null;
+      const newG = project.restaurantGroupId || null;
+      if (prevG !== newG) {
+        this._restaurantLocationScope = 'single';
+        this.persistRestaurantLocationScope();
+      }
       this.currentProject = project;
       const userCurrentProjectKey = this.getUserStorageKey(
         this.currentProjectKey
@@ -619,6 +630,132 @@ class ProjectManagementSystem {
    */
   getCurrentProject() {
     return this.currentProject;
+  }
+
+  getRestaurantLocationScopeKey() {
+    const uid = this.currentUserId || 'guest';
+    return `iterum_restaurant_location_scope_user_${uid}`;
+  }
+
+  loadRestaurantLocationScope() {
+    try {
+      const v = localStorage.getItem(this.getRestaurantLocationScopeKey());
+      this._restaurantLocationScope = v === 'all' ? 'all' : 'single';
+      const members = this.getRestaurantGroupMembersForCurrentProject();
+      if (members.length < 2 && this._restaurantLocationScope === 'all') {
+        this._restaurantLocationScope = 'single';
+      }
+    } catch {
+      this._restaurantLocationScope = 'single';
+    }
+  }
+
+  persistRestaurantLocationScope() {
+    try {
+      localStorage.setItem(
+        this.getRestaurantLocationScopeKey(),
+        this._restaurantLocationScope
+      );
+    } catch (e) {
+      console.warn('⚠️ Could not persist restaurant location scope:', e);
+    }
+  }
+
+  /**
+   * @returns {'single'|'all'}
+   */
+  getRestaurantLocationScope() {
+    return this._restaurantLocationScope;
+  }
+
+  /**
+   * @param {'single'|'all'} mode
+   * @param {{ silent?: boolean }} [options] — silent: no locationScopeChanged event
+   */
+  setRestaurantLocationScope(mode, options = {}) {
+    if (mode !== 'all' && mode !== 'single') {
+      return;
+    }
+    const members = this.getRestaurantGroupMembersForCurrentProject();
+    if (members.length < 2 && mode === 'all') {
+      return;
+    }
+    this._restaurantLocationScope = mode;
+    this.persistRestaurantLocationScope();
+    if (!options.silent) {
+      window.dispatchEvent(
+        new CustomEvent('locationScopeChanged', {
+          detail: { mode, userId: this.currentUserId }
+        })
+      );
+      this.updateProjectUI();
+    }
+  }
+
+  /**
+   * All projects in the same restaurant group as the current project (or solo list).
+   * @returns {object[]}
+   */
+  getRestaurantGroupMembersForCurrentProject() {
+    const p = this.currentProject;
+    if (!p || p.id === this.masterProjectId) {
+      return [];
+    }
+    const gid = p.restaurantGroupId;
+    if (!gid) {
+      return [p];
+    }
+    const grouped = this.projects.filter(
+      x =>
+        x.restaurantGroupId === gid &&
+        x.id !== this.masterProjectId &&
+        x.status !== 'archived'
+    );
+    if (grouped.length === 0) {
+      return [p];
+    }
+    return grouped.sort((a, b) =>
+      (a.name || '').localeCompare(b.name || '', undefined, {
+        sensitivity: 'base'
+      })
+    );
+  }
+
+  /**
+   * Project IDs to use when filtering recipes, menus, etc.
+   * @returns {string[]}
+   */
+  getEffectiveProjectIds() {
+    const cur = this.currentProject?.id || this.masterProjectId;
+    if (!this.currentProject || cur === this.masterProjectId) {
+      return [this.masterProjectId];
+    }
+    const members = this.getRestaurantGroupMembersForCurrentProject();
+    if (members.length <= 1) {
+      return [cur];
+    }
+    if (this._restaurantLocationScope === 'all') {
+      return members.map(m => m.id);
+    }
+    return [cur];
+  }
+
+  /**
+   * Whether a recipe belongs to the active / multi-location scope.
+   */
+  recipeMatchesEffectiveProjects(recipe) {
+    if (!recipe) {
+      return false;
+    }
+    const ids = new Set(this.getEffectiveProjectIds());
+    if (ids.has(this.masterProjectId)) {
+      return true;
+    }
+    const pid = recipe.projectId || recipe.project;
+    if (!pid) {
+      return true;
+    }
+    return ids.has(pid);
   }
 
   /**
@@ -1446,13 +1583,15 @@ class ProjectManagementSystem {
    * Handle user change events
    */
   handleUserChange(user) {
-    if (user && user.id) {
-      this.currentUserId = user.id;
-      console.log('🔄 User changed to:', user.name, 'ID:', user.id);
+    const uid = user?.userId || user?.id;
+    if (user && uid) {
+      this.currentUserId = uid;
+      console.log('🔄 User changed to:', user.name, 'ID:', uid);
 
       // Reload projects for new user
       this.loadProjects();
       this.loadCurrentProject();
+      this.loadRestaurantLocationScope();
       this.updateProjectUI();
     }
   }

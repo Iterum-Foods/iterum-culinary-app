@@ -138,7 +138,28 @@ class UnifiedNavHeader {
     // Setup mobile toggle
     this.setupMobileToggle();
 
+    this.injectRestaurantLocationSidebarScript();
+
     console.log('✅ Navigation sidebar injected');
+  }
+
+  injectRestaurantLocationSidebarScript() {
+    if (window.__restaurantLocationSidebarInjected) {
+      if (typeof window.initRestaurantLocationSidebar === 'function') {
+        window.initRestaurantLocationSidebar();
+      }
+      return;
+    }
+    window.__restaurantLocationSidebarInjected = true;
+    const s = document.createElement('script');
+    s.src = 'assets/js/restaurant-location-sidebar.js';
+    s.defer = true;
+    s.onload = () => {
+      if (typeof window.initRestaurantLocationSidebar === 'function') {
+        window.initRestaurantLocationSidebar();
+      }
+    };
+    document.head.appendChild(s);
   }
 
   setupDropdownClickToggle() {
@@ -266,7 +287,12 @@ class UnifiedNavHeader {
 
             <div class="sidebar-footer">
                 <div class="nav-project-chip" id="nav-project-chip">Project: Master Project</div>
-                
+                <div class="sidebar-restaurant-scope-wrap" style="display:none;width:100%;margin:10px 0 14px;">
+                    <div style="font-size:10px;text-transform:uppercase;font-weight:600;letter-spacing:0.06em;color:#b45309;opacity:0.9;margin-bottom:6px;">Locations</div>
+                    <label for="sidebar-restaurant-location-select" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Restaurant location</label>
+                    <select id="sidebar-restaurant-location-select" data-restaurant-location-select aria-label="Restaurant location"
+                        style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(180,83,9,0.35);background:rgba(255,251,235,0.95);color:#451a03;font-size:12px;font-weight:600;cursor:pointer;"></select>
+                </div>
                 <!-- User Profile Section -->
                 <div class="sidebar-user-profile">
                     <div class="flex items-center mb-2">

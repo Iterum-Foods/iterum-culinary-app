@@ -429,13 +429,33 @@
             if (!projectName) return;
 
             if (window.projectManager) {
+                const activeProj = window.projectManager.getCurrentProject?.();
+                const groupTemplates = ['restaurant-menu', 'catering', 'restaurant'];
+                const groupExtras =
+                    groupTemplates.includes(templateId) &&
+                    activeProj?.restaurantGroupId &&
+                    activeProj?.restaurantGroupName
+                        ? {
+                            restaurantGroupId: activeProj.restaurantGroupId,
+                            restaurantGroupName: activeProj.restaurantGroupName,
+                            tags: Array.from(
+                                new Set([
+                                    ...(Array.isArray(activeProj.tags)
+                                        ? activeProj.tags
+                                        : []),
+                                    'restaurant-group'
+                                ])
+                            )
+                        }
+                        : {};
                 const project = window.projectManager.createProject({
                     name: projectName,
                     description: template.description,
                     type: templateId,
                     color: template.color,
                     icon: template.icon,
-                    settings: template.settings
+                    settings: template.settings,
+                    ...groupExtras
                 });
 
                 alert(`✅ Project "${projectName}" created!\n\nOpening project...`);
@@ -568,6 +588,28 @@
             const userId = window.authManager?.currentUser?.userId || 'guest';
             const userName = window.authManager?.currentUser?.displayName || 'Guest User';
 
+            // Link new restaurant projects to the current multi-location group when applicable
+            const activeProj = window.projectManager.getCurrentProject?.();
+            const restaurantLikeTypes = ['restaurant', 'restaurant-menu', 'catering'];
+            const groupExtras =
+                restaurantLikeTypes.includes(type) &&
+                activeProj &&
+                activeProj.restaurantGroupId &&
+                activeProj.restaurantGroupName
+                    ? {
+                        restaurantGroupId: activeProj.restaurantGroupId,
+                        restaurantGroupName: activeProj.restaurantGroupName,
+                        tags: Array.from(
+                            new Set([
+                                ...(Array.isArray(activeProj.tags)
+                                    ? activeProj.tags
+                                    : []),
+                                'restaurant-group'
+                            ])
+                        )
+                    }
+                    : {};
+
             // Create project
             const project = window.projectManager.createProject({
                 name: name,
@@ -578,7 +620,8 @@
                 isPrivate: ownerOnly,
                 createdBy: userId,
                 createdByName: userName,
-                settings: getSettingsForType(type)
+                settings: getSettingsForType(type),
+                ...groupExtras
             });
 
             // Close modal

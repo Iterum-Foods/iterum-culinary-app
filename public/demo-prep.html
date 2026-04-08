@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo showcase data | Iterum</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            moss: '#6b8e6f',
+            'moss-dark': '#5b7c5f',
+            pine: '#3d5348',
+            ink: '#1a2e35',
+            slate: '#5a6d75',
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
+  <script src="assets/js/user-role-setup.js"></script>
+  <script src="assets/js/demo-seed-data.js"></script>
+</head>
+<body class="min-h-screen bg-[#f0f4f2] text-ink antialiased font-[Inter,system-ui,sans-serif]">
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem('session_active') !== 'true' || !localStorage.getItem('current_user')) {
+          window.location.replace('signin.html');
+        }
+      } catch (e) {
+        window.location.replace('signin.html');
+      }
+    })();
+  </script>
+
+  <div class="max-w-lg mx-auto px-4 py-10 sm:py-14">
+    <div class="mb-8">
+      <div class="flex items-center gap-2 text-moss-dark font-semibold text-lg mb-1">
+        <span aria-hidden="true">◇</span> Iterum
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-semibold text-ink tracking-tight">Load demo showcase data</h1>
+      <p class="text-slate mt-2 text-base leading-relaxed">
+        Merges sample projects, dashboard tasks and ideas, recipes, vendors, ingredients, and a menu draft into this signed-in browser. Use a dedicated Firebase user (for example <code class="text-sm bg-white/80 px-1 rounded">demo@yourdomain.com</code>) so production workspaces stay clean.
+      </p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200/90 shadow-lg shadow-slate-900/5 p-6 sm:p-8 space-y-6">
+      <p id="demo-status" class="text-sm text-slate" role="status"></p>
+      <button type="button" id="btn-demo-seed"
+        class="w-full rounded-xl bg-moss-dark hover:bg-pine text-white font-semibold py-3 px-4 transition-colors focus:outline-none focus:ring-2 focus:ring-moss focus:ring-offset-2">
+        Install demo data for this account
+      </button>
+      <p class="text-xs text-slate leading-relaxed">
+        Safe to run again: matching sample IDs are updated in place. Cloud sync may overwrite local recipes if an account already has a newer library in Firestore—prefer a fresh demo login for pitch decks.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <a href="dashboard.html" class="flex-1 text-center rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-ink hover:bg-slate-50 transition-colors">Open dashboard</a>
+        <a href="recipe-developer.html" class="flex-1 text-center rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-ink hover:bg-slate-50 transition-colors">Recipe developer</a>
+        <a href="menu-builder.html" class="flex-1 text-center rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-ink hover:bg-slate-50 transition-colors">Menu builder</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var statusEl = document.getElementById('demo-status');
+      var btn = document.getElementById('btn-demo-seed');
+      btn.addEventListener('click', function () {
+        btn.disabled = true;
+        var r = typeof applyIterumDemoSeed === 'function' ? applyIterumDemoSeed({}) : { ok: false, error: 'missing_seed' };
+        if (r.ok) {
+          statusEl.textContent =
+            'Done. Active project: Bistro Nord — Spring tasting. Recipes: ' +
+            (r.summary && r.summary.recipes) +
+            '. Menu builder dishes: ' +
+            (r.summary && r.summary.menuItems) +
+            '. Open Menu builder and select the Spring lunch card to edit.';
+          statusEl.className = 'text-sm text-moss-dark font-medium';
+        } else if (r.error === 'not_signed_in') {
+          statusEl.textContent = 'Session missing — sign in first.';
+          statusEl.className = 'text-sm text-red-700';
+        } else {
+          statusEl.textContent = 'Could not load seed script.';
+          statusEl.className = 'text-sm text-red-700';
+        }
+        btn.disabled = false;
+      });
+    })();
+  </script>
+</body>
+</html>
