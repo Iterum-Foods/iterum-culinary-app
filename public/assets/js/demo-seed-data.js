@@ -200,7 +200,12 @@
             unit: 'g',
             notes: 'brown in pan first'
           },
-          { name: 'Yukon potatoes', amount: '800', unit: 'g', notes: 'diced' },
+          {
+            name: 'Yukon potatoes',
+            amount: '800',
+            unit: 'g',
+            notes: 'diced'
+          },
           { name: 'Vegetable stock', amount: '3', unit: 'L', notes: '' }
         ],
         instructions: [
@@ -298,7 +303,12 @@
             unit: 'batch',
             notes: 'vanilla'
           },
-          { name: 'Cloudberry preserves', amount: '200', unit: 'g', notes: '' },
+          {
+            name: 'Cloudberry preserves',
+            amount: '200',
+            unit: 'g',
+            notes: ''
+          },
           {
             name: 'Short dough',
             amount: '1',
@@ -394,7 +404,10 @@
           { name: 'Shallot brunoise', amount: '40', unit: 'g', notes: '' }
         ],
         instructions: [
-          { step: 1, instruction: 'Shuck; check liquor; nest on crushed ice.' },
+          {
+            step: 1,
+            instruction: 'Shuck; check liquor; nest on crushed ice.'
+          },
           {
             step: 2,
             instruction: 'Mignonette: kelp vinegar + shallot + white pepper.'
@@ -451,7 +464,12 @@
         tags: ['vegetarian', 'bar', 'demo'],
         ingredients: [
           { name: 'Maitake clusters', amount: '800', unit: 'g', notes: '' },
-          { name: 'Smoked cashew cream', amount: '200', unit: 'ml', notes: '' },
+          {
+            name: 'Smoked cashew cream',
+            amount: '200',
+            unit: 'ml',
+            notes: ''
+          },
           { name: 'Grape seed oil', amount: '30', unit: 'ml', notes: '' }
         ],
         instructions: [
@@ -483,7 +501,10 @@
           { name: 'Soda', amount: '120', unit: 'ml', notes: '' }
         ],
         instructions: [
-          { step: 1, instruction: 'Build in wine glass over ice; stir gently.' }
+          {
+            step: 1,
+            instruction: 'Build in wine glass over ice; stir gently.'
+          }
         ],
         createdAt: now,
         updatedAt: now
@@ -505,7 +526,12 @@
         status: 'published',
         tags: ['na-bev', 'bar', 'demo'],
         ingredients: [
-          { name: 'Cloudberry preserves', amount: '200', unit: 'g', notes: '' },
+          {
+            name: 'Cloudberry preserves',
+            amount: '200',
+            unit: 'g',
+            notes: ''
+          },
           { name: 'Champagne vinegar', amount: '80', unit: 'ml', notes: '' },
           { name: 'Sugar', amount: '60', unit: 'g', notes: '' }
         ],
@@ -1367,8 +1393,8 @@
     try {
       var cu = JSON.parse(global.localStorage.getItem('current_user') || '{}');
       userLabel = cu.name || cu.displayName || cu.email || userLabel;
-    } catch {
-      void 0; // ignore malformed current_user when building demo label
+    } catch (err) {
+      void err; // ignore malformed current_user when building demo label
     }
 
     if (

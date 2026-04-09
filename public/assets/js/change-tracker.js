@@ -154,8 +154,8 @@ class ChangeTracker {
           changes.push(key);
         }
       });
-    } catch (e) {
-      // Not objects to compare
+    } catch {
+      void 0; // not structured data — skip field diff
     }
 
     return changes;

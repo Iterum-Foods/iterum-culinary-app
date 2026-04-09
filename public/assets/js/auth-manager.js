@@ -789,8 +789,8 @@ class AuthManager {
     localStorage.removeItem(this.STORAGE_KEYS.SESSION_ACTIVE);
     try {
       localStorage.removeItem('iterum_operator_profile');
-    } catch {
-      void 0; // optional key — ignore quota / private-mode errors
+    } catch (err) {
+      void err; // optional key — ignore quota / private-mode errors
     }
 
     this.notifyListeners('session_cleared');

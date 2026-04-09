@@ -65,11 +65,11 @@
     }
     const match = String(text)
       .trim()
-      .match(/^([0-9\\s\\/.,¼½¾⅓⅔⅛⅜⅝⅞-]+)/);
+      .match(/^([0-9\s/.,¼½¾⅓⅔⅛⅜⅝⅞-]+)/);
     if (!match) {
       return '';
     }
-    const tokens = match[1].trim().split(/\\s+/);
+    const tokens = match[1].trim().split(/\s+/);
     let total = 0;
     let found = false;
     tokens.forEach(token => {
@@ -87,7 +87,7 @@
       return { remainder: '', quantity: '', unit: '' };
     }
     const cleaned = line.trim();
-    const quantityMatch = cleaned.match(/^([0-9\\s\\/.,¼½¾⅓⅔⅛⅜⅝⅞-]+)/);
+    const quantityMatch = cleaned.match(/^([0-9\s/.,¼½¾⅓⅔⅛⅜⅝⅞-]+)/);
     let remainder = cleaned;
     let unit = '';
     let quantity = '';
@@ -96,7 +96,7 @@
       quantity = parseQuantityFromString(quantityMatch[0]);
       remainder = cleaned.slice(quantityMatch[0].length).trim();
 
-      const unitMatch = remainder.match(/^(\\w+)/);
+      const unitMatch = remainder.match(/^(\w+)/);
       if (unitMatch) {
         unit = unitMatch[1];
         remainder = remainder.slice(unit.length).trim();
@@ -126,7 +126,7 @@
       return 0;
     }
     const match = duration.match(
-      /P(?:(\\d+)D)?(?:T(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+)S)?)?/i
+      /P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?/i
     );
     if (!match) {
       return 0;
@@ -149,11 +149,11 @@
     if (/^P/i.test(text)) {
       return parseIsoDuration(text);
     }
-    const hourMatch = text.match(/([0-9.]+)\\s*(hours?|hrs?|h)/i);
+    const hourMatch = text.match(/([0-9.]+)\s*(hours?|hrs?|h)/i);
     if (hourMatch) {
       return Math.round(parseFloat(hourMatch[1]) * 60);
     }
-    const minuteMatch = text.match(/([0-9.]+)\\s*(minutes?|mins?|m)/i);
+    const minuteMatch = text.match(/([0-9.]+)\s*(minutes?|mins?|m)/i);
     if (minuteMatch) {
       return Math.round(parseFloat(minuteMatch[1]));
     }
@@ -641,8 +641,8 @@
       // Fallback: treat CSV as lines joined with newlines
       const normalized = normalizeRecipeFromData(
         {
-          title: file.name.replace(/\\.[^.]+$/, ''),
-          ingredients: text.split('\\n').slice(1)
+          title: file.name.replace(/\.[^.]+$/, ''),
+          ingredients: text.split('\n').slice(1)
         },
         {
           fileName: file.name,
