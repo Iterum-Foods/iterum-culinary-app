@@ -19,6 +19,20 @@ Repo secret required: **`FIREBASE_TOKEN`** (from `npx firebase-tools login:ci`).
 
 ---
 
+## If **Deploy Firebase** fails in CI
+
+Typical failure is the step **Deploy Firestore + Storage rules** (≈20–45s after checkout).
+
+| Symptom / log hint | What to do |
+|--------------------|------------|
+| **Authentication Error**, **Invalid JWT**, **HTTP 401/403**, or “could not determine project” | Regenerate a CI token: locally run `npx firebase-tools@15.12.0 login:ci`, then set repo secret **`FIREBASE_TOKEN`** on the org/repo. Re-run the failed workflow (**Re-run all jobs**) or **Actions → Deploy Firebase → Run workflow**. |
+| **Error compiling rules** / syntax | Fix `firestore.rules` / `storage.rules`, push to `main`, or open a PR. |
+| **Permission denied** on project | The token account must have deploy rights on **`iterum-culinary-app2`** (Firebase Console → Project settings → Users and permissions). |
+
+After fixing the token or rules, you do **not** need a new commit if only the secret changed: use **workflow_dispatch** on [Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml).
+
+---
+
 ## Engineer checklist (every production-facing change)
 
 1. Merge to **`main`** after PR / review as appropriate.  

@@ -39,19 +39,28 @@ class FirestoreSync {
       return this.normalizeId(explicitUserId);
     }
 
+    const firebaseUid = window.firebaseAuth?.auth?.currentUser?.uid;
+    if (firebaseUid) {
+      return firebaseUid;
+    }
+
     const authUser = window.authManager?.currentUser;
     if (authUser) {
-      return this.normalizeId(
-        authUser.id || authUser.uid || authUser.userId || authUser.email
-      );
+      const id = authUser.userId || authUser.id || authUser.uid;
+      if (id) {
+        return this.normalizeId(id);
+      }
     }
 
     const stored = localStorage.getItem('current_user');
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        if (parsed?.id || parsed?.userId || parsed?.email) {
-          return this.normalizeId(parsed.id || parsed.userId || parsed.email);
+        if (parsed?.id || parsed?.userId) {
+          return this.normalizeId(parsed.id || parsed.userId);
+        }
+        if (parsed?.email) {
+          return this.normalizeId(parsed.email);
         }
       } catch (error) {
         console.warn(
@@ -396,7 +405,14 @@ class FirestoreSync {
       const userId =
         userData.id ||
         userData.userId ||
-        userData.email.replace(/[^a-zA-Z0-9]/g, '_');
+        window.firebaseAuth?.auth?.currentUser?.uid ||
+        (userData.email
+          ? userData.email.replace(/[^a-zA-Z0-9]/g, '_')
+          : null);
+      if (!userId) {
+        console.warn('⚠️ saveUser: no user id / Firebase uid; skip Firestore write');
+        return false;
+      }
       const userRef = doc(this.db, 'users', userId);
 
       const firestoreData = {

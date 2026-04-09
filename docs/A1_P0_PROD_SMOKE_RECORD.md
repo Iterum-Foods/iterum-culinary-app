@@ -25,7 +25,7 @@
 | **Environment URL** | **Primary:** https://iterum-culinary-app.vercel.app/ _(Firebase mirror if used: https://iterum-culinary-app2.web.app)_ |
 | **Entry path tested** | `/` `signin.html` `dashboard.html` `menu-builder.html` (automated); full signed-in flows TBD below |
 | **Browser + version** | Playwright Chromium (automated); human: _fill browser_ |
-| **Rules / deploy reference** | **Trigger:** push to `main` changes `firestore.rules` → GitHub **Deploy Firebase** workflow — confirm latest run green and note commit SHA (e.g. post–membership + `employee_line` write split). |
+| **Rules / deploy reference** | **Trigger:** push to `main` changes `firestore.rules` → GitHub **Deploy Firebase**. **2026-04-09:** run for `fccef3a` **failed** ([Actions run 24173148382](https://github.com/Iterum-Foods/iterum-culinary-app/actions/runs/24173148382)); treat rules as **not verified in prod** until a run is **green** — see [HOW_WE_SHIP.md — If Deploy Firebase fails](./HOW_WE_SHIP.md#if-deploy-firebase-fails-in-ci). |
 | **Test account** | _Human step 2: identifier only; no passwords in this doc_ |
 
 ---
