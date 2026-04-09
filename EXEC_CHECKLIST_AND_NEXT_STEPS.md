@@ -1,7 +1,7 @@
 # Executive checklist & next steps
 
 **Purpose:** Single page for leadership to track launch readiness and foundation work.  
-**Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](./NEXT_STEPS_LEADERSHIP.md) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) · [docs/workflows/](./docs/workflows/) (e.g. sign-in UI redesign)  
+**Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](./NEXT_STEPS_LEADERSHIP.md) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) · [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) (phased path to pilot-ready / scale-ready) · [docs/workflows/](./docs/workflows/) (e.g. sign-in UI redesign)  
 **Last updated:** 29 March 2026  
 
 ---
@@ -111,8 +111,8 @@ Run this block whenever `firestore.rules`, `storage.rules`, or membership-relate
 
 ## Next 30 days (suggested sequence)
 
-1. **Week 1:** Deploy Firestore + Storage rules; run production smoke tests; executive P0 sign-off row above.  
-2. **Week 2–3:** Extend data-access pattern to one more entity (checklists **or** recipe snapshots); Product + Eng draft **source-of-truth** one-pager.  
+1. **Week 1:** Deploy Firestore + Storage rules; run production smoke tests; executive P0 sign-off row above — use **Ship & verify** and [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) **Phase A**.  
+2. **Week 2–3:** Phase **B–C** in completion plan (team access, source-of-truth); extend data-access pattern to one more entity (checklists **or** recipe snapshots).  
 3. **Week 4:** Lock ICP + acceptance criteria for multi-restaurant / shared vendor story; queue P1 epic for engineering.
 
 ---

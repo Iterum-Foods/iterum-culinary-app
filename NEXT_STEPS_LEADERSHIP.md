@@ -1,7 +1,7 @@
 # Leadership next steps & meeting agenda
 
 **Purpose:** One page for CEO + CTO (and ops sponsor) to run a short sync and lock the sequence for the next month.  
-**Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [EXEC_CHECKLIST_AND_NEXT_STEPS.md](./EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) (team tasks & `@` tags)  
+**Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [EXEC_CHECKLIST_AND_NEXT_STEPS.md](./EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) (phased completion) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) (team tasks & `@` tags)  
 **Suggested cadence:** 30 minutes weekly until P0 sign-off; then biweekly through P1 framing.
 
 ---

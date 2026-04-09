@@ -5,6 +5,7 @@
 **Date:** March 2026  
 
 **Working checklist:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](./EXEC_CHECKLIST_AND_NEXT_STEPS.md) (status trackers and 30-day sequence).  
+**Completion roadmap:** [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) (pilot-ready vs scale-ready phases).  
 **Leadership sync:** [NEXT_STEPS_LEADERSHIP.md](./NEXT_STEPS_LEADERSHIP.md) (meeting agenda, decisions, 30-day sequence).  
 **Roles:** [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) (COO / CTO tasks, RACI, specialty hires).  
 **Team execution:** [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) (streams A–E, `@` tags).
