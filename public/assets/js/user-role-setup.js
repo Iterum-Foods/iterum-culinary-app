@@ -118,11 +118,9 @@
   global.getOperatorProfile = parseProfile;
 
   global.saveOperatorProfile = function (profile) {
-    var payload = Object.assign(
-      {},
-      profile,
-      { updatedAt: new Date().toISOString() }
-    );
+    var payload = Object.assign({}, profile, {
+      updatedAt: new Date().toISOString()
+    });
     global.localStorage.setItem(PROFILE_KEY, JSON.stringify(payload));
   };
 
@@ -133,7 +131,8 @@
   /** True when signed in but profile not saved (first run or cleared). */
   global.needsOperatorSetup = function () {
     try {
-      if (global.localStorage.getItem('session_active') !== 'true') return false;
+      if (global.localStorage.getItem('session_active') !== 'true')
+        return false;
       if (!global.localStorage.getItem('current_user')) return false;
       return !hasOperatorProfile();
     } catch (e) {
@@ -283,7 +282,9 @@
     }
 
     global.dispatchEvent(
-      new CustomEvent('iterumDashboardRoleApplied', { detail: { roleKey: role } })
+      new CustomEvent('iterumDashboardRoleApplied', {
+        detail: { roleKey: role }
+      })
     );
   };
 

@@ -310,9 +310,7 @@ class AuthManager {
           typeof window.getPostAuthDestination === 'function'
             ? window.getPostAuthDestination()
             : 'dashboard.html';
-        window.location.replace(
-          new URL(dest, window.location.href).href
-        );
+        window.location.replace(new URL(dest, window.location.href).href);
       }
     }
 
@@ -791,8 +789,8 @@ class AuthManager {
     localStorage.removeItem(this.STORAGE_KEYS.SESSION_ACTIVE);
     try {
       localStorage.removeItem('iterum_operator_profile');
-    } catch (e) {
-      void e;
+    } catch {
+      void 0; // optional key — ignore quota / private-mode errors
     }
 
     this.notifyListeners('session_cleared');

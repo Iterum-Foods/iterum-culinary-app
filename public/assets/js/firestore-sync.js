@@ -146,20 +146,12 @@ class FirestoreSync {
       return null;
     }
     const authUid =
-      opts.firebaseUid ||
-      window.authManager?.currentUser?.uid ||
-      null;
+      opts.firebaseUid || window.authManager?.currentUser?.uid || null;
     if (!authUid) {
       return null;
     }
     const role = opts.role || 'account_admin';
-    const memberRef = doc(
-      this.db,
-      'projects',
-      projectId,
-      'members',
-      authUid
-    );
+    const memberRef = doc(this.db, 'projects', projectId, 'members', authUid);
     const email =
       opts.email !== undefined
         ? opts.email
@@ -406,11 +398,11 @@ class FirestoreSync {
         userData.id ||
         userData.userId ||
         window.firebaseAuth?.auth?.currentUser?.uid ||
-        (userData.email
-          ? userData.email.replace(/[^a-zA-Z0-9]/g, '_')
-          : null);
+        (userData.email ? userData.email.replace(/[^a-zA-Z0-9]/g, '_') : null);
       if (!userId) {
-        console.warn('⚠️ saveUser: no user id / Firebase uid; skip Firestore write');
+        console.warn(
+          '⚠️ saveUser: no user id / Firebase uid; skip Firestore write'
+        );
         return false;
       }
       const userRef = doc(this.db, 'users', userId);

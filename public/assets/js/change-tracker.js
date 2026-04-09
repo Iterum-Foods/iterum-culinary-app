@@ -104,37 +104,30 @@ class ChangeTracker {
    */
   getEntityName(entityType, entityId) {
     try {
-      switch (entityType) {
-        case 'recipe':
-          const recipes = window.universalRecipeManager?.getAllRecipes() || [];
-          const recipe = recipes.find(r => r.id === entityId);
-          return recipe?.title || recipe?.name || entityId;
-
-        case 'menu':
-          // Get from localStorage
-          const user = window.authManager?.currentUser;
-          const menuKey = `menus_${user?.userId}`;
-          const menus = JSON.parse(localStorage.getItem(menuKey) || '[]');
-          const menu = menus.find(m => m.id === entityId);
-          return menu?.name || entityId;
-
-        case 'ingredient':
-          const ingredients = JSON.parse(
-            localStorage.getItem('ingredients_database') || '[]'
-          );
-          const ing = ingredients.find(i => i.id === entityId);
-          return ing?.name || entityId;
-
-        case 'equipment':
-          if (window.equipmentManager) {
-            const equip = window.equipmentManager.getById(entityId);
-            return equip?.name || entityId;
-          }
-          return entityId;
-
-        default:
-          return entityId;
+      if (entityType === 'recipe') {
+        const recipes = window.universalRecipeManager?.getAllRecipes() || [];
+        const recipe = recipes.find(r => r.id === entityId);
+        return recipe?.title || recipe?.name || entityId;
       }
+      if (entityType === 'menu') {
+        const user = window.authManager?.currentUser;
+        const menuKey = `menus_${user?.userId}`;
+        const menus = JSON.parse(localStorage.getItem(menuKey) || '[]');
+        const menu = menus.find(m => m.id === entityId);
+        return menu?.name || entityId;
+      }
+      if (entityType === 'ingredient') {
+        const ingredients = JSON.parse(
+          localStorage.getItem('ingredients_database') || '[]'
+        );
+        const ing = ingredients.find(i => i.id === entityId);
+        return ing?.name || entityId;
+      }
+      if (entityType === 'equipment' && window.equipmentManager) {
+        const equip = window.equipmentManager.getById(entityId);
+        return equip?.name || entityId;
+      }
+      return entityId;
     } catch (error) {
       return entityId;
     }

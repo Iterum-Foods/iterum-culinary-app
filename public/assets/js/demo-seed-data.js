@@ -188,15 +188,35 @@
         status: 'published',
         tags: ['vegetarian', 'spring', 'demo'],
         ingredients: [
-          { name: 'Leeks, cleaned', amount: '3', unit: 'kg', notes: 'white + light green' },
-          { name: 'Unsalted butter', amount: '200', unit: 'g', notes: 'brown in pan first' },
+          {
+            name: 'Leeks, cleaned',
+            amount: '3',
+            unit: 'kg',
+            notes: 'white + light green'
+          },
+          {
+            name: 'Unsalted butter',
+            amount: '200',
+            unit: 'g',
+            notes: 'brown in pan first'
+          },
           { name: 'Yukon potatoes', amount: '800', unit: 'g', notes: 'diced' },
           { name: 'Vegetable stock', amount: '3', unit: 'L', notes: '' }
         ],
         instructions: [
-          { step: 1, instruction: 'Char leeks hard on plancha; deglaze with stock.' },
-          { step: 2, instruction: 'Sweat potatoes in brown butter; add leeks + stock; simmer 25 min.' },
-          { step: 3, instruction: 'Blitz smooth; pass; finish with cold leek oil.' }
+          {
+            step: 1,
+            instruction: 'Char leeks hard on plancha; deglaze with stock.'
+          },
+          {
+            step: 2,
+            instruction:
+              'Sweat potatoes in brown butter; add leeks + stock; simmer 25 min.'
+          },
+          {
+            step: 3,
+            instruction: 'Blitz smooth; pass; finish with cold leek oil.'
+          }
         ],
         createdAt: now,
         updatedAt: now
@@ -205,7 +225,8 @@
         id: 'demo_recipe_arctic_char',
         title: 'Arctic char — beet, horseradish, dill oil',
         name: 'Arctic char — beet, horseradish, dill oil',
-        description: 'Plated main: gentle smoke, bright roots, dairy counterpoint.',
+        description:
+          'Plated main: gentle smoke, bright roots, dairy counterpoint.',
         category: 'entree',
         cuisine: 'Scandinavian',
         servings: 12,
@@ -218,15 +239,32 @@
         status: 'published',
         tags: ['fish', 'plated', 'demo'],
         ingredients: [
-          { name: 'Arctic char fillet', amount: '1.8', unit: 'kg', notes: 'pin bone out' },
-          { name: 'Golden beets', amount: '1', unit: 'kg', notes: 'roast, dice' },
+          {
+            name: 'Arctic char fillet',
+            amount: '1.8',
+            unit: 'kg',
+            notes: 'pin bone out'
+          },
+          {
+            name: 'Golden beets',
+            amount: '1',
+            unit: 'kg',
+            notes: 'roast, dice'
+          },
           { name: 'Horseradish cream', amount: '300', unit: 'ml', notes: '' },
           { name: 'Dill oil', amount: '60', unit: 'ml', notes: '' }
         ],
         instructions: [
           { step: 1, instruction: 'Cold-smoke char 12 min; portion 120 g.' },
-          { step: 2, instruction: 'Pan skin-side to crisp; finish in oven 120°C until 48°C internal.' },
-          { step: 3, instruction: 'Swoosh cream; beets; fish; dill oil in strokes.' }
+          {
+            step: 2,
+            instruction:
+              'Pan skin-side to crisp; finish in oven 120°C until 48°C internal.'
+          },
+          {
+            step: 3,
+            instruction: 'Swoosh cream; beets; fish; dill oil in strokes.'
+          }
         ],
         createdAt: now,
         updatedAt: now
@@ -248,15 +286,37 @@
         status: 'published',
         tags: ['dessert', 'allergen-aware', 'demo'],
         ingredients: [
-          { name: 'Sunflower seeds, toasted', amount: '400', unit: 'g', notes: '' },
-          { name: 'Pastry cream', amount: '1', unit: 'batch', notes: 'vanilla' },
+          {
+            name: 'Sunflower seeds, toasted',
+            amount: '400',
+            unit: 'g',
+            notes: ''
+          },
+          {
+            name: 'Pastry cream',
+            amount: '1',
+            unit: 'batch',
+            notes: 'vanilla'
+          },
           { name: 'Cloudberry preserves', amount: '200', unit: 'g', notes: '' },
-          { name: 'Short dough', amount: '1', unit: 'batch', notes: 'blind bake' }
+          {
+            name: 'Short dough',
+            amount: '1',
+            unit: 'batch',
+            notes: 'blind bake'
+          }
         ],
         instructions: [
-          { step: 1, instruction: 'Grind seeds with sugar; fold into frangipane alternative.' },
+          {
+            step: 1,
+            instruction:
+              'Grind seeds with sugar; fold into frangipane alternative.'
+          },
           { step: 2, instruction: 'Fill tart shell; bake 165°C until set.' },
-          { step: 3, instruction: 'Glaze with cloudberry; micro herbs optional.' }
+          {
+            step: 3,
+            instruction: 'Glaze with cloudberry; micro herbs optional.'
+          }
         ],
         createdAt: now,
         updatedAt: now
@@ -278,14 +338,30 @@
         status: 'published',
         tags: ['vegetarian', 'amuse', 'demo'],
         ingredients: [
-          { name: 'Golden beets', amount: '1.2', unit: 'kg', notes: 'roast, brunoise' },
+          {
+            name: 'Golden beets',
+            amount: '1.2',
+            unit: 'kg',
+            notes: 'roast, brunoise'
+          },
           { name: 'Shallot', amount: '60', unit: 'g', notes: 'minced' },
-          { name: 'Capers', amount: '30', unit: 'g', notes: 'fried for garnish' },
+          {
+            name: 'Capers',
+            amount: '30',
+            unit: 'g',
+            notes: 'fried for garnish'
+          },
           { name: 'Mustard oil', amount: '15', unit: 'ml', notes: 'finish' }
         ],
         instructions: [
-          { step: 1, instruction: 'Roast beets wrapped; peel while warm; cool.' },
-          { step: 2, instruction: 'Cut fine tartare; bind with shallot, salt, lemon.' },
+          {
+            step: 1,
+            instruction: 'Roast beets wrapped; peel while warm; cool.'
+          },
+          {
+            step: 2,
+            instruction: 'Cut fine tartare; bind with shallot, salt, lemon.'
+          },
           { step: 3, instruction: 'Quenelle on plate; capers; micro sorrel.' }
         ],
         createdAt: now,
@@ -308,13 +384,21 @@
         status: 'published',
         tags: ['shellfish', 'bar', 'demo'],
         ingredients: [
-          { name: 'Oysters', amount: '24', unit: 'pc', notes: 'shucked to order' },
+          {
+            name: 'Oysters',
+            amount: '24',
+            unit: 'pc',
+            notes: 'shucked to order'
+          },
           { name: 'Kelp vinegar', amount: '100', unit: 'ml', notes: '' },
           { name: 'Shallot brunoise', amount: '40', unit: 'g', notes: '' }
         ],
         instructions: [
           { step: 1, instruction: 'Shuck; check liquor; nest on crushed ice.' },
-          { step: 2, instruction: 'Mignonette: kelp vinegar + shallot + white pepper.' }
+          {
+            step: 2,
+            instruction: 'Mignonette: kelp vinegar + shallot + white pepper.'
+          }
         ],
         createdAt: now,
         updatedAt: now
@@ -426,7 +510,10 @@
           { name: 'Sugar', amount: '60', unit: 'g', notes: '' }
         ],
         instructions: [
-          { step: 1, instruction: 'Simmer preserves with sugar; cool; add vinegar.' },
+          {
+            step: 1,
+            instruction: 'Simmer preserves with sugar; cool; add vinegar.'
+          },
           { step: 2, instruction: 'Strain; bottle; dose 20 ml per serve.' }
         ],
         createdAt: now,
@@ -614,7 +701,10 @@
         isSignature: false,
         isNew: true,
         isSeasonal: true,
-        availability: { daysAvailable: ['all'], mealPeriods: ['lunch', 'dinner'] },
+        availability: {
+          daysAvailable: ['all'],
+          mealPeriods: ['lunch', 'dinner']
+        },
         createdAt: now,
         updatedAt: now,
         projectId: DEMO_PROJECT_ID
@@ -746,7 +836,10 @@
         projectedCovers: 30,
         portionSize: '2 pc',
         prepStation: 'Raw bar',
-        availability: { daysAvailable: ['all'], mealPeriods: ['dinner', 'lunch'] }
+        availability: {
+          daysAvailable: ['all'],
+          mealPeriods: ['dinner', 'lunch']
+        }
       }),
       baseMenuItem(uid, {
         id: 'demo_mitem_rye',
@@ -791,7 +884,10 @@
         projectedCovers: 80,
         portionSize: '350 ml',
         prepStation: 'Bar',
-        availability: { daysAvailable: ['all'], mealPeriods: ['lunch', 'dinner'] }
+        availability: {
+          daysAvailable: ['all'],
+          mealPeriods: ['lunch', 'dinner']
+        }
       }),
       baseMenuItem(uid, {
         id: 'demo_mitem_shrub',
@@ -1136,7 +1232,8 @@
       {
         id: 'demo_idea_rec_1',
         title: 'Birch syrup panna cotta',
-        description: 'Pilot for fall menu — replace cloudberry garnish with lingon.',
+        description:
+          'Pilot for fall menu — replace cloudberry garnish with lingon.',
         tags: ['dessert', 'pilot'],
         projectId: DEMO_PROJECT_ID,
         userId: uid,
@@ -1170,9 +1267,19 @@
         status: 'draft',
         ingredients: [
           { name: 'Dry scallops', amount: '12', unit: 'pc', notes: '' },
-          { name: 'Rhubarb kosho', amount: '80', unit: 'g', notes: 'test batch' }
+          {
+            name: 'Rhubarb kosho',
+            amount: '80',
+            unit: 'g',
+            notes: 'test batch'
+          }
         ],
-        instructions: [{ step: 1, instruction: 'Slice scallop thin; dot kosho; finish evoo.' }],
+        instructions: [
+          {
+            step: 1,
+            instruction: 'Slice scallop thin; dot kosho; finish evoo.'
+          }
+        ],
         createdAt: now,
         updatedAt: now
       }
@@ -1234,11 +1341,11 @@
 
   function setActiveProjectKeys(uid, projectId, projectName) {
     global.localStorage.setItem('iterum_current_project', projectId);
-    global.localStorage.setItem('iterum_current_project_user_' + uid, projectId);
     global.localStorage.setItem(
-      'iterum_current_project_' + uid,
+      'iterum_current_project_user_' + uid,
       projectId
     );
+    global.localStorage.setItem('iterum_current_project_' + uid, projectId);
     global.localStorage.setItem('active_project_id', projectId);
     global.localStorage.setItem('active_project_name', projectName);
     global.localStorage.setItem('active_project', projectId);
@@ -1260,11 +1367,14 @@
     try {
       var cu = JSON.parse(global.localStorage.getItem('current_user') || '{}');
       userLabel = cu.name || cu.displayName || cu.email || userLabel;
-    } catch (e) {
-      void e;
+    } catch {
+      void 0; // ignore malformed current_user when building demo label
     }
 
-    if (!options.skipProfile && typeof global.saveOperatorProfile === 'function') {
+    if (
+      !options.skipProfile &&
+      typeof global.saveOperatorProfile === 'function'
+    ) {
       global.saveOperatorProfile({
         roleKey: 'chef_leadership',
         scope: 'restaurant_group',
@@ -1317,9 +1427,11 @@
     var prevIdeas = parseJson(ideasKey, []);
     global.localStorage.setItem(
       ideasKey,
-      JSON.stringify(mergeByKey(prevIdeas, demoIdeas(), function (i) {
-        return i.id;
-      }))
+      JSON.stringify(
+        mergeByKey(prevIdeas, demoIdeas(), function (i) {
+          return i.id;
+        })
+      )
     );
 
     var newRecipes = demoRecipes(uid);

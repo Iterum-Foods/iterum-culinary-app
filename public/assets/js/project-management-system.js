@@ -834,10 +834,7 @@ class ProjectManagementSystem {
     const cur = this.currentProject?.id || this.masterProjectId;
     const sidebarMembers = this.getRestaurantGroupMembersForSidebar();
 
-    if (
-      this._restaurantLocationScope === 'all' &&
-      sidebarMembers.length >= 2
-    ) {
+    if (this._restaurantLocationScope === 'all' && sidebarMembers.length >= 2) {
       return sidebarMembers.map(m => m.id);
     }
 

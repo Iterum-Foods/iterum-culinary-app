@@ -86,7 +86,9 @@ class UnifiedProjectSelector {
       const legacyUnifiedKey = `iterum_projects_${this.currentUserId}`;
       projectsJson = localStorage.getItem(legacyUnifiedKey);
       if (projectsJson) {
-        console.log('📦 Migrating projects from legacy unified key → iterum_projects_user_*');
+        console.log(
+          '📦 Migrating projects from legacy unified key → iterum_projects_user_*'
+        );
         localStorage.setItem(projectsKey, projectsJson);
       }
     }

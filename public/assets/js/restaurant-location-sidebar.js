@@ -58,8 +58,7 @@
         : '<option value="__all__">All locations</option>';
     const rest = members
       .map(m => {
-        const sel =
-          scope === 'single' && m.id === curId ? ' selected' : '';
+        const sel = scope === 'single' && m.id === curId ? ' selected' : '';
         return `<option value="${escapeHtml(m.id)}"${sel}>${escapeHtml(m.name)}</option>`;
       })
       .join('');
@@ -73,9 +72,7 @@
       return;
     }
     const val = select.value;
-    const all = document.querySelectorAll(
-      '[data-restaurant-location-select]'
-    );
+    const all = document.querySelectorAll('[data-restaurant-location-select]');
 
     if (val === '__all__') {
       pm.setRestaurantLocationScope('all');
@@ -93,15 +90,15 @@
   }
 
   function bindSelects() {
-    document.querySelectorAll('[data-restaurant-location-select]').forEach(
-      sel => {
+    document
+      .querySelectorAll('[data-restaurant-location-select]')
+      .forEach(sel => {
         if (sel.dataset.rlBound === '1') {
           return;
         }
         sel.dataset.rlBound = '1';
         sel.addEventListener('change', onChange);
-      }
-    );
+      });
   }
 
   function refresh() {
@@ -121,9 +118,7 @@
 
   window.refreshRestaurantLocationSidebar = refresh;
 
-  document.addEventListener('projectChanged', () =>
-    setTimeout(refresh, 0)
-  );
+  document.addEventListener('projectChanged', () => setTimeout(refresh, 0));
   document.addEventListener('locationScopeChanged', () =>
     setTimeout(refresh, 0)
   );

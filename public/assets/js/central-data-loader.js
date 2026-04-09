@@ -15,12 +15,12 @@ class CentralDataLoader {
     console.log('📂 Central Data Loader initialized');
 
     // Listen for authentication events
-    window.addEventListener('userLoggedIn', e => {
+    window.addEventListener('userLoggedIn', () => {
       console.log('👤 User logged in - loading all data...');
       this.loadAllData();
     });
 
-    window.addEventListener('userSwitched', e => {
+    window.addEventListener('userSwitched', () => {
       console.log('🔄 User switched - reloading data...');
       this.loadAllData();
     });
@@ -495,46 +495,6 @@ class CentralDataLoader {
       notification.style.animation = 'fadeOut 0.3s ease';
       setTimeout(() => notification.remove(), 300);
     }, 3000);
-  }
-
-  /**
-   * Sync from backend
-   */
-  async syncFromBackend() {
-    if (!window.authApiHelper) {
-      return;
-    }
-
-    try {
-      // Try to get latest data from backend
-      const endpoints = [
-        { key: 'recipesFromBackend', url: '/api/recipes' },
-        { key: 'projectsFromBackend', url: '/api/projects' },
-        { key: 'vendorsFromBackend', url: '/api/vendors' }
-      ];
-
-      for (const endpoint of endpoints) {
-        try {
-          const data = await window.authApiHelper.get(endpoint.url);
-          if (data) {
-            this.dataCache[endpoint.key] = data;
-            console.log(`✅ Synced ${endpoint.key} from backend`);
-          }
-        } catch (e) {
-          // Silently fail, use localStorage data
-        }
-      }
-    } catch (error) {
-      console.warn('Backend sync unavailable, using local data only');
-    }
-  }
-
-  /**
-   * Log data stats
-   */
-  logDataStats() {
-    const summary = this.getSummary();
-    console.log('📊 User Data Summary:', summary);
   }
 
   /**

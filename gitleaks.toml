@@ -1,0 +1,17 @@
+# Gitleaks: extend defaults; allowlist Firebase Web SDK snippets.
+# Client API keys are not secrets — Firebase restricts them via domain/API restrictions and Security Rules.
+# https://firebase.google.com/docs/projects/api-keys
+
+title = "iterum-culinary-app"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Firebase web client config (public by design)"
+paths = [
+  '''public/assets/js/firebase-config.js''',
+  '''public/assets/js/firebase-auth.js''',
+  '''public/assets/js/firebase-storage.js''',
+  '''public/landing.html''',
+]

@@ -516,7 +516,7 @@
         try {
           const label = file.name || `File ${i + 1}`;
           onProgress(i + 1, files.length, label);
-          const importedRecipes = await this.importFile(file, i);
+          const importedRecipes = await this.importFile(file);
           importedRecipes.forEach(recipe => recipes.push(recipe));
         } catch (error) {
           warnings.push({ file: file.name, message: error.message });
@@ -526,7 +526,7 @@
       return { recipes, warnings };
     }
 
-    async importFile(file, index = 0) {
+    async importFile(file) {
       const extension = getExtension(file.name);
       if (extension === 'json') {
         return this.parseJsonFile(file);
@@ -538,7 +538,7 @@
         return this.parseCsvFile(file);
       }
       throw new Error(
-        `Unsupported file format \"${extension || 'unknown'}\". Try JSON, TXT, or CSV files.`
+        `Unsupported file format "${extension || 'unknown'}". Try JSON, TXT, or CSV files.`
       );
     }
 

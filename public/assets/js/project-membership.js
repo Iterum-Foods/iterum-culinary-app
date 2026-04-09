@@ -42,9 +42,10 @@
       return null;
     }
 
-    var uid = global.authManager && global.authManager.currentUser
-      ? global.authManager.currentUser.uid
-      : null;
+    var uid =
+      global.authManager && global.authManager.currentUser
+        ? global.authManager.currentUser.uid
+        : null;
     if (!uid) {
       clearMembership();
       return null;
@@ -54,13 +55,7 @@
       var mod = await import(
         'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'
       );
-      var docRef = mod.doc(
-        fs.db,
-        'projects',
-        projectId,
-        'members',
-        uid
-      );
+      var docRef = mod.doc(fs.db, 'projects', projectId, 'members', uid);
       var snap = await mod.getDoc(docRef);
       if (!snap.exists()) {
         global.iterumMembership = {
@@ -111,9 +106,7 @@
 
   global.iterumRefreshMembershipForActiveProject = async function () {
     var fs = global.firestoreSync;
-    var pid = fs && fs.resolveProjectId
-      ? fs.resolveProjectId()
-      : null;
+    var pid = fs && fs.resolveProjectId ? fs.resolveProjectId() : null;
     return global.iterumRefreshProjectMembership(pid);
   };
 })(typeof window !== 'undefined' ? window : this);

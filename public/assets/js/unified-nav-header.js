@@ -463,7 +463,11 @@ class UnifiedNavHeader {
           sidebar.classList.contains('mobile-open') &&
           !sidebar.contains(e.target) &&
           !toggle.contains(e.target) &&
-          !(e.target && e.target.closest && e.target.closest('#dash-menu-toggle'))
+          !(
+            e.target &&
+            e.target.closest &&
+            e.target.closest('#dash-menu-toggle')
+          )
         ) {
           sidebar.classList.remove('mobile-open');
           toggle.setAttribute('aria-expanded', 'false');
