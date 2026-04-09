@@ -1,5 +1,7 @@
 # 🔥 Firebase Setup Verification
 
+**Deploy & teammates:** See [docs/HOW_WE_SHIP.md](docs/HOW_WE_SHIP.md) (Vercel vs Firebase rules, adding `members/{uid}`).
+
 ## ✅ **Current Firebase Configuration**
 
 ### **Project Details:**

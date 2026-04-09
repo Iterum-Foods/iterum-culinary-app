@@ -45,7 +45,7 @@
       </div>
       <h1 class="text-2xl sm:text-3xl font-semibold text-ink tracking-tight">Load demo showcase data</h1>
       <p class="text-slate mt-2 text-base leading-relaxed">
-        Merges sample projects, dashboard tasks and ideas, recipes, vendors, ingredients, and a menu draft into this signed-in browser. Use a dedicated Firebase user (for example <code class="text-sm bg-white/80 px-1 rounded">demo@yourdomain.com</code>) so production workspaces stay clean.
+        Merges sample projects, two menus (lunch + bar), recipes (published + WIP), recipe ideas, ingredients, inventory, vendors, menu–recipe links, equipment for HACCP, and sanitizer / temperature / dishwasher logs into this browser. Use a dedicated Firebase user (for example <code class="text-sm bg-white/80 px-1 rounded">demo@yourdomain.com</code>) so production workspaces stay clean.
       </p>
     </div>
 
@@ -74,12 +74,21 @@
         btn.disabled = true;
         var r = typeof applyIterumDemoSeed === 'function' ? applyIterumDemoSeed({}) : { ok: false, error: 'missing_seed' };
         if (r.ok) {
+          var s = r.summary || {};
           statusEl.textContent =
-            'Done. Active project: Bistro Nord — Spring tasting. Recipes: ' +
-            (r.summary && r.summary.recipes) +
-            '. Menu builder dishes: ' +
-            (r.summary && r.summary.menuItems) +
-            '. Open Menu builder and select the Spring lunch card to edit.';
+            'Done. Project ' +
+            (s.projectId || '') +
+            '. Recipes: ' +
+            s.recipes +
+            '. Menu cards: ' +
+            s.menuCards +
+            ', linked dishes: ' +
+            s.menuItems +
+            '. HACCP demo: ' +
+            s.sanitizerChecks +
+            ' sanitizer checks, ' +
+            s.temperatureLogs +
+            ' temp logs. Open Kitchen/HACCP or Menu builder to browse.';
           statusEl.className = 'text-sm text-moss-dark font-medium';
         } else if (r.error === 'not_signed_in') {
           statusEl.textContent = 'Session missing — sign in first.';

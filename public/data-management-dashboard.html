@@ -7,6 +7,7 @@
     
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/auth-manager.js"></script>
+    <script src="assets/js/workspace-features.js" defer></script>
     <script src="assets/js/unified-nav-header.js" defer></script>
     <script src="assets/js/unified-project-selector.js" defer></script>
     <script src="assets/js/user-data-manager.js" defer></script>
@@ -161,6 +162,15 @@
                 <button class="btn" onclick="verifyIntegrity()">🔍 Verify Integrity</button>
                 <button class="btn btn-warning" onclick="recoverData()">🔧 Recover Data</button>
                 <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+            </div>
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+                <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: #64748b; font-weight: 600;">Related tools</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    <a href="data-backup-center.html" class="btn btn-success" data-iterum-feature="backup" style="text-decoration: none;">💾 Backup center</a>
+                    <a href="audit-log.html" class="btn" data-iterum-feature="data_tools" style="text-decoration: none;">📜 Audit log</a>
+                    <a href="contact_management.html" class="btn" data-iterum-feature="data_tools" style="text-decoration: none;">👥 CRM &amp; contacts</a>
+                    <a href="user_management.html" class="btn" data-iterum-feature="data_tools" style="text-decoration: none;">🛡️ User admin</a>
+                </div>
             </div>
         </div>
 

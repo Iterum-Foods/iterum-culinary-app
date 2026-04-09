@@ -682,7 +682,7 @@ class ProjectManagementSystem {
     try {
       const v = localStorage.getItem(this.getRestaurantLocationScopeKey());
       this._restaurantLocationScope = v === 'all' ? 'all' : 'single';
-      const members = this.getRestaurantGroupMembersForCurrentProject();
+      const members = this.getRestaurantGroupMembersForSidebar();
       if (members.length < 2 && this._restaurantLocationScope === 'all') {
         this._restaurantLocationScope = 'single';
       }
@@ -717,7 +717,7 @@ class ProjectManagementSystem {
     if (mode !== 'all' && mode !== 'single') {
       return;
     }
-    const members = this.getRestaurantGroupMembersForCurrentProject();
+    const members = this.getRestaurantGroupMembersForSidebar();
     if (members.length < 2 && mode === 'all') {
       return;
     }
@@ -750,7 +750,8 @@ class ProjectManagementSystem {
       x =>
         x.restaurantGroupId === gid &&
         x.id !== this.masterProjectId &&
-        x.status !== 'archived'
+        x.status !== 'archived' &&
+        !x.isArchived
     );
     if (grouped.length === 0) {
       return [p];
@@ -763,14 +764,87 @@ class ProjectManagementSystem {
   }
 
   /**
+   * Locations shown in the left sidebar (Master-friendly).
+   * Uses current project's group when it has 2+ members; otherwise the largest
+   * restaurant group, or all active restaurant-type projects if there are 2+.
+   * @returns {object[]}
+   */
+  getRestaurantGroupMembersForSidebar() {
+    const fromCurrent = this.getRestaurantGroupMembersForCurrentProject();
+    if (fromCurrent.length >= 2) {
+      return fromCurrent;
+    }
+
+    const byGroup = new Map();
+    for (const p of this.projects) {
+      if (!p?.restaurantGroupId || p.id === this.masterProjectId) {
+        continue;
+      }
+      if (p.status === 'archived' || p.isArchived) {
+        continue;
+      }
+      const gid = p.restaurantGroupId;
+      if (!byGroup.has(gid)) {
+        byGroup.set(gid, []);
+      }
+      byGroup.get(gid).push(p);
+    }
+    let best = [];
+    for (const arr of byGroup.values()) {
+      if (arr.length > best.length) {
+        best = arr;
+      }
+    }
+    if (best.length >= 2) {
+      return best.sort((a, b) =>
+        (a.name || '').localeCompare(b.name || '', undefined, {
+          sensitivity: 'base'
+        })
+      );
+    }
+
+    const restaurants = this.projects.filter(p => {
+      if (!p || p.id === this.masterProjectId) {
+        return false;
+      }
+      if (p.status === 'archived' || p.isArchived) {
+        return false;
+      }
+      if (p.type !== 'restaurant') {
+        return false;
+      }
+      return true;
+    });
+    if (restaurants.length >= 2) {
+      return restaurants.sort((a, b) =>
+        (a.name || '').localeCompare(b.name || '', undefined, {
+          sensitivity: 'base'
+        })
+      );
+    }
+
+    return fromCurrent.length ? fromCurrent : [];
+  }
+
+  /**
    * Project IDs to use when filtering recipes, menus, etc.
    * @returns {string[]}
    */
   getEffectiveProjectIds() {
     const cur = this.currentProject?.id || this.masterProjectId;
+    const sidebarMembers = this.getRestaurantGroupMembersForSidebar();
+
+    if (
+      this._restaurantLocationScope === 'all' &&
+      sidebarMembers.length >= 2
+    ) {
+      return sidebarMembers.map(m => m.id);
+    }
+
     if (!this.currentProject || cur === this.masterProjectId) {
       return [this.masterProjectId];
     }
+
     const members = this.getRestaurantGroupMembersForCurrentProject();
     if (members.length <= 1) {
       return [cur];

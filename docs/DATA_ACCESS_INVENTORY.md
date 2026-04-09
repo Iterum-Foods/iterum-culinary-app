@@ -1,7 +1,7 @@
 # Data access inventory (storage keys & Firestore)
 
 Snapshot for supply-chain / security review. Regenerate diffs with ripgrep as code changes.  
-**Operator UI roles** (not Firestore): [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md).
+**Operator UI roles** (not Firestore): [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md). **Source-of-truth (entity storage):** [SOURCE_OF_TRUTH.md](./SOURCE_OF_TRUTH.md). **Ship runbook:** [HOW_WE_SHIP.md](./HOW_WE_SHIP.md).
 
 ## Firestore paths (client: `public/assets/js/firestore-sync.js`)
 

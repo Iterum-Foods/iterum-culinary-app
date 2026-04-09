@@ -10,12 +10,48 @@ class UnifiedNavHeader {
   }
 
   detectCurrentPage() {
-    const path = window.location.pathname;
-    if (path.includes('index')) {
+    const path = (window.location.pathname || '').toLowerCase();
+    if (path.includes('index') || path.includes('dashboard')) {
       return 'dashboard';
     }
-    if (path.includes('dashboard')) {
-      return 'dashboard';
+    if (path.includes('restaurant-group-onboarding')) {
+      return 'rgo';
+    }
+    if (path.includes('bulk-ingredient-import')) {
+      return 'import_ing';
+    }
+    if (path.includes('bulk-recipe-import')) {
+      return 'import_recipe';
+    }
+    if (path.includes('recipe-scaling-tool')) {
+      return 'scaling';
+    }
+    if (path.includes('recipe-photo-studio')) {
+      return 'photo';
+    }
+    if (path.includes('recipe-canvas')) {
+      return 'canvas';
+    }
+    if (path.includes('data-management-dashboard')) {
+      return 'datamgmt';
+    }
+    if (path.includes('data-backup')) {
+      return 'backup';
+    }
+    if (path.includes('vendor-price-comparison')) {
+      return 'vendorprice';
+    }
+    if (path.includes('production-planning')) {
+      return 'production';
+    }
+    if (path.includes('project-hub')) {
+      return 'projects';
+    }
+    if (path.includes('contact_management')) {
+      return 'crm';
+    }
+    if (path.includes('user_management')) {
+      return 'admin';
     }
     if (path.includes('recipe-library')) {
       return 'recipes';
@@ -32,14 +68,20 @@ class UnifiedNavHeader {
     if (path.includes('kitchen-management')) {
       return 'kitchen';
     }
-    if (path.includes('ingredients')) {
-      return 'ingredients';
+    if (path.includes('inventory-variance')) {
+      return 'invvar';
     }
-    if (path.includes('vendor')) {
+    if (path.includes('inventory')) {
+      return 'inventory';
+    }
+    if (path.includes('vendor-management')) {
       return 'vendors';
     }
-    if (path.includes('equipment')) {
+    if (path.includes('equipment-management')) {
       return 'equipment';
+    }
+    if (path.includes('ingredients')) {
+      return 'ingredients';
     }
     if (path.includes('user-profile')) {
       return 'profile';
@@ -53,23 +95,58 @@ class UnifiedNavHeader {
     if (path.includes('audit-log')) {
       return 'audit';
     }
+    if (path.includes('setup')) {
+      return 'setup';
+    }
     return 'other';
   }
 
-  /**
-   * Notebook-style pages ship their own shell (aside + layout). Injecting the
-   * legacy unified sidebar here duplicates nav, breaks flex, and hides links.
-   */
+  navPageActive(slug) {
+    return this.currentPage === slug ? 'active' : '';
+  }
+
+  moreMenuActiveClass() {
+    const inMore = [
+      'highlights',
+      'server',
+      'vendorprice',
+      'equipment',
+      'production',
+      'import_recipe',
+      'import_ing',
+      'rgo',
+      'datamgmt',
+      'backup',
+      'audit',
+      'profile',
+      'setup',
+      'invvar',
+      'crm',
+      'admin'
+    ];
+    return inMore.indexOf(this.currentPage) >= 0 ? 'active' : '';
+  }
+
+  /** Only skip when a page opts out explicitly (auth, marketing, embeds). */
   shouldSkipUnifiedNav() {
-    if (document.body?.getAttribute('data-no-unified-nav') === 'true') {
-      return true;
+    return document.body?.getAttribute('data-no-unified-nav') === 'true';
+  }
+
+  ensureFontAwesome() {
+    if (
+      document.querySelector(
+        'link[href*="font-awesome"], link[href*="fontawesome"]'
+      )
+    ) {
+      return;
     }
-    const path = (window.location.pathname || '').toLowerCase();
-    // Matches dashboard.html, /dashboard, pretty URLs on static hosts
-    if (path.includes('dashboard')) {
-      return true;
-    }
-    return false;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href =
+      'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css';
+    link.crossOrigin = 'anonymous';
+    link.referrerPolicy = 'no-referrer';
+    document.head.appendChild(link);
   }
 
   init() {
@@ -80,9 +157,7 @@ class UnifiedNavHeader {
     }
 
     if (this.shouldSkipUnifiedNav()) {
-      console.log(
-        'Unified nav: skipped (page has custom shell — e.g. dashboard.html)'
-      );
+      console.log('Unified nav: skipped (data-no-unified-nav)');
       return;
     }
 
@@ -99,6 +174,8 @@ class UnifiedNavHeader {
     if (this.shouldSkipUnifiedNav()) {
       return;
     }
+
+    this.ensureFontAwesome();
 
     const sidebar = document.createElement('aside');
     sidebar.className = 'unified-nav-sidebar';
@@ -137,6 +214,7 @@ class UnifiedNavHeader {
 
     // Setup mobile toggle
     this.setupMobileToggle();
+    this.setupMobileNavLinkClose();
 
     this.injectWorkspaceFeaturesScript();
     this.injectRestaurantLocationSidebarScript();
@@ -238,73 +316,99 @@ class UnifiedNavHeader {
   }
 
   getSidebarHTML() {
+    const p = slug => this.navPageActive(slug);
+    const moreActive = this.moreMenuActiveClass();
     return `
             <div class="sidebar-header">
-                <a href="index.html" class="nav-logo">
+                <a href="dashboard.html" class="nav-logo">
                     <span class="nav-logo-icon">🍳</span>
                     <span class="nav-logo-text">Iterum</span>
                 </a>
-                <button class="sidebar-toggle-mobile" id="sidebar-toggle">
+                <button type="button" class="sidebar-toggle-mobile" id="sidebar-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="unified-sidebar-nav">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
 
-            <nav class="sidebar-nav">
+            <nav class="sidebar-nav" id="unified-sidebar-nav" aria-label="Main">
                 <div class="nav-links">
-                    <a href="index.html" class="nav-link nav-link-emphasis ${this.currentPage === 'dashboard' ? 'active' : ''}">
+                    <div class="nav-section-label">Main</div>
+                    <a href="dashboard.html" class="nav-link nav-link-emphasis ${p('dashboard')}">
                         <span>🏠</span> Dashboard
                     </a>
-                    <a href="recipe-library.html" class="nav-link ${this.currentPage === 'recipes' ? 'active' : ''}" data-iterum-feature="recipes">
-                        <span>📚</span> Recipes
+                    <a href="project-hub.html" class="nav-link ${p('projects')}" data-iterum-feature="projects">
+                        <span>📂</span> Projects
                     </a>
-                    <a href="menu-builder.html" class="nav-link ${this.currentPage === 'menu' ? 'active' : ''}" data-iterum-feature="menus">
-                        <span>🍽️</span> Menus
+                    <a href="menu-builder.html" class="nav-link ${p('menu')}" data-iterum-feature="menus">
+                        <span>🍽️</span> Menu Builder
                     </a>
-                    <a href="calendar.html" class="nav-link ${this.currentPage === 'calendar' ? 'active' : ''}" data-iterum-feature="calendar">
-                        <span>📅</span> Calendar
+                    <a href="recipe-library.html" class="nav-link ${p('recipes')}" data-iterum-feature="recipes">
+                        <span>📚</span> Recipe Index
                     </a>
-                    <a href="kitchen-management.html" class="nav-link ${this.currentPage === 'kitchen' ? 'active' : ''}" data-iterum-feature="kitchen">
-                        <span>🔪</span> Kitchen
-                    </a>
-                    <a href="ingredients.html" class="nav-link ${this.currentPage === 'ingredients' ? 'active' : ''}" data-iterum-feature="ingredients">
+                    <a href="ingredients.html" class="nav-link ${p('ingredients')}" data-iterum-feature="ingredients">
                         <span>🥬</span> Ingredients
                     </a>
+                    <a href="recipe-developer.html" class="nav-link ${p('developer')}" data-iterum-feature="recipes">
+                        <span>🧪</span> Recipe Developer
+                    </a>
+                    <a href="calendar.html" class="nav-link ${p('calendar')}" data-iterum-feature="calendar">
+                        <span>📅</span> Calendar
+                    </a>
+                    <a href="kitchen-management.html" class="nav-link ${p('kitchen')}" data-iterum-feature="kitchen">
+                        <span>🔪</span> Kitchen
+                    </a>
+                    <a href="inventory.html" class="nav-link ${p('inventory')}" data-iterum-feature="inventory">
+                        <span>📦</span> Inventory
+                    </a>
+                    <a href="vendor-management.html" class="nav-link ${p('vendors')}" data-iterum-feature="vendors">
+                        <span>🏪</span> Vendors
+                    </a>
+
+                    <div class="nav-section-label">Tools</div>
+                    <a href="recipe-photo-studio.html" class="nav-link ${p('photo')}" data-iterum-feature="photo_studio">
+                        <span>📸</span> Photo Studio
+                    </a>
+                    <a href="recipe-scaling-tool.html" class="nav-link ${p('scaling')}" data-iterum-feature="scaling">
+                        <span>🔢</span> Recipe Scaling
+                    </a>
+                    <a href="recipe-canvas.html" class="nav-link ${p('canvas')}" data-iterum-feature="recipes">
+                        <span>🎨</span> Recipe Canvas
+                    </a>
+
                     <div class="nav-dropdown">
-                        <button class="nav-link nav-dropdown-btn">
+                        <button type="button" class="nav-link nav-dropdown-btn ${moreActive}">
                             <span>☰</span> More
                         </button>
                         <div class="nav-dropdown-content">
-                            <div class="nav-dropdown-category">Kitchen Tools</div>
-                            <a href="kitchen-management.html" data-iterum-feature="kitchen">🔪 Kitchen Management</a>
-                            <a href="kitchen-management.html?tab=pdf" data-iterum-feature="kitchen">📕 Recipe Book PDF</a>
-                            <a href="kitchen-management.html?tab=preplist" data-iterum-feature="kitchen">📝 Prep Lists</a>
-                            <a href="ingredient-highlights.html" data-iterum-feature="ingredients">✨ Ingredient Stories</a>
-                            <a href="server-info-sheet.html" data-iterum-feature="kitchen">🗣️ Server Info</a>
+                            <div class="nav-dropdown-category">Kitchen tools</div>
+                            <a href="kitchen-management.html?tab=pdf" data-iterum-feature="kitchen">📕 Recipe book PDF</a>
+                            <a href="kitchen-management.html?tab=preplist" data-iterum-feature="kitchen">📝 Prep lists</a>
+                            <a href="ingredient-highlights.html" class="${p('highlights')}" data-iterum-feature="ingredients">✨ Ingredient stories</a>
+                            <a href="server-info-sheet.html" class="${p('server')}" data-iterum-feature="kitchen">🗣️ Server info</a>
                             <hr>
-                            <div class="nav-dropdown-category">Inventory</div>
-                            <a href="inventory.html" data-iterum-feature="inventory">📦 Inventory</a>
-                            <a href="vendor-management.html" data-iterum-feature="vendors">🏪 Vendors</a>
-                            <a href="vendor-price-comparison.html" data-iterum-feature="vendors">💰 Price Compare</a>
-                            <a href="equipment-management.html" data-iterum-feature="equipment">🔧 Equipment</a>
-                            <a href="production-planning.html" data-iterum-feature="production">📋 Production</a>
+                            <div class="nav-dropdown-category">Operations</div>
+                            <a href="vendor-price-comparison.html" class="${p('vendorprice')}" data-iterum-feature="vendors">💰 Price compare</a>
+                            <a href="equipment-management.html" class="${p('equipment')}" data-iterum-feature="equipment">🔧 Equipment</a>
+                            <a href="production-planning.html" class="${p('production')}" data-iterum-feature="production">📋 Production</a>
+                            <a href="inventory-variance.html" class="${p('invvar')}" data-iterum-feature="inventory">📉 Inventory variance</a>
                             <hr>
                             <div class="nav-dropdown-category">Import</div>
-                            <a href="bulk-recipe-import.html" data-iterum-feature="import_export">🚀 Recipe Import</a>
-                            <a href="bulk-ingredient-import.html" data-iterum-feature="import_export">📥 Ingredient Import</a>
-                            <a href="recipe-photo-studio.html" data-iterum-feature="photo_studio">📸 Photo Studio</a>
+                            <a href="bulk-recipe-import.html" class="${p('import_recipe')}" data-iterum-feature="import_export">🚀 Recipe import</a>
+                            <a href="bulk-ingredient-import.html" class="${p('import_ing')}" data-iterum-feature="import_export">📥 Ingredient import</a>
                             <hr>
-                            <div class="nav-dropdown-category">System</div>
-                            <a href="project-hub.html" data-iterum-feature="projects">📂 Project Hub</a>
-                            <a href="restaurant-group-onboarding.html" data-iterum-feature="projects">📍 Add a restaurant group</a>
-                            <a href="data-backup-center.html" data-iterum-feature="backup">💾 Backup Center</a>
-                            <a href="data-management-dashboard.html" data-iterum-feature="data_tools">🧠 Data Management</a>
-                            <a href="audit-log.html" data-iterum-feature="data_tools">📜 Audit Log</a>
+                            <div class="nav-dropdown-category">Workspace</div>
+                            <a href="restaurant-group-onboarding.html" class="${p('rgo')}" data-iterum-feature="projects">📍 Add a restaurant group</a>
+                            <a href="data-backup-center.html" class="${p('backup')}" data-iterum-feature="backup">💾 Backup center</a>
+                            <a href="data-management-dashboard.html" class="${p('datamgmt')}" data-iterum-feature="data_tools">🧠 Data management</a>
+                            <a href="audit-log.html" class="${p('audit')}" data-iterum-feature="data_tools">📜 Audit log</a>
+                            <a href="contact_management.html" class="${p('crm')}" data-iterum-feature="data_tools">👥 CRM &amp; contacts</a>
+                            <a href="user_management.html" class="${p('admin')}" data-iterum-feature="data_tools">🛡️ User admin</a>
                         </div>
                     </div>
                 </div>
             </nav>
 
             <div class="sidebar-footer">
+                <div id="unified-project-selector" class="sidebar-unified-project-slot" style="width:100%;margin-bottom:12px;position:relative;"></div>
                 <div class="nav-project-chip" id="nav-project-chip">Project: Master Project</div>
                 <div class="sidebar-restaurant-scope-wrap" style="display:none;width:100%;margin:10px 0 14px;">
                     <div style="font-size:10px;text-transform:uppercase;font-weight:600;letter-spacing:0.06em;color:#b45309;opacity:0.9;margin-bottom:6px;">Locations</div>
@@ -328,11 +432,12 @@ class UnifiedNavHeader {
                             <span style="font-size: 0.75rem;">⚙️ Settings</span>
                         </button>
                         <div class="nav-dropdown-content nav-user-menu">
-                            <a href="user-profile.html">👤 Profile & Settings</a>
-                            <a href="project-hub.html" data-iterum-feature="projects">📂 Project Hub</a>
+                            <a href="user-profile.html">👤 Profile &amp; settings</a>
+                            <a href="setup.html">🛠️ Workspace setup</a>
+                            <a href="project-hub.html" data-iterum-feature="projects">📂 Project hub</a>
                             <a href="restaurant-group-onboarding.html" data-iterum-feature="projects">📍 Add a restaurant group</a>
                             <hr>
-                            <a href="#" onclick="event.preventDefault(); if (window.authManager) { window.authManager.signOut(); } window.location.href='index.html';">🚪 Sign Out</a>
+                            <a href="#" onclick="event.preventDefault(); if (window.authManager) { window.authManager.signOut(); } window.location.href='index.html';">🚪 Sign out</a>
                         </div>
                     </div>
                 </div>
@@ -347,6 +452,8 @@ class UnifiedNavHeader {
     if (toggle && sidebar) {
       toggle.addEventListener('click', () => {
         sidebar.classList.toggle('mobile-open');
+        const open = sidebar.classList.contains('mobile-open');
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       });
 
       // Close sidebar when clicking outside on mobile
@@ -355,12 +462,31 @@ class UnifiedNavHeader {
           window.innerWidth <= 768 &&
           sidebar.classList.contains('mobile-open') &&
           !sidebar.contains(e.target) &&
-          !toggle.contains(e.target)
+          !toggle.contains(e.target) &&
+          !(e.target && e.target.closest && e.target.closest('#dash-menu-toggle'))
         ) {
           sidebar.classList.remove('mobile-open');
+          toggle.setAttribute('aria-expanded', 'false');
         }
       });
     }
+  }
+
+  /** Collapse the drawer after navigating on small screens */
+  setupMobileNavLinkClose() {
+    const sidebar = document.querySelector('.unified-nav-sidebar');
+    if (!sidebar) return;
+    sidebar.addEventListener('click', e => {
+      const a = e.target.closest('a[href]');
+      if (!a || window.innerWidth > 768) return;
+      const href = (a.getAttribute('href') || '').trim();
+      if (!href || href === '#') return;
+      sidebar.classList.remove('mobile-open');
+      const t = document.getElementById('sidebar-toggle');
+      if (t) t.setAttribute('aria-expanded', 'false');
+      const dash = document.getElementById('dash-menu-toggle');
+      if (dash) dash.setAttribute('aria-expanded', 'false');
+    });
   }
 
   injectStyles() {
@@ -500,6 +626,21 @@ class UnifiedNavHeader {
                 padding: 0 12px;
             }
 
+            .nav-section-label {
+                font-size: 0.65rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                color: #94a3b8;
+                padding: 14px 16px 6px;
+                margin-top: 2px;
+            }
+
+            .nav-section-label:first-child {
+                padding-top: 4px;
+                margin-top: 0;
+            }
+
             .nav-link {
                 color: #3E4C54;
                 text-decoration: none;
@@ -606,6 +747,16 @@ class UnifiedNavHeader {
                 color: #ffffff;
             }
 
+            .nav-dropdown-content a.active {
+                background: rgba(37, 99, 235, 0.85);
+                color: #ffffff;
+            }
+
+            .nav-dropdown-btn.active:not(:hover) {
+                border-color: rgba(59, 130, 246, 0.45);
+                background: rgba(59, 130, 246, 0.22);
+            }
+
             .nav-dropdown-content hr {
                 border: none;
                 border-top: 1px solid rgba(148, 163, 184, 0.22);
@@ -642,25 +793,7 @@ class UnifiedNavHeader {
                 letter-spacing: 0.01em;
             }
 
-            /* Mobile Responsive */
-            @media (max-width: 900px) {
-                .nav-links {
-                    display: none;
-                }
-
-                .nav-container {
-                    justify-content: space-between;
-                }
-
-                .nav-logo-text {
-                    display: none;
-                }
-            }
-
-                /* Aggressively hide any legacy headers/navs to prevent double headers */
-                header:not(.unified-nav-header) { display: none !important; }
-                nav:not(.unified-nav-header) { display: none !important; }
-                .page-header,
+                /* Legacy top bars only — avoid .page-header (used by audit-log and others as content heroes) */
                 .legacy-header,
                 .site-header,
                 .app-header,

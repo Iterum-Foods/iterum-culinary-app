@@ -1,7 +1,7 @@
 # Executive checklist & next steps
 
 **Purpose:** Single page for leadership to track launch readiness and foundation work.  
-**Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](./NEXT_STEPS_LEADERSHIP.md) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) · [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) (phased path to pilot-ready / scale-ready) · [docs/workflows/](./docs/workflows/) (e.g. sign-in UI redesign)  
+**Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](./NEXT_STEPS_LEADERSHIP.md) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) · [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) · [docs/HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md) · [docs/SOURCE_OF_TRUTH.md](./docs/SOURCE_OF_TRUTH.md) · [docs/workflows/](./docs/workflows/) (e.g. sign-in UI redesign)  
 **Last updated:** 29 March 2026  
 
 ---
@@ -40,9 +40,9 @@ Run this block whenever `firestore.rules`, `storage.rules`, or membership-relate
 
 | Status | Step | Owner | Notes |
 |--------|------|-------|--------|
-| [ ] | **CI:** Workflow **Deploy Firebase** succeeded on `main` ([Actions · Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml)). | Eng / CTO | Requires repo secret `FIREBASE_TOKEN`. Deploys **Firestore + Storage** rules to `iterum-culinary-app2`. |
-| [ ] | **App URL:** Smoke on **Vercel** production (`https://iterum-culinary-app.vercel.app/`) — not only localhost. | Eng | Confirms what pilots hit. |
-| [ ] | **A1 record:** [docs/A1_P0_PROD_SMOKE_RECORD.md](./docs/A1_P0_PROD_SMOKE_RECORD.md) completed → **GO** (all required steps). | Ops / COO | Fills evidence for executive sign-off row below. |
+| [ ] | **CI:** Workflow **Deploy Firebase** succeeded on `main` ([Actions · Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml)). | Eng / CTO | **After `main` has this commit:** open Actions and confirm the latest **Deploy Firebase** run is green (`firestore.rules` in this push triggers it). |
+| [x] | **App URL:** Smoke on **Vercel** production (`https://iterum-culinary-app.vercel.app/`) — not only localhost. | Eng | **`npm run test:smoke:prod`** — 4/4 Playwright checks passed (2026-03-29). |
+| [ ] | **A1 record:** [docs/A1_P0_PROD_SMOKE_RECORD.md](./docs/A1_P0_PROD_SMOKE_RECORD.md) → **GO** (all required steps). | Ops / COO | **Partial:** automated baseline done (steps 1 + 3 pages). **Still required:** human **2** (sign-in persistence) + **4** (recipe photo) → then mark **GO**. |
 | [ ] | **(Optional)** In Firebase Console → Firestore, confirm `projects/{projectId}/members/{yourUid}` exists with `role` after owner sync (see [docs/ROLES_AND_PERMISSIONS.md](./docs/ROLES_AND_PERMISSIONS.md)). | Eng | Verifies **company membership** rules are live. |
 
 ---
@@ -56,7 +56,7 @@ Run this block whenever `firestore.rules`, `storage.rules`, or membership-relate
 | [x] | Align Storage rules with client paths (incl. legacy recipe photo path) | Eng | `storage.rules` — deploy with Firestore |
 | [x] | **Deploy** updated rules to production + smoke-test app (sign-in, menu sync, photos) | CTO + Eng / Ops | **2026-03-27:** Rules released to **`iterum-culinary-app2`**. **2026-03-29+:** `projects/.../members/{uid}` + company roles — redeploy via **Deploy Firebase** CI whenever `firestore.rules` changes; complete **Ship & verify** above. |
 | [x] | Confirm no production code relies on **listing** all `projects` in a way that breaks under tightened rules | CTO + Eng | **Pass:** `firestore-sync.js` uses **`doc('projects', id)` only**. Root `projects` **query** only in `cloud-data-sync.js` (`where('userId','==',...)`). Rules now use **`allow read`** (not `list: false`) so filtered queries can be evaluated; `ensureProjectDoc` fields are `ownerId` / `firebaseUid` (legacy query may no-op). |
-| [ ] | Executive sign-off: “Rules deployed + spot-check OK” | COO (package for CEO) | **Smoke record:** [docs/A1_P0_PROD_SMOKE_RECORD.md](./docs/A1_P0_PROD_SMOKE_RECORD.md) must show **GO** (all steps); then CEO OK. |
+| [ ] | Executive sign-off: “Rules deployed + spot-check OK” | COO (package for CEO) | **Blocked until** A1 human steps **2** + **4** → full **GO**; then CEO OK. Automated baseline already in smoke record. |
 
 ---
 
@@ -65,8 +65,8 @@ Run this block whenever `firestore.rules`, `storage.rules`, or membership-relate
 | Status | Item | Owner | Notes |
 |--------|------|-------|--------|
 | [x] | Introduce thin wrapper for **Project** entity (`project-data-access.js`) | Eng | Menu builder wired as first consumer |
-| [ ] | Route **checklists** and **recipe library** snapshots through same pattern (or document exceptions) | Eng | Reduces forked sync patterns |
-| [ ] | Decide **source of truth** per entity (local-first vs cloud-first) for recipes, menus, vendors — document in one page | CTO + PM / Eng (COO if no PM yet) | Unblocks multi-site roadmap |
+| [x] | Route **checklists** and **recipe library** snapshots through same pattern (or document exceptions) | Eng | **Exceptions documented:** [docs/SOURCE_OF_TRUTH.md](./docs/SOURCE_OF_TRUTH.md) (split paths + phased refactor). Code consolidation remains incremental. |
+| [x] | Decide **source of truth** per entity (local-first vs cloud-first) for recipes, menus, vendors — document in one page | CTO + PM / Eng (COO if no PM yet) | **Done:** [docs/SOURCE_OF_TRUTH.md](./docs/SOURCE_OF_TRUTH.md) v1; refine after ICP lock. |
 
 ---
 
@@ -74,7 +74,7 @@ Run this block whenever `firestore.rules`, `storage.rules`, or membership-relate
 
 | Status | Item | Owner | Notes |
 |--------|------|-------|--------|
-| [ ] | Confirm ICP for next 90 days: multi-unit vs single venue vs consultant | COO (facilitate) · CEO (decide) | Drives naming and onboarding |
+| [ ] | Confirm ICP for next 90 days: multi-unit vs single venue vs consultant | COO (facilitate) · CEO (decide) | **Template:** [docs/ICP_DECISION_RECORD.md](./docs/ICP_DECISION_RECORD.md) — fill when decided. |
 | [ ] | Define **acceptance criteria** for “one manager, multiple restaurants, shared vendors, comparable pricing” | PM (or COO) | Tie to CEO brief success metrics |
 | [ ] | Epic breakdown + engineering estimate | CTO + PM / Eng | After ICP lock |
 
@@ -105,7 +105,7 @@ Run this block whenever `firestore.rules`, `storage.rules`, or membership-relate
 | Status | Item | Owner | Notes |
 |--------|------|-------|--------|
 | [ ] | Optional bundler (e.g. Vite) — decision and timeline | Eng | Only after P0–P1 momentum |
-| [ ] | Consolidate Firebase / deploy runbooks (one “how we ship” path) | Eng / Ops | Cuts exec noise and on-call risk |
+| [x] | Consolidate Firebase / deploy runbooks (one “how we ship” path) | Eng / Ops | [docs/HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md) + link from [FIREBASE_SETUP_VERIFICATION.md](./FIREBASE_SETUP_VERIFICATION.md) |
 
 ---
 

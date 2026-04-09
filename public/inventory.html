@@ -135,6 +135,7 @@
     </style>
     
     <!-- Unified Navigation & Project Selector -->
+    <script src="assets/js/workspace-features.js" defer></script>
     <script src="assets/js/unified-nav-header.js" defer></script>
     <script src="assets/js/unified-project-selector.js" defer></script>
     <link rel="stylesheet" href="assets/css/header-universal.css">
@@ -148,7 +149,8 @@
                 <h1 style="font-size: 32px; font-weight: 800; margin-bottom: 8px;">📦 Inventory Management</h1>
                 <p style="color: #64748b;">Track stock levels, manage reorders, and prevent waste</p>
             </div>
-            <div style="display: flex; gap: 12px;">
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <a href="inventory-variance.html" class="btn btn-secondary" data-iterum-feature="inventory" style="text-decoration: none; display: inline-flex; align-items: center;">📉 Variance analysis</a>
                 <button class="btn btn-secondary" onclick="exportInventory()">📥 Export</button>
                 <button class="btn btn-secondary" onclick="showImportModal()">📤 Import</button>
                 <button class="btn btn-primary" onclick="showAddStockModal()">+ Add Stock</button>

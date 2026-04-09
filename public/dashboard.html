@@ -167,10 +167,6 @@
       box-shadow: 0 0 0 3px rgba(107, 142, 111, 0.2);
     }
 
-    aside nav a.nav-dash-link:hover {
-      background-color: var(--nav-hover-bg) !important;
-    }
-
     button {
       padding: 0.5rem 1rem;
       border-radius: var(--radius-md);
@@ -251,66 +247,6 @@
     .dash-menu-btn:focus-visible {
       outline: 2px solid var(--brand-primary-accent);
       outline-offset: 2px;
-    }
-    .dash-drawer-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(26, 46, 53, 0.35);
-      z-index: 40;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.2s ease, visibility 0.2s;
-    }
-    .dash-drawer-overlay.is-open {
-      opacity: 1;
-      visibility: visible;
-    }
-    .dash-drawer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: min(18rem, 88vw);
-      height: 100%;
-      z-index: 41;
-      background: var(--brand-bg-primary);
-      border-right: 1px solid var(--brand-border-light);
-      box-shadow: var(--shadow-md);
-      transform: translateX(-100%);
-      transition: transform 0.22s ease;
-      overflow-y: auto;
-      padding: 1rem;
-    }
-    .dash-drawer.is-open {
-      transform: translateX(0);
-    }
-    .dash-drawer nav a {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.65rem 0.75rem;
-      border-radius: var(--radius-md);
-      color: var(--brand-text-primary);
-      text-decoration: none;
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-    .dash-drawer nav a:hover {
-      background: var(--brand-bg-secondary);
-    }
-    .dash-drawer nav a.is-active {
-      background: rgba(107, 142, 111, 0.15);
-      color: var(--brand-moss-dark);
-      font-weight: 600;
-    }
-    .dash-drawer nav {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .dash-drawer .drawer-footer-links {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
     }
     header.dash-page-header {
       backdrop-filter: blur(8px);
@@ -420,139 +356,17 @@
       flex-wrap: wrap;
     }
 
-    /* Scrollable left nav: long link lists must not clip above the user block */
-    .dashboard-sidebar-nav {
-      flex: 1 1 auto;
-      min-height: 0;
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-      padding-right: 2px;
-    }
   </style>
 </head>
-  <body class="flex h-screen text-primary bg-secondary" style="padding-top: 0;" data-no-unified-nav="true">
+  <body class="text-primary bg-secondary" style="padding-top: 0;">
 
-  <!-- LEFT SIDEBAR (Notebook Spine) -->
-  <aside class="w-56 flex-shrink-0 border-r p-4 hidden md:block bg-primary border-brand" style="background-color: var(--brand-bg-primary); border-color: var(--brand-border-light);">
-    <div class="h-full flex flex-col">
-      <!-- Logo/Title -->
-      <div class="mb-8 flex items-center">
-        <span class="text-2xl font-extrabold" style="color: var(--brand-primary-accent);">Iterum</span>
-      </div>
-
-      <!-- Navigation Links -->
-      <nav class="flex-grow space-y-1 dashboard-sidebar-nav">
-        <div class="text-xs uppercase font-semibold mb-3 px-2" style="color: var(--brand-text-muted);">Main</div>
-        
-        <!-- Dashboard Link (Active) -->
-        <a href="dashboard.html" class="flex items-center px-3 py-2.5 rounded-md text-white font-semibold text-sm" style="background-color: var(--brand-primary-accent);">
-          <i class="fa-solid fa-gauge-high" style="width: 18px; font-size: 0.9rem;"></i>
-          <span class="ml-2.5">Dashboard</span>
-        </a>
-        
-        <!-- Projects Link -->
-        <a href="project-hub.html" data-iterum-feature="projects" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
-          <i class="fa-solid fa-folder-tree" style="width: 18px; font-size: 0.9rem;"></i>
-          <span class="ml-2.5">Projects</span>
-        </a>
-        
-        <!-- Menu Builder Link -->
-        <a href="menu-builder.html" data-iterum-feature="menus" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
-          <i class="fa-solid fa-utensils" style="width: 18px; font-size: 0.9rem;"></i>
-          <span class="ml-2.5">Menu Builder</span>
-        </a>
-        
-        <!-- Recipe Library Link -->
-        <a href="recipe-library.html" data-iterum-feature="recipes" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
-          <i class="fa-solid fa-book-open" style="width: 18px; font-size: 0.9rem;"></i>
-          <span class="ml-2.5">Recipe Index</span>
-        </a>
-        
-        <!-- Ingredients Link -->
-        <a href="ingredients.html" data-iterum-feature="ingredients" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
-          <i class="fa-solid fa-carrot" style="width: 18px; font-size: 0.9rem;"></i>
-          <span class="ml-2.5">Ingredients</span>
-        </a>
-        
-        <!-- Recipe Developer Link -->
-        <a href="recipe-developer.html" data-iterum-feature="recipes" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
-          <i class="fa-solid fa-flask" style="width: 18px; font-size: 0.9rem;"></i>
-          <span class="ml-2.5">Recipe Developer</span>
-        </a>
-        
-        <!-- Calendar Link -->
-        <a href="calendar.html" data-iterum-feature="calendar" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
-          <i class="fa-solid fa-calendar-days" style="width: 18px; font-size: 0.9rem;"></i>
-          <span class="ml-2.5">Calendar</span>
-        </a>
-        
-        <!-- Kitchen Management Link -->
-        <a href="kitchen-management.html" data-iterum-feature="kitchen" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
-          <i class="fa-solid fa-kitchen-set" style="width: 18px; font-size: 0.9rem;"></i>
-          <span class="ml-2.5">Kitchen</span>
-        </a>
-        
-        <!-- Inventory Link -->
-        <a href="inventory.html" data-iterum-feature="inventory" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
-          <i class="fa-solid fa-boxes-stacked" style="width: 18px; font-size: 0.9rem;"></i>
-          <span class="ml-2.5">Inventory</span>
-        </a>
-        
-        <!-- Vendors Link -->
-        <a href="vendor-management.html" data-iterum-feature="vendors" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
-          <i class="fa-solid fa-store" style="width: 18px; font-size: 0.9rem;"></i>
-          <span class="ml-2.5">Vendors</span>
-        </a>
-        
-        <div class="text-xs uppercase font-semibold mt-5 mb-2 pt-4 px-2 border-t" style="border-color: var(--brand-border-light); color: var(--brand-text-muted);">Tools</div>
-        
-        <!-- Recipe Photo Studio Link -->
-        <a href="recipe-photo-studio.html" data-iterum-feature="photo_studio" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
-          <i class="fa-solid fa-camera" style="width: 18px; font-size: 0.9rem;"></i>
-          <span class="ml-2.5">Photo Studio</span>
-        </a>
-        
-        <!-- Recipe Scaling Tool Link -->
-        <a href="recipe-scaling-tool.html" data-iterum-feature="scaling" class="flex items-center px-3 py-2.5 rounded-md nav-dash-link cursor-pointer font-medium text-sm transition-colors" style="color: var(--brand-text-primary);">
-          <i class="fa-solid fa-calculator" style="width: 18px; font-size: 0.9rem;"></i>
-          <span class="ml-2.5">Recipe Scaling</span>
-        </a>
-        
-        <div class="text-xs uppercase font-semibold mt-5 mb-2 pt-4 px-2 border-t" style="border-color: var(--brand-border-light); color: var(--brand-text-muted);">Project</div>
-        <div id="sidebar-project-chip" class="text-xs font-semibold px-2" style="color: var(--brand-text-secondary);">Master Project</div>
-        <div class="sidebar-restaurant-scope-wrap px-2 mt-2" style="display:none;">
-          <div class="text-xs uppercase font-semibold mb-2" style="color: var(--brand-text-muted);">Locations</div>
-          <label for="dash-sidebar-restaurant-location-select" class="sr-only">Restaurant location</label>
-          <select id="dash-sidebar-restaurant-location-select" data-restaurant-location-select aria-label="Restaurant location"
-                  class="w-full text-sm py-2 px-2 rounded-md border" style="border-color: var(--brand-border-light); background: var(--brand-card-bg); color: var(--brand-text-primary);"></select>
-        </div>
-      </nav>
-
-      <!-- User Profile -->
-      <div class="mt-auto pt-4 border-t" style="border-color: var(--brand-border-light);">
-        <div class="flex items-center">
-          <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-white text-sm" style="background-color: var(--brand-secondary-accent);" id="user-avatar">C</div>
-          <div class="ml-2.5 flex-1 min-w-0">
-            <div class="text-sm font-semibold truncate" id="user-name" style="color: var(--brand-text-primary);">Chef</div>
-            <div class="text-xs truncate" style="color: var(--brand-text-muted);" id="user-email">Loading...</div>
-            <div class="mt-1 flex flex-col gap-0.5">
-              <a href="user-profile.html" class="text-xs font-medium hover:underline" style="color: var(--brand-text-secondary);">Profile &amp; settings</a>
-              <a href="setup.html" class="text-xs font-medium hover:underline" style="color: var(--brand-primary-accent);">Workspace setup</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN CONTENT AREA (Notebook Page) -->
-  <section class="flex-grow main-content-area min-h-full" style="flex: 1 1 auto; min-width: 0;">
+  <!-- MAIN CONTENT AREA (unified nav injects the left sidebar) -->
+  <section class="main-content-area min-h-full" style="min-width: 0;">
     <div class="w-full px-5 py-4" style="max-width: none; width: 100%; margin-right: 0;">
 
       <div class="dash-mobile-strip">
         <span class="text-lg font-bold tracking-tight" style="color: var(--brand-primary-accent);">Iterum</span>
-        <button type="button" class="dash-menu-btn" id="dash-menu-toggle" aria-expanded="false" aria-controls="dash-mobile-drawer">
+        <button type="button" class="dash-menu-btn" id="dash-menu-toggle" aria-expanded="false" aria-controls="unified-sidebar-nav">
           <i class="fa-solid fa-bars text-lg" aria-hidden="true"></i>
           <span class="sr-only">Open menu</span>
         </button>
@@ -836,41 +650,6 @@
       </div>
     </div>
   </section>
-
-  <div id="dash-drawer-overlay" class="dash-drawer-overlay" aria-hidden="true" tabindex="-1"></div>
-  <aside id="dash-mobile-drawer" class="dash-drawer" aria-hidden="true" aria-label="Mobile menu" role="dialog">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; padding-bottom:0.75rem; border-bottom:1px solid var(--brand-border-light);">
-      <span class="text-lg font-bold" style="color: var(--brand-primary-accent);">Iterum</span>
-      <button type="button" class="dash-menu-btn" id="dash-drawer-close" aria-label="Close menu">
-        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-      </button>
-    </div>
-    <nav aria-label="Primary">
-      <a href="dashboard.html" class="is-active"><i class="fa-solid fa-gauge-high" style="width:1.25rem" aria-hidden="true"></i> Dashboard</a>
-      <a href="project-hub.html" data-iterum-feature="projects"><i class="fa-solid fa-folder-tree" style="width:1.25rem" aria-hidden="true"></i> Projects</a>
-      <a href="menu-builder.html" data-iterum-feature="menus"><i class="fa-solid fa-utensils" style="width:1.25rem" aria-hidden="true"></i> Menu Builder</a>
-      <a href="recipe-library.html" data-iterum-feature="recipes"><i class="fa-solid fa-book-open" style="width:1.25rem" aria-hidden="true"></i> Recipe Index</a>
-      <a href="ingredients.html" data-iterum-feature="ingredients"><i class="fa-solid fa-carrot" style="width:1.25rem" aria-hidden="true"></i> Ingredients</a>
-      <a href="recipe-developer.html" data-iterum-feature="recipes"><i class="fa-solid fa-flask" style="width:1.25rem" aria-hidden="true"></i> Recipe Developer</a>
-      <a href="calendar.html" data-iterum-feature="calendar"><i class="fa-solid fa-calendar-days" style="width:1.25rem" aria-hidden="true"></i> Calendar</a>
-      <a href="kitchen-management.html" data-iterum-feature="kitchen"><i class="fa-solid fa-kitchen-set" style="width:1.25rem" aria-hidden="true"></i> Kitchen</a>
-      <a href="inventory.html" data-iterum-feature="inventory"><i class="fa-solid fa-boxes-stacked" style="width:1.25rem" aria-hidden="true"></i> Inventory</a>
-      <a href="vendor-management.html" data-iterum-feature="vendors"><i class="fa-solid fa-store" style="width:1.25rem" aria-hidden="true"></i> Vendors</a>
-      <div class="text-xs uppercase font-semibold mt-4 mb-2 pt-3 border-t" style="border-color: var(--brand-border-light); color: var(--brand-text-muted);">Tools</div>
-      <a href="recipe-photo-studio.html" data-iterum-feature="photo_studio"><i class="fa-solid fa-camera" style="width:1.25rem" aria-hidden="true"></i> Photo Studio</a>
-      <a href="recipe-scaling-tool.html" data-iterum-feature="scaling"><i class="fa-solid fa-calculator" style="width:1.25rem" aria-hidden="true"></i> Recipe Scaling</a>
-      <div class="sidebar-restaurant-scope-wrap mt-4 pt-3 border-t" style="display:none;border-color: var(--brand-border-light);">
-        <div class="text-xs uppercase font-semibold mb-2" style="color: var(--brand-text-muted);">Locations</div>
-        <label for="dash-drawer-restaurant-location-select" class="sr-only">Restaurant location</label>
-        <select id="dash-drawer-restaurant-location-select" data-restaurant-location-select aria-label="Restaurant location"
-                class="w-full text-sm py-2 px-2 rounded-md border" style="border-color: var(--brand-border-light); background: var(--brand-card-bg); color: var(--brand-text-primary);"></select>
-      </div>
-    </nav>
-    <div class="drawer-footer-links" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--brand-border-light);">
-      <a href="user-profile.html" class="text-sm font-semibold block" style="color: var(--brand-text-primary);">Profile &amp; settings</a>
-      <a href="setup.html" class="text-sm font-semibold block mt-2" style="color: var(--brand-primary-accent);">Workspace setup</a>
-    </div>
-  </aside>
 
   <script type="module" src="assets/js/firestore-sync.js"></script>
   <script src="assets/js/user-role-setup.js"></script>
@@ -1422,9 +1201,12 @@
         const userEmail = currentUser.email || 'Loading...';
         const userInitial = userName.charAt(0).toUpperCase();
 
-        document.getElementById('user-name').textContent = userName;
-        document.getElementById('user-email').textContent = userEmail;
-        document.getElementById('user-avatar').textContent = userInitial;
+        var nameEl = document.getElementById('nav-user-name') || document.getElementById('user-name');
+        var emailEl = document.getElementById('nav-user-email') || document.getElementById('user-email');
+        var avatarEl = document.getElementById('nav-user-avatar') || document.getElementById('user-avatar');
+        if (nameEl) nameEl.textContent = userName;
+        if (emailEl) emailEl.textContent = userEmail;
+        if (avatarEl) avatarEl.textContent = userInitial;
       } catch (e) {
         console.warn('Failed to load user info:', e);
       }
@@ -1464,46 +1246,30 @@
         }
       });
 
-      (function setupDashDrawer() {
-        var toggle = document.getElementById('dash-menu-toggle');
-        var drawer = document.getElementById('dash-mobile-drawer');
-        var overlay = document.getElementById('dash-drawer-overlay');
-        var closeBtn = document.getElementById('dash-drawer-close');
-        if (!toggle || !drawer || !overlay) return;
-        function openNav() {
-          drawer.classList.add('is-open');
-          overlay.classList.add('is-open');
-          drawer.setAttribute('aria-hidden', 'false');
-          overlay.setAttribute('aria-hidden', 'false');
-          toggle.setAttribute('aria-expanded', 'true');
-          document.body.style.overflow = 'hidden';
-        }
-        function closeNav() {
-          drawer.classList.remove('is-open');
-          overlay.classList.remove('is-open');
-          drawer.setAttribute('aria-hidden', 'true');
-          overlay.setAttribute('aria-hidden', 'true');
-          toggle.setAttribute('aria-expanded', 'false');
-          document.body.style.overflow = '';
-        }
-        toggle.addEventListener('click', function () {
-          if (drawer.classList.contains('is-open')) closeNav();
-          else openNav();
-        });
-        if (closeBtn) closeBtn.addEventListener('click', closeNav);
-        overlay.addEventListener('click', closeNav);
-        document.addEventListener('keydown', function (e) {
-          if (e.key === 'Escape') closeNav();
+      (function setupDashMobileUnifiedNav() {
+        var dashToggle = document.getElementById('dash-menu-toggle');
+        if (!dashToggle) return;
+        dashToggle.addEventListener('click', function () {
+          var sidebarToggle = document.getElementById('sidebar-toggle');
+          if (sidebarToggle) {
+            sidebarToggle.click();
+            dashToggle.setAttribute(
+              'aria-expanded',
+              sidebarToggle.getAttribute('aria-expanded') === 'true'
+                ? 'true'
+                : 'false'
+            );
+          }
         });
       })();
 
       // Load project info
       function updateProjectChips(projectName) {
         const name = projectName || 'Master Project';
-        const sidebarChip = document.getElementById('sidebar-project-chip');
+        const navChip = document.getElementById('nav-project-chip');
         const headerChip = document.getElementById('header-project-chip');
         
-        if (sidebarChip) sidebarChip.textContent = name;
+        if (navChip) navChip.textContent = `Project: ${name}`;
         if (headerChip) headerChip.textContent = `Project: ${name}`;
       }
 

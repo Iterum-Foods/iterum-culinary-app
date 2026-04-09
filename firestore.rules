@@ -1,3 +1,4 @@
+// iterum-culinary-app2 — last tightened: employee_line read-only on project menus/recipes/snapshots
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -125,6 +126,15 @@ service cloud.firestore {
     // Owner OR invited member (company / workspace access)
     function canAccessProjectDoc(projectId) {
       return isProjectOwnerOnly(projectId) || isProjectMember(projectId);
+    }
+
+    // Line staff: read project data; write checklists only (no menu/recipe/snapshot edits)
+    function isEmployeeLineMember(projectId) {
+      return isProjectMember(projectId) && projectMemberRole(projectId) == 'employee_line';
+    }
+
+    function canWriteProjectMenusRecipesSnapshots(projectId) {
+      return canAccessProjectDoc(projectId) && !isEmployeeLineMember(projectId);
     }
 
     // ============================================
@@ -266,15 +276,18 @@ service cloud.firestore {
 
       // Project sub-collections — same tenant as parent project doc
       match /snapshots/{snapshotId} {
-        allow read, write: if canAccessProjectDoc(projectId) && isValidSize();
+        allow read: if canAccessProjectDoc(projectId);
+        allow write: if canWriteProjectMenusRecipesSnapshots(projectId) && isValidSize();
       }
 
       match /menus/{menuId} {
-        allow read, write: if canAccessProjectDoc(projectId) && isValidSize();
+        allow read: if canAccessProjectDoc(projectId);
+        allow write: if canWriteProjectMenusRecipesSnapshots(projectId) && isValidSize();
       }
 
       match /recipes/{recipeId} {
-        allow read, write: if canAccessProjectDoc(projectId) && isValidSize();
+        allow read: if canAccessProjectDoc(projectId);
+        allow write: if canWriteProjectMenusRecipesSnapshots(projectId) && isValidSize();
       }
 
       match /checklists/{checklistId} {

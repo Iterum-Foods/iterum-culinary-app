@@ -667,8 +667,14 @@
             const projects = window.projectManager.projects || [];
             const currentProject = window.projectManager.currentProject;
 
-            // Separate active and archived
-            const active = projects.filter(p => !p.isArchived && p.type !== 'master');
+            // Separate active and archived (hide master / default workspace)
+            const active = projects.filter(
+                p =>
+                    !p.isArchived &&
+                    p.type !== 'master' &&
+                    p.id !== 'master' &&
+                    !p.isMaster
+            );
             const archived = projects.filter(p => p.isArchived);
 
             // Render active projects
@@ -693,6 +699,10 @@
                 archivedContainer.innerHTML = archived.map(project => createProjectCard(project, currentProject)).join('');
             } else {
                 archivedSection.style.display = 'none';
+            }
+
+            if (typeof window.refreshRestaurantLocationSidebar === 'function') {
+                window.refreshRestaurantLocationSidebar();
             }
         }
 

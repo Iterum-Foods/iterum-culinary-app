@@ -791,7 +791,9 @@ class AuthManager {
     localStorage.removeItem(this.STORAGE_KEYS.SESSION_ACTIVE);
     try {
       localStorage.removeItem('iterum_operator_profile');
-    } catch (e) {}
+    } catch (e) {
+      void e;
+    }
 
     this.notifyListeners('session_cleared');
     this.log('✅ Session cleared');

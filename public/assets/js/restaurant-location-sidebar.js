@@ -31,9 +31,11 @@
       return;
     }
     const wrap = select.closest('.sidebar-restaurant-scope-wrap');
-    const members = pm.getRestaurantGroupMembersForCurrentProject
-      ? pm.getRestaurantGroupMembersForCurrentProject()
-      : [];
+    const members = pm.getRestaurantGroupMembersForSidebar
+      ? pm.getRestaurantGroupMembersForSidebar()
+      : pm.getRestaurantGroupMembersForCurrentProject
+        ? pm.getRestaurantGroupMembersForCurrentProject()
+        : [];
     if (!wrap) {
       return;
     }
