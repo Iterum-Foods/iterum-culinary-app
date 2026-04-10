@@ -1,0 +1,16 @@
+{
+  "appId": "com.iterumfoods.linelog",
+  "appName": "Iterum Line Log",
+  "webDir": "public",
+  "server": {
+    "url": "https://iterum-culinary-app.vercel.app/mobile-compliance.html",
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false
+  },
+  "ios": {
+    "contentInset": "automatic"
+  }
+}

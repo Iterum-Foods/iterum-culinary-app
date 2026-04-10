@@ -73,9 +73,18 @@
 
 ## Mobile acquisition — line log (MVP)
 
-**URL:** `/mobile-compliance.html` (installable via `manifest-compliance.json`).  
-**Purpose:** Free **fridge temperature** + **sanitizer (ppm)** logging on phones; uses the same Firestore collections as the dashboard (`refrigeration_units`, `temperature_readings`, `sanitizer_locations`, `sanitizer_readings`) so data appears in **Dashboard** and **Calendar** for the same account.  
-**Next:** Marketing copy A/B, optional Capacitor/Expo wrapper for store listings, sanitizer pass bands per chemistry (today aligned with dashboard defaults).
+**Web:** `/mobile-compliance.html` (installable via `manifest-compliance.json`).  
+**Store apps (native shell):** **Capacitor** — `android/` and `ios/` at repo root.
+
+| Task | Where |
+|------|--------|
+| Config | Root `capacitor.config.json` — **`server.url`** points the WebView at production `…/mobile-compliance.html` so most web fixes ship without a store resubmit. To bundle offline assets instead, remove `server` and set the WebView entry (see Capacitor docs). |
+| Sync after changing `public/` or config | `npm run cap:sync` |
+| Android | `npm run cap:open:android` → Android Studio → signed **AAB/APK** for Play Console. |
+| iOS (requires Mac) | `cd ios/App && pod install` then `npm run cap:open:ios` → Xcode → **Archive** for App Store Connect. |
+
+**Purpose:** Free **fridge temperature** + **sanitizer (ppm)** logging; same Firestore paths as the dashboard so **Dashboard** / **Calendar** stay in sync.  
+**Next:** Store listings (screenshots, privacy policy URL), optional sanitizer bands per chemistry, ATS / Play data-safety disclosures.
 
 ---
 
@@ -106,3 +115,4 @@ Adjust dates on the **exec checklist** “Next 30 days” section when leadershi
 |------|--------|
 | 2026-03-29 | Initial plan: Phases A–D, pilot vs scale-ready definitions, links to existing trackers. |
 | 2026-03-29 | Mobile line log page + PWA manifest; same Firestore paths as dashboard compliance cards. |
+| 2026-03-29 | Capacitor `android/` + `ios/` for Play Store / App Store (WebView → production line log URL). |

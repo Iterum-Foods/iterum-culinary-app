@@ -12,6 +12,7 @@
 | Surface | How | When |
 |---------|-----|------|
 | **Static app** (HTML, JS, CSS in `public/`) | **Vercel** — Git integration on `main` | Every push to `main` (typical). Includes **`/mobile-compliance.html`** (phone-first fridge + sanitizer log; PWA manifest **`/manifest-compliance.json`**). |
+| **Store apps** (Play / App Store) | **Capacitor** — `android/`, `ios/` | `npm run cap:sync` after changing `public/` or `capacitor.config.json`. Open Android Studio / Xcode via `npm run cap:open:android` / `cap:open:ios`. Default config loads production **`server.url`** (line log); see [APP_COMPLETION_PLAN — Mobile acquisition](./APP_COMPLETION_PLAN.md#mobile-acquisition--line-log-mvp). |
 | **Firestore rules** + **Storage rules** | **GitHub Actions** — workflow **Deploy Firebase** | On push to `main` when `firestore.rules`, `storage.rules`, `firebase.json`, `.firebaserc`, or the workflow file changes; or **Run workflow** manually. |
 | **Firebase Auth / Firestore data** | Console + client at runtime | Not redeployed with static files. |
 

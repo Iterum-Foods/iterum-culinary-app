@@ -16,6 +16,10 @@
     "format": "prettier --write \"public/assets/js/**/*.js\" \"public/assets/css/**/*.css\"",
     "format:check": "prettier --check \"public/assets/js/**/*.js\" \"public/assets/css/**/*.css\"",
     "build": "echo 'No build step required for static app'",
+    "cap:sync": "npx cap sync",
+    "cap:copy": "npx cap copy",
+    "cap:open:android": "npx cap open android",
+    "cap:open:ios": "npx cap open ios",
     "prepare": "husky install"
   },
   "keywords": [
@@ -30,6 +34,10 @@
   "author": "Iterum Culinary Team",
   "license": "MIT",
   "devDependencies": {
+    "@capacitor/android": "^7.6.1",
+    "@capacitor/cli": "^7.6.1",
+    "@capacitor/core": "^7.6.1",
+    "@capacitor/ios": "^7.6.1",
     "@playwright/test": "^1.59.1",
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.0",
