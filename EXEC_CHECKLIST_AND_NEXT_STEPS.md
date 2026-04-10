@@ -12,6 +12,21 @@
 
 _Use this section for short, dated notes that do not belong in a checkbox row._
 
+**CEO directive — “Finish” = pilot-ready trust, not feature-complete**  
+**Decision:** We ship **pilot-ready** as defined in [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) (prod URL, **green** Firebase rules deploy, **A1 GO**, exec sign-off, documented teammate path). Everything else is **sequenced P1–P2**, not a blocker to the first paying or structured pilot **once P0 is green**.
+
+| Delegate | Owns (now) | Done when |
+|----------|------------|-----------|
+| **CTO** (technical accountable) | **`FIREBASE_TOKEN`** / permissions; **Deploy Firebase** CI green on `main`; optional `members/{uid}` spot-check | Latest [Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml) run **success**; [HOW_WE_SHIP](./docs/HOW_WE_SHIP.md) triage applied if needed |
+| **COO** (process accountable) | **A1** human steps **2** + **4** on Vercel URL; fill [A1_P0_PROD_SMOKE_RECORD](./docs/A1_P0_PROD_SMOKE_RECORD.md); package **executive P0 sign-off** for CEO | Smoke record → **GO**; checklist **Executive sign-off** row ready for CEO **yes** |
+| **Eng** | No net-new P1 scope until **Ship & verify → CI** is green; keep `main` healthy (lint/smoke) | CI green; support COO with any repro from smoke |
+| **CEO** (me) | **ICP** decision after COO memo ([ICP_DECISION_RECORD](./docs/ICP_DECISION_RECORD.md)); formal **P0 approval** when COO + CTO evidence is in | One-line ICP lock + dated sign-off on P0 evidence |
+| **PM or COO** | P1 acceptance criteria + pilot shortlist | Rows closed in P1 tables below |
+
+**Cursor / AI personas:** Do not run one generic thread for “the whole app.” Use the role prompts in [LEADERSHIP_ROLE_ASSIGNMENTS.md → AI agent prompts](./LEADERSHIP_ROLE_ASSIGNMENTS.md#ai-agent-prompts) — e.g. **CTO-shaped** session for deploy/rules/security, **COO-shaped** for checklist and pilot comms, **engineering** session for code. Same RACI as humans; agents are tools, not owners of sign-off.
+
+---
+
 **2026-03-29 — Analytics & pilot reporting (Data Analyst proxy; no warehouse assumed)**  
 Recorded so exports and decks use one set of definitions (see paths/keys in [docs/DATA_ACCESS_INVENTORY.md](./docs/DATA_ACCESS_INVENTORY.md)):
 
