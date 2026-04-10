@@ -71,6 +71,14 @@
 
 ---
 
+## Mobile acquisition — line log (MVP)
+
+**URL:** `/mobile-compliance.html` (installable via `manifest-compliance.json`).  
+**Purpose:** Free **fridge temperature** + **sanitizer (ppm)** logging on phones; uses the same Firestore collections as the dashboard (`refrigeration_units`, `temperature_readings`, `sanitizer_locations`, `sanitizer_readings`) so data appears in **Dashboard** and **Calendar** for the same account.  
+**Next:** Marketing copy A/B, optional Capacitor/Expo wrapper for store listings, sanitizer pass bands per chemistry (today aligned with dashboard defaults).
+
+---
+
 ## Suggested sequencing (8-week view)
 
 | Weeks | Focus |
@@ -97,3 +105,4 @@ Adjust dates on the **exec checklist** “Next 30 days” section when leadershi
 | Date | Change |
 |------|--------|
 | 2026-03-29 | Initial plan: Phases A–D, pilot vs scale-ready definitions, links to existing trackers. |
+| 2026-03-29 | Mobile line log page + PWA manifest; same Firestore paths as dashboard compliance cards. |

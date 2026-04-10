@@ -11,7 +11,7 @@
 
 | Surface | How | When |
 |---------|-----|------|
-| **Static app** (HTML, JS, CSS in `public/`) | **Vercel** — Git integration on `main` | Every push to `main` (typical). |
+| **Static app** (HTML, JS, CSS in `public/`) | **Vercel** — Git integration on `main` | Every push to `main` (typical). Includes **`/mobile-compliance.html`** (phone-first fridge + sanitizer log; PWA manifest **`/manifest-compliance.json`**). |
 | **Firestore rules** + **Storage rules** | **GitHub Actions** — workflow **Deploy Firebase** | On push to `main` when `firestore.rules`, `storage.rules`, `firebase.json`, `.firebaserc`, or the workflow file changes; or **Run workflow** manually. |
 | **Firebase Auth / Firestore data** | Console + client at runtime | Not redeployed with static files. |
 

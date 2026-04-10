@@ -1,0 +1,18 @@
+{
+  "name": "Iterum Line Log",
+  "short_name": "Line log",
+  "description": "Fridge temperature and sanitizer checks for kitchens. Free with an Iterum account.",
+  "start_url": "/mobile-compliance.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f6f4",
+  "theme_color": "#1a2e1f",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon",
+      "purpose": "any"
+    }
+  ]
+}

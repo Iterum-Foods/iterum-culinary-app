@@ -24,4 +24,10 @@ test.describe('Smoke', () => {
     expect(res?.ok()).toBeTruthy();
     await expect(page.locator('body')).toBeVisible();
   });
+
+  test('mobile compliance (line log) page loads', async ({ page }) => {
+    const res = await page.goto('/mobile-compliance.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(page.getByRole('heading', { name: /fridge temp/i })).toBeVisible();
+  });
 });

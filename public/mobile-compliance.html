@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a2e1f" />
+  <meta name="description" content="Free mobile fridge temperature and sanitizer log for kitchens. Syncs with Iterum." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Iterum Line Log" />
+  <title>Iterum — Line log (fridge &amp; sanitizer)</title>
+  <link rel="manifest" href="/manifest-compliance.json" />
+  <link rel="icon" href="/favicon.ico" />
+  <style>
+    :root {
+      --mc-bg: #f4f6f4;
+      --mc-card: #fff;
+      --mc-text: #142015;
+      --mc-muted: #5c6b5f;
+      --mc-accent: #3d6b47;
+      --mc-accent2: #2d4a35;
+      --mc-border: #d8e0da;
+      --mc-safe-top: env(safe-area-inset-top, 0);
+      --mc-safe-bottom: env(safe-area-inset-bottom, 0);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: var(--mc-bg);
+      color: var(--mc-text);
+      min-height: 100dvh;
+      padding: calc(12px + var(--mc-safe-top)) 16px calc(16px + var(--mc-safe-bottom));
+      line-height: 1.45;
+    }
+    .mc-top {
+      max-width: 28rem;
+      margin: 0 auto 1rem;
+    }
+    .mc-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--mc-accent);
+      margin-bottom: 0.35rem;
+    }
+    h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin: 0 0 0.35rem;
+      line-height: 1.2;
+    }
+    .mc-sub {
+      font-size: 0.9rem;
+      color: var(--mc-muted);
+      margin: 0 0 0.75rem;
+    }
+    .mc-panel {
+      max-width: 28rem;
+      margin: 0 auto;
+      background: var(--mc-card);
+      border-radius: 14px;
+      border: 1px solid var(--mc-border);
+      padding: 1rem;
+      box-shadow: 0 4px 24px rgba(20, 32, 21, 0.06);
+    }
+    .mc-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-bottom: 0.75rem;
+    }
+    .mc-field label { font-size: 0.8rem; font-weight: 600; color: var(--mc-muted); }
+    .mc-field input {
+      font-size: 1rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px;
+      border: 1px solid var(--mc-border);
+      min-height: 48px;
+    }
+    .mc-row-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .mc-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0.65rem 1rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: 1px solid var(--mc-border);
+      background: #fff;
+      color: var(--mc-text);
+      cursor: pointer;
+      width: 100%;
+    }
+    .mc-btn-primary {
+      background: var(--mc-accent);
+      color: #fff;
+      border-color: var(--mc-accent2);
+    }
+    .mc-btn-ghost { background: var(--mc-bg); }
+    .mc-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 0.75rem;
+      background: var(--mc-bg);
+      padding: 4px;
+      border-radius: 12px;
+    }
+    .mc-tabs button {
+      flex: 1;
+      min-height: 44px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      background: transparent;
+      color: var(--mc-muted);
+      cursor: pointer;
+    }
+    .mc-tabs button[aria-selected="true"] {
+      background: var(--mc-card);
+      color: var(--mc-accent2);
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .mc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.65rem; }
+    .mc-card {
+      border: 1px solid var(--mc-border);
+      border-radius: 12px;
+      padding: 0.75rem;
+      background: #fafbf9;
+    }
+    .mc-card-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .mc-hint { font-size: 0.8rem; color: var(--mc-muted); }
+    .mc-empty { padding: 1rem; text-align: center; color: var(--mc-muted); font-size: 0.9rem; }
+    .mc-toolbar { margin-bottom: 0.75rem; }
+    .mc-foot {
+      max-width: 28rem;
+      margin: 1.25rem auto 0;
+      font-size: 0.8rem;
+      color: var(--mc-muted);
+      text-align: center;
+    }
+    .mc-foot a { color: var(--mc-accent); font-weight: 600; }
+    .mc-chip {
+      font-size: 0.75rem;
+      color: var(--mc-muted);
+      margin-bottom: 0.5rem;
+      word-break: break-all;
+    }
+    .mc-unit-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+      color: var(--mc-muted);
+    }
+    #status-line { min-height: 1.25rem; font-size: 0.8rem; margin-top: 0.5rem; }
+  </style>
+  <script src="assets/js/firebase-config.js"></script>
+</head>
+<body>
+  <div class="mc-top">
+    <div class="mc-badge">Free line log</div>
+    <h1>Fridge temp &amp; sanitizer</h1>
+    <p class="mc-sub">Log cold-holding and sanitizer strength on your phone. Same data as the Iterum dashboard and calendar when you use the same account.</p>
+  </div>
+
+  <div id="auth-panel" class="mc-panel">
+    <p style="margin:0 0 0.75rem;font-size:0.9rem;color:var(--mc-muted);">Create a free account or sign in. No credit card.</p>
+    <div class="mc-field">
+      <label for="auth-email">Email</label>
+      <input id="auth-email" type="email" autocomplete="username" />
+    </div>
+    <div class="mc-field">
+      <label for="auth-password">Password</label>
+      <input id="auth-password" type="password" autocomplete="current-password" />
+    </div>
+    <div class="mc-row-btns">
+      <button type="button" class="mc-btn mc-btn-primary" id="btn-signin">Sign in</button>
+      <button type="button" class="mc-btn mc-btn-ghost" id="btn-signup">Create free account</button>
+      <button type="button" class="mc-btn mc-btn-ghost" id="btn-google">Continue with Google</button>
+    </div>
+    <p id="status-line"></p>
+  </div>
+
+  <div id="app-panel" class="mc-panel" hidden>
+    <div class="mc-chip" id="user-chip"></div>
+    <div class="mc-tabs" role="tablist">
+      <button type="button" id="tab-fridge" role="tab" aria-selected="true">Refrigerators</button>
+      <button type="button" id="tab-san" role="tab" aria-selected="false">Sanitizer</button>
+    </div>
+    <div id="panel-fridge">
+      <div class="mc-unit-toggle">
+        <input type="checkbox" id="unit-fahrenheit" checked />
+        <label for="unit-fahrenheit">Enter temperature in °F (default for US kitchens)</label>
+      </div>
+      <div class="mc-toolbar">
+        <button type="button" class="mc-btn mc-btn-primary" id="btn-add-fridge">+ Add fridge / cooler</button>
+      </div>
+      <ul class="mc-list" id="fridge-list"></ul>
+    </div>
+    <div id="panel-san" hidden>
+      <div class="mc-toolbar">
+        <button type="button" class="mc-btn mc-btn-primary" id="btn-add-san">+ Add sanitizer station</button>
+      </div>
+      <ul class="mc-list" id="san-list"></ul>
+    </div>
+    <p id="status-line-app" style="margin-top:0.75rem;font-size:0.8rem;min-height:1.25rem;"></p>
+    <button type="button" class="mc-btn mc-btn-ghost" id="btn-signout" style="margin-top:0.5rem;">Sign out</button>
+  </div>
+
+  <footer class="mc-foot">
+    <a href="/dashboard.html">Open full dashboard</a>
+    ·
+    <a href="/">Iterum home</a>
+  </footer>
+
+  <script type="module">
+    import { initMobileCompliance } from './assets/js/mobile-compliance.js';
+    document.addEventListener('DOMContentLoaded', () => {
+      initMobileCompliance();
+    });
+  </script>
+</body>
+</html>
