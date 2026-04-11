@@ -235,7 +235,7 @@ class UniversalRecipeManager {
 
     // Try localStorage
     const currentUser = this.getCurrentUser();
-    const userId = currentUser?.id || 'guest';
+    const userId = currentUser?.userId || currentUser?.id || 'guest';
     const storedProjectId =
       localStorage.getItem(`iterum_current_project_user_${userId}`) ||
       localStorage.getItem('iterum_current_project');
@@ -298,7 +298,7 @@ class UniversalRecipeManager {
   saveToMultipleLocations(recipe) {
     try {
       const currentUser = this.getCurrentUser();
-      const userId = currentUser?.id || 'guest';
+      const userId = currentUser?.userId || currentUser?.id || 'guest';
 
       // 1. Save to general recipes storage
       let allRecipes = JSON.parse(

@@ -73,7 +73,8 @@ class ProjectManagementSystem {
 
       // CRITICAL: Get current user ID from authManager
       if (window.authManager && window.authManager.currentUser) {
-        this.currentUserId = window.authManager.currentUser.userId;
+        const u = window.authManager.currentUser;
+        this.currentUserId = u.userId || u.id;
         console.log('✅ Set user ID from authManager:', this.currentUserId);
       } else {
         // Fallback to localStorage
@@ -378,6 +379,11 @@ class ProjectManagementSystem {
           projectId
         );
       }
+
+      // Keys used by dashboard, Firestore sync, and legacy menu flows
+      localStorage.setItem('active_project_id', projectId);
+      localStorage.setItem('active_project_name', project.name || '');
+      localStorage.setItem('active_project', projectId);
 
       // Force immediate write completion
       if (localStorage.getItem(userCurrentProjectKey) !== projectId) {
@@ -1154,6 +1160,7 @@ class ProjectManagementSystem {
     window.dispatchEvent(
       new CustomEvent('projectChanged', {
         detail: {
+          projectId: this.currentProject?.id ?? null,
           project: this.currentProject,
           isMaster: this.isMasterProject(),
           userId: this.currentUserId

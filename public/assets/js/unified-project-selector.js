@@ -188,57 +188,66 @@ class UnifiedProjectSelector {
 
     console.log(`🔄 Switching to project: ${projectId}`);
 
-    this.currentProjectId = projectId;
+    const resolvedProject = this.projects.find(p => p.id === projectId);
+    const pm = window.projectManager;
 
-    // Save to multiple storage keys for compatibility
-    const currentProjectKey = `${this.STORAGE_KEYS.CURRENT_PROJECT}${this.currentUserId}`;
-    localStorage.setItem(currentProjectKey, projectId);
-    localStorage.setItem('iterum_current_project', projectId);
-    localStorage.setItem(
-      `iterum_current_project_${this.currentUserId}`,
-      projectId
-    );
-
-    // Update old project manager if available
-    const currentProject = this.projects.find(p => p.id === projectId);
-    if (window.projectManager) {
-      window.projectManager.currentProject = currentProject;
-      window.projectManager.currentProjectId = projectId;
-
-      // Update project UI if method exists
-      if (typeof window.projectManager.updateProjectUI === 'function') {
-        window.projectManager.updateProjectUI();
+    if (pm && typeof pm.setCurrentProject === 'function') {
+      pm.currentUserId = this.currentUserId;
+      pm.loadProjects();
+      if (Array.isArray(pm.projects) && pm.projects.length) {
+        this.projects = pm.projects;
       }
+      if (!pm.setCurrentProject(projectId)) {
+        console.warn('Project manager could not activate project:', projectId);
+        return;
+      }
+      this.currentProjectId = pm.currentProject?.id || projectId;
+    } else {
+      this.currentProjectId = projectId;
+      const currentProjectKey = `${this.STORAGE_KEYS.CURRENT_PROJECT}${this.currentUserId}`;
+      localStorage.setItem(currentProjectKey, projectId);
+      localStorage.setItem('iterum_current_project', projectId);
+      localStorage.setItem(
+        `iterum_current_project_${this.currentUserId}`,
+        projectId
+      );
+      localStorage.setItem('active_project_id', projectId);
+      localStorage.setItem('active_project_name', resolvedProject?.name || '');
+      localStorage.setItem('active_project', projectId);
+
+      if (pm) {
+        pm.currentProject = resolvedProject || null;
+        pm.currentProjectId = projectId;
+        if (typeof pm.updateProjectUI === 'function') {
+          pm.updateProjectUI();
+        }
+      }
+
+      window.dispatchEvent(
+        new CustomEvent('projectChanged', {
+          detail: {
+            projectId,
+            project: resolvedProject,
+            userId: this.currentUserId
+          }
+        })
+      );
     }
 
-    // Update state persistence manager
     if (window.statePersistenceManager) {
       window.statePersistenceManager.loadProjectState();
     }
 
-    // Dispatch event for other components
-    window.dispatchEvent(
-      new CustomEvent('projectChanged', {
-        detail: {
-          projectId,
-          project: currentProject,
-          userId: this.currentUserId
-        }
-      })
-    );
-
-    // Refresh UI
+    const displayProject = (pm && pm.currentProject) || resolvedProject || null;
     this.updateSelectorUI();
-
-    // Reload page data for the new project
     this.reloadPageData();
 
     // Show notification
     this.showNotification(
-      `✅ Switched to project: ${currentProject?.name || projectId}`
+      `✅ Switched to project: ${displayProject?.name || projectId}`
     );
 
-    console.log('✅ Project changed to:', projectId, currentProject);
+    console.log('✅ Project changed to:', projectId, displayProject);
   }
 
   /**
@@ -451,42 +460,28 @@ class UnifiedProjectSelector {
   reloadPageData() {
     console.log('🔄 Reloading page data for current project...');
 
-    // Reload recipes if on recipe library page
-    if (
-      window.location.pathname.includes('recipe-library') &&
-      typeof loadRecipes === 'function'
-    ) {
+    const path = `${window.location.pathname} ${window.location.href}`;
+
+    if (/recipe-library/i.test(path) && typeof loadRecipes === 'function') {
       setTimeout(() => loadRecipes(), 100);
     }
 
-    // Reload menus if on menu builder page
-    if (
-      window.location.pathname.includes('menu-builder') &&
-      window.loadMenuData
-    ) {
+    if (/menu-builder/i.test(path) && window.loadMenuData) {
       setTimeout(() => window.loadMenuData(), 100);
     }
 
-    // Reload vendors if on vendor page
-    if (
-      window.location.pathname.includes('vendor-management') &&
-      window.vendorManager
-    ) {
+    if (/vendor-management/i.test(path) && window.vendorManager) {
       setTimeout(() => window.vendorManager.loadVendors(), 100);
     }
 
-    // Reload ingredients if on ingredients page
-    if (
-      window.location.pathname.includes('ingredients') &&
-      typeof displayIngredients === 'function'
-    ) {
+    if (/ingredients/i.test(path) && typeof displayIngredients === 'function') {
       setTimeout(() => displayIngredients(), 100);
     }
 
-    // Refresh dashboard stats if on index
     if (
-      window.location.pathname.includes('index') ||
-      window.location.pathname === '/'
+      /index\.html|^\/$|\/dashboard/i.test(
+        `${window.location.pathname} ${window.location.href}`
+      )
     ) {
       if (typeof updateDashboardStats === 'function') {
         setTimeout(() => updateDashboardStats(), 100);

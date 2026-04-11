@@ -64,6 +64,8 @@ class UserDataManager {
         if (user) {
           this.userId = user.userId || user.id;
           this.userEmail = user.email;
+          this.migrateLegacyProjectsStorage();
+          this.bindProjectChangeListener();
           this.updateCurrentProject();
           console.log(`✅ User Data Manager ready for: ${this.userEmail}`);
           resolve();
@@ -93,11 +95,44 @@ class UserDataManager {
     }
 
     console.log(`📋 Current project: ${this.currentProjectId}`);
+  }
 
-    // Listen for project changes
+  /**
+   * Align legacy projects key with ProjectManagementSystem / UnifiedProjectSelector.
+   */
+  migrateLegacyProjectsStorage() {
+    if (!this.userId) {
+      return;
+    }
+    const legacy = `iterum_projects_${this.userId}`;
+    const canonical = `iterum_projects_user_${this.userId}`;
+    const legacyJson = localStorage.getItem(legacy);
+    const canonicalJson = localStorage.getItem(canonical);
+    if (legacyJson && (!canonicalJson || canonicalJson === '[]')) {
+      localStorage.setItem(canonical, legacyJson);
+      console.log(
+        'Migrated projects list to iterum_projects_user_* for user',
+        this.userId
+      );
+    }
+  }
+
+  /**
+   * Register once — saveData/loadData call updateCurrentProject frequently.
+   */
+  bindProjectChangeListener() {
+    if (this._projectChangeListenerBound) {
+      return;
+    }
+    this._projectChangeListenerBound = true;
     window.addEventListener('projectChanged', event => {
-      this.currentProjectId = event.detail?.projectId || 'master';
-      console.log(`📋 Project changed to: ${this.currentProjectId}`);
+      const pid =
+        event.detail?.projectId ||
+        event.detail?.project?.id ||
+        window.projectManager?.currentProject?.id ||
+        'master';
+      this.currentProjectId = pid;
+      console.log('Project changed to:', this.currentProjectId);
     });
   }
 
@@ -286,7 +321,7 @@ class UserDataManager {
     const keyMap = {
       recipes: `recipes_${this.userId}`,
       menus: `menus_${this.userId}`,
-      projects: `iterum_projects_${this.userId}`,
+      projects: `iterum_projects_user_${this.userId}`,
       ingredients: `user_ingredients_${this.userId}`,
       vendors: `vendors_${this.userId}`,
       equipment: `equipment_${this.userId}`
@@ -734,7 +769,7 @@ class UserDataManager {
       { old: 'menus', new: `menus_${this.userId}`, type: 'menus' },
       {
         old: 'iterum_projects',
-        new: `iterum_projects_${this.userId}`,
+        new: `iterum_projects_user_${this.userId}`,
         type: 'projects'
       }
     ];

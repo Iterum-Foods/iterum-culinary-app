@@ -25,6 +25,13 @@ class CentralDataLoader {
       this.loadAllData();
     });
 
+    window.addEventListener('projectChanged', () => {
+      console.log('Project changed - refreshing cached workspace data');
+      this.forceReload().catch(err => {
+        console.warn('Central data reload after project change:', err);
+      });
+    });
+
     // If user is already logged in, load immediately
     if (window.authManager?.isAuthenticated()) {
       this.loadAllData();
