@@ -80,7 +80,7 @@
 |------|--------|
 | Config | Root `capacitor.config.json` — **`server.url`** points the WebView at production `…/mobile-compliance.html` so most web fixes ship without a store resubmit. To bundle offline assets instead, remove `server` and set the WebView entry (see Capacitor docs). |
 | Sync after changing `public/` or config | `npm run cap:sync` |
-| Android | `npm run cap:open:android` → Android Studio → signed **AAB/APK** for Play Console. |
+| Android | Open the **`android/`** folder in Android Studio (see `android/README.md`). `npm run cap:sync` from repo root after web changes. Gradle uses **JDK 21** via `android/gradle.properties` (`org.gradle.java.home` → Android Studio **jbr**). |
 | iOS (requires Mac) | `cd ios/App && pod install` then `npm run cap:open:ios` → Xcode → **Archive** for App Store Connect. |
 
 **Purpose:** Free **fridge temperature** + **sanitizer (ppm)** logging; same Firestore paths as the dashboard so **Dashboard** / **Calendar** stay in sync.  
