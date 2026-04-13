@@ -1,7 +1,7 @@
 # App completion plan (pilot → sustainable launch)
 
 **Purpose:** Single phased roadmap to **finish** the Iterum Culinary web app for operator pilots and a defensible production posture—not a feature wishlist.  
-**Living trackers:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](../CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](../NEXT_STEPS_LEADERSHIP.md)  
+**Living trackers:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md) · [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](../CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](../NEXT_STEPS_LEADERSHIP.md)  
 **Roles & data:** [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md) · [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md) · [SOURCE_OF_TRUTH.md](./SOURCE_OF_TRUTH.md) · [HOW_WE_SHIP.md](./HOW_WE_SHIP.md)  
 **Last updated:** March 2026  
 
