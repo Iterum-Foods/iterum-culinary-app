@@ -44,13 +44,14 @@ After fixing the token or rules, you do **not** need a new commit if only the se
 
 ---
 
-## Add a teammate (no invite UI yet)
+## Add a teammate
 
-1. User must have a **Firebase Auth** account (sign up once on the app).  
-2. In **Firebase Console → Firestore**, create or merge:  
-   `projects/{projectId}/members/{theirAuthUid}`  
-   with fields `{ "role": "employee_line" | "chef_leadership" | ... }` (see [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md)).  
-3. Only **project owner** or existing **`account_admin`** member can create these docs from the client when invite UI exists; Console works for internal testing.
+1. User must have a **Firebase Auth** account (sign up once — web or **line log**). They can tap **Copy my user ID** on `mobile-compliance.html` and send that string to their manager.  
+2. **In-app (preferred):** On **Project Hub** (`project-hub.html`), signed-in **project owner** or **`account_admin`** uses **Add teammate to a project**, chooses the project, pastes the teammate’s **Firebase UID**, role, optional email → writes `projects/{projectId}/members/{uid}` with `authUid` + `role` (see [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md)).  
+3. **Console (fallback):** Firestore → `projects/{projectId}/members/{theirAuthUid}` with `role` and **`authUid`** equal to the document id (required for collection-group queries and security rules).  
+4. **Indexes:** Deploy **`firestore.indexes.json`** (collection group `members` · field `authUid`) so the line log app can list a user’s projects.
+
+**Line log app:** After they are added, they sign in, pick the **Workspace** dropdown, then new fridge/sanitizer rows use that `projectId` (same as dashboard/calendar filters).
 
 ---
 

@@ -113,7 +113,10 @@ class FirestoreSync {
     }
     const projectRef = doc(this.db, 'projects', projectId);
     const authUid =
-      window.authManager?.currentUser?.uid || metadata.firebaseUid || null;
+      window.firebaseAuth?.auth?.currentUser?.uid ||
+      window.authManager?.currentUser?.uid ||
+      metadata.firebaseUid ||
+      null;
     const enriched = {
       projectId,
       updatedAt: serverTimestamp(),
@@ -161,6 +164,7 @@ class FirestoreSync {
       {
         role,
         email,
+        authUid,
         updatedAt: serverTimestamp()
       },
       { merge: true }
@@ -477,7 +481,32 @@ class FirestoreSync {
   }
 
   /**
-   * Get all users from Firestore
+   * Custom claim `iterum_admin` (set via Firebase Admin SDK) allows collection-wide
+   * user queries. Others only receive their own `users/{auth.uid}` doc per rules.
+   */
+  async isIterumAdminUser() {
+    const user = window.firebaseAuth?.auth?.currentUser;
+    if (!user || typeof user.getIdTokenResult !== 'function') {
+      return false;
+    }
+    try {
+      const token = await user.getIdTokenResult();
+      return token.claims && token.claims.iterum_admin === true;
+    } catch (e) {
+      console.warn('⚠️ Could not read token claims:', e);
+      return false;
+    }
+  }
+
+  mapUserDoc(snapshot) {
+    if (!snapshot.exists()) {
+      return null;
+    }
+    return { id: snapshot.id, ...snapshot.data() };
+  }
+
+  /**
+   * Users visible to this client: all users only if iterum_admin; else own profile only.
    */
   async getAllUsers() {
     if (!this.initialized) {
@@ -486,21 +515,28 @@ class FirestoreSync {
     }
 
     try {
-      console.log('📊 Fetching all users from Firestore...');
-
-      const usersRef = collection(this.db, 'users');
-      const querySnapshot = await getDocs(usersRef);
-
-      const users = [];
-      querySnapshot.forEach(doc => {
-        users.push({
-          id: doc.id,
-          ...doc.data()
+      if (await this.isIterumAdminUser()) {
+        console.log('📊 Fetching all users from Firestore (admin)...');
+        const usersRef = collection(this.db, 'users');
+        const querySnapshot = await getDocs(usersRef);
+        const users = [];
+        querySnapshot.forEach(d => {
+          users.push({ id: d.id, ...d.data() });
         });
-      });
+        console.log('✅ Fetched', users.length, 'users from Firestore');
+        return users;
+      }
 
-      console.log('✅ Fetched', users.length, 'users from Firestore');
-      return users;
+      const uid = window.firebaseAuth?.auth?.currentUser?.uid;
+      if (!uid) {
+        console.warn('⚠️ getAllUsers: not signed in');
+        return [];
+      }
+
+      const userRef = doc(this.db, 'users', uid);
+      const snap = await getDoc(userRef);
+      const one = this.mapUserDoc(snap);
+      return one ? [one] : [];
     } catch (error) {
       console.error('❌ Error fetching users from Firestore:', error);
       return [];
@@ -508,7 +544,7 @@ class FirestoreSync {
   }
 
   /**
-   * Get trial users from Firestore
+   * Trial users: full list only for iterum_admin; otherwise [self] if type === trial.
    */
   async getTrialUsers() {
     if (!this.initialized) {
@@ -517,20 +553,29 @@ class FirestoreSync {
     }
 
     try {
-      const usersRef = collection(this.db, 'users');
-      const q = query(usersRef, where('type', '==', 'trial'));
-      const querySnapshot = await getDocs(q);
-
-      const users = [];
-      querySnapshot.forEach(doc => {
-        users.push({
-          id: doc.id,
-          ...doc.data()
+      if (await this.isIterumAdminUser()) {
+        const usersRef = collection(this.db, 'users');
+        const q = query(usersRef, where('type', '==', 'trial'));
+        const querySnapshot = await getDocs(q);
+        const users = [];
+        querySnapshot.forEach(d => {
+          users.push({ id: d.id, ...d.data() });
         });
-      });
+        console.log('✅ Fetched', users.length, 'trial users from Firestore');
+        return users;
+      }
 
-      console.log('✅ Fetched', users.length, 'trial users from Firestore');
-      return users;
+      const uid = window.firebaseAuth?.auth?.currentUser?.uid;
+      if (!uid) {
+        return [];
+      }
+      const userRef = doc(this.db, 'users', uid);
+      const snap = await getDoc(userRef);
+      const data = this.mapUserDoc(snap);
+      if (data && data.type === 'trial') {
+        return [data];
+      }
+      return [];
     } catch (error) {
       console.error('❌ Error fetching trial users:', error);
       return [];

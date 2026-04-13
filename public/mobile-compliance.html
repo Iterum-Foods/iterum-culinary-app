@@ -199,6 +199,13 @@
 
   <div id="app-panel" class="mc-panel" hidden>
     <div class="mc-chip" id="user-chip"></div>
+    <div id="project-workspace" style="margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--mc-border);">
+      <label for="project-picker" style="font-size:0.8rem;font-weight:700;color:var(--mc-muted);display:block;margin-bottom:0.35rem;">Workspace (team project)</label>
+      <select id="project-picker" style="width:100%;min-height:48px;padding:0.5rem 0.65rem;border-radius:10px;border:1px solid var(--mc-border);font-size:1rem;background:var(--mc-card);color:var(--mc-text);"></select>
+      <p style="font-size:0.75rem;color:var(--mc-muted);margin:0.5rem 0 0;line-height:1.35;">Give this ID to your manager so they can add you to a project:</p>
+      <code id="my-firebase-uid" style="display:block;word-break:break-all;font-size:0.72rem;margin-top:0.35rem;color:var(--mc-text);"></code>
+      <button type="button" class="mc-btn mc-btn-ghost" id="copy-uid" style="margin-top:0.5rem;">Copy my user ID</button>
+    </div>
     <div class="mc-tabs" role="tablist">
       <button type="button" id="tab-fridge" role="tab" aria-selected="true">Refrigerators</button>
       <button type="button" id="tab-san" role="tab" aria-selected="false">Sanitizer</button>

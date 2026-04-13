@@ -15,23 +15,29 @@ import {
 import {
   addDoc,
   collection,
+  collectionGroup,
   doc,
+  getDoc,
+  getDocs,
   getFirestore,
   onSnapshot,
   query,
   serverTimestamp,
-  updateDoc
+  updateDoc,
+  where
 } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
 const REF_UNITS = 'refrigeration_units';
 const SAN_LOCS = 'sanitizer_locations';
+
+/** @type {{ id: string, role?: string }[]} */
+let myProjectRows = [];
 
 function getProjectId() {
   try {
     return (
       localStorage.getItem('iterum_current_project') ||
       localStorage.getItem('userCurrentProjectKey') ||
-      localStorage.getItem('iterum_mobile_site_id') ||
       'mobile-default'
     );
   } catch {
@@ -297,6 +303,107 @@ function ensureSiteId() {
   }
 }
 
+function persistProjectId(uid, projectId) {
+  try {
+    localStorage.setItem('iterum_current_project', projectId);
+    localStorage.setItem('userCurrentProjectKey', projectId);
+    localStorage.setItem(`iterum_current_project_user_${uid}`, projectId);
+  } catch {
+    /* ignore */
+  }
+}
+
+async function refreshProjectPicker(uid) {
+  const sel = document.getElementById('project-picker');
+  const uidEl = document.getElementById('my-firebase-uid');
+  if (uidEl) {
+    uidEl.textContent = uid;
+  }
+  if (!db || !sel) {
+    return;
+  }
+  myProjectRows = [];
+  try {
+    const q = query(
+      collectionGroup(db, 'members'),
+      where('authUid', '==', uid)
+    );
+    const snap = await getDocs(q);
+    snap.forEach(d => {
+      const pid = d.ref.parent.parent.id;
+      myProjectRows.push({ id: pid, role: d.data().role });
+    });
+    sel.innerHTML = '';
+    const opt0 = document.createElement('option');
+    opt0.value = '';
+    opt0.textContent = myProjectRows.length
+      ? 'Choose workspace…'
+      : 'No shared projects yet (ask your manager)';
+    sel.appendChild(opt0);
+    for (const row of myProjectRows) {
+      let label = row.id;
+      try {
+        const ps = await getDoc(doc(db, 'projects', row.id));
+        if (ps.exists) {
+          const data = ps.data();
+          const n = data.name || data.projectName;
+          if (n) {
+            label = n;
+          }
+        }
+      } catch {
+        /* keep id */
+      }
+      const o = document.createElement('option');
+      o.value = row.id;
+      o.textContent = label;
+      sel.appendChild(o);
+    }
+    const personal = document.createElement('option');
+    personal.value = 'mobile-default';
+    personal.textContent = 'Personal logs (not a team project)';
+    sel.appendChild(personal);
+
+    const cur = getProjectId();
+    if (myProjectRows.some(r => r.id === cur)) {
+      sel.value = cur;
+    } else if (myProjectRows.length === 1) {
+      sel.value = myProjectRows[0].id;
+      persistProjectId(uid, myProjectRows[0].id);
+    } else if (myProjectRows.length === 0) {
+      sel.value = 'mobile-default';
+      persistProjectId(uid, 'mobile-default');
+    } else {
+      sel.value = '';
+    }
+
+    sel.onchange = () => {
+      const v = sel.value;
+      if (v) {
+        persistProjectId(uid, v);
+        setStatus(
+          v === 'mobile-default'
+            ? 'Logging as personal workspace.'
+            : 'Workspace saved for new readings.'
+        );
+      }
+    };
+  } catch (e) {
+    console.error('refreshProjectPicker', e);
+    setStatus(
+      'Could not load team projects. If this is new, deploy Firestore indexes (members / authUid).',
+      true
+    );
+  }
+}
+
+function ensureSiteIdIfNoTeamProjects() {
+  if (myProjectRows.length > 0) {
+    return;
+  }
+  ensureSiteId();
+}
+
 function wireAuth() {
   $('btn-signin').addEventListener('click', async () => {
     const email = $('auth-email').value.trim();
@@ -373,13 +480,20 @@ export function initMobileCompliance() {
     if (user) {
       $('user-chip').textContent = user.email || user.uid.slice(0, 8) + '…';
       showPanel('app');
-      ensureSiteId();
       startListeners(user.uid);
       switchTab('fridge');
-      setStatus('Synced with your Iterum account.');
+      refreshProjectPicker(user.uid)
+        .then(() => {
+          ensureSiteIdIfNoTeamProjects();
+          setStatus('Choose your workspace, then log temps or sanitizer.');
+        })
+        .catch(() => {
+          setStatus('Signed in — set workspace if prompted.', true);
+        });
     } else {
       showPanel('auth');
       $('user-chip').textContent = '';
+      myProjectRows = [];
       setStatus('Sign in to sync logs with the web app.');
     }
   });

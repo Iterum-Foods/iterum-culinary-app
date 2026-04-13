@@ -13,6 +13,7 @@ on:
       - 'firebase.json'
       - '.firebaserc'
       - 'firestore.rules'
+      - 'firestore.indexes.json'
       - 'storage.rules'
       - '.github/workflows/firebase-deploy.yml'
   workflow_dispatch:
@@ -34,8 +35,8 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: Deploy Firestore + Storage rules
-        run: npx firebase-tools@15.12.0 deploy --only "firestore:rules,storage" --project iterum-culinary-app2 --non-interactive
+      - name: Deploy Firestore rules, indexes + Storage rules
+        run: npx firebase-tools@15.12.0 deploy --only "firestore:rules,firestore:indexes,storage" --project iterum-culinary-app2 --non-interactive
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
 

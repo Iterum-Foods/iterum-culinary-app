@@ -1,4 +1,6 @@
 // iterum-culinary-app2 — last tightened: employee_line read-only on project menus/recipes/snapshots
+// Operators needing Firestore `contacts` read/export: set Custom Claim via Admin SDK, e.g.
+//   admin.auth().setCustomUserClaims(uid, { iterum_admin: true })
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -10,6 +12,14 @@ service cloud.firestore {
     // Check if user is authenticated
     function isAuthenticated() {
       return request.auth != null;
+    }
+
+    // Custom claim set via Firebase Admin SDK only (operators / support). Used for
+    // least-privilege access to PII collections (e.g. contacts waitlist).
+    function isIterumAdmin() {
+      return isAuthenticated()
+        && request.auth.token.keys().hasAny(['iterum_admin'])
+        && request.auth.token.iterum_admin == true;
     }
     
     // Check if user owns the document (strict: Firestore doc id must be auth uid)
@@ -154,8 +164,9 @@ service cloud.firestore {
       // Users can update their own profile
       allow update: if isOwner(userId)
                     && isValidSize()
-                    // Prevent changing critical fields
-                    && request.resource.data.userId == resource.data.userId;
+                    // Prevent changing critical fields (email tied to auth / tenancy)
+                    && request.resource.data.userId == resource.data.userId
+                    && request.resource.data.email == resource.data.email;
       
       // Users can delete their own profile
       allow delete: if isOwner(userId);
@@ -298,10 +309,13 @@ service cloud.firestore {
       match /members/{memberId} {
         allow read: if canAccessProjectDoc(projectId);
 
+        // memberId must equal the invited user's Firebase Auth uid; authUid in data must match (for collectionGroup queries)
         allow create: if isValidSize()
           && request.resource.data.keys().hasAny(['role'])
           && request.resource.data.role is string
           && isValidMemberRole(request.resource.data.role)
+          && request.resource.data.keys().hasAny(['authUid'])
+          && request.resource.data.authUid == memberId
           && (
             isProjectOwnerOnly(projectId)
             || isAccountAdminMember(projectId)
@@ -310,6 +324,7 @@ service cloud.firestore {
         allow update: if isValidSize()
           && request.resource.data.role is string
           && isValidMemberRole(request.resource.data.role)
+          && request.resource.data.authUid == memberId
           && (
             isProjectOwnerOnly(projectId)
             || isAccountAdminMember(projectId)
@@ -340,16 +355,22 @@ service cloud.firestore {
     // ============================================
     
     match /contacts/{contactId} {
-      // Allow anyone to CREATE waitlist entries (public signup)
+      // Public waitlist signup (unauthenticated OK). Optional creatorUid must match
+      // auth when present to prevent stuffing another uid into the doc.
       allow create: if request.resource.data.contactType == 'waitlist'
                     && isValidEmail(request.resource.data.email)
-                    && isValidSize();
-      
-      // Authenticated users can read contacts
-      allow read: if isAuthenticated();
-      
-      // Authenticated users can update/delete contacts
-      allow update, delete: if isAuthenticated();
+                    && isValidSize()
+                    && (
+                      !request.resource.data.keys().hasAny(['creatorUid'])
+                      || (
+                        isAuthenticated()
+                        && request.resource.data.creatorUid == request.auth.uid
+                      )
+                    );
+
+      // PII: no broad client access. Operators need Custom Claim iterum_admin (Admin SDK).
+      allow read: if isIterumAdmin();
+      allow update, delete: if isIterumAdmin();
     }
     
     // ============================================
@@ -357,20 +378,23 @@ service cloud.firestore {
     // ============================================
     
     match /analytics/{eventId} {
-      // Users can write their own analytics
-      allow create: if isAuthenticated() && isValidSize();
-      
-      // Only admins can read analytics
-      allow read: if false; // Read via backend only
+      // Client-written events (if used): bound to caller uid; no updates from the client
+      allow create: if isAuthenticated()
+                    && isValidSize()
+                    && request.resource.data.keys().hasAny(['userId'])
+                    && request.resource.data.userId == request.auth.uid;
+      allow read: if false;
+      allow update, delete: if false;
     }
     
     match /activity_logs/{logId} {
-      // Users can create their own activity logs
-      allow create: if isAuthenticated() && isValidSize();
-      
-      // Users can read their own logs
-      allow read: if isAuthenticated() 
+      allow create: if isAuthenticated()
+                    && isValidSize()
+                    && request.resource.data.keys().hasAny(['userId'])
+                    && request.resource.data.userId == request.auth.uid;
+      allow read: if isAuthenticated()
                   && resource.data.userId == request.auth.uid;
+      allow update, delete: if false;
     }
     
     // ============================================

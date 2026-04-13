@@ -8,6 +8,9 @@
     <!-- Auth System -->
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/auth-manager.js"></script>
+    <script type="module" src="assets/js/firebase-auth.js"></script>
+    <script type="module" src="assets/js/firestore-sync.js"></script>
+    <script type="module" src="assets/js/project-hub-team.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- UNIFIED COLOR SYSTEM - MUST LOAD FIRST -->
@@ -264,6 +267,45 @@
             <div class="hero-title">📋 Project Hub</div>
             <div style="font-size: 18px; opacity: 0.95;">Organize your culinary work into focused projects</div>
         </div>
+
+        <!-- Team access (Firestore members -> line log / dashboard) -->
+        <section id="team-access-panel" style="display: none; background: white; border-radius: 16px; padding: 28px; margin-bottom: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+            <h2 class="section-title" style="margin-bottom: 8px;">Add teammate to a project</h2>
+            <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
+                The person must <strong>create an account</strong> first (web or <a href="mobile-compliance.html" style="color: #4f46e5; font-weight: 600;">line log app</a>).
+                Then paste their <strong>Firebase User UID</strong> (they can copy it from the line log app after sign-in, or find it in Firebase Console Authentication users list).
+            </p>
+            <div style="display: grid; gap: 14px; max-width: 520px;">
+                <div>
+                    <label for="team-project-select" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Project</label>
+                    <select id="team-project-select" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;"></select>
+                </div>
+                <div>
+                    <label for="team-target-uid" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Teammate Firebase UID</label>
+                    <input id="team-target-uid" type="text" autocomplete="off" placeholder="From their line log app (Copy ID)" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;" />
+                </div>
+                <div>
+                    <label for="team-target-email" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Email (optional)</label>
+                    <input id="team-target-email" type="email" autocomplete="off" placeholder="for your records" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;" />
+                </div>
+                <div>
+                    <label for="team-member-role" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Role</label>
+                    <select id="team-member-role" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;">
+                        <option value="employee_line">Line / crew (temps and sanitizer)</option>
+                        <option value="location_manager">Location manager</option>
+                        <option value="chef_leadership">Chef / leadership</option>
+                        <option value="account_admin">Account admin (full access)</option>
+                        <option value="operations_gm">Operations / GM</option>
+                        <option value="purchasing">Purchasing</option>
+                        <option value="consultant_rd">Consultant / R&amp;D</option>
+                    </select>
+                </div>
+                <button type="button" id="team-add-member-btn" style="padding: 12px 20px; border-radius: 10px; border: none; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; font-weight: 700; font-size: 15px; cursor: pointer;">
+                    Save to project
+                </button>
+                <p id="team-access-msg" style="font-size: 14px; color: #0f766e; min-height: 1.25em;"></p>
+            </div>
+        </section>
 
         <!-- Quick Start Templates -->
         <section>
