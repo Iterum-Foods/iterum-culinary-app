@@ -4,27 +4,27 @@
 **For:** CTO, COO, Engineering, Product/Marketing, Ops  
 **Purpose:** One delegable list from **today** through **first market motion** (pilot + store presence).  
 **Living trackers:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [APP_COMPLETION_PLAN.md](./APP_COMPLETION_PLAN.md) · [HOW_WE_SHIP.md](./HOW_WE_SHIP.md)  
-**Last updated:** March 2026  
+**Last updated:** 29 March 2026  
 
 ---
 
 ## How to use
 
 - Assign a **name** next to each **Owner role** in your standup tool; keep dates in one place (Notion, Asana, etc.).
-- **Phase 0** is blocking: do not promise external pilots or store dates until it is green.
+- **Phase 0** is **complete** (2026-03-29): role prompts run; evidence on [EXEC_CHECKLIST](../EXEC_CHECKLIST_AND_NEXT_STEPS.md). **Phase 1** is now the gate before promising structured pilots (ICP + teammate path + support playbook). Historical prompts: [PHASE_0_ROLE_PROMPTS.md](./PHASE_0_ROLE_PROMPTS.md).
 - Use `[ ]` / `[x]` here or mirror rows into your PM tool; this file stays the **narrative + links**.
 
 ---
 
-## Phase 0 — Production trust (blocking)
+## Phase 0 — Production trust (closed 2026-03-29)
 
 | Done | Task | Owner | Done when |
 |------|------|-------|-----------|
-| [ ] | Fix **Deploy Firebase** CI | CTO + Eng | Latest [Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml) on `main` is **success** (rules + indexes + storage). Use [HOW_WE_SHIP: If Deploy Firebase fails](./HOW_WE_SHIP.md#if-deploy-firebase-fails-in-ci) if needed. |
-| [ ] | Confirm **Firestore indexes** built | Eng | Console shows collection group index for **members** / **authUid** after deploy of `firestore.indexes.json`. |
-| [ ] | **A1 human smoke** complete | COO / Ops | [A1_P0_PROD_SMOKE_RECORD.md](./A1_P0_PROD_SMOKE_RECORD.md) set to **GO** (steps **2** sign-in persistence + **4** recipe photo on Vercel). |
-| [ ] | **Executive P0 sign-off** package | COO | One-pager for CEO: CI green + A1 GO + open risks. |
-| [ ] | **CEO** formal P0 approval | CEO | Dated OK on [EXEC_CHECKLIST](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) executive row. |
+| [x] | Fix **Deploy Firebase** CI | CTO + Eng | Latest [Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml) on `main` is **success** (rules + indexes + storage). Use [HOW_WE_SHIP: If Deploy Firebase fails](./HOW_WE_SHIP.md#if-deploy-firebase-fails-in-ci) if needed. |
+| [x] | Confirm **Firestore indexes** built | Eng | Console shows collection group index for **members** / **authUid** after deploy of `firestore.indexes.json`. |
+| [x] | **A1 human smoke** complete | COO / Ops | [A1_P0_PROD_SMOKE_RECORD.md](./A1_P0_PROD_SMOKE_RECORD.md) set to **GO** (steps **2** sign-in persistence + **4** recipe photo on Vercel). |
+| [x] | **Executive P0 sign-off** package | COO | One-pager for CEO: CI green + A1 GO + open risks. |
+| [x] | **CEO** formal P0 approval | CEO | Dated OK on [EXEC_CHECKLIST](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) executive row. |
 
 ---
 
@@ -65,7 +65,7 @@
 
 ## Dependencies (do not skip)
 
-1. **Phase 0 before Phase 3** — avoid marketing ahead of green Firebase and A1.  
+1. **Phase 0 before Phase 3** — Phase 0 **done** (2026-03-29); still avoid big GTM ahead of **Phase 1** pilot readiness (ICP, teammate path).  
 2. **ICP before heavy multi-site engineering** — P1 estimates in [EXEC_CHECKLIST](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) follow ICP.  
 3. **Store review** — WebView shell must match policy; privacy and data use must match Firebase.
 

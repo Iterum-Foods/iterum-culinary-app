@@ -3,7 +3,7 @@
 **Purpose:** Single phased roadmap to **finish** the Iterum Culinary web app for operator pilots and a defensible production posture—not a feature wishlist.  
 **Living trackers:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md) · [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](../CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](../NEXT_STEPS_LEADERSHIP.md)  
 **Roles & data:** [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md) · [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md) · [SOURCE_OF_TRUTH.md](./SOURCE_OF_TRUTH.md) · [HOW_WE_SHIP.md](./HOW_WE_SHIP.md)  
-**Last updated:** March 2026  
+**Last updated:** 29 March 2026  
 
 ---
 
@@ -18,9 +18,9 @@
 
 ---
 
-## Phase A — Close P0 (now)
+## Phase A — Close P0 (closed 2026-03-29)
 
-**Goal:** Evidence that production is safe to put operators on.
+**Goal:** Evidence that production is safe to put operators on. **Status:** Criteria met — see [EXEC_CHECKLIST](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) Leadership log and **Ship & verify** block.
 
 | # | Task | Done when | Owner |
 |---|------|-----------|--------|

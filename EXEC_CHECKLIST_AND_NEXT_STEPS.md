@@ -12,6 +12,8 @@
 
 _Use this section for short, dated notes that do not belong in a checkbox row._
 
+**2026-03-29 — Phase 0 closed (production trust):** Deploy Firebase CI green on `main`; Firestore **members** / **authUid** collection group index verified; [A1_P0_PROD_SMOKE_RECORD.md](./docs/A1_P0_PROD_SMOKE_RECORD.md) → **GO** (human steps **2** + **4**); COO executive pack + **CEO P0 approval** recorded below. **Next organizational gate:** Phase 1 — [CEO_TEAM_TASK_LIST_TO_MARKET.md](./docs/CEO_TEAM_TASK_LIST_TO_MARKET.md#phase-1--web-app-pilot-ready) (ICP lock, teammate path, support playbook, pilot acceptance criteria).
+
 **CEO directive — “Finish” = pilot-ready trust, not feature-complete**  
 **Decision:** We ship **pilot-ready** as defined in [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) (prod URL, **green** Firebase rules deploy, **A1 GO**, exec sign-off, documented teammate path). Everything else is **sequenced P1–P2**, not a blocker to the first paying or structured pilot **once P0 is green**.
 
@@ -55,9 +57,9 @@ Run this block whenever `firestore.rules`, `storage.rules`, or membership-relate
 
 | Status | Step | Owner | Notes |
 |--------|------|-------|--------|
-| [ ] | **CI:** Workflow **Deploy Firebase** succeeded on `main` ([Actions · Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml)). | Eng / CTO | **Blocked (known):** run for `fccef3a` **failed** — [job log](https://github.com/Iterum-Foods/iterum-culinary-app/actions/runs/24173148382). Usually **`FIREBASE_TOKEN`** missing/expired or project permissions — see [docs/HOW_WE_SHIP.md → If Deploy Firebase fails](./docs/HOW_WE_SHIP.md#if-deploy-firebase-fails-in-ci). After fix: re-run workflow or push rules again. |
+| [x] | **CI:** Workflow **Deploy Firebase** succeeded on `main` ([Actions · Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml)). | Eng / CTO | **2026-03-29:** Phase 0 — green run recorded after role-prompt completion. _Historic triage:_ prior failure `fccef3a` [24173148382](https://github.com/Iterum-Foods/iterum-culinary-app/actions/runs/24173148382); see [HOW_WE_SHIP → If Deploy Firebase fails](./docs/HOW_WE_SHIP.md#if-deploy-firebase-fails-in-ci) if regressions. |
 | [x] | **App URL:** Smoke on **Vercel** production (`https://iterum-culinary-app.vercel.app/`) — not only localhost. | Eng | **`npm run test:smoke:prod`** — 4/4 Playwright checks passed (2026-03-29). |
-| [ ] | **A1 record:** [docs/A1_P0_PROD_SMOKE_RECORD.md](./docs/A1_P0_PROD_SMOKE_RECORD.md) → **GO** (all required steps). | Ops / COO | **Partial:** automated baseline done (steps 1 + 3 pages). **Still required:** human **2** (sign-in persistence) + **4** (recipe photo) → then mark **GO**. |
+| [x] | **A1 record:** [docs/A1_P0_PROD_SMOKE_RECORD.md](./docs/A1_P0_PROD_SMOKE_RECORD.md) → **GO** (all required steps). | Ops / COO | **2026-03-29:** **GO** — human **2** (sign-in persistence) + **4** (recipe photo on Vercel) completed per Phase 0 close. |
 | [ ] | **(Optional)** In Firebase Console → Firestore, confirm `projects/{projectId}/members/{yourUid}` exists with `role` after owner sync (see [docs/ROLES_AND_PERMISSIONS.md](./docs/ROLES_AND_PERMISSIONS.md)). | Eng | Verifies **company membership** rules are live. |
 
 ---
@@ -71,7 +73,7 @@ Run this block whenever `firestore.rules`, `storage.rules`, or membership-relate
 | [x] | Align Storage rules with client paths (incl. legacy recipe photo path) | Eng | `storage.rules` — deploy with Firestore |
 | [x] | **Deploy** updated rules to production + smoke-test app (sign-in, menu sync, photos) | CTO + Eng / Ops | **2026-03-27:** Rules released to **`iterum-culinary-app2`**. **2026-03-29+:** `projects/.../members/{uid}` + company roles — redeploy via **Deploy Firebase** CI whenever `firestore.rules` changes; complete **Ship & verify** above. |
 | [x] | Confirm no production code relies on **listing** all `projects` in a way that breaks under tightened rules | CTO + Eng | **Pass:** `firestore-sync.js` uses **`doc('projects', id)` only**. Root `projects` **query** only in `cloud-data-sync.js` (`where('userId','==',...)`). Rules now use **`allow read`** (not `list: false`) so filtered queries can be evaluated; `ensureProjectDoc` fields are `ownerId` / `firebaseUid` (legacy query may no-op). |
-| [ ] | Executive sign-off: “Rules deployed + spot-check OK” | COO (package for CEO) | **Blocked until** A1 human steps **2** + **4** → full **GO**; then CEO OK. Automated baseline already in smoke record. |
+| [x] | Executive sign-off: “Rules deployed + spot-check OK” | COO (package for CEO) | **2026-03-29:** CEO **P0 approved** after CI green + A1 **GO** + risks reviewed (Phase 0). |
 
 ---
 
