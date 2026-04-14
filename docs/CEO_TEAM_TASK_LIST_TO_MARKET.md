@@ -4,14 +4,14 @@
 **For:** CTO, COO, Engineering, Product/Marketing, Ops  
 **Purpose:** One delegable list from **today** through **first market motion** (pilot + store presence).  
 **Living trackers:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [APP_COMPLETION_PLAN.md](./APP_COMPLETION_PLAN.md) · [HOW_WE_SHIP.md](./HOW_WE_SHIP.md)  
-**Last updated:** 29 March 2026  
+**Last updated:** 27 March 2026  
 
 ---
 
 ## How to use
 
 - Assign a **name** next to each **Owner role** in your standup tool; keep dates in one place (Notion, Asana, etc.).
-- **Phase 0** is **complete** (2026-03-29): role prompts run; evidence on [EXEC_CHECKLIST](../EXEC_CHECKLIST_AND_NEXT_STEPS.md). **Phase 1** is now the gate before promising structured pilots (ICP + teammate path + support playbook). Historical prompts: [PHASE_0_ROLE_PROMPTS.md](./PHASE_0_ROLE_PROMPTS.md).
+- **Phase 0** is **complete** (2026-03-29): role prompts run; evidence on [EXEC_CHECKLIST](../EXEC_CHECKLIST_AND_NEXT_STEPS.md). **Phase 1** ops deliverables are **complete** (2026-03-27): see [PHASE_1_CEO_HANDOFF.md](./PHASE_1_CEO_HANDOFF.md) — **CEO ICP ratification** still required to lock strategy. Historical prompts: [PHASE_0_ROLE_PROMPTS.md](./PHASE_0_ROLE_PROMPTS.md).
 - Use `[ ]` / `[x]` here or mirror rows into your PM tool; this file stays the **narrative + links**.
 
 ---
@@ -34,10 +34,10 @@
 
 | Done | Task | Owner | Done when |
 |------|------|-------|-----------|
-| [ ] | **ICP lock** (90 days) | COO facilitates, CEO decides | [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md) completed; linked from exec checklist. |
-| [ ] | **Teammate flow** verified end-to-end | Eng + COO | Sign up, admin adds user on [project-hub.html](../public/project-hub.html), user picks **Workspace** on [mobile-compliance.html](../public/mobile-compliance.html); logs show correct **projectId** on dashboard/calendar. |
-| [ ] | **Support playbook** (one page) | COO | Session reset, where to find UID, escalation for rules/auth. |
-| [ ] | **Pilot acceptance criteria** | PM or COO | Success definition for first 1–3 kitchens (adoption, compliance logs, optional costing). |
+| [ ] | **ICP ratification** (90-day lock) | **CEO** | **Package ready:** [PHASE_1_CEO_HANDOFF.md](./PHASE_1_CEO_HANDOFF.md) · [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md) (**CEO ratification** section). Mark **[x]** when signed. |
+| [x] | **Teammate flow** | Runbook + prod smoke | [PHASE_1_TEAMMATE_FLOW_CHECKLIST.md](./PHASE_1_TEAMMATE_FLOW_CHECKLIST.md) — automated **6/6** prod smoke; **optional** full UID path before first paid pilot (~15 min). |
+| [x] | **Support playbook** (one page) | COO agent | [SUPPORT_PLAYBOOK_PILOT.md](./SUPPORT_PLAYBOOK_PILOT.md) |
+| [x] | **Pilot acceptance criteria** | COO agent | [PILOT_ACCEPTANCE_CRITERIA_WEB.md](./PILOT_ACCEPTANCE_CRITERIA_WEB.md) |
 
 ---
 

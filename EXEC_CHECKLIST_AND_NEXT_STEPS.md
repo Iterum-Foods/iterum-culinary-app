@@ -91,8 +91,8 @@ Run this block whenever `firestore.rules`, `storage.rules`, or membership-relate
 
 | Status | Item | Owner | Notes |
 |--------|------|-------|--------|
-| [ ] | Confirm ICP for next 90 days: multi-unit vs single venue vs consultant | COO (facilitate) · CEO (decide) | **Template:** [docs/ICP_DECISION_RECORD.md](./docs/ICP_DECISION_RECORD.md) — fill when decided. |
-| [ ] | Define **acceptance criteria** for “one manager, multiple restaurants, shared vendors, comparable pricing” | PM (or COO) | Tie to CEO brief success metrics |
+| [ ] | Confirm ICP for next 90 days: multi-unit vs single venue vs consultant | **CEO** (ratify) | **Ops package complete:** [docs/PHASE_1_CEO_HANDOFF.md](./docs/PHASE_1_CEO_HANDOFF.md) · [docs/ICP_DECISION_RECORD.md](./docs/ICP_DECISION_RECORD.md) — check **[x]** when the **CEO ratification** section is filled. |
+| [x] | Define **acceptance criteria** for “one manager, multiple restaurants, shared vendors, comparable pricing” | COO agent | **Web pilot bar:** [docs/PILOT_ACCEPTANCE_CRITERIA_WEB.md](./docs/PILOT_ACCEPTANCE_CRITERIA_WEB.md); CEO brief success metrics |
 | [ ] | Epic breakdown + engineering estimate | CTO + PM / Eng | After ICP lock |
 
 ---

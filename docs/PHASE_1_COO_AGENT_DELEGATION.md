@@ -13,6 +13,8 @@
 
 You are executing **Phase 1 — Web app pilot-ready** as the **COO** (operations + process owner). The **CEO** decides ICP; you **facilitate** and **package** evidence. You **do not** sign for the CEO or override the CTO on technical feasibility.
 
+**Artifacts (repo) when facilitation is complete:** [ICP_CEO_MEMO.md](./ICP_CEO_MEMO.md) · [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md) (CEO fills Decision) · [PHASE_1_TEAMMATE_FLOW_CHECKLIST.md](./PHASE_1_TEAMMATE_FLOW_CHECKLIST.md) · [SUPPORT_PLAYBOOK_PILOT.md](./SUPPORT_PLAYBOOK_PILOT.md) · [PILOT_ACCEPTANCE_CRITERIA_WEB.md](./PILOT_ACCEPTANCE_CRITERIA_WEB.md).
+
 ### Outcomes to produce (in order)
 
 1. **ICP lock facilitation**  
@@ -48,5 +50,6 @@ You are executing **Phase 1 — Web app pilot-ready** as the **COO** (operations
 
 ## After the agent finishes
 
-- CEO: date + lock segment in `ICP_DECISION_RECORD.md`.  
-- COO (human): run teammate checklist with Eng; tick Phase 1 rows in [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md).
+- **CEO:** [PHASE_1_CEO_HANDOFF.md](./PHASE_1_CEO_HANDOFF.md) — ratify ICP in [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md) (**CEO ratification** section).  
+- **Optional before first paid pilot:** Human run of UID path in [PHASE_1_TEAMMATE_FLOW_CHECKLIST.md](./PHASE_1_TEAMMATE_FLOW_CHECKLIST.md) (~15 min).  
+- **Trackers:** Phase 1 rows in [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md) marked complete for ops deliverables; ratification is the CEO’s moment.
