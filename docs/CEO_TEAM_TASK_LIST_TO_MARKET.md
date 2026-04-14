@@ -30,6 +30,8 @@
 
 ## Phase 1 — Web app pilot-ready
 
+**COO Agent delegation (paste prompt):** [PHASE_1_COO_AGENT_DELEGATION.md](./PHASE_1_COO_AGENT_DELEGATION.md)
+
 | Done | Task | Owner | Done when |
 |------|------|-------|-----------|
 | [ ] | **ICP lock** (90 days) | COO facilitates, CEO decides | [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md) completed; linked from exec checklist. |
