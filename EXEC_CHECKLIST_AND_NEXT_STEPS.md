@@ -2,7 +2,7 @@
 
 **Purpose:** Single page for leadership to track launch readiness and foundation work.  
 **Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](./NEXT_STEPS_LEADERSHIP.md) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) · [docs/CEO_TEAM_TASK_LIST_TO_MARKET.md](./docs/CEO_TEAM_TASK_LIST_TO_MARKET.md) (delegated CEO task list) · [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) · [docs/HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md) · [docs/SOURCE_OF_TRUTH.md](./docs/SOURCE_OF_TRUTH.md) · [docs/workflows/](./docs/workflows/) (e.g. sign-in UI redesign)  
-**Last updated:** 29 March 2026  
+**Last updated:** 14 April 2026  
 
 ---
 
@@ -22,7 +22,7 @@ _Use this section for short, dated notes that do not belong in a checkbox row._
 | **CTO** (technical accountable) | **`FIREBASE_TOKEN`** / permissions; **Deploy Firebase** CI green on `main`; optional `members/{uid}` spot-check | Latest [Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml) run **success**; [HOW_WE_SHIP](./docs/HOW_WE_SHIP.md) triage applied if needed |
 | **COO** (process accountable) | **A1** human steps **2** + **4** on Vercel URL; fill [A1_P0_PROD_SMOKE_RECORD](./docs/A1_P0_PROD_SMOKE_RECORD.md); package **executive P0 sign-off** for CEO | Smoke record → **GO**; checklist **Executive sign-off** row ready for CEO **yes** |
 | **Eng** | No net-new P1 scope until **Ship & verify → CI** is green; keep `main` healthy (lint/smoke) | CI green; support COO with any repro from smoke |
-| **CEO** (me) | **ICP** decision after COO memo ([ICP_DECISION_RECORD](./docs/ICP_DECISION_RECORD.md)); formal **P0 approval** when COO + CTO evidence is in | One-line ICP lock + dated sign-off on P0 evidence |
+| **CEO** (me) | **ICP** locked 2026-04-14 ([ICP_DECISION_RECORD](./docs/ICP_DECISION_RECORD.md)); steer P1 epic + pilots | Ratification recorded; team notified of 90-day ICP; **next:** close **Epic breakdown + engineering estimate** row with CTO |
 | **PM or COO** | P1 acceptance criteria + pilot shortlist | Rows closed in P1 tables below |
 
 **Cursor / AI personas:** Do not run one generic thread for “the whole app.” Use the role prompts in [LEADERSHIP_ROLE_ASSIGNMENTS.md → AI agent prompts](./LEADERSHIP_ROLE_ASSIGNMENTS.md#ai-agent-prompts) — e.g. **CTO-shaped** session for deploy/rules/security, **COO-shaped** for checklist and pilot comms, **engineering** session for code. Same RACI as humans; agents are tools, not owners of sign-off.
@@ -91,7 +91,7 @@ Run this block whenever `firestore.rules`, `storage.rules`, or membership-relate
 
 | Status | Item | Owner | Notes |
 |--------|------|-------|--------|
-| [ ] | Confirm ICP for next 90 days: multi-unit vs single venue vs consultant | **CEO** (ratify) | **Ops package complete:** [docs/PHASE_1_CEO_HANDOFF.md](./docs/PHASE_1_CEO_HANDOFF.md) · [docs/ICP_DECISION_RECORD.md](./docs/ICP_DECISION_RECORD.md) — check **[x]** when the **CEO ratification** section is filled. |
+| [x] | Confirm ICP for next 90 days: multi-unit vs single venue vs consultant | **CEO** (ratify) | **2026-04-14:** Ratified — [docs/ICP_DECISION_RECORD.md](./docs/ICP_DECISION_RECORD.md). |
 | [x] | Define **acceptance criteria** for “one manager, multiple restaurants, shared vendors, comparable pricing” | COO agent | **Web pilot bar:** [docs/PILOT_ACCEPTANCE_CRITERIA_WEB.md](./docs/PILOT_ACCEPTANCE_CRITERIA_WEB.md); CEO brief success metrics |
 | [ ] | Epic breakdown + engineering estimate | CTO + PM / Eng | After ICP lock |
 

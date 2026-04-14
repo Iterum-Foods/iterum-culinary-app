@@ -3,7 +3,7 @@
 **Purpose:** Single phased roadmap to **finish** the Iterum Culinary web app for operator pilots and a defensible production posture—not a feature wishlist.  
 **Living trackers:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md) · [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](../CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](../NEXT_STEPS_LEADERSHIP.md)  
 **Roles & data:** [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md) · [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md) · [SOURCE_OF_TRUTH.md](./SOURCE_OF_TRUTH.md) · [HOW_WE_SHIP.md](./HOW_WE_SHIP.md)  
-**Last updated:** 29 March 2026  
+**Last updated:** 14 April 2026  
 
 ---
 
@@ -34,6 +34,8 @@
 ---
 
 ## Phase B — Team access without Console (next)
+
+**ICP:** Locked **2026-04-14** — [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md) (multi-unit 2–8 primary; consultant secondary). P1 build priorities follow that segment.
 
 **Goal:** Same restaurant (`projectId`), same login story; admins can add people without Firebase Console.
 

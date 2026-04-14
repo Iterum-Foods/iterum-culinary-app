@@ -1,8 +1,10 @@
 # Phase 1 — CEO handoff (web app pilot-ready)
 
+**Status:** **Complete** — ICP ratified **2026-04-14** ([ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md)). This memo is **historical**; next work is P1 epic + Phase 2/3 per [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md).
+
 **From:** Operations (COO agent — no separate human COO)  
 **To:** CEO  
-**Date:** 27 March 2026  
+**Date:** 27 March 2026 (issued) · **ICP locked:** 14 April 2026  
 
 **Purpose:** Everything Phase 1 required for **pilot-ready** narrative is packaged; **you** ratify ICP and communicate to the team.  
 **Trackers:** [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md) (Phase 1) · [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) (P1 ICP row).
@@ -13,7 +15,7 @@
 
 | Deliverable | Location |
 |-------------|----------|
-| **ICP recommendation + implications** | [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md) — complete the **CEO ratification** section to lock |
+| **ICP recommendation + implications** | [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md) — **locked** (CEO ratification complete) |
 | **ICP options memo** | [ICP_CEO_MEMO.md](./ICP_CEO_MEMO.md) |
 | **Teammate runbook** | [PHASE_1_TEAMMATE_FLOW_CHECKLIST.md](./PHASE_1_TEAMMATE_FLOW_CHECKLIST.md) |
 | **Support playbook** | [SUPPORT_PLAYBOOK_PILOT.md](./SUPPORT_PLAYBOOK_PILOT.md) |
@@ -22,18 +24,18 @@
 
 ---
 
-## Your required actions (short)
+## Your required actions (historical — ratified 2026-04-14)
 
-1. **Ratify ICP** — Open [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md), read **Decision**; if you accept, complete the **CEO ratification** section (date, name, initials). If you change segment, edit the **Decision** table and still sign.  
-2. **One line to team** — e.g. *“ICP locked for 90 days: multi-unit (2–8) primary; consultant opportunistic. See ICP_DECISION_RECORD.”*  
+1. ~~**Ratify ICP**~~ — **Done.**  
+2. **One line to team** — If not already sent: *“ICP locked for 90 days: multi-unit (2–8) primary; consultant opportunistic. See ICP_DECISION_RECORD.”*  
 3. **Optional before first paid pilot** — Spend **~15 minutes** with Eng running [PHASE_1_TEAMMATE_FLOW_CHECKLIST.md](./PHASE_1_TEAMMATE_FLOW_CHECKLIST.md) with real test accounts (UID add path). Automated smoke does not replace this; it only proves pages and hosting.
 
 ---
 
-## Tracker updates (already mirrored)
+## Tracker updates
 
-- [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md) Phase 1 — marked complete for COO-deliverables; **your** ratification is the legal/strategic moment.  
-- [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) P1 — ICP row updated after you sign.
+- [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md) Phase 1 — **closed** (ICP + ops deliverables).  
+- [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) P1 — ICP row **[x]** (2026-04-14).
 
 ---
 

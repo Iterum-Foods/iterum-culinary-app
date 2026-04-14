@@ -1,13 +1,15 @@
 # ICP — CEO decision memo (Phase 1)
 
+**Status:** **Superseded by ratification** — ICP locked **2026-04-14** in [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md). This memo is **historical context** only.
+
 **Prepared by:** COO (facilitation)  
-**Decision owner:** CEO only — this memo does **not** constitute a lock until the **Decision** table in [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md) is dated and signed.
+**Decision owner:** CEO — ratification complete (see decision record).
 
 ---
 
 ## Why this matters now
 
-Phase 1 **pilot-ready** requires one **ideal customer profile (ICP)** for the next **90 days** so onboarding copy (“project” vs “restaurant”), pilot shortlist, and engineering priorities (multi-site vs single venue) stay aligned. [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md) blocks structured pilot promises until ICP is locked.
+Phase 1 **pilot-ready** required one **ICP** for **90 days**; that lock is **in place** (2026-04-14). Onboarding copy, pilot shortlist, and engineering priorities should follow [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md).
 
 ---
 
@@ -31,12 +33,11 @@ Phase 1 **pilot-ready** requires one **ideal customer profile (ICP)** for the ne
 
 ## Explicit non-goals for 90 days
 
-**Already copied** into [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md). CEO may add rows when ratifying.
+**Copied** into [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md) (locked).
 
 ---
 
-## Next step for CEO
+## Next steps (post-ratification)
 
-1. Open [PHASE_1_CEO_HANDOFF.md](./PHASE_1_CEO_HANDOFF.md).  
-2. Ratify in [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md) under **CEO ratification**.  
-3. One line to team: **“ICP locked for 90 days — see ICP_DECISION_RECORD.”**
+1. CTO + Eng: **Epic breakdown + engineering estimate** — [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md).  
+2. Optional: human [PHASE_1_TEAMMATE_FLOW_CHECKLIST.md](./PHASE_1_TEAMMATE_FLOW_CHECKLIST.md) before first paid pilot.

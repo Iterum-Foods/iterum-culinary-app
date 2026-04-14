@@ -11,12 +11,12 @@
 
 | Item | State |
 |------|--------|
-| **COO package** | **Complete** — recommended ICP filled below for your ratification. |
-| **CEO ratification** | **Pending** — add **date + initials** in the **CEO ratification** section below when you adopt (or revise the segment and note changes). |
+| **COO package** | **Complete** — recommended ICP filled below; ratified 2026-04-14. |
+| **CEO ratification** | **Complete** (2026-04-14) — Matthew McPherson, CEO (initials MKM). |
 
 ---
 
-## Decision (recommended — operative after CEO ratification)
+## Decision (locked 2026-04-14 — 90-day ICP)
 
 | Field | Value |
 |--------|--------|
@@ -44,9 +44,9 @@
 
 | Field | Value |
 |--------|--------|
-| **Date** | |
-| **Name / role** | |
-| **Initials** | |
+| **Date** | 2026-04-14 |
+| **Name / role** | Matthew McPherson, CEO |
+| **Initials** | MKM |
 
 ---
 
@@ -55,3 +55,4 @@
 | Date | Change |
 |------|--------|
 | 2026-03-27 | COO operations agent: recommended ICP filled; CEO ratification pending. |
+| 2026-04-14 | CEO ratification signed; ICP locked 90 days (primary: multi-unit 2–8; secondary: consultant opportunistic). |
