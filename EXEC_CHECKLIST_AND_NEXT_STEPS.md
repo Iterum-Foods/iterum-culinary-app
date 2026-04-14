@@ -14,7 +14,7 @@ _Use this section for short, dated notes that do not belong in a checkbox row._
 
 **2026-03-29 — Phase 0 closed (production trust):** Deploy Firebase CI green on `main`; Firestore **members** / **authUid** collection group index verified; [A1_P0_PROD_SMOKE_RECORD.md](./docs/A1_P0_PROD_SMOKE_RECORD.md) → **GO** (human steps **2** + **4**); COO executive pack + **CEO P0 approval** recorded below. **Next organizational gate:** Phase 1 — [CEO_TEAM_TASK_LIST_TO_MARKET.md](./docs/CEO_TEAM_TASK_LIST_TO_MARKET.md#phase-1--web-app-pilot-ready) (ICP lock, teammate path, support playbook, pilot acceptance criteria).
 
-**2026-04-14 — P1 engineering plan:** [P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md) (E1–E5, **~13–22** eng-weeks sequential; vendor_catalog sketch). **Execute next:** milestone **M1** — E1 (Phase B) + E2a–b (multi-workspace correctness).
+**2026-04-14 — P1 engineering plan:** [P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md) (E1–E5, **~13–22** eng-weeks sequential; vendor_catalog sketch). **M1 in progress:** [M1_CTO_AGENT_DELEGATION.md](./docs/M1_CTO_AGENT_DELEGATION.md) (CTO/Eng agent) · [M1_PROJECTID_AUDIT.md](./docs/M1_PROJECTID_AUDIT.md) (E2a).
 
 **CEO directive — “Finish” = pilot-ready trust, not feature-complete**  
 **Decision:** We ship **pilot-ready** as defined in [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) (prod URL, **green** Firebase rules deploy, **A1 GO**, exec sign-off, documented teammate path). Everything else is **sequenced P1–P2**, not a blocker to the first paying or structured pilot **once P0 is green**.

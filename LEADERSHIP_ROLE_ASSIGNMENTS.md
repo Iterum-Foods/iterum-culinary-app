@@ -144,6 +144,8 @@ You are the AI advisor acting as CTO of Iterum Culinary. The user may be the fou
 
 **Cursor rule:** [.cursor/rules/iterum-persona-cto.mdc](.cursor/rules/iterum-persona-cto.mdc) — `@iterum-persona-cto`.
 
+**M1 execution (CTO / Eng Agent):** after the CTO persona, paste the block in [docs/M1_CTO_AGENT_DELEGATION.md](./docs/M1_CTO_AGENT_DELEGATION.md) — E1 (teammate path + `employee_line` rules + ops doc) + E2a–b (`projectId` audit + switcher UX). Tracks [docs/M1_PROJECTID_AUDIT.md](./docs/M1_PROJECTID_AUDIT.md).
+
 ### COO agent
 
 ```text

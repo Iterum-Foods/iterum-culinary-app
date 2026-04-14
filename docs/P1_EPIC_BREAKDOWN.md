@@ -138,7 +138,7 @@
 
 | Milestone | Contents | Target (indicative) |
 |-----------|----------|---------------------|
-| **M1 — Trust** | E1 done + E2a–b | End of sprint +2 |
+| **M1 — Trust** | E1 done + E2a–b | End of sprint +2 · **CTO prompt:** [M1_CTO_AGENT_DELEGATION.md](./M1_CTO_AGENT_DELEGATION.md) · **Audit:** [M1_PROJECTID_AUDIT.md](./M1_PROJECTID_AUDIT.md) |
 | **M2 — Catalog alpha** | E3a–b behind flag or admin-only | +4–6 eng-weeks from M1 |
 | **M3 — Pilot-ready economics** | E3c–d + E4a | +6–10 from M1 |
 | **M4 — Quality** | E5a–b green | Parallel to M2–M3 |
@@ -162,3 +162,4 @@ Adjust in PM tool when sprint capacity is known.
 | Date | Change |
 |------|--------|
 | 2026-04-14 | Initial breakdown after ICP lock; eng-week ranges; vendor_catalog sketch. |
+| 2026-04-14 | **M1 kickoff:** [M1_CTO_AGENT_DELEGATION.md](./M1_CTO_AGENT_DELEGATION.md), [M1_PROJECTID_AUDIT.md](./M1_PROJECTID_AUDIT.md), [ADD_TEAMMATE_UID_PATH.md](./ADD_TEAMMATE_UID_PATH.md). |
