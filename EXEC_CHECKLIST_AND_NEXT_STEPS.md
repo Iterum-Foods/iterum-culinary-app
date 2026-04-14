@@ -1,7 +1,7 @@
 # Executive checklist & next steps
 
 **Purpose:** Single page for leadership to track launch readiness and foundation work.  
-**Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](./NEXT_STEPS_LEADERSHIP.md) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) · [docs/CEO_TEAM_TASK_LIST_TO_MARKET.md](./docs/CEO_TEAM_TASK_LIST_TO_MARKET.md) (delegated CEO task list) · [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) · [docs/HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md) · [docs/SOURCE_OF_TRUTH.md](./docs/SOURCE_OF_TRUTH.md) · [docs/workflows/](./docs/workflows/) (e.g. sign-in UI redesign)  
+**Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](./NEXT_STEPS_LEADERSHIP.md) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) · [docs/CEO_TEAM_TASK_LIST_TO_MARKET.md](./docs/CEO_TEAM_TASK_LIST_TO_MARKET.md) (delegated CEO task list) · [docs/P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md) (E1–E5) · [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) · [docs/HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md) · [docs/SOURCE_OF_TRUTH.md](./docs/SOURCE_OF_TRUTH.md) · [docs/workflows/](./docs/workflows/) (e.g. sign-in UI redesign)  
 **Last updated:** 14 April 2026  
 
 ---
@@ -14,6 +14,8 @@ _Use this section for short, dated notes that do not belong in a checkbox row._
 
 **2026-03-29 — Phase 0 closed (production trust):** Deploy Firebase CI green on `main`; Firestore **members** / **authUid** collection group index verified; [A1_P0_PROD_SMOKE_RECORD.md](./docs/A1_P0_PROD_SMOKE_RECORD.md) → **GO** (human steps **2** + **4**); COO executive pack + **CEO P0 approval** recorded below. **Next organizational gate:** Phase 1 — [CEO_TEAM_TASK_LIST_TO_MARKET.md](./docs/CEO_TEAM_TASK_LIST_TO_MARKET.md#phase-1--web-app-pilot-ready) (ICP lock, teammate path, support playbook, pilot acceptance criteria).
 
+**2026-04-14 — P1 engineering plan:** [P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md) (E1–E5, **~13–22** eng-weeks sequential; vendor_catalog sketch). **Execute next:** milestone **M1** — E1 (Phase B) + E2a–b (multi-workspace correctness).
+
 **CEO directive — “Finish” = pilot-ready trust, not feature-complete**  
 **Decision:** We ship **pilot-ready** as defined in [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) (prod URL, **green** Firebase rules deploy, **A1 GO**, exec sign-off, documented teammate path). Everything else is **sequenced P1–P2**, not a blocker to the first paying or structured pilot **once P0 is green**.
 
@@ -21,8 +23,8 @@ _Use this section for short, dated notes that do not belong in a checkbox row._
 |----------|------------|-----------|
 | **CTO** (technical accountable) | **`FIREBASE_TOKEN`** / permissions; **Deploy Firebase** CI green on `main`; optional `members/{uid}` spot-check | Latest [Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml) run **success**; [HOW_WE_SHIP](./docs/HOW_WE_SHIP.md) triage applied if needed |
 | **COO** (process accountable) | **A1** human steps **2** + **4** on Vercel URL; fill [A1_P0_PROD_SMOKE_RECORD](./docs/A1_P0_PROD_SMOKE_RECORD.md); package **executive P0 sign-off** for CEO | Smoke record → **GO**; checklist **Executive sign-off** row ready for CEO **yes** |
-| **Eng** | No net-new P1 scope until **Ship & verify → CI** is green; keep `main` healthy (lint/smoke) | CI green; support COO with any repro from smoke |
-| **CEO** (me) | **ICP** locked 2026-04-14 ([ICP_DECISION_RECORD](./docs/ICP_DECISION_RECORD.md)); steer P1 epic + pilots | Ratification recorded; team notified of 90-day ICP; **next:** close **Epic breakdown + engineering estimate** row with CTO |
+| **Eng** | **P1 delivery** per [P1_EPIC_BREAKDOWN](./docs/P1_EPIC_BREAKDOWN.md); keep `main` healthy (lint/smoke); **Ship & verify** on rules changes | M1 (E1 + E2a–b) underway; CI green |
+| **CEO** (me) | **ICP** locked 2026-04-14 ([ICP_DECISION_RECORD](./docs/ICP_DECISION_RECORD.md)); steer P1 delivery + pilots | Ratification recorded; **next:** sprint commit on E1–E2 vs E3 priority with CTO ([P1_EPIC_BREAKDOWN](./docs/P1_EPIC_BREAKDOWN.md)). |
 | **PM or COO** | P1 acceptance criteria + pilot shortlist | Rows closed in P1 tables below |
 
 **Cursor / AI personas:** Do not run one generic thread for “the whole app.” Use the role prompts in [LEADERSHIP_ROLE_ASSIGNMENTS.md → AI agent prompts](./LEADERSHIP_ROLE_ASSIGNMENTS.md#ai-agent-prompts) — e.g. **CTO-shaped** session for deploy/rules/security, **COO-shaped** for checklist and pilot comms, **engineering** session for code. Same RACI as humans; agents are tools, not owners of sign-off.
@@ -93,7 +95,7 @@ Run this block whenever `firestore.rules`, `storage.rules`, or membership-relate
 |--------|------|-------|--------|
 | [x] | Confirm ICP for next 90 days: multi-unit vs single venue vs consultant | **CEO** (ratify) | **2026-04-14:** Ratified — [docs/ICP_DECISION_RECORD.md](./docs/ICP_DECISION_RECORD.md). |
 | [x] | Define **acceptance criteria** for “one manager, multiple restaurants, shared vendors, comparable pricing” | COO agent | **Web pilot bar:** [docs/PILOT_ACCEPTANCE_CRITERIA_WEB.md](./docs/PILOT_ACCEPTANCE_CRITERIA_WEB.md); CEO brief success metrics |
-| [ ] | Epic breakdown + engineering estimate | CTO + PM / Eng | After ICP lock |
+| [x] | Epic breakdown + engineering estimate | CTO + PM / Eng | **2026-04-14:** [docs/P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md) — E1–E5 + eng-week ranges + milestones. |
 
 ---
 
@@ -101,7 +103,7 @@ Run this block whenever `firestore.rules`, `storage.rules`, or membership-relate
 
 | Status | Item | Owner | Notes |
 |--------|------|-------|--------|
-| [ ] | Data model sketch: vendor directory, site/location linkage, price rows | CTO + PM / Eng | Depends on P1 product framing |
+| [x] | Data model sketch: vendor directory, site/location linkage, price rows | CTO + PM / Eng | **2026-04-14:** [docs/P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md#p1-vendor-data-sketch) (`users/{uid}/vendor_catalog/...`). Refine after pilot. |
 | [ ] | Pilot customer identified for design validation | COO / Sales | Optional but high leverage |
 
 ---

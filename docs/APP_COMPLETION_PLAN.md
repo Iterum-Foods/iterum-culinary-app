@@ -1,7 +1,7 @@
 # App completion plan (pilot → sustainable launch)
 
 **Purpose:** Single phased roadmap to **finish** the Iterum Culinary web app for operator pilots and a defensible production posture—not a feature wishlist.  
-**Living trackers:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md) · [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](../CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](../NEXT_STEPS_LEADERSHIP.md)  
+**Living trackers:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) (post–ICP engineering) · [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md) · [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](../CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](../NEXT_STEPS_LEADERSHIP.md)  
 **Roles & data:** [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md) · [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md) · [SOURCE_OF_TRUTH.md](./SOURCE_OF_TRUTH.md) · [HOW_WE_SHIP.md](./HOW_WE_SHIP.md)  
 **Last updated:** 14 April 2026  
 
@@ -57,7 +57,7 @@
 |---|------|-----------|--------|
 | C1 | **Source-of-truth one-pager** | Recipes, menus, vendors, checklists: which is canonical on device vs server; linked from exec checklist | CTO + PM/COO |
 | C2 | **Route one more entity** through shared pattern | e.g. checklists **or** recipe snapshot via `project-data-access` (checklist row in EXEC_CHECKLIST) | Eng |
-| C3 | **P1 framing** | ICP + acceptance criteria for multi-restaurant / shared vendors (checklist P1 rows) | COO / CEO |
+| C3 | **P1 framing** | ICP + acceptance criteria for multi-restaurant / shared vendors (checklist P1 rows) | COO / CEO — **done**; epics in [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) |
 
 ---
 
@@ -118,3 +118,4 @@ Adjust dates on the **exec checklist** “Next 30 days” section when leadershi
 | 2026-03-29 | Initial plan: Phases A–D, pilot vs scale-ready definitions, links to existing trackers. |
 | 2026-03-29 | Mobile line log page + PWA manifest; same Firestore paths as dashboard compliance cards. |
 | 2026-03-29 | Capacitor `android/` + `ios/` for Play Store / App Store (WebView → production line log URL). |
+| 2026-04-14 | [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md): E1–E5 sized; `vendor_catalog` sketch; **M1** = E1 + E2a–b. |
