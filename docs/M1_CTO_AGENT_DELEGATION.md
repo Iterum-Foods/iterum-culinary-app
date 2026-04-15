@@ -5,6 +5,10 @@
 **Human verification:** [PHASE_1_TEAMMATE_FLOW_CHECKLIST.md](./PHASE_1_TEAMMATE_FLOW_CHECKLIST.md) on **Vercel prod** when E1a is ready.  
 **Last updated:** 14 April 2026  
 
+**Engineering shipped (`main` `2e28c70`):** `firestore-sync.js` — `resolveProjectId()` uses the same cascade as the rest of the app (explicit → unified selector → `projectManager` → user-scoped storage → fallbacks). `menuManager.js` (`MenuManagerLegacy`) — same cascade; `projectChanged` reloads draft key/draft. `menu-recipe-integration.js` — aligned; `default` → `master`. [M1_PROJECTID_AUDIT.md](./M1_PROJECTID_AUDIT.md) filled (E1/E2, P0s marked fixed in repo).  
+
+**Still open:** Human **E1a GO** on Vercel + **Deploy Firebase** green after any rules/index work. **COO:** two-workspace prod demo (selector → menu-builder draft follows; mobile-compliance list + one write). **Next PR (optional):** `#nav-project-chip` / selector on straggler pages; calendar per-`projectId` = **E2c / backlog** if pilots require it.
+
 ---
 
 ## Delegation prompt (copy everything below the line)

@@ -16,6 +16,8 @@ _Use this section for short, dated notes that do not belong in a checkbox row._
 
 **2026-04-14 — P1 engineering plan:** [P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md) (E1–E5, **~13–22** eng-weeks sequential; vendor_catalog sketch). **M1 in progress:** [M1_CTO_AGENT_DELEGATION.md](./docs/M1_CTO_AGENT_DELEGATION.md) (CTO/Eng agent) · [M1_PROJECTID_AUDIT.md](./docs/M1_PROJECTID_AUDIT.md) (E2a).
 
+**2026-04-14 — M1 code landed (`2e28c70`):** `projectId` resolution aligned in `firestore-sync.js`, `menuManager.js`, `menu-recipe-integration.js`; audit doc updated (E1b reviewed, E2a/E2b, P0 fixes recorded). **M1 not closed until:** human [PHASE_1_TEAMMATE_FLOW_CHECKLIST.md](./docs/PHASE_1_TEAMMATE_FLOW_CHECKLIST.md) on **Vercel prod** + **Deploy Firebase** green if rules/indexes changed. **COO:** re-run two-workspace demo on prod (menu-builder draft follows switch; mobile-compliance). **Follow-up PR:** nav chip / selector on straggler pages; calendar scope → E2c/backlog.
+
 **CEO directive — “Finish” = pilot-ready trust, not feature-complete**  
 **Decision:** We ship **pilot-ready** as defined in [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) (prod URL, **green** Firebase rules deploy, **A1 GO**, exec sign-off, documented teammate path). Everything else is **sequenced P1–P2**, not a blocker to the first paying or structured pilot **once P0 is green**.
 
@@ -23,8 +25,8 @@ _Use this section for short, dated notes that do not belong in a checkbox row._
 |----------|------------|-----------|
 | **CTO** (technical accountable) | **`FIREBASE_TOKEN`** / permissions; **Deploy Firebase** CI green on `main`; optional `members/{uid}` spot-check | Latest [Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml) run **success**; [HOW_WE_SHIP](./docs/HOW_WE_SHIP.md) triage applied if needed |
 | **COO** (process accountable) | **A1** human steps **2** + **4** on Vercel URL; fill [A1_P0_PROD_SMOKE_RECORD](./docs/A1_P0_PROD_SMOKE_RECORD.md); package **executive P0 sign-off** for CEO | Smoke record → **GO**; checklist **Executive sign-off** row ready for CEO **yes** |
-| **Eng** | **P1 delivery** per [P1_EPIC_BREAKDOWN](./docs/P1_EPIC_BREAKDOWN.md); keep `main` healthy (lint/smoke); **Ship & verify** on rules changes | M1 (E1 + E2a–b) underway; CI green |
-| **CEO** (me) | **ICP** locked 2026-04-14 ([ICP_DECISION_RECORD](./docs/ICP_DECISION_RECORD.md)); steer P1 delivery + pilots | Ratification recorded; **next:** sprint commit on E1–E2 vs E3 priority with CTO ([P1_EPIC_BREAKDOWN](./docs/P1_EPIC_BREAKDOWN.md)). |
+| **Eng** | **P1 delivery** per [P1_EPIC_BREAKDOWN](./docs/P1_EPIC_BREAKDOWN.md); keep `main` healthy (lint/smoke); **Ship & verify** on rules changes | **M1 eng:** `2e28c70` on `main`; **next:** straggler nav/chip PRs optional; E3 when M1 human GO |
+| **CEO** (me) | **ICP** locked 2026-04-14 ([ICP_DECISION_RECORD](./docs/ICP_DECISION_RECORD.md)); steer P1 delivery + pilots | **Next:** confirm M1 human bar (teammate checklist + COO demo), then green-light **E3** vendor catalog with CTO |
 | **PM or COO** | P1 acceptance criteria + pilot shortlist | Rows closed in P1 tables below |
 
 **Cursor / AI personas:** Do not run one generic thread for “the whole app.” Use the role prompts in [LEADERSHIP_ROLE_ASSIGNMENTS.md → AI agent prompts](./LEADERSHIP_ROLE_ASSIGNMENTS.md#ai-agent-prompts) — e.g. **CTO-shaped** session for deploy/rules/security, **COO-shaped** for checklist and pilot comms, **engineering** session for code. Same RACI as humans; agents are tools, not owners of sign-off.

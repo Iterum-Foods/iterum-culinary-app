@@ -163,3 +163,4 @@ Adjust in PM tool when sprint capacity is known.
 |------|--------|
 | 2026-04-14 | Initial breakdown after ICP lock; eng-week ranges; vendor_catalog sketch. |
 | 2026-04-14 | **M1 kickoff:** [M1_CTO_AGENT_DELEGATION.md](./M1_CTO_AGENT_DELEGATION.md), [M1_PROJECTID_AUDIT.md](./M1_PROJECTID_AUDIT.md), [ADD_TEAMMATE_UID_PATH.md](./ADD_TEAMMATE_UID_PATH.md). |
+| 2026-04-14 | **`2e28c70`:** `resolveProjectId` + menu/menu-recipe `projectId` cascade; [M1_PROJECTID_AUDIT.md](./M1_PROJECTID_AUDIT.md) updated. M1 awaits human E1a + prod verification. |

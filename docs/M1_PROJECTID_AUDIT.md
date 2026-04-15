@@ -72,3 +72,4 @@
 |------|--------|
 | 2026-04-14 | Seed audit table; CTO delegation [M1_CTO_AGENT_DELEGATION.md](./M1_CTO_AGENT_DELEGATION.md). |
 | 2026-04-14 | Filled module table; E1a–c status; P0 fixes: `firestore-sync` `resolveProjectId`, `menuManager` cascade + `projectChanged`, `menu-recipe-integration` ids. |
+| 2026-04-14 | Shipped on `main` as **`2e28c70`** (`feat(m1): align projectId resolution for Firestore sync and menu flows`). |
