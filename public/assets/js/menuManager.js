@@ -41,12 +41,32 @@ class MenuManagerLegacy {
 
   getCurrentProjectId() {
     try {
-      const stored = localStorage.getItem('iterum_current_project');
-      if (stored) {
-        const p = JSON.parse(stored);
-        return p?.id || p?.projectId || 'master';
+      if (window.unifiedProjectSelector?.currentProjectId) {
+        return String(window.unifiedProjectSelector.currentProjectId);
       }
-      return 'master';
+      if (window.projectManager?.currentProject?.id) {
+        return String(window.projectManager.currentProject.id);
+      }
+      const uid =
+        window.authManager?.currentUser?.userId ||
+        window.authManager?.currentUser?.id ||
+        'guest';
+      const userPick = localStorage.getItem(
+        `iterum_current_project_user_${uid}`
+      );
+      if (userPick) {
+        return String(userPick).replace(/^"|"$/g, '') || 'master';
+      }
+      const stored = localStorage.getItem('iterum_current_project');
+      if (!stored) {
+        return 'master';
+      }
+      try {
+        const p = JSON.parse(stored);
+        return String(p?.id || p?.projectId || stored);
+      } catch {
+        return String(stored).replace(/^"|"$/g, '') || 'master';
+      }
     } catch {
       return 'master';
     }
@@ -127,11 +147,90 @@ class MenuManagerLegacy {
       id: this.itemIdCounter++,
       name: item?.name || 'New Item',
       description: item?.description || '',
-      price: item?.price != null ? Number(item.price) : null
+      price: item?.price != null ? Number(item.price) : null,
+      recipeId: item?.recipeId || null,
+      prepTime: item?.prepTime ?? item?.prep_time ?? null,
+      cookTime: item?.cookTime ?? item?.cook_time ?? null,
+      servings: item?.servings ?? null,
+      category: item?.category || null,
+      targetFoodCost: item?.targetFoodCost ?? null,
+      allergens: item?.allergens || [],
+      dietaryInfo: item?.dietaryInfo || [],
+      difficulty: item?.difficulty || null
     };
     category.items.push(newItem);
     this.saveToStorage();
     this.renderAll();
+    this.syncMenuItemToRecipeIndex(newItem, category.name);
+  }
+
+  /**
+   * Keep Recipe index in sync: link existing recipes or create a draft stub for new dishes.
+   */
+  syncMenuItemToRecipeIndex(menuItem, sectionName) {
+    const menuName = (this.menu && this.menu.name) || '';
+    const payload = {
+      ...menuItem,
+      menuName,
+      menuSection: sectionName,
+      category: menuItem.category || sectionName
+    };
+
+    const tryRun = () => {
+      if (!window.universalRecipeManager) return;
+
+      if (menuItem.recipeId) {
+        const combined = window.universalRecipeManager.getAllRecipes?.() || [];
+        const found = combined.find(r => r.id === menuItem.recipeId);
+        if (found) {
+          window.universalRecipeManager.addToLibrary(
+            {
+              ...found,
+              menuLinks: [
+                ...(found.menuLinks || []),
+                {
+                  menuItemId: menuItem.id,
+                  menuName,
+                  menuSection: sectionName,
+                  linkedAt: new Date().toISOString()
+                }
+              ]
+            },
+            'menu_builder_link'
+          );
+        }
+        return;
+      }
+
+      if (window.menuRecipeIntegration?.createRecipeStubForMenuItem) {
+        window.menuRecipeIntegration
+          .createRecipeStubForMenuItem(payload)
+          .then(stub => {
+            menuItem.recipeId = stub.id;
+            this.saveToStorage();
+            this.renderAll();
+          })
+          .catch(err => console.error('Menu → recipe index sync failed:', err));
+      }
+    };
+
+    if (window.menuRecipeIntegration && window.universalRecipeManager) {
+      tryRun();
+    } else {
+      let n = 0;
+      const t = setInterval(() => {
+        n++;
+        if (
+          (window.menuRecipeIntegration && window.universalRecipeManager) ||
+          n > 50
+        ) {
+          clearInterval(t);
+          if (window.menuRecipeIntegration && window.universalRecipeManager) {
+            tryRun();
+          }
+        }
+      }, 100);
+    }
   }
 
   ensureDefaultCategory() {
@@ -159,12 +258,16 @@ class MenuManagerLegacy {
         this.menu.categories.push(category);
       }
       for (const it of catItems) {
-        category.items.push({
+        const newItem = {
           id: this.itemIdCounter++,
           name: it.name || 'Imported Item',
           description: it.description || '',
-          price: it.price != null ? Number(it.price) : null
-        });
+          price: it.price != null ? Number(it.price) : null,
+          recipeId: it.recipeId || null,
+          category: it.category || catName
+        };
+        category.items.push(newItem);
+        this.syncMenuItemToRecipeIndex(newItem, category.name);
       }
     }
     this.saveToStorage();
@@ -365,6 +468,24 @@ class MenuManagerLegacy {
 document.addEventListener('DOMContentLoaded', () => {
   try {
     window.menuManager = new MenuManagerLegacy();
+    document.addEventListener('projectChanged', () => {
+      try {
+        const m = window.menuManager;
+        if (!m || typeof m.getCurrentProjectId !== 'function') {
+          return;
+        }
+        const next = m.getCurrentProjectId();
+        if (next === m.projectId) {
+          return;
+        }
+        m.projectId = next;
+        m.storageKey = m.buildStorageKey();
+        m.loadFromStorage();
+        m.renderAll();
+      } catch (e) {
+        console.warn('menuManager project sync', e);
+      }
+    });
     // Expose helpers for inline handlers
     window.addCategory = () => window.menuManager.addCategory();
     window.addMenuItem = () =>

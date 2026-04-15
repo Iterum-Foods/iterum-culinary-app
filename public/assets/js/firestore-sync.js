@@ -78,10 +78,36 @@ class FirestoreSync {
       return this.normalizeId(explicitProjectId, 'master');
     }
 
+    const ups = window.unifiedProjectSelector?.currentProjectId;
+    if (ups) {
+      return this.normalizeId(ups, 'master');
+    }
+
     const projectManager = window.projectManager;
     if (projectManager?.currentProject?.id) {
       return this.normalizeId(projectManager.currentProject.id, 'master');
     }
+
+    const uid =
+      window.firebaseAuth?.auth?.currentUser?.uid ||
+      window.authManager?.currentUser?.uid ||
+      window.authManager?.currentUser?.userId ||
+      window.authManager?.currentUser?.id ||
+      null;
+    if (uid) {
+      const userPick = localStorage.getItem(
+        `iterum_current_project_user_${uid}`
+      );
+      if (userPick) {
+        return this.normalizeId(userPick, 'master');
+      }
+    }
+
+    const globalPick = localStorage.getItem('iterum_current_project');
+    if (globalPick) {
+      return this.normalizeId(globalPick, 'master');
+    }
+
     if (projectManager?.masterProjectId) {
       return this.normalizeId(projectManager.masterProjectId, 'master');
     }

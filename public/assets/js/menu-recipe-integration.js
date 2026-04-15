@@ -236,34 +236,30 @@ class MenuRecipeIntegration {
     recipes.push(recipeStub);
     localStorage.setItem('recipes', JSON.stringify(recipes));
 
+    let forLibrary = { ...recipeStub };
     if (menuItem) {
-      const existing =
-        window.universalRecipeManager?.getRecipeLibrary?.() || recipes;
-      const recipeIndex = existing.findIndex(r => r.id === recipeStub.id);
-      if (recipeIndex !== -1) {
-        const enriched = {
-          ...existing[recipeIndex],
-          menuLinks: [
-            ...(existing[recipeIndex].menuLinks || []),
-            {
-              menuItemId: menuItem.id,
-              menuName: menuItem.menuName || menuItem.name,
-              menuSection: menuItem.menuSection || menuItem.category,
-              linkedAt: new Date().toISOString()
-            }
-          ],
-          course: menuItem.course,
-          menuCategory: menuItem.category,
-          recommendedServiceStyle: menuItem.serviceStyle || menuItem.persona,
-          platingNotes: menuItem.platingNotes
-        };
-
-        existing[recipeIndex] = enriched;
-        localStorage.setItem('recipes', JSON.stringify(existing));
-        if (window.universalRecipeManager?.saveRecipeLibrary) {
-          window.universalRecipeManager.saveRecipeLibrary(existing);
-        }
-      }
+      forLibrary = {
+        ...recipeStub,
+        menuLinks: [
+          ...(recipeStub.menuLinks || []),
+          {
+            menuItemId: menuItem.id,
+            menuName: menuItem.menuName || menuItem.name,
+            menuSection: menuItem.menuSection || menuItem.category,
+            linkedAt: new Date().toISOString()
+          }
+        ],
+        course: menuItem.course,
+        menuCategory: menuItem.category,
+        recommendedServiceStyle: menuItem.serviceStyle || menuItem.persona,
+        platingNotes: menuItem.platingNotes
+      };
+    }
+    if (window.universalRecipeManager?.addToLibrary) {
+      window.universalRecipeManager.addToLibrary(
+        forLibrary,
+        'menu_builder_stub'
+      );
     }
 
     // Try to sync to backend
@@ -639,8 +635,9 @@ class MenuRecipeIntegration {
    * Get current user ID
    */
   getCurrentUserId() {
-    if (window.authManager?.currentUser) {
-      return window.authManager.currentUser.userId;
+    const u = window.authManager?.currentUser;
+    if (u) {
+      return u.userId || u.id || 'guest';
     }
     return 'guest';
   }
@@ -649,11 +646,28 @@ class MenuRecipeIntegration {
    * Get current project ID
    */
   getCurrentProjectId() {
+    if (window.unifiedProjectSelector?.currentProjectId) {
+      return String(window.unifiedProjectSelector.currentProjectId);
+    }
     if (window.projectManager?.getCurrentProject) {
       const project = window.projectManager.getCurrentProject();
-      return project?.id || 'default';
+      if (project?.id) {
+        return String(project.id);
+      }
     }
-    return 'default';
+    const uid =
+      window.authManager?.currentUser?.userId ||
+      window.authManager?.currentUser?.id ||
+      'guest';
+    const userPick = localStorage.getItem(`iterum_current_project_user_${uid}`);
+    if (userPick) {
+      return String(userPick);
+    }
+    const g = localStorage.getItem('iterum_current_project');
+    if (g) {
+      return String(g);
+    }
+    return 'master';
   }
 
   /**
