@@ -118,17 +118,19 @@
 
 ### Recommended MVP shape (Firestore)
 
+**Reality:** `firestore.rules` already exposes **`users/{userId}/vendors/{vendorId}`** with owner-style access (see [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md)). **Prefer extending this path** for E3 rather than introducing a parallel `vendor_catalog` tree unless CTO decides otherwise.
+
 | Path | Contents |
 |------|----------|
-| `users/{accountOwnerUid}/vendor_catalog/vendors/{vendorId}` | Stable vendor record: `displayName`, optional `externalRef`, `createdAt`, `archived`. |
-| `users/{accountOwnerUid}/vendor_catalog/prices/{priceRowId}` | `vendorId`, `ingredientKey` or `sku`, `unit`, `basePrice`, `currency`, **`projectId` nullable** (null = default for all projects; set = override for one workspace). |
+| `users/{accountOwnerUid}/vendors/{vendorId}` | Stable vendor record: `displayName`, optional `externalRef`, `createdAt`, `archived`. |
+| `users/{accountOwnerUid}/vendor_prices/{priceRowId}` *(or fields on vendor doc)* | `vendorId`, `ingredientKey` or `sku`, `unit`, `basePrice`, **`projectId` nullable** for workspace override. *New subcollection needs a **rules patch** + deploy.* |
 | `projects/{projectId}/...` (existing) | Menus, checklists, etc. unchanged; **menu costing** resolves price by: project override → account default → ingredient local fallback (policy TBD in E3). |
 
-**Rules:** Reads/writes on `vendor_catalog` only for `request.auth.uid == accountOwnerUid` **or** delegated admin role you already model on `projects/.../members` (may require helper `canManageCatalog(uid)` in rules—CTO decision).
+**Rules:** Today, `users/.../vendors` is **isOwner(userId) || userProfileEmailMatches**; delegated `account_admin` on a **project** does not automatically grant another user’s `users/{slug}` path—**E3** may need `firebaseUid`-keyed user docs or catalog under `projects/{id}` for multi-admin accounts (CTO decision).
 
-**Alternatives (defer):** Top-level `organizations/{orgId}` if you later introduce org entity; multi-user org billing. For **90-day ICP**, `users/{uid}/vendor_catalog` matches **consultant + multi-unit under one owner** without new identity model.
+**Alternatives (defer):** Top-level `organizations/{orgId}`; multi-user org billing.
 
-**Client:** Introduce thin module (similar to [project-data-access.js](../public/assets/js/project-data-access.js)) for catalog paths; migrate `vendorManager.js` / price comparator gradually.
+**Client:** Thin module for `users/{uid}/vendors` (and future `vendor_prices` if added); migrate [vendorManager.js](../public/assets/js/vendorManager.js) / [vendor-price-comparator.js](../public/assets/js/vendor-price-comparator.js) gradually.
 
 **This sketch closes:** EXEC_CHECKLIST row *Data model sketch: vendor directory, site/location linkage, price rows* — refine after first pilot feedback.
 
@@ -164,3 +166,4 @@ Adjust in PM tool when sprint capacity is known.
 | 2026-04-14 | Initial breakdown after ICP lock; eng-week ranges; vendor_catalog sketch. |
 | 2026-04-14 | **M1 kickoff:** [M1_CTO_AGENT_DELEGATION.md](./M1_CTO_AGENT_DELEGATION.md), [M1_PROJECTID_AUDIT.md](./M1_PROJECTID_AUDIT.md), [ADD_TEAMMATE_UID_PATH.md](./ADD_TEAMMATE_UID_PATH.md). |
 | 2026-04-14 | **`2e28c70`:** `resolveProjectId` + menu/menu-recipe `projectId` cascade; [M1_PROJECTID_AUDIT.md](./M1_PROJECTID_AUDIT.md) updated. M1 awaits human E1a + prod verification. |
+| 2026-04-14 | Vendor sketch aligned to existing Firestore **`users/.../vendors`** rules; optional `vendor_prices` subcollection noted. |

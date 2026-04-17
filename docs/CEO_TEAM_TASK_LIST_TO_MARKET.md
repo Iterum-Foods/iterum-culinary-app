@@ -3,7 +3,7 @@
 **From:** CEO (working persona)  
 **For:** CTO, COO, Engineering, Product/Marketing, Ops  
 **Purpose:** One delegable list from **today** through **first market motion** (pilot + store presence).  
-**Living trackers:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) (engineering backlog) · [APP_COMPLETION_PLAN.md](./APP_COMPLETION_PLAN.md) · [HOW_WE_SHIP.md](./HOW_WE_SHIP.md)  
+**Living trackers:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [PILOT_APP_COMPLETION_MASTER.md](./PILOT_APP_COMPLETION_MASTER.md) (what “done” means) · [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) (engineering backlog) · [APP_COMPLETION_PLAN.md](./APP_COMPLETION_PLAN.md) · [HOW_WE_SHIP.md](./HOW_WE_SHIP.md)  
 **Last updated:** 14 April 2026  
 
 ---

@@ -9,6 +9,7 @@ Snapshot for supply-chain / security review. Regenerate diffs with ripgrep as co
 |--------------|------------|--------|
 | `users/{userId}` | setDoc merge, getDoc, updateDoc, deleteDoc, collection query | `userId` often normalized email/id from app, not always Firebase Auth UID |
 | `users/{userId}/snapshots/recipeLibrary` | setDoc merge, getDoc | Recipe library blob snapshot |
+| `users/{userId}/vendors/{vendorId}` | allow read/write per `firestore.rules` (owner or email-matched profile) | **E3 target:** wire `vendorManager` / costing to this path; today often **localStorage** `iterum_vendors` only |
 | `projects/{projectId}` | setDoc merge (`ensureProjectDoc`) | Metadata: `ownerId`, `ownerEmail`, `firebaseUid` (new), tags, names |
 | `projects/{projectId}/members/{userId}` | setDoc merge (`ensureProjectMemberDoc`) | Company role: `role`, `email`, `updatedAt` — see [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md) |
 | `projects/{projectId}/menus/{menuId}` | setDoc merge, getDoc | Menu + items + links snapshot |

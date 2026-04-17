@@ -38,6 +38,15 @@
     })();
   </script>
 
+  <nav class="border-b border-slate-200/80 bg-white/95 backdrop-blur-sm sticky top-0 z-50" aria-label="App shortcuts">
+    <div class="max-w-lg mx-auto px-4 py-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-moss-dark">
+      <a href="dashboard.html" class="font-medium hover:underline">Dashboard</a>
+      <a href="project-hub.html" class="hover:underline">Team</a>
+      <a href="menu-builder.html" class="hover:underline">Menus</a>
+      <a href="mobile-compliance.html" class="hover:underline">Line log</a>
+    </div>
+  </nav>
+
   <div class="max-w-lg mx-auto px-4 py-10 sm:py-14">
     <div class="mb-8">
       <div class="flex items-center gap-2 text-moss-dark font-semibold text-lg mb-1">
@@ -45,7 +54,8 @@
       </div>
       <h1 class="text-2xl sm:text-3xl font-semibold text-ink tracking-tight">Load demo showcase data</h1>
       <p class="text-slate mt-2 text-base leading-relaxed">
-        Merges sample projects, two menus (lunch + bar), recipes (published + WIP), recipe ideas, ingredients, inventory, vendors, menu–recipe links, equipment for HACCP, and sanitizer / temperature / dishwasher logs into this browser. Use a dedicated Firebase user (for example <code class="text-sm bg-white/80 px-1 rounded">demo@yourdomain.com</code>) so production workspaces stay clean.
+        Merges sample projects, two menus (lunch + bar), recipes (published + WIP), recipe ideas, ingredients, inventory, vendors, menu–recipe links, equipment for HACCP, and sanitizer / temperature / dishwasher logs into this browser.
+        The account demo@iterumfoods.com automatically receives the same local merge plus a one-time Firestore sample (dashboard sanitizer and fridge logs) when they sign in on pages that load the app shell (home, sign-in, dashboard). Create that user in Firebase Authentication (email/password) if it does not exist yet. Other accounts can use this page manually.
       </p>
     </div>
 
