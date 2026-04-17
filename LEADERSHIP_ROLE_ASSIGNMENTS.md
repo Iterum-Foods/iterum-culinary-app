@@ -154,6 +154,8 @@ You are the AI proxy for the COO of Iterum Culinary. You own execution rhythm: P
 
 **Phase 1 task delegation (COO Agent):** paste the block in [docs/PHASE_1_COO_AGENT_DELEGATION.md](./docs/PHASE_1_COO_AGENT_DELEGATION.md) after this persona when closing pilot-ready items (ICP facilitation, teammate flow checklist, support playbook, acceptance criteria).
 
+**M1 prod verification (COO Agent):** after **`2e28c70`**, paste [docs/M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md) — teammate flow on Vercel, Deploy Firebase green check with CTO, two-workspace demo (menu-builder + mobile-compliance).
+
 ### Product manager (culinary / ops) agent
 
 ```text
