@@ -12,7 +12,7 @@
 
 _Use this section for short, dated notes that do not belong in a checkbox row._
 
-**2026-03-29 — M1 engineering ship batch (pre–human GO):** Pushed to **`main`** — Iterum **Shift** branded mobile layer (`mobile-shift-brand.css`, `mobile-compliance.html`, `manifest-compliance.json`), Playwright smoke fix for Shift landing (`tests/e2e/smoke.spec.js`), **`npm run test:chromium`** for local/CI parity. **COO next:** run [M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md) on Vercel prod after deploy lands; **CTO:** confirm **Deploy Firebase** green if this batch touched `firestore.rules` / `firestore.indexes.json` / `storage.rules`.
+**2026-03-29 — M1 engineering ship batch (pre–human GO):** Pushed to **`main`** **`a6ece5d`** — Iterum **Shift** branded mobile layer (`mobile-shift-brand.css`, `mobile-compliance.html`, `manifest-compliance.json`), Playwright smoke fix for Shift landing (`tests/e2e/smoke.spec.js`), **`npm run test:chromium`** for local/CI parity. **COO next:** run [M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md) on Vercel prod after deploy lands; **CTO:** confirm **Deploy Firebase** green (this batch touched `firestore.rules` / `firestore.indexes.json` / `storage.rules`).
 
 **2026-03-29 — Phase 0 closed (production trust):** Deploy Firebase CI green on `main`; Firestore **members** / **authUid** collection group index verified; [A1_P0_PROD_SMOKE_RECORD.md](./docs/A1_P0_PROD_SMOKE_RECORD.md) → **GO** (human steps **2** + **4**); COO executive pack + **CEO P0 approval** recorded below. **Next organizational gate:** Phase 1 — [CEO_TEAM_TASK_LIST_TO_MARKET.md](./docs/CEO_TEAM_TASK_LIST_TO_MARKET.md#phase-1--web-app-pilot-ready) (ICP lock, teammate path, support playbook, pilot acceptance criteria).
 
