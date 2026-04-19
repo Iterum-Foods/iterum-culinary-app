@@ -28,6 +28,15 @@ test.describe('Smoke', () => {
   test('mobile compliance (line log) page loads', async ({ page }) => {
     const res = await page.goto('/mobile-compliance.html');
     expect(res?.ok()).toBeTruthy();
-    await expect(page.getByRole('heading', { name: /fridge temp/i })).toBeVisible();
+    await expect(page).toHaveTitle(/Shift|Iterum/i);
+    await expect(
+      page.getByRole('heading', { level: 1, name: /what you need for your shift/i })
+    ).toBeVisible();
+  });
+
+  test('project hub page loads', async ({ page }) => {
+    const res = await page.goto('/project-hub.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(page.locator('body')).toBeVisible();
   });
 });

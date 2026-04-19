@@ -1,4 +1,4 @@
-// iterum-culinary-app2 — last tightened: employee_line read-only on project menus/recipes/snapshots
+// iterum-culinary-app2 — field-staff roles read-only on project menus/recipes/snapshots (see isFieldStaffMember)
 // Operators needing Firestore `contacts` read/export: set Custom Claim via Admin SDK, e.g.
 //   admin.auth().setCustomUserClaims(uid, { iterum_admin: true })
 rules_version = '2';
@@ -127,6 +127,9 @@ service cloud.firestore {
       return r == 'account_admin'
         || r == 'location_manager'
         || r == 'employee_line'
+        || r == 'front_of_house'
+        || r == 'kitchen_staff'
+        || r == 'support_staff'
         || r == 'chef_leadership'
         || r == 'operations_gm'
         || r == 'purchasing'
@@ -138,13 +141,18 @@ service cloud.firestore {
       return isProjectOwnerOnly(projectId) || isProjectMember(projectId);
     }
 
-    // Line staff: read project data; write checklists only (no menu/recipe/snapshot edits)
-    function isEmployeeLineMember(projectId) {
-      return isProjectMember(projectId) && projectMemberRole(projectId) == 'employee_line';
+    // Field / shift staff (any position): read menus & SOPs; no writes to menu/recipe/snapshot masters
+    function isFieldStaffMember(projectId) {
+      return isProjectMember(projectId) && (
+        projectMemberRole(projectId) == 'employee_line'
+        || projectMemberRole(projectId) == 'front_of_house'
+        || projectMemberRole(projectId) == 'kitchen_staff'
+        || projectMemberRole(projectId) == 'support_staff'
+      );
     }
 
     function canWriteProjectMenusRecipesSnapshots(projectId) {
-      return canAccessProjectDoc(projectId) && !isEmployeeLineMember(projectId);
+      return canAccessProjectDoc(projectId) && !isFieldStaffMember(projectId);
     }
 
     // ============================================
@@ -210,6 +218,12 @@ service cloud.firestore {
         allow read: if isOwner(userId);
         allow write: if isOwner(userId) && isValidSize();
       }
+
+      // Per-project / account-default ingredient unit costs (E3c; keyed vendor + project + ingredient)
+      match /vendor_prices/{priceId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId) && isValidSize();
+      }
       
       // Inventory sub-collection
       match /inventory/{inventoryId} {
@@ -221,6 +235,11 @@ service cloud.firestore {
       match /notes/{noteId} {
         allow read: if isOwner(userId);
         allow write: if isOwner(userId) && isValidSize();
+      }
+
+      // Self-service position per team project (UI only; access control stays on projects/.../members)
+      match /workspace_prefs/{projectId} {
+        allow read, write: if isOwner(userId) && isValidSize();
       }
 
       // Snapshots (e.g. recipeLibrary — firestore-sync.js; user doc id may be slug)
@@ -303,6 +322,19 @@ service cloud.firestore {
 
       match /checklists/{checklistId} {
         allow read, write: if canAccessProjectDoc(projectId) && isValidSize();
+      }
+
+      // Shift-app posts: visible on dashboard "Daily restaurant notes" feed (same day / project)
+      match /shift_day_posts/{postId} {
+        allow read: if canAccessProjectDoc(projectId);
+        allow create: if canAccessProjectDoc(projectId)
+          && isValidSize()
+          && request.resource.data.keys().hasAll(['dateKey', 'body', 'authorUid', 'category'])
+          && request.resource.data.dateKey is string
+          && request.resource.data.body is string
+          && request.resource.data.authorUid == request.auth.uid
+          && request.resource.data.category in ['shift', 'inventory'];
+        allow update, delete: if isProjectOwnerOnly(projectId) || isAccountAdminMember(projectId);
       }
 
       // Company / workspace membership (uid = Firebase Auth uid)

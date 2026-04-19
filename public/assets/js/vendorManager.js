@@ -6,6 +6,7 @@
 class VendorManager {
   constructor() {
     this.vendors = [];
+    this._vendorFirestoreMergeAttempts = 0;
     this.selectedVendors = new Set();
     this.currentView = 'list';
     this.currentFilters = {
@@ -113,6 +114,8 @@ class VendorManager {
         }
       }
 
+      await this.tryMergeVendorsFromFirestore();
+      await this.tryLegacyImportE3b({ force: false });
       this.updateVendorCount();
       this.displayVendors();
       this.updateFilters();
@@ -123,6 +126,305 @@ class VendorManager {
         console.log('📁 No user file found, using sample data');
         this.loadSampleVendors();
       }
+      await this.tryMergeVendorsFromFirestore();
+      await this.tryLegacyImportE3b({ force: false });
+      this.updateVendorCount();
+      this.displayVendors();
+      this.updateFilters();
+    }
+  }
+
+  /**
+   * Stable merge key aligned with FirestoreSync.vendorFirestoreDocId (id or normalized name).
+   */
+  _vendorMergeKey(vendor) {
+    const fs = typeof window !== 'undefined' && window.firestoreSync;
+    if (
+      fs &&
+      typeof fs.vendorFirestoreDocId === 'function' &&
+      vendor &&
+      typeof vendor === 'object'
+    ) {
+      const docId = fs.vendorFirestoreDocId(vendor);
+      if (docId && docId !== 'unknown' && !/^v_\d+$/.test(docId)) {
+        return docId;
+      }
+    }
+    if (!vendor || typeof vendor !== 'object') {
+      return '_null';
+    }
+    const tail = [vendor.company, vendor.email, vendor.phone]
+      .filter(Boolean)
+      .join('|')
+      .slice(0, 120);
+    return tail
+      ? `misc:${tail.toLowerCase()}`
+      : `misc:${Math.random().toString(36).slice(2)}`;
+  }
+
+  /**
+   * Union local + Firestore vendors; same merge key → cloud fields win (E3).
+   */
+  mergeVendorsByCloudWins(localRows, cloudRows) {
+    const map = new Map();
+    const key = v => this._vendorMergeKey(v);
+    for (const v of localRows || []) {
+      map.set(key(v), { ...v });
+    }
+    for (const v of cloudRows || []) {
+      const k = key(v);
+      map.set(k, { ...(map.get(k) || {}), ...v });
+    }
+    return Array.from(map.values());
+  }
+
+  /**
+   * When signed in and Firestore is ready, merge remote vendors and optionally persist.
+   */
+  async tryMergeVendorsFromFirestore() {
+    const fs = typeof window !== 'undefined' && window.firestoreSync;
+    if (!fs || typeof fs.fetchVendorsFromFirestore !== 'function') {
+      return;
+    }
+    if (!fs.initialized && this._vendorFirestoreMergeAttempts < 10) {
+      this._vendorFirestoreMergeAttempts += 1;
+      setTimeout(() => {
+        this.tryMergeVendorsFromFirestore();
+      }, 400);
+      return;
+    }
+    if (fs.initialized) {
+      this._vendorFirestoreMergeAttempts = 0;
+    }
+    try {
+      const cloud = await fs.fetchVendorsFromFirestore();
+      if (!cloud || cloud.length === 0) {
+        return;
+      }
+      const before = JSON.stringify(this.vendors || []);
+      this.vendors = this.mergeVendorsByCloudWins(this.vendors || [], cloud);
+      if (JSON.stringify(this.vendors) !== before) {
+        this.saveVendorsToFile();
+        this.updateVendorCount();
+        this.displayVendors();
+        this.updateFilters();
+      }
+    } catch (e) {
+      console.warn(
+        'Vendor Firestore merge skipped:',
+        e && e.message ? e.message : e
+      );
+    }
+  }
+
+  /**
+   * E3b — localStorage key: one-shot legacy import per browser profile (guest vs user id).
+   */
+  _e3bImportStorageKey() {
+    try {
+      if (window.userDataManager && window.userDataManager.isUserLoggedIn()) {
+        const id = window.userDataManager.getCurrentUserId();
+        if (id) {
+          return `iterum_vendors_e3b_imported_v1_${String(id).replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+        }
+      }
+    } catch (e) {
+      /* ignore */
+    }
+    return 'iterum_vendors_e3b_imported_v1__guest';
+  }
+
+  _safeJsonArray(key) {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  collectLegacyVendorsFromIterumStorage() {
+    return this._safeJsonArray('iterum_vendors').filter(
+      v => v && typeof v === 'object'
+    );
+  }
+
+  /**
+   * Vendor name stubs from ingredients_database / custom_ingredients / ingredients (supplier, vendorPrices, vendor_info).
+   */
+  collectVendorStubsFromIngredients() {
+    const seen = new Set();
+    const stubs = [];
+    const addName = raw => {
+      const n = String(raw || '').trim();
+      if (!n) {
+        return;
+      }
+      const low = n.toLowerCase();
+      if (seen.has(low)) {
+        return;
+      }
+      seen.add(low);
+      stubs.push({
+        name: n,
+        company: n,
+        products: [],
+        is_active: true,
+        created_at: new Date().toISOString(),
+        _sourceE3b: 'ingredient_catalog'
+      });
+    };
+    const scanIng = ing => {
+      if (!ing || typeof ing !== 'object') {
+        return;
+      }
+      addName(ing.supplier);
+      addName(ing.primaryVendor);
+      const vi = ing.vendor_info;
+      if (vi && typeof vi === 'object') {
+        addName(vi.primaryVendor);
+        if (Array.isArray(vi.alternateVendors)) {
+          vi.alternateVendors.forEach(addName);
+        }
+      }
+      if (Array.isArray(ing.vendorPrices)) {
+        ing.vendorPrices.forEach(vp => addName(vp && vp.vendor));
+      }
+    };
+    this._safeJsonArray('ingredients_database').forEach(scanIng);
+    this._safeJsonArray('custom_ingredients').forEach(scanIng);
+    this._safeJsonArray('ingredients').forEach(scanIng);
+    return stubs;
+  }
+
+  /**
+   * Union additions then existing: same merge key → keep fields from `existing` (local / cloud merged list wins).
+   */
+  mergeVendorsPreferFirst(existing, additions) {
+    const map = new Map();
+    const key = v => this._vendorMergeKey(v);
+    for (const v of additions || []) {
+      if (!v || typeof v !== 'object') {
+        continue;
+      }
+      const k = key(v);
+      if (!map.has(k)) {
+        map.set(k, { ...v });
+      }
+    }
+    for (const v of existing || []) {
+      if (!v || typeof v !== 'object') {
+        continue;
+      }
+      const k = key(v);
+      map.set(k, { ...(map.get(k) || {}), ...v });
+    }
+    return Array.from(map.values());
+  }
+
+  /**
+   * E3b — Merge `iterum_vendors` + ingredient-derived vendor names into the live list once per profile; then persist + Firestore sync.
+   */
+  async tryLegacyImportE3b(options = {}) {
+    const force = !!options.force;
+    const storageKey = this._e3bImportStorageKey();
+    if (!force) {
+      try {
+        if (localStorage.getItem(storageKey)) {
+          return { ok: true, skipped: true, reason: 'already_imported' };
+        }
+      } catch (e) {
+        /* ignore */
+      }
+    }
+
+    const legacyRows = this.collectLegacyVendorsFromIterumStorage();
+    const ingredientStubs = this.collectVendorStubsFromIngredients();
+    const additions = [...legacyRows, ...ingredientStubs];
+
+    if (additions.length === 0) {
+      try {
+        localStorage.setItem(
+          storageKey,
+          JSON.stringify({
+            at: new Date().toISOString(),
+            reason: 'no_legacy_sources'
+          })
+        );
+      } catch (e) {
+        /* ignore */
+      }
+      return { ok: true, skipped: true, reason: 'no_legacy_sources' };
+    }
+
+    const before = JSON.stringify(this.vendors || []);
+    this.vendors = this.mergeVendorsPreferFirst(this.vendors || [], additions);
+    const changed = JSON.stringify(this.vendors) !== before;
+
+    if (changed) {
+      this.saveVendorsToFile();
+      this.updateVendorCount();
+      this.displayVendors();
+      this.updateFilters();
+    }
+
+    try {
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify({
+          at: new Date().toISOString(),
+          changed,
+          legacyRows: legacyRows.length,
+          ingredientStubs: ingredientStubs.length
+        })
+      );
+    } catch (e) {
+      /* ignore */
+    }
+
+    const message = changed
+      ? `Merged ${legacyRows.length} legacy row(s) and ${ingredientStubs.length} ingredient-derived name(s); list updated.`
+      : 'No new vendors to add (existing entries already cover legacy data).';
+
+    console.log('E3b legacy vendor import:', {
+      changed,
+      legacyRows: legacyRows.length,
+      ingredientStubs: ingredientStubs.length
+    });
+    return {
+      ok: true,
+      changed,
+      legacyRows: legacyRows.length,
+      ingredientStubs: ingredientStubs.length,
+      message
+    };
+  }
+
+  /**
+   * Re-run E3b import (clears one-shot flag for this profile). Optional `force` from UI.
+   */
+  importLegacyVendorsE3b(options = {}) {
+    if (options.force) {
+      try {
+        localStorage.removeItem(this._e3bImportStorageKey());
+      } catch (e) {
+        /* ignore */
+      }
+    }
+    return this.tryLegacyImportE3b({ force: !!options.force });
+  }
+
+  async importLegacyVendorsE3bFromUi() {
+    const r = await this.importLegacyVendorsE3b({ force: true });
+    const msg =
+      r.message ||
+      (r.skipped && r.reason === 'no_legacy_sources'
+        ? 'No legacy vendor data found in this browser (iterum_vendors / ingredients).'
+        : JSON.stringify(r));
+    if (typeof window !== 'undefined' && window.alert) {
+      window.alert(msg);
+    } else {
+      console.log(msg);
     }
   }
 
@@ -242,6 +544,18 @@ class VendorManager {
       // Fallback to localStorage
       localStorage.setItem('iterum_vendors', JSON.stringify(this.vendors));
       console.log(`💾 Saved ${this.vendors.length} vendors to localStorage`);
+    }
+    if (
+      typeof window !== 'undefined' &&
+      window.firestoreSync &&
+      typeof window.firestoreSync.syncVendorsToFirestore === 'function'
+    ) {
+      window.firestoreSync.syncVendorsToFirestore(this.vendors).catch(err => {
+        console.warn(
+          'Vendor cloud sync:',
+          err && err.message ? err.message : err
+        );
+      });
     }
   }
 
@@ -1386,6 +1700,21 @@ class VendorManager {
                             <button onclick="vendorManager.downloadTemplate()" 
                                     style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                                 📥 Download
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- E3b: legacy browser storage + ingredient supplier names -->
+                    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 18px; margin-top: 25px;">
+                        <div style="display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap;">
+                            <span style="font-size: 2rem; line-height: 1;">&#128190;</span>
+                            <div style="flex: 1; min-width: 200px;">
+                                <h4 style="font-weight: 600; color: #1e3a5f; margin: 0 0 6px;">From this browser (E3b)</h4>
+                                <p style="font-size: 0.88rem; color: #334155; margin: 0; line-height: 1.5;">Merge <strong>iterum_vendors</strong> and supplier names from <strong>ingredients</strong> into your vendor list. Your current rows win if the same vendor already exists. Runs once automatically on load; use the button to run again.</p>
+                            </div>
+                            <button type="button" onclick="vendorManager.importLegacyVendorsE3bFromUi()"
+                                    style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap;">
+                                Merge legacy data
                             </button>
                         </div>
                     </div>

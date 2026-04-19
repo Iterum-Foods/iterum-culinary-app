@@ -6,6 +6,11 @@
  * entry points for future refactors.
  */
 
+export const UserScopedPaths = Object.freeze({
+  /** @param {string} userId resolved Firestore user doc id */
+  vendorPrices: userId => `users/${userId}/vendor_prices`
+});
+
 export const ProjectFirestorePaths = Object.freeze({
   collection: 'projects',
   /** @param {string} projectId */
@@ -64,6 +69,7 @@ export async function fetchProjectMenuSnapshot(projectId, options = {}) {
 }
 
 window.iterumProjectDataAccess = {
+  UserScopedPaths,
   ProjectFirestorePaths,
   ensureProjectForCurrentUser,
   saveProjectMenuSnapshot,

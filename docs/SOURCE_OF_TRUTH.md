@@ -2,7 +2,7 @@
 
 **Purpose:** One place that states **canonical storage** for recipes, menus, vendors, and checklists until product and sync fully converge.  
 **Companion:** [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md) (paths, keys, rules).  
-**Last updated:** March 2026  
+**Last updated:** 2026-03-29    
 
 ---
 
@@ -12,7 +12,7 @@
 |--------|----------------------------------|-------------------|-----------|
 | **Recipes (working copy)** | Browser `localStorage` + app-specific keys | `users/{id}/recipes/*`, snapshots under `users/.../snapshots/recipeLibrary`; optional `projects/{id}/recipes` | **Local-first**; cloud is backup/sync where wired. |
 | **Menus** | `localStorage` + enhanced menu manager keys | `projects/{projectId}/menus/*` via `firestore-sync` / menu snapshot flows | **Local-first** for editing; **project path** canonical for shared venue snapshot when saved. |
-| **Vendors / ingredients** | `localStorage` + per-feature keys | Partial: user-scoped collections where implemented | **Local-first**; align incremental writes to `users/{id}/vendors` etc. per inventory doc. |
+| **Vendors / ingredients** | `localStorage` + per-feature keys (`iterum_vendors`, user file via `userDataManager`) | **`users/{id}/vendors/*`**; **`users/{id}/vendor_prices/*`** (per-workspace or account-default unit costs) | **Local-first** with vendor **bidirectional sync** when signed in. **E3b** legacy merge. **E3c–d:** `cost-calculator` applies **`vendor_prices`** for active **`projectId`** after local ingredient prices. |
 | **Checklists / HACCP-style** | Mix: dashboard compliance often `users/{id}/*` paths | `projects/{projectId}/checklists/*` where sync used | **Documented split:** compliance logs may stay **user-scoped** in rules today; **project checklists** for shared venue — prefer `project-data-access` pattern for new work. |
 
 ---
@@ -21,7 +21,7 @@
 
 - **Recipe library snapshot** is a **blob** sync in `firestore-sync.js` — not yet forced through `project-data-access.js`. Exception is **intentional** until refactored; tracked in exec checklist as phased.
 - **Checklists** may exist both under **`users/{userId}/...`** (compliance) and **`projects/{projectId}/checklists`** — rules allow both; product should **prefer project path** when the checklist belongs to a venue.
-- **`employee_line`** members: **read** `projects/.../menus`, `recipes`, `snapshots`; **write** only **`checklists`** (see `firestore.rules`).
+- **Field-staff roles** (`employee_line`, `front_of_house`, `kitchen_staff`, `support_staff`): **read** `projects/.../menus`, `recipes`, `snapshots`; **write** **`checklists`** (not menu/recipe/snapshot masters) — see `isFieldStaffMember` in `firestore.rules`.
 
 ---
 

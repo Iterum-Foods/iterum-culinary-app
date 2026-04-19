@@ -268,12 +268,12 @@
             <div style="font-size: 18px; opacity: 0.95;">Organize your culinary work into focused projects</div>
         </div>
 
-        <!-- Team access (Firestore members -> line log / dashboard) -->
+        <!-- Team access (Firestore members -> team mobile app / dashboard) -->
         <section id="team-access-panel" style="display: none; background: white; border-radius: 16px; padding: 28px; margin-bottom: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
             <h2 class="section-title" style="margin-bottom: 8px;">Add teammate to a project</h2>
             <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
-                The person must <strong>create an account</strong> first (web or <a href="mobile-compliance.html" style="color: #4f46e5; font-weight: 600;">line log app</a>).
-                Then paste their <strong>Firebase User UID</strong> (they can copy it from the line log app after sign-in, or find it in Firebase Console Authentication users list).
+                The person must <strong>create an account</strong> first (web or <a href="mobile-compliance.html" style="color: #4f46e5; font-weight: 600;">team mobile app</a>).
+                Then paste their <strong>Firebase User UID</strong> (they can copy it from the team app after sign-in, or find it in Firebase Console Authentication users list).
             </p>
             <div style="display: grid; gap: 14px; max-width: 520px;">
                 <div>
@@ -282,7 +282,7 @@
                 </div>
                 <div>
                     <label for="team-target-uid" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Teammate Firebase UID</label>
-                    <input id="team-target-uid" type="text" autocomplete="off" placeholder="From their line log app (Copy ID)" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;" />
+                    <input id="team-target-uid" type="text" autocomplete="off" placeholder="From their team mobile app (Copy ID)" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;" />
                 </div>
                 <div>
                     <label for="team-target-email" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Email (optional)</label>
@@ -291,7 +291,10 @@
                 <div>
                     <label for="team-member-role" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Role</label>
                     <select id="team-member-role" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;">
-                        <option value="employee_line">Line / crew (temps and sanitizer)</option>
+                        <option value="employee_line">Kitchen line / crew (daily app, menu read-only)</option>
+                        <option value="kitchen_staff">Kitchen / prep (daily app, menu read-only)</option>
+                        <option value="front_of_house">Front of house — service, bar, hosts (daily app)</option>
+                        <option value="support_staff">Support — runners, dish, utility (daily app)</option>
                         <option value="location_manager">Location manager</option>
                         <option value="chef_leadership">Chef / leadership</option>
                         <option value="account_admin">Account admin (full access)</option>

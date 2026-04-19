@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -515,6 +515,25 @@
             return out;
         }
 
+
+        function getMergedRecipesForLibrary() {
+            const byId = new Map();
+            const add = list => {
+                (list || []).forEach(r => {
+                    if (r && r.id) byId.set(r.id, r);
+                });
+            };
+            if (window.universalRecipeManager) {
+                add(window.universalRecipeManager.getAllRecipes());
+            } else {
+                add(JSON.parse(localStorage.getItem('recipes') || '[]'));
+            }
+            if (window.userDataManager) {
+                add(window.userDataManager.loadData('recipes'));
+            }
+            return Array.from(byId.values());
+        }
+
         function loadRecipes() {
             console.log('📚 ========== LOADING RECIPES ==========');
             
@@ -528,23 +547,9 @@
                     </div>
                 `;
             }
-            
-            let recipes = [];
-            
-            // Use new User Data Manager if available (handles filtering automatically)
-            if (window.userDataManager) {
-                recipes = window.userDataManager.loadData('recipes');
-                console.log(`📊 Loaded ${recipes.length} recipes from User Data Manager`);
-                recipes = filterRecipesByWorkspaceScope(recipes);
-            } else if (window.universalRecipeManager) {
-                recipes = window.universalRecipeManager.getAllRecipes();
-                recipes = filterRecipesByWorkspaceScope(recipes);
-            } else {
-                // Last resort fallback
-                recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
-                console.log(`📦 Fallback: Loaded ${recipes.length} recipes from localStorage`);
-            }
-            
+            let recipes = getMergedRecipesForLibrary();
+            console.log('Loaded ' + recipes.length + ' recipes (merged for recipe index)');
+            recipes = filterRecipesByWorkspaceScope(recipes);
             displayRecipes(recipes);
         }
 
@@ -598,7 +603,7 @@
             card.innerHTML = `
                 ${photoHTML}
                 <div class="recipe-card-header">
-                    <div class="recipe-card-title">${recipe.name || 'Untitled Recipe'}</div>
+                    <div class="recipe-card-title">${recipe.name || recipe.title || 'Untitled Recipe'}</div>
                     <div class="recipe-card-meta">
                         <span>${recipe.category || 'Uncategorized'}</span>
                         <span>${recipe.difficulty || 'Medium'}</span>
@@ -642,14 +647,7 @@
             const servings = document.getElementById('filter-servings').value;
             const sortBy = document.getElementById('sort-by').value;
 
-            // Load from universal recipe manager (all sources)
-            let recipes = [];
-            if (window.universalRecipeManager) {
-                recipes = window.universalRecipeManager.getAllRecipes();
-            } else {
-                recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
-            }
-
+            let recipes = getMergedRecipesForLibrary();
             recipes = filterRecipesByWorkspaceScope(recipes);
 
             // Filter

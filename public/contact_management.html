@@ -686,6 +686,23 @@
                 min-width: 800px;
             }
         }
+
+        .crm-firestore-note {
+            margin: 0 0 16px 0;
+            padding: 12px 16px;
+            background: #eff6ff;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            color: #1e3a5f;
+            font-size: 0.9rem;
+            line-height: 1.45;
+        }
+        .crm-firestore-note code {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
     </style>
 </head>
 <body>
@@ -715,6 +732,9 @@
         <div class="success-message" id="success-message">
             <span>✅</span>
             <span id="success-text">Operation completed successfully!</span>
+        </div>
+        <div id="crm-firestore-note" class="crm-firestore-note" style="display: none;" role="status">
+            <strong>Firestore waitlist access:</strong> Waitlist documents in Firestore are restricted to operator accounts with the Custom Claim <code>iterum_admin</code> (set in Firebase Admin SDK). Without it, this page uses local data and exports only. New public signups can still <em>create</em> waitlist rows; they are not readable from the app for non-admin users.
         </div>
 
         <!-- Navigation Tabs -->
@@ -1004,6 +1024,10 @@
                         return;
                     } catch (firestoreError) {
                         console.error('  ❌ Firestore query error:', firestoreError);
+                        if (firestoreError && firestoreError.code === 'permission-denied') {
+                            const note = document.getElementById('crm-firestore-note');
+                            if (note) note.style.display = 'block';
+                        }
                     }
                 }
                 
@@ -1040,6 +1064,10 @@
                         return;
                     } catch (e) {
                         console.error('  ❌ Compat SDK error:', e);
+                        if (e && e.code === 'permission-denied') {
+                            const note = document.getElementById('crm-firestore-note');
+                            if (note) note.style.display = 'block';
+                        }
                     }
                 }
                 

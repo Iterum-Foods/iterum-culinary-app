@@ -45,7 +45,9 @@ function getFirebaseUid() {
 async function onAddTeamMemberClick() {
   const msg = document.getElementById('team-access-msg');
   const targetUid = document.getElementById('team-target-uid')?.value?.trim();
-  const projectId = document.getElementById('team-project-select')?.value?.trim();
+  const projectId = document
+    .getElementById('team-project-select')
+    ?.value?.trim();
   const role =
     document.getElementById('team-member-role')?.value || 'employee_line';
   const email =
@@ -57,14 +59,16 @@ async function onAddTeamMemberClick() {
 
   if (!projectId || !targetUid) {
     if (msg) {
-      msg.textContent = 'Choose a project and enter the teammate’s Firebase User UID.';
+      msg.textContent =
+        'Choose a project and enter the teammate’s Firebase User UID.';
     }
     return;
   }
 
   if (!getFirebaseUid()) {
     if (msg) {
-      msg.textContent = 'Sign in (Firebase) first — open Sign in from the header if needed.';
+      msg.textContent =
+        'Sign in (Firebase) first — open Sign in from the header if needed.';
     }
     return;
   }
@@ -72,12 +76,15 @@ async function onAddTeamMemberClick() {
   const fsOk = await waitForFirestore();
   if (!fsOk || !window.firestoreSync?.ensureProjectDoc) {
     if (msg) {
-      msg.textContent = 'Firestore is not ready. Refresh the page and try again.';
+      msg.textContent =
+        'Firestore is not ready. Refresh the page and try again.';
     }
     return;
   }
 
-  const projMeta = window.projectManager?.projects?.find(p => p.id === projectId);
+  const projMeta = window.projectManager?.projects?.find(
+    p => p.id === projectId
+  );
 
   try {
     await window.firestoreSync.ensureProjectDoc(projectId, {

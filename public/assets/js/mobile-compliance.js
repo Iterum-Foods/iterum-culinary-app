@@ -2,15 +2,23 @@
  * Mobile-first fridge temperature + sanitizer log.
  * Uses same Firestore paths as dashboard.html for sync with the full Iterum app.
  */
-import { initializeApp, getApp, getApps } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+import {
+  initializeApp,
+  getApp,
+  getApps
+} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
 import {
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
   getAuth,
+  getRedirectResult,
   onAuthStateChanged,
+  sendEmailVerification,
   signInWithEmailAndPassword,
   signInWithPopup,
-  signOut
+  signInWithRedirect,
+  signOut,
+  updateProfile
 } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import {
   addDoc,
@@ -23,9 +31,12 @@ import {
   onSnapshot,
   query,
   serverTimestamp,
+  setDoc,
   updateDoc,
   where
 } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+import { attachLineEmployeeHub } from './mobile-line-employee.js';
 
 const REF_UNITS = 'refrigeration_units';
 const SAN_LOCS = 'sanitizer_locations';
@@ -33,16 +44,150 @@ const SAN_LOCS = 'sanitizer_locations';
 /** @type {{ id: string, role?: string }[]} */
 let myProjectRows = [];
 
+const PROJECTS_STORE_PREFIX = 'iterum_projects_user_';
+
+function projectsStorageKey(uid) {
+  return `${PROJECTS_STORE_PREFIX}${uid}`;
+}
+
+function loadPersonalProjects(uid) {
+  try {
+    const raw = localStorage.getItem(projectsStorageKey(uid));
+    if (!raw) {
+      return [];
+    }
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
+}
+
+function savePersonalProjects(uid, projects) {
+  localStorage.setItem(projectsStorageKey(uid), JSON.stringify(projects));
+}
+
+/** Any non-master project the user created (named workspace). */
+function hasNamedPersonalWorkspace(uid) {
+  return loadPersonalProjects(uid).some(p => p && p.id && p.id !== 'master');
+}
+
 function getProjectId() {
   try {
-    return (
+    const v =
       localStorage.getItem('iterum_current_project') ||
       localStorage.getItem('userCurrentProjectKey') ||
-      'mobile-default'
+      '';
+    return v || '';
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Team location picked OR any saved personal project selected — enough to use shift tools.
+ * @param {string} uid
+ */
+function isWorkspaceReady(uid) {
+  if (myProjectRows.length > 0) {
+    return true;
+  }
+  if (hasNamedPersonalWorkspace(uid)) {
+    return true;
+  }
+  const cur = getProjectId();
+  if (!cur || cur === 'mobile-default') {
+    return false;
+  }
+  const pl = loadPersonalProjects(uid);
+  return pl.some(p => p && p.id === cur);
+}
+
+function setWorkspaceReadyGlobally(uid) {
+  window.__iterumShiftWorkspaceReady = () => isWorkspaceReady(uid);
+}
+
+async function bootstrapPersonalProjectInFirestore(
+  uid,
+  projectId,
+  name,
+  description,
+  email
+) {
+  if (!db) {
+    return;
+  }
+  await setDoc(
+    doc(db, 'projects', projectId),
+    {
+      firebaseUid: uid,
+      name,
+      description: description || '',
+      projectName: name,
+      ownerId: uid,
+      updatedAt: serverTimestamp()
+    },
+    { merge: true }
+  );
+  await setDoc(
+    doc(db, 'projects', projectId, 'members', uid),
+    {
+      authUid: uid,
+      role: 'account_admin',
+      email: email || '',
+      updatedAt: serverTimestamp()
+    },
+    { merge: true }
+  );
+}
+
+async function createPersonalWorkspace(uid, name, about, email) {
+  const n = (name || '').trim();
+  if (!n) {
+    return { ok: false, error: 'Name your workspace first.' };
+  }
+  const description = (about || '').trim();
+  const id = `project_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  const projects = loadPersonalProjects(uid);
+  const newProject = {
+    id,
+    name: n,
+    description,
+    type: 'culinary',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    isMaster: false,
+    icon: '📋',
+    userId: uid,
+    source: 'mobile_shift'
+  };
+  projects.push(newProject);
+  savePersonalProjects(uid, projects);
+  try {
+    await bootstrapPersonalProjectInFirestore(uid, id, n, description, email);
+  } catch (e) {
+    console.warn('bootstrapPersonalProjectInFirestore', e);
+  }
+  persistProjectId(uid, id);
+  try {
+    localStorage.setItem('active_project_name', n);
+    localStorage.setItem('active_project_id', id);
+    localStorage.setItem('active_project', id);
+    localStorage.setItem(`iterum_current_project_user_${uid}`, id);
+  } catch {
+    /* ignore */
+  }
+  try {
+    document.dispatchEvent(
+      new CustomEvent('projectChanged', {
+        bubbles: true,
+        detail: { projectId: id, project: newProject, userId: uid }
+      })
     );
   } catch {
-    return 'mobile-default';
+    /* ignore */
   }
+  return { ok: true, project: newProject };
 }
 
 function escapeHtml(s) {
@@ -51,6 +196,95 @@ function escapeHtml(s) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/"/g, '&quot;');
+}
+
+function isNativeCapacitor() {
+  try {
+    return (
+      typeof window.Capacitor !== 'undefined' &&
+      typeof window.Capacitor.isNativePlatform === 'function' &&
+      window.Capacitor.isNativePlatform() === true
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** @param {unknown} err */
+function friendlyAuthMessage(err) {
+  const code = err && typeof err === 'object' && 'code' in err ? err.code : '';
+  const msg =
+    err && typeof err === 'object' && 'message' in err
+      ? String(err.message)
+      : '';
+  switch (code) {
+    case 'auth/email-already-in-use':
+      return 'That email is already registered. Try Sign in, or reset your password on the web app.';
+    case 'auth/invalid-email':
+      return 'Please enter a valid email address.';
+    case 'auth/weak-password':
+      return 'Password is too weak. Use at least 6 characters.';
+    case 'auth/wrong-password':
+    case 'auth/invalid-credential':
+      return 'Wrong email or password. Check caps lock and try again.';
+    case 'auth/user-not-found':
+      return 'No account for that email. Tap Create free account.';
+    case 'auth/too-many-requests':
+      return 'Too many attempts. Wait a minute and try again.';
+    case 'auth/popup-closed-by-user':
+      return 'Google sign-in was cancelled.';
+    case 'auth/network-request-failed':
+      return 'Network error. Check connection and try again.';
+    default:
+      return msg || 'Something went wrong. Try again.';
+  }
+}
+
+/** @param {import('firebase/auth').User} user */
+function persistLocalWebSession(user) {
+  if (!user) return;
+  try {
+    const name =
+      user.displayName || (user.email ? user.email.split('@')[0] : 'Chef');
+    const profile = {
+      id: user.uid,
+      userId: user.uid,
+      name,
+      email: user.email || '',
+      type: user.providerData?.some(p => p?.providerId === 'google.com')
+        ? 'google'
+        : 'email',
+      createdAt: new Date().toISOString(),
+      lastLogin: new Date().toISOString()
+    };
+    localStorage.setItem('current_user', JSON.stringify(profile));
+    localStorage.setItem('session_active', 'true');
+    localStorage.setItem('last_login', new Date().toISOString());
+  } catch (e) {
+    console.warn('persistLocalWebSession', e);
+  }
+}
+
+/** @param {import('firebase/auth').User} user */
+async function ensureUserProfileDoc(user) {
+  if (!db || !user) return;
+  const name =
+    user.displayName || (user.email ? user.email.split('@')[0] : 'User');
+  try {
+    await setDoc(
+      doc(db, 'users', user.uid),
+      {
+        userId: user.uid,
+        email: user.email || '',
+        name,
+        updatedAt: serverTimestamp(),
+        lastMobileSignInAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+  } catch (e) {
+    console.warn('ensureUserProfileDoc', e);
+  }
 }
 
 function fToC(f) {
@@ -313,42 +547,170 @@ function persistProjectId(uid, projectId) {
   }
 }
 
+function migrateLegacyMobileDefault() {
+  try {
+    const cur =
+      localStorage.getItem('iterum_current_project') ||
+      localStorage.getItem('userCurrentProjectKey');
+    if (cur === 'mobile-default') {
+      localStorage.removeItem('iterum_current_project');
+      localStorage.removeItem('userCurrentProjectKey');
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+function updateWorkspaceFirstRunVisibility(uid) {
+  const personalList = loadPersonalProjects(uid);
+  const card = document.getElementById('workspace-first-run');
+  const addBtn = document.getElementById('btn-add-personal-workspace');
+  if (card) {
+    const showFirstRun =
+      myProjectRows.length === 0 &&
+      !hasNamedPersonalWorkspace(uid) &&
+      personalList.length === 0;
+    card.style.display = showFirstRun ? 'block' : 'none';
+  }
+  if (addBtn) {
+    addBtn.style.display =
+      myProjectRows.length > 0 || personalList.length > 0 ? 'block' : 'none';
+  }
+  setWorkspaceReadyGlobally(uid);
+}
+
+function wirePersonalWorkspaceUi(uid, email) {
+  const firstSave = document.getElementById('btn-save-workspace-first');
+  const nameEl = document.getElementById('ws-name');
+  const aboutEl = document.getElementById('ws-about');
+  const addBtn = document.getElementById('btn-add-personal-workspace');
+  const extraWrap = document.getElementById('extra-workspace-fields');
+  const extraName = document.getElementById('ws-extra-name');
+  const extraAbout = document.getElementById('ws-extra-about');
+  const extraSave = document.getElementById('btn-save-extra-workspace');
+  const extraCancel = document.getElementById('btn-cancel-extra-workspace');
+
+  if (firstSave && !firstSave.dataset.bound) {
+    firstSave.dataset.bound = '1';
+    firstSave.addEventListener('click', async () => {
+      const name = (nameEl && nameEl.value) || '';
+      const about = (aboutEl && aboutEl.value) || '';
+      setStatus('Saving…');
+      const res = await createPersonalWorkspace(uid, name, about, email);
+      if (!res.ok) {
+        setStatus(res.error || 'Could not save.', true);
+        return;
+      }
+      if (nameEl) {
+        nameEl.value = '';
+      }
+      if (aboutEl) {
+        aboutEl.value = '';
+      }
+      setStatus('Workspace saved. Pick it above if needed, then use Home.');
+      await refreshProjectPicker(uid);
+    });
+  }
+
+  if (addBtn && !addBtn.dataset.bound) {
+    addBtn.dataset.bound = '1';
+    addBtn.addEventListener('click', () => {
+      if (extraWrap) {
+        extraWrap.style.display =
+          extraWrap.style.display === 'none' ? 'block' : 'none';
+      }
+      if (extraName) {
+        extraName.value = '';
+      }
+      if (extraAbout) {
+        extraAbout.value = '';
+      }
+    });
+  }
+
+  if (extraSave && !extraSave.dataset.bound) {
+    extraSave.dataset.bound = '1';
+    extraSave.addEventListener('click', async () => {
+      const name = (extraName && extraName.value) || '';
+      const about = (extraAbout && extraAbout.value) || '';
+      setStatus('Saving…');
+      const res = await createPersonalWorkspace(uid, name, about, email);
+      if (!res.ok) {
+        setStatus(res.error || 'Could not save.', true);
+        return;
+      }
+      if (extraWrap) {
+        extraWrap.style.display = 'none';
+      }
+      setStatus('Personal workspace added.');
+      await refreshProjectPicker(uid);
+    });
+  }
+
+  if (extraCancel && !extraCancel.dataset.bound) {
+    extraCancel.dataset.bound = '1';
+    extraCancel.addEventListener('click', () => {
+      if (extraWrap) {
+        extraWrap.style.display = 'none';
+      }
+    });
+  }
+}
+
 async function refreshProjectPicker(uid) {
+  migrateLegacyMobileDefault();
   const sel = document.getElementById('project-picker');
   const uidEl = document.getElementById('my-firebase-uid');
   if (uidEl) {
     uidEl.textContent = uid;
   }
-  if (!db || !sel) {
+  if (!sel) {
     return;
   }
   myProjectRows = [];
-  try {
-    const q = query(
-      collectionGroup(db, 'members'),
-      where('authUid', '==', uid)
-    );
-    const snap = await getDocs(q);
-    snap.forEach(d => {
-      const pid = d.ref.parent.parent.id;
-      myProjectRows.push({ id: pid, role: d.data().role });
-    });
-    sel.innerHTML = '';
-    const opt0 = document.createElement('option');
-    opt0.value = '';
-    opt0.textContent = myProjectRows.length
-      ? 'Choose workspace…'
-      : 'No shared projects yet (ask your manager)';
-    sel.appendChild(opt0);
+  const personalList = loadPersonalProjects(uid);
+
+  if (db) {
+    try {
+      const q = query(
+        collectionGroup(db, 'members'),
+        where('authUid', '==', uid)
+      );
+      const snap = await getDocs(q);
+      snap.forEach(d => {
+        const pid = d.ref.parent.parent.id;
+        myProjectRows.push({ id: pid, role: d.data().role });
+      });
+    } catch (e) {
+      console.error('refreshProjectPicker members', e);
+      setStatus(
+        'Could not load team projects. If this is new, deploy Firestore indexes (members / authUid).',
+        true
+      );
+    }
+  }
+
+  sel.innerHTML = '';
+
+  const opt0 = document.createElement('option');
+  opt0.value = '';
+  opt0.textContent = 'Choose a workspace…';
+  sel.appendChild(opt0);
+
+  if (myProjectRows.length) {
+    const og = document.createElement('optgroup');
+    og.label = 'Team locations';
     for (const row of myProjectRows) {
       let label = row.id;
       try {
-        const ps = await getDoc(doc(db, 'projects', row.id));
-        if (ps.exists) {
-          const data = ps.data();
-          const n = data.name || data.projectName;
-          if (n) {
-            label = n;
+        if (db) {
+          const ps = await getDoc(doc(db, 'projects', row.id));
+          if (ps.exists()) {
+            const data = ps.data();
+            const n = data.name || data.projectName;
+            if (n) {
+              label = n;
+            }
           }
         }
       } catch {
@@ -357,44 +719,85 @@ async function refreshProjectPicker(uid) {
       const o = document.createElement('option');
       o.value = row.id;
       o.textContent = label;
-      sel.appendChild(o);
+      og.appendChild(o);
     }
-    const personal = document.createElement('option');
-    personal.value = 'mobile-default';
-    personal.textContent = 'Personal logs (not a team project)';
-    sel.appendChild(personal);
-
-    const cur = getProjectId();
-    if (myProjectRows.some(r => r.id === cur)) {
-      sel.value = cur;
-    } else if (myProjectRows.length === 1) {
-      sel.value = myProjectRows[0].id;
-      persistProjectId(uid, myProjectRows[0].id);
-    } else if (myProjectRows.length === 0) {
-      sel.value = 'mobile-default';
-      persistProjectId(uid, 'mobile-default');
-    } else {
-      sel.value = '';
-    }
-
-    sel.onchange = () => {
-      const v = sel.value;
-      if (v) {
-        persistProjectId(uid, v);
-        setStatus(
-          v === 'mobile-default'
-            ? 'Logging as personal workspace.'
-            : 'Workspace saved for new readings.'
-        );
-      }
-    };
-  } catch (e) {
-    console.error('refreshProjectPicker', e);
-    setStatus(
-      'Could not load team projects. If this is new, deploy Firestore indexes (members / authUid).',
-      true
-    );
+    sel.appendChild(og);
   }
+
+  if (personalList.length) {
+    const ogP = document.createElement('optgroup');
+    ogP.label = 'My workspaces';
+    for (const p of personalList) {
+      if (!p || !p.id) {
+        continue;
+      }
+      const o = document.createElement('option');
+      o.value = p.id;
+      const isMaster = p.id === 'master';
+      o.textContent = isMaster
+        ? `${p.name || 'Master'} (all my data)`
+        : p.name || p.id;
+      ogP.appendChild(o);
+    }
+    sel.appendChild(ogP);
+  }
+
+  let cur = getProjectId();
+  if (cur === 'mobile-default' || !cur) {
+    cur = '';
+  }
+
+  if (
+    cur &&
+    (myProjectRows.some(r => r.id === cur) ||
+      personalList.some(p => p.id === cur))
+  ) {
+    sel.value = cur;
+  } else if (myProjectRows.length === 1 && !hasNamedPersonalWorkspace(uid)) {
+    sel.value = myProjectRows[0].id;
+    persistProjectId(uid, myProjectRows[0].id);
+  } else if (
+    personalList.length === 1 &&
+    myProjectRows.length === 0 &&
+    personalList[0].id === 'master'
+  ) {
+    sel.value = 'master';
+    persistProjectId(uid, 'master');
+  } else if (
+    personalList.length === 1 &&
+    hasNamedPersonalWorkspace(uid) &&
+    myProjectRows.length === 0
+  ) {
+    const only = personalList.find(p => p.id !== 'master') || personalList[0];
+    if (only) {
+      sel.value = only.id;
+      persistProjectId(uid, only.id);
+    }
+  } else {
+    sel.value = '';
+  }
+
+  sel.onchange = () => {
+    const v = sel.value;
+    if (v) {
+      persistProjectId(uid, v);
+      try {
+        const picked = personalList.find(p => p.id === v);
+        if (picked && picked.name) {
+          localStorage.setItem('active_project_name', picked.name);
+        }
+      } catch {
+        /* ignore */
+      }
+      setStatus('Workspace saved.');
+    }
+    setWorkspaceReadyGlobally(uid);
+  };
+
+  updateWorkspaceFirstRunVisibility(uid);
+
+  const u = auth?.currentUser;
+  wirePersonalWorkspaceUi(uid, u?.email || '');
 }
 
 function ensureSiteIdIfNoTeamProjects() {
@@ -418,24 +821,49 @@ function wireAuth() {
       setStatus('Signed in.');
     } catch (e) {
       console.error(e);
-      setStatus(e?.message || 'Sign-in failed.', true);
+      setStatus(friendlyAuthMessage(e), true);
     }
   });
 
   $('btn-signup').addEventListener('click', async () => {
+    const nameRaw = $('auth-name').value.trim();
     const email = $('auth-email').value.trim();
     const pass = $('auth-password').value;
+    const pass2 = $('auth-password2').value;
     if (!email || !pass) {
-      setStatus('Enter email and password (min 6 chars).', true);
+      setStatus('Enter email and password (min 6 characters).', true);
       return;
     }
+    if (pass.length < 6) {
+      setStatus('Password must be at least 6 characters.', true);
+      return;
+    }
+    if (pass !== pass2) {
+      setStatus('Passwords do not match. Re-enter confirm password.', true);
+      return;
+    }
+    const displayName =
+      nameRaw || (email.includes('@') ? email.split('@')[0] : email) || 'User';
     try {
       setStatus('Creating account…');
-      await createUserWithEmailAndPassword(auth, email, pass);
-      setStatus('Account ready — you are signed in.');
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      const u = cred.user;
+      if (displayName && u) {
+        await updateProfile(u, { displayName });
+      }
+      try {
+        if (u) {
+          await sendEmailVerification(u);
+        }
+      } catch (verErr) {
+        console.warn('sendEmailVerification', verErr);
+      }
+      setStatus(
+        'Account created. Check your email to verify. You are signed in.'
+      );
     } catch (e) {
       console.error(e);
-      setStatus(e?.message || 'Sign-up failed.', true);
+      setStatus(friendlyAuthMessage(e), true);
     }
   });
 
@@ -443,11 +871,16 @@ function wireAuth() {
     try {
       setStatus('Opening Google…');
       const prov = new GoogleAuthProvider();
+      prov.setCustomParameters({ prompt: 'select_account' });
+      if (isNativeCapacitor()) {
+        await signInWithRedirect(auth, prov);
+        return;
+      }
       await signInWithPopup(auth, prov);
       setStatus('Signed in with Google.');
     } catch (e) {
       console.error(e);
-      setStatus(e?.message || 'Google sign-in failed.', true);
+      setStatus(friendlyAuthMessage(e), true);
     }
   });
 
@@ -460,10 +893,32 @@ function wireAuth() {
     }
   });
 
+  const copyBtn = document.getElementById('copy-uid');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', async () => {
+      const uid = auth?.currentUser?.uid;
+      if (!uid) {
+        setStatus('Sign in first.', true);
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(uid);
+        setStatus('ID copied. Send it to your manager.');
+      } catch {
+        setStatus(
+          'Could not copy automatically. Long-press the ID above.',
+          true
+        );
+      }
+    });
+  }
+
   $('tab-fridge').addEventListener('click', () => switchTab('fridge'));
   $('tab-san').addEventListener('click', () => switchTab('san'));
   $('btn-add-fridge').addEventListener('click', () => addFridge());
   $('btn-add-san').addEventListener('click', () => addSanStation());
+
+  window.addEventListener('lineShowTemps', () => switchTab('fridge'));
 }
 
 export function initMobileCompliance() {
@@ -472,29 +927,60 @@ export function initMobileCompliance() {
     return;
   }
   wireAuth();
-  const app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
+  const app = getApps().length
+    ? getApp()
+    : initializeApp(window.firebaseConfig);
   db = getFirestore(app);
   auth = getAuth(app);
 
+  let profileEnsuredThisSession = false;
+
+  getRedirectResult(auth)
+    .then(() => {
+      /* user available via onAuthStateChanged */
+    })
+    .catch(e => {
+      console.warn('getRedirectResult', e);
+    });
+
   onAuthStateChanged(auth, user => {
     if (user) {
-      $('user-chip').textContent = user.email || user.uid.slice(0, 8) + '…';
+      persistLocalWebSession(user);
+      if (!profileEnsuredThisSession) {
+        profileEnsuredThisSession = true;
+        void ensureUserProfileDoc(user);
+      }
+      const chip = user.displayName || user.email || user.uid.slice(0, 8) + '…';
+      $('user-chip').textContent = chip;
       showPanel('app');
       startListeners(user.uid);
       switchTab('fridge');
       refreshProjectPicker(user.uid)
         .then(() => {
           ensureSiteIdIfNoTeamProjects();
-          setStatus('Choose your workspace, then log temps or sanitizer.');
+          setStatus(
+            isWorkspaceReady(user.uid)
+              ? 'Pick a workspace above, then open Home for menu, lists, and checks.'
+              : 'Name your workspace below, or choose a team location when your manager adds you.'
+          );
         })
         .catch(() => {
           setStatus('Signed in — set workspace if prompted.', true);
         });
     } else {
+      profileEnsuredThisSession = false;
       showPanel('auth');
       $('user-chip').textContent = '';
       myProjectRows = [];
-      setStatus('Sign in to sync logs with the web app.');
+      setStatus('Sign in to use shift tools.');
     }
+  });
+
+  attachLineEmployeeHub({
+    getDb: () => db,
+    getAuth: () => auth,
+    getProjectId,
+    setStatus,
+    escapeHtml
   });
 }

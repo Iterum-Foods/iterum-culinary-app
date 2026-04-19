@@ -17,6 +17,7 @@ import {
   deleteDoc,
   orderBy,
   limit,
+  onSnapshot,
   serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
@@ -24,6 +25,8 @@ class FirestoreSync {
   constructor() {
     this.db = null;
     this.initialized = false;
+    /** @type {Array<Record<string, unknown>>} Cached rows from users/{uid}/vendor_prices (E3c). */
+    this.vendorPriceRows = [];
     // Don't call init in constructor - will be called externally
   }
 
@@ -244,6 +247,14 @@ class FirestoreSync {
       // Make globally available
       window.firestoreDB = this.db;
       window.firestoreSync = this;
+
+      this.refreshVendorPricesFromFirestore().catch(() => {});
+      if (typeof window !== 'undefined' && !this._vendorPriceProjectListener) {
+        this._vendorPriceProjectListener = true;
+        window.addEventListener('projectChanged', () => {
+          this.refreshVendorPricesFromFirestore().catch(() => {});
+        });
+      }
     } catch (error) {
       console.error('❌ Firestore initialization failed:', error);
       this.initialized = false;
@@ -954,6 +965,324 @@ class FirestoreSync {
     return results;
   }
 
+  /**
+   * Stable Firestore document id for a vendor row (users/{uid}/vendors/{id}).
+   */
+  vendorFirestoreDocId(vendor) {
+    if (!vendor || typeof vendor !== 'object') {
+      return 'unknown';
+    }
+    if (
+      vendor.id !== undefined &&
+      vendor.id !== null &&
+      String(vendor.id).trim() !== ''
+    ) {
+      return this.normalizeId(String(vendor.id), 'v');
+    }
+    if (vendor.name && String(vendor.name).trim()) {
+      return this.normalizeId(String(vendor.name), 'vendor');
+    }
+    return `v_${Date.now()}`;
+  }
+
+  /**
+   * Drop huge attachment payloads so writes stay under Firestore limits.
+   */
+  stripLargeVendorFieldsForSync(vendor) {
+    const v = this.sanitizeForFirestore(vendor, {});
+    if (
+      v.invoiceAttachment &&
+      typeof v.invoiceAttachment === 'string' &&
+      v.invoiceAttachment.length > 40000
+    ) {
+      delete v.invoiceAttachment;
+      v.invoiceAttachmentOmitted = true;
+    }
+    return v;
+  }
+
+  /**
+   * E3 — Push vendor list to users/{uid}/vendors/* (rules: isOwner(uid)).
+   */
+  async syncVendorsToFirestore(vendors) {
+    if (!this.initialized || !Array.isArray(vendors)) {
+      return { ok: false, reason: 'not_ready' };
+    }
+    const uid = this.resolveUserId();
+    if (!uid || uid === 'local-testing') {
+      return { ok: false, reason: 'no_user' };
+    }
+    const userRef = doc(this.db, 'users', uid);
+    let wrote = 0;
+    for (const vendor of vendors) {
+      const docId = this.vendorFirestoreDocId(vendor);
+      const base = this.stripLargeVendorFieldsForSync(vendor);
+      const payload = {
+        ...base,
+        id: base.id != null ? base.id : vendor.id,
+        iterumVendorDocId: docId,
+        updatedAt: serverTimestamp()
+      };
+      try {
+        const vRef = doc(collection(userRef, 'vendors'), docId);
+        await setDoc(vRef, payload, { merge: true });
+        wrote += 1;
+      } catch (error) {
+        console.warn('Vendor Firestore sync skipped:', docId, error.message);
+      }
+    }
+    return { ok: true, wrote, userId: uid };
+  }
+
+  /**
+   * E3 — Load all vendors from users/{uid}/vendors/*.
+   */
+  async fetchVendorsFromFirestore(explicitUserId) {
+    if (!this.initialized) {
+      return [];
+    }
+    const uid = explicitUserId || this.resolveUserId();
+    if (!uid || uid === 'local-testing') {
+      return [];
+    }
+    try {
+      const userRef = doc(this.db, 'users', uid);
+      const vendorsCol = collection(userRef, 'vendors');
+      const snap = await getDocs(vendorsCol);
+      const out = [];
+      snap.forEach(d => {
+        const data = d.data();
+        const row = this.deserializeTimestamps(data);
+        delete row.iterumVendorDocId;
+        delete row.updatedAt;
+        out.push(row);
+      });
+      return out;
+    } catch (error) {
+      console.error('Error fetching vendors from Firestore:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Stable document id for users/{uid}/vendor_prices/{id} (E3c).
+   */
+  vendorPriceFirestoreDocId(row) {
+    if (!row || typeof row !== 'object') {
+      return 'unknown';
+    }
+    const vendorPart = String(
+      row.vendorDocId || row.iterumVendorDocId || row.vendorId || ''
+    ).trim();
+    const v = vendorPart ? this.normalizeId(vendorPart, 'v') : 'v_na';
+    const projPart =
+      row.projectId != null && String(row.projectId).trim() !== ''
+        ? this.normalizeId(String(row.projectId), 'p')
+        : '_acct';
+    let ingPart;
+    if (row.ingredientId != null && String(row.ingredientId).trim() !== '') {
+      ingPart = `i_${this.normalizeId(String(row.ingredientId), 'ing')}`;
+    } else {
+      ingPart = this.normalizeId(
+        String(row.ingredientName || row.sku || 'item'),
+        'ing'
+      );
+    }
+    return this.normalizeId(`${v}__${projPart}__${ingPart}`, 'vp');
+  }
+
+  /**
+   * E3c — Upsert one price override row (project-specific or account default when projectId null/empty).
+   */
+  async syncVendorPriceRowToFirestore(row) {
+    if (!this.initialized || !row || typeof row !== 'object') {
+      return { ok: false, reason: 'not_ready' };
+    }
+    const uid = this.resolveUserId();
+    if (!uid || uid === 'local-testing') {
+      return { ok: false, reason: 'no_user' };
+    }
+    const docId =
+      row.iterumVendorPriceDocId || this.vendorPriceFirestoreDocId(row);
+    const base = this.sanitizeForFirestore(
+      {
+        vendorDocId:
+          String(row.vendorDocId || row.iterumVendorDocId || '').trim() || null,
+        projectId:
+          row.projectId != null && String(row.projectId).trim() !== ''
+            ? String(row.projectId)
+            : null,
+        ingredientId:
+          row.ingredientId != null && String(row.ingredientId).trim() !== ''
+            ? row.ingredientId
+            : null,
+        ingredientName: String(row.ingredientName || '').trim(),
+        sku: row.sku != null ? String(row.sku).trim() : null,
+        unitCost: Number(row.unitCost) || 0,
+        unit: String(row.unit || 'ea').trim() || 'ea',
+        vendorName: String(row.vendorName || '').trim() || null
+      },
+      {}
+    );
+    const payload = {
+      ...base,
+      iterumVendorPriceDocId: docId,
+      updatedAt: serverTimestamp()
+    };
+    try {
+      const userRef = doc(this.db, 'users', uid);
+      const pRef = doc(collection(userRef, 'vendor_prices'), docId);
+      await setDoc(pRef, payload, { merge: true });
+      await this.refreshVendorPricesFromFirestore();
+      return { ok: true, docId, userId: uid };
+    } catch (error) {
+      console.warn(
+        'Vendor price Firestore sync skipped:',
+        docId,
+        error.message
+      );
+      return { ok: false, reason: error.message };
+    }
+  }
+
+  /**
+   * E3c — Load all vendor price rows for the current resolved user.
+   */
+  async fetchVendorPricesFromFirestore(explicitUserId) {
+    if (!this.initialized) {
+      return [];
+    }
+    const uid = explicitUserId || this.resolveUserId();
+    if (!uid || uid === 'local-testing') {
+      return [];
+    }
+    try {
+      const userRef = doc(this.db, 'users', uid);
+      const col = collection(userRef, 'vendor_prices');
+      const snap = await getDocs(col);
+      const out = [];
+      snap.forEach(d => {
+        const data = d.data();
+        const row = this.deserializeTimestamps(data);
+        row.iterumVendorPriceDocId = d.id;
+        out.push(row);
+      });
+      return out;
+    } catch (error) {
+      console.error('Error fetching vendor_prices from Firestore:', error);
+      return [];
+    }
+  }
+
+  async refreshVendorPricesFromFirestore(explicitUserId) {
+    const rows = await this.fetchVendorPricesFromFirestore(explicitUserId);
+    this.vendorPriceRows = rows;
+    if (
+      typeof window !== 'undefined' &&
+      window.costCalculator &&
+      typeof window.costCalculator.loadIngredientPrices === 'function'
+    ) {
+      try {
+        window.costCalculator.loadIngredientPrices();
+      } catch (e) {
+        /* non-fatal */
+      }
+    }
+    return rows;
+  }
+
+  _vendorPriceRowSortTime(row) {
+    const u = row && row.updatedAt;
+    if (!u) {
+      return 0;
+    }
+    if (typeof u === 'number') {
+      return u;
+    }
+    if (typeof u === 'string') {
+      const n = new Date(u).getTime();
+      return Number.isNaN(n) ? 0 : n;
+    }
+    if (typeof u.toDate === 'function') {
+      try {
+        return u.toDate().getTime();
+      } catch (e) {
+        return 0;
+      }
+    }
+    return 0;
+  }
+
+  /**
+   * Map ingredient name key (lowercase) → override row for the active project.
+   * Project-specific rows beat account-default rows (projectId null/empty).
+   */
+  getVendorPriceOverridesMap(explicitProjectId) {
+    const pid =
+      explicitProjectId != null && String(explicitProjectId).trim() !== ''
+        ? String(explicitProjectId)
+        : String(this.resolveProjectId() || '');
+    const rows = Array.isArray(this.vendorPriceRows)
+      ? this.vendorPriceRows
+      : [];
+    const best = new Map();
+    for (const row of rows) {
+      if (!row || typeof row !== 'object') {
+        continue;
+      }
+      const nameKey = String(row.ingredientName || '')
+        .trim()
+        .toLowerCase();
+      const skuKey = String(row.sku || '')
+        .trim()
+        .toLowerCase();
+      const keys = [nameKey, skuKey].filter(Boolean);
+      if (keys.length === 0) {
+        continue;
+      }
+      const rpid =
+        row.projectId != null && String(row.projectId).trim() !== ''
+          ? String(row.projectId)
+          : null;
+      if (rpid != null && rpid !== pid) {
+        continue;
+      }
+      const score = rpid === pid ? 2 : 1;
+      const t = this._vendorPriceRowSortTime(row);
+      for (const ingKey of keys) {
+        const prev = best.get(ingKey);
+        const prevScore = prev ? prev._vpScore : 0;
+        const prevT = prev ? prev._vpT : 0;
+        if (score > prevScore || (score === prevScore && t >= prevT)) {
+          best.set(ingKey, {
+            ingredientName: row.ingredientName,
+            ingredientId: row.ingredientId,
+            sku: row.sku,
+            unitCost: row.unitCost,
+            unit: row.unit,
+            vendorName: row.vendorName,
+            vendorDocId: row.vendorDocId,
+            _vpScore: score,
+            _vpT: t
+          });
+        }
+      }
+    }
+    const out = new Map();
+    best.forEach((row, k) => {
+      out.set(k, {
+        ingredientName: row.ingredientName,
+        ingredientId: row.ingredientId,
+        sku: row.sku,
+        unitCost: row.unitCost,
+        unit: row.unit,
+        vendorName: row.vendorName,
+        vendorDocId: row.vendorDocId
+      });
+    });
+    return out;
+  }
+
   deriveProjectMetadata(metadata = {}) {
     const projectManager = window.projectManager;
     const currentProject = projectManager?.currentProject;
@@ -1000,6 +1329,153 @@ class FirestoreSync {
 
     return value;
   }
+
+  /**
+   * Shift app → dashboard: team posts for a calendar day (project-scoped).
+   * @param {string} projectId
+   * @param {string} dateKey YYYY-MM-DD
+   * @returns {Promise<Array<Record<string, unknown>>>}
+   */
+  async getShiftDayPosts(projectId, dateKey) {
+    if (!this.initialized || !this.db || !dateKey) {
+      return [];
+    }
+    const pid = this.resolveProjectId(projectId);
+    const col = collection(this.db, 'projects', pid, 'shift_day_posts');
+    let snap;
+    try {
+      const q = query(
+        col,
+        where('dateKey', '==', dateKey),
+        orderBy('createdAt', 'asc')
+      );
+      snap = await getDocs(q);
+    } catch (err) {
+      console.warn('getShiftDayPosts orderBy (deploy index if needed):', err);
+      try {
+        const q2 = query(col, where('dateKey', '==', dateKey));
+        snap = await getDocs(q2);
+      } catch (e2) {
+        console.warn('getShiftDayPosts:', e2);
+        return [];
+      }
+    }
+    const out = [];
+    snap.forEach(d => {
+      out.push({ id: d.id, ...d.data() });
+    });
+    out.sort((a, b) => {
+      const ta =
+        a.createdAt && typeof a.createdAt.toMillis === 'function'
+          ? a.createdAt.toMillis()
+          : 0;
+      const tb =
+        b.createdAt && typeof b.createdAt.toMillis === 'function'
+          ? b.createdAt.toMillis()
+          : 0;
+      return ta - tb;
+    });
+    return out;
+  }
+
+  /**
+   * Live listener for shift app posts (one calendar day). Uses equality filter only so
+   * no composite index is required; sorts client-side.
+   * @param {string} projectId
+   * @param {string} dateKey YYYY-MM-DD
+   * @param {(posts: Array<Record<string, unknown>>) => void} onUpdate
+   * @param {(err: Error) => void} [onError]
+   * @returns {() => void} unsubscribe
+   */
+  subscribeShiftDayPosts(projectId, dateKey, onUpdate, onError) {
+    if (!this.initialized || !this.db || !dateKey) {
+      return () => {};
+    }
+    const pid = this.resolveProjectId(projectId);
+    const col = collection(this.db, 'projects', pid, 'shift_day_posts');
+    const q = query(col, where('dateKey', '==', dateKey));
+    return onSnapshot(
+      q,
+      snap => {
+        const out = [];
+        snap.forEach(d => out.push({ id: d.id, ...d.data() }));
+        out.sort((a, b) => {
+          const ta =
+            a.createdAt && typeof a.createdAt.toMillis === 'function'
+              ? a.createdAt.toMillis()
+              : 0;
+          const tb =
+            b.createdAt && typeof b.createdAt.toMillis === 'function'
+              ? b.createdAt.toMillis()
+              : 0;
+          return ta - tb;
+        });
+        onUpdate(out);
+      },
+      err => {
+        if (typeof onError === 'function') {
+          onError(err);
+        } else {
+          console.warn('subscribeShiftDayPosts:', err);
+        }
+      }
+    );
+  }
+
+  /**
+   * @param {object} opts
+   * @param {string} opts.projectId
+   * @param {string} opts.dateKey YYYY-MM-DD
+   * @param {string} opts.body
+   * @param {'shift'|'inventory'} opts.category
+   * @param {'normal'|'low'|'out'} [opts.priority]
+   */
+  async saveShiftDayPost(opts) {
+    if (!this.initialized || !this.db) {
+      console.warn('Firestore not ready; skip saveShiftDayPost');
+      return { ok: false };
+    }
+    const authUid =
+      window.firebaseAuth?.auth?.currentUser?.uid ||
+      window.authManager?.currentUser?.uid ||
+      null;
+    if (!authUid) {
+      console.warn('saveShiftDayPost: no auth uid');
+      return { ok: false };
+    }
+    const u = window.authManager?.currentUser;
+    const authorName =
+      (u && (u.name || u.displayName)) ||
+      window.firebaseAuth?.auth?.currentUser?.displayName ||
+      'Team member';
+    const pid = this.resolveProjectId(opts.projectId);
+    const dateKey = String(opts.dateKey || '').slice(0, 10);
+    const body = String(opts.body || '')
+      .trim()
+      .slice(0, 8000);
+    if (!dateKey || !body) {
+      return { ok: false };
+    }
+    const category = opts.category === 'inventory' ? 'inventory' : 'shift';
+    const priority =
+      opts.priority === 'out'
+        ? 'out'
+        : opts.priority === 'low'
+          ? 'low'
+          : 'normal';
+    const ref = doc(collection(this.db, 'projects', pid, 'shift_day_posts'));
+    await setDoc(ref, {
+      dateKey,
+      body,
+      category,
+      priority,
+      authorUid: authUid,
+      authorName: String(authorName).slice(0, 120),
+      source: 'shift_app',
+      createdAt: serverTimestamp()
+    });
+    return { ok: true, id: ref.id };
+  }
 }
 
 // Initialize Firestore Sync
@@ -1011,6 +1487,11 @@ firestoreSync
   .init()
   .then(() => {
     console.log('✅ Firestore Sync initialized successfully');
+    try {
+      window.dispatchEvent(new CustomEvent('firestoreSyncReady'));
+    } catch (e) {
+      /* ignore */
+    }
   })
   .catch(error => {
     console.warn('⚠️ Firestore Sync initialization failed:', error.message);

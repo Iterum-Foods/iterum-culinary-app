@@ -14,6 +14,15 @@ class CostCalculator {
 
   init() {
     console.log('💰 Cost Calculator initialized');
+    if (
+      typeof window !== 'undefined' &&
+      !window._iterumCostCalcProjectListener
+    ) {
+      window._iterumCostCalcProjectListener = true;
+      window.addEventListener('projectChanged', () => {
+        this.loadIngredientPrices();
+      });
+    }
     this.loadIngredientPrices();
   }
 
@@ -109,12 +118,49 @@ class CostCalculator {
         }
       });
 
+      this.applyFirestoreVendorPriceOverrides();
+
       console.log(
         `💰 Loaded prices for ${Object.keys(this.ingredientPrices).length} ingredients`
       );
     } catch (error) {
       console.error('Error loading ingredient prices:', error);
     }
+  }
+
+  /**
+   * E3d — Apply users/{uid}/vendor_prices overrides for the active workspace (after local sources).
+   */
+  applyFirestoreVendorPriceOverrides() {
+    const sync = window.firestoreSync;
+    if (!sync || typeof sync.getVendorPriceOverridesMap !== 'function') {
+      return;
+    }
+    const projectId =
+      typeof sync.resolveProjectId === 'function'
+        ? sync.resolveProjectId()
+        : null;
+    const omap = sync.getVendorPriceOverridesMap(projectId);
+    if (!omap || omap.size === 0) {
+      return;
+    }
+    omap.forEach((row, key) => {
+      if (!key) {
+        return;
+      }
+      const cost = parseFloat(row.unitCost);
+      if (!(cost > 0)) {
+        return;
+      }
+      this.ingredientPrices[key] = {
+        name: row.ingredientName || key,
+        price: cost,
+        unit: row.unit || 'lb',
+        vendor: row.vendorName || 'Workspace price',
+        ingredientId: row.ingredientId || null,
+        source: 'firestore_vendor_price'
+      };
+    });
   }
 
   /**

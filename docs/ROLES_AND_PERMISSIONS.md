@@ -23,11 +23,12 @@
 |------|------------------|--------|
 | `projects/{projectId}/members/{userId}` | `role`, `email`, `updatedAt` | `userId` = Firebase Auth UID. |
 
-**Valid `role` values:** `account_admin`, `location_manager`, `employee_line`, `chef_leadership`, `operations_gm`, `purchasing`, `consultant_rd`.
+**Valid `role` values:** `account_admin`, `location_manager`, `employee_line`, `front_of_house`, `kitchen_staff`, `support_staff`, `chef_leadership`, `operations_gm`, `purchasing`, `consultant_rd`.  
+Field-staff roles (`employee_line`, `front_of_house`, `kitchen_staff`, `support_staff`) share the same Firestore pattern: **read** project `menus` / `recipes` / `snapshots`; **write** `checklists` and personal `users/...` data; **no write** to menu/recipe/snapshot masters.
 
 **Bootstrap:** When [`ensureProjectDoc`](../public/assets/js/firestore-sync.js) runs, the current user gets `members/{uid}` with `role: account_admin` (owner/org admin).
 
-**UI mapping** (server → dashboard `roleKey`): `account_admin` → `chef_leadership`; `location_manager` → `operations_gm`; others map 1:1 including `employee_line`.
+**UI mapping** (server → dashboard `roleKey`): `account_admin` → `chef_leadership`; `location_manager` → `operations_gm`; `employee_line`, `front_of_house`, `kitchen_staff`, `support_staff` → `employee_line` (same daily/compliance dashboard); others map 1:1.
 
 **Invite / add teammates:** Owner or `account_admin` may create other `members/{uid}` docs (requires that user’s UID — e.g. after they sign up). No email-invite UI in this PR.
 

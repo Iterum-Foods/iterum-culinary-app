@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -3611,7 +3611,7 @@
                                 📚 Select from Recipe Library
                             </button>
                             <button class="tab-btn" onclick="switchDishTab('new')">
-                                ➕ Create New Dish Idea
+                                ➕ Quick add dish
                             </button>
                         </div>
                         
@@ -3683,13 +3683,9 @@
                                     </div>
                                 </div>
                                 
-                                <div class="form-group">
-                                    <label class="checkbox-label">
-                                        <input type="checkbox" id="create-recipe-idea">
-                                        <span class="checkmark"></span>
-                                        Also create this as a recipe idea for future development
-                                    </label>
-                                </div>
+                                <p class="text-sm" style="color:#64748b;margin:0;line-height:1.5;">
+                                    This dish is saved on your menu and <strong>added to Recipe index</strong> as a draft automatically—open it there anytime to add ingredients and steps.
+                                </p>
                             </form>
                         </div>
                     </div>
@@ -3727,33 +3723,31 @@
         }
 
         async function loadRecipes() {
-            const recipesList = document.getElementById('recipes-list');
-            
-            try {
-                // Try to load from API first
-                const response = await fetch('/api/recipes/library', {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`
+            availableRecipes =
+                (window.universalRecipeManager &&
+                    window.universalRecipeManager.getAllRecipes()) ||
+                [];
+            if (!availableRecipes.length) {
+                try {
+                    const response = await fetch('/api/recipes/library', {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('auth_token') || ''}`
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        availableRecipes = data.recipes || [];
                     }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    availableRecipes = data.recipes || [];
-                } else {
-                    throw new Error('API not available');
-                }
-            } catch (error) {
-                console.warn('Loading recipes from local storage:', error);
-                // Fallback to local storage
-                const storedRecipes = localStorage.getItem('userRecipes');
-                if (storedRecipes) {
-                    availableRecipes = JSON.parse(storedRecipes);
-                } else {
-                    availableRecipes = [];
+                } catch (e) {
+                    console.warn('Recipe library API skipped:', e);
                 }
             }
-            
+            if (!availableRecipes.length) {
+                const storedRecipes = localStorage.getItem('userRecipes');
+                availableRecipes = storedRecipes
+                    ? JSON.parse(storedRecipes)
+                    : JSON.parse(localStorage.getItem('recipes') || '[]');
+            }
             displayRecipes(availableRecipes);
         }
 
@@ -3766,14 +3760,14 @@
                         <div style="font-size: 48px; margin-bottom: 16px;">📚</div>
                         <h4>No Recipes Found</h4>
                         <p>You don't have any recipes in your library yet.</p>
-                        <p>Create a new dish idea or add recipes to your library first.</p>
+                        <p>Use <strong>Quick add dish</strong> to add a menu line and a Recipe index draft, or import recipes elsewhere first.</p>
                     </div>
                 `;
                 return;
             }
             
             recipesList.innerHTML = recipes.map(recipe => `
-                <div class="recipe-card-selectable" onclick="selectRecipe(${recipe.id})">
+                <div class="recipe-card-selectable" onclick='selectRecipe(${JSON.stringify(recipe.id)})'>
                     <div class="recipe-card-header">
                         <div class="recipe-title">${recipe.name || recipe.title || 'Untitled Recipe'}</div>
                         <div class="recipe-category">${recipe.category || recipe.cuisine || 'Uncategorized'}</div>
@@ -3829,11 +3823,15 @@
             const menuItem = {
                 name: selectedRecipe.name || selectedRecipe.title,
                 description: selectedRecipe.description,
-                price: null, // User can set price later
+                price: null,
                 recipeId: selectedRecipe.id,
-                prepTime: selectedRecipe.prep_time,
+                prepTime: selectedRecipe.prepTime || selectedRecipe.prep_time,
                 servings: selectedRecipe.servings,
-                difficulty: selectedRecipe.difficulty
+                difficulty: selectedRecipe.difficulty,
+                category:
+                    selectedRecipe.category ||
+                    selectedRecipe.cuisine ||
+                    'Main Courses'
             };
             
             // Add to current category or create default category
@@ -3869,38 +3867,7 @@
             const currentCategory = menuManager.ensureDefaultCategory();
             menuManager.addItem(currentCategory.id, menuItem);
             
-            // Create recipe idea if requested
-            if (document.getElementById('create-recipe-idea').checked) {
-                createRecipeIdea(menuItem);
-            }
-            
             closeModal('dish-selection-modal');
-        }
-
-        function createRecipeIdea(dishData) {
-            // Create a recipe idea from the dish data
-            const recipeIdea = {
-                name: dishData.name,
-                description: dishData.description,
-                category: dishData.category,
-                prepTime: dishData.prepTime,
-                servings: dishData.servings,
-                status: 'idea',
-                createdAt: new Date().toISOString(),
-                source: 'menu_builder'
-            };
-            
-            // Save to recipe library
-            try {
-                const existingRecipes = JSON.parse(localStorage.getItem('userRecipes') || '[]');
-                recipeIdea.id = Date.now();
-                existingRecipes.push(recipeIdea);
-                localStorage.setItem('userRecipes', JSON.stringify(existingRecipes));
-                
-                console.log('✅ Recipe idea created:', recipeIdea);
-            } catch (error) {
-                console.error('Failed to create recipe idea:', error);
-            }
         }
 
         function addTabStyles() {

@@ -8,6 +8,49 @@
 
   console.log('👤 Profile Editor initializing...');
 
+  function iterumPrimaryRoleFieldHtml() {
+    if (
+      typeof window.getOperatorProfile !== 'function' ||
+      typeof window.saveOperatorProfile !== 'function'
+    ) {
+      return '';
+    }
+    var opts = window.ITERUM_PRIMARY_ROLE_OPTIONS;
+    if (!opts || !opts.length) {
+      opts = [
+        { value: 'chef_leadership', label: 'Executive chef / Kitchen lead' },
+        { value: 'operations_gm', label: 'GM & operations' },
+        { value: 'purchasing', label: 'Purchasing & costing' },
+        { value: 'consultant_rd', label: 'Consultant / R&D' },
+        { value: 'employee_line', label: 'Shift team (daily ops focus)' }
+      ];
+    }
+    var pr = window.getOperatorProfile();
+    var cur = pr && pr.roleKey ? pr.roleKey : 'chef_leadership';
+    var options = opts
+      .map(function (o) {
+        return (
+          '<option value="' +
+          o.value +
+          '"' +
+          (o.value === cur ? ' selected' : '') +
+          '>' +
+          o.label +
+          '</option>'
+        );
+      })
+      .join('');
+    return (
+      '<div style="margin-bottom: 20px;">' +
+      '<label for="profile-primary-role" style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Primary position (your profile)</label>' +
+      '<select id="profile-primary-role" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 16px;">' +
+      options +
+      '</select>' +
+      '<div style="font-size: 12px; color: #6b7280; margin-top: 4px;">Default dashboard layout. Admin sets <strong>team access</strong> per project. Open <strong>Dashboard → Your positions</strong> to set how you show up on each site.</div>' +
+      '</div>'
+    );
+  }
+
   /**
    * Show profile edit modal
    */
@@ -100,6 +143,8 @@
                                        placeholder="Your name"
                                        style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 16px;">
                             </div>
+                            
+                            ${iterumPrimaryRoleFieldHtml()}
                             
                             <div style="margin-bottom: 20px;">
                                 <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">
@@ -305,6 +350,36 @@
       await window.authManager.updateProfile({
         displayName: name
       });
+
+      try {
+        var sel = document.getElementById('profile-primary-role');
+        if (
+          sel &&
+          typeof window.getOperatorProfile === 'function' &&
+          typeof window.saveOperatorProfile === 'function'
+        ) {
+          var pr = window.getOperatorProfile();
+          if (pr && pr.scope) {
+            var scopeL =
+              pr.scope === 'restaurant_group'
+                ? 'Restaurant group'
+                : 'Single restaurant';
+            var po = window.ITERUM_PRIMARY_ROLE_OPTIONS || [];
+            var labObj = po.find(function (o) {
+              return o.value === sel.value;
+            });
+            var lab = (labObj && labObj.label) || sel.value;
+            window.saveOperatorProfile(
+              Object.assign({}, pr, {
+                roleKey: sel.value,
+                label: lab + ' — ' + scopeL
+              })
+            );
+          }
+        }
+      } catch (roleErr) {
+        console.warn('profile primary role', roleErr);
+      }
 
       // Show success
       messageDiv.style.display = 'block';

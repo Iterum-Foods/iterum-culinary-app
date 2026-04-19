@@ -3,192 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#1a2e1f" />
-  <meta name="description" content="Free mobile fridge temperature and sanitizer log for kitchens. Syncs with Iterum." />
+  <meta name="theme-color" content="#1e3d28" />
+  <meta name="description" content="Simple shift tools for kitchen and FOH: today’s menu, prep lists, notes, station checks, how-to guides, temps." />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Iterum Line Log" />
-  <title>Iterum — Line log (fridge &amp; sanitizer)</title>
+  <meta name="apple-mobile-web-app-title" content="Iterum Shift" />
+  <title>Iterum — Shift tools</title>
   <link rel="manifest" href="/manifest-compliance.json" />
   <link rel="icon" href="/favicon.ico" />
-  <style>
-    :root {
-      --mc-bg: #f4f6f4;
-      --mc-card: #fff;
-      --mc-text: #142015;
-      --mc-muted: #5c6b5f;
-      --mc-accent: #3d6b47;
-      --mc-accent2: #2d4a35;
-      --mc-border: #d8e0da;
-      --mc-safe-top: env(safe-area-inset-top, 0);
-      --mc-safe-bottom: env(safe-area-inset-bottom, 0);
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      background: var(--mc-bg);
-      color: var(--mc-text);
-      min-height: 100dvh;
-      padding: calc(12px + var(--mc-safe-top)) 16px calc(16px + var(--mc-safe-bottom));
-      line-height: 1.45;
-    }
-    .mc-top {
-      max-width: 28rem;
-      margin: 0 auto 1rem;
-    }
-    .mc-badge {
-      display: inline-block;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--mc-accent);
-      margin-bottom: 0.35rem;
-    }
-    h1 {
-      font-size: 1.35rem;
-      font-weight: 800;
-      margin: 0 0 0.35rem;
-      line-height: 1.2;
-    }
-    .mc-sub {
-      font-size: 0.9rem;
-      color: var(--mc-muted);
-      margin: 0 0 0.75rem;
-    }
-    .mc-panel {
-      max-width: 28rem;
-      margin: 0 auto;
-      background: var(--mc-card);
-      border-radius: 14px;
-      border: 1px solid var(--mc-border);
-      padding: 1rem;
-      box-shadow: 0 4px 24px rgba(20, 32, 21, 0.06);
-    }
-    .mc-field {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      margin-bottom: 0.75rem;
-    }
-    .mc-field label { font-size: 0.8rem; font-weight: 600; color: var(--mc-muted); }
-    .mc-field input {
-      font-size: 1rem;
-      padding: 0.65rem 0.75rem;
-      border-radius: 10px;
-      border: 1px solid var(--mc-border);
-      min-height: 48px;
-    }
-    .mc-row-btns {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
-    .mc-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 48px;
-      padding: 0.65rem 1rem;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      border: 1px solid var(--mc-border);
-      background: #fff;
-      color: var(--mc-text);
-      cursor: pointer;
-      width: 100%;
-    }
-    .mc-btn-primary {
-      background: var(--mc-accent);
-      color: #fff;
-      border-color: var(--mc-accent2);
-    }
-    .mc-btn-ghost { background: var(--mc-bg); }
-    .mc-tabs {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 0.75rem;
-      background: var(--mc-bg);
-      padding: 4px;
-      border-radius: 12px;
-    }
-    .mc-tabs button {
-      flex: 1;
-      min-height: 44px;
-      border: none;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 0.88rem;
-      background: transparent;
-      color: var(--mc-muted);
-      cursor: pointer;
-    }
-    .mc-tabs button[aria-selected="true"] {
-      background: var(--mc-card);
-      color: var(--mc-accent2);
-      box-shadow: 0 1px 4px rgba(0,0,0,.06);
-    }
-    .mc-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.65rem; }
-    .mc-card {
-      border: 1px solid var(--mc-border);
-      border-radius: 12px;
-      padding: 0.75rem;
-      background: #fafbf9;
-    }
-    .mc-card-row {
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
-      margin-bottom: 0.5rem;
-    }
-    .mc-hint { font-size: 0.8rem; color: var(--mc-muted); }
-    .mc-empty { padding: 1rem; text-align: center; color: var(--mc-muted); font-size: 0.9rem; }
-    .mc-toolbar { margin-bottom: 0.75rem; }
-    .mc-foot {
-      max-width: 28rem;
-      margin: 1.25rem auto 0;
-      font-size: 0.8rem;
-      color: var(--mc-muted);
-      text-align: center;
-    }
-    .mc-foot a { color: var(--mc-accent); font-weight: 600; }
-    .mc-chip {
-      font-size: 0.75rem;
-      color: var(--mc-muted);
-      margin-bottom: 0.5rem;
-      word-break: break-all;
-    }
-    .mc-unit-toggle {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.85rem;
-      margin-bottom: 0.75rem;
-      color: var(--mc-muted);
-    }
-    #status-line { min-height: 1.25rem; font-size: 0.8rem; margin-top: 0.5rem; }
-  </style>
+  <link rel="stylesheet" href="/assets/css/mobile-shift-brand.css" />
   <script src="assets/js/firebase-config.js"></script>
 </head>
-<body>
+<body class="mc-shift-app">
+  <header class="mc-brand-bar" aria-label="Iterum Shift">
+    <div class="mc-brand-bar__inner">
+      <span class="mc-brand-wordmark">Iterum</span>
+      <span class="mc-brand-product">Shift</span>
+      <span class="mc-brand-tagline">Kitchen &amp; FOH tools for your shift</span>
+    </div>
+  </header>
+
   <div class="mc-top">
-    <div class="mc-badge">Free line log</div>
-    <h1>Fridge temp &amp; sanitizer</h1>
-    <p class="mc-sub">Log cold-holding and sanitizer strength on your phone. Same data as the Iterum dashboard and calendar when you use the same account.</p>
+    <div class="mc-badge">Shift tools</div>
+    <h1>What you need for your shift</h1>
+    <p class="mc-sub">Menu, lists, and checks in one place. Sign in with the same email your manager uses for Iterum.</p>
   </div>
 
   <div id="auth-panel" class="mc-panel">
-    <p style="margin:0 0 0.75rem;font-size:0.9rem;color:var(--mc-muted);">Create a free account or sign in. No credit card.</p>
+    <p style="margin:0 0 0.75rem;font-size:0.9rem;color:var(--mc-muted);line-height:1.45;">Sign in with the email your job uses for Iterum. New here? Create a free account — no card needed.</p>
+    <div class="mc-field">
+      <label for="auth-name">Your name <span style="font-weight:400;color:var(--mc-muted);">(for new accounts)</span></label>
+      <input id="auth-name" type="text" autocomplete="name" placeholder="e.g. Jamie Chen" />
+    </div>
     <div class="mc-field">
       <label for="auth-email">Email</label>
-      <input id="auth-email" type="email" autocomplete="username" />
+      <input id="auth-email" type="email" autocomplete="username" inputmode="email" />
     </div>
     <div class="mc-field">
       <label for="auth-password">Password</label>
-      <input id="auth-password" type="password" autocomplete="current-password" />
+      <input id="auth-password" type="password" autocomplete="current-password" minlength="6" />
     </div>
+    <div class="mc-field">
+      <label for="auth-password2">Confirm password <span style="font-weight:400;color:var(--mc-muted);">(new accounts only)</span></label>
+      <input id="auth-password2" type="password" autocomplete="new-password" minlength="6" />
+    </div>
+    <p style="margin:-0.25rem 0 0.5rem;font-size:0.78rem;color:var(--mc-muted);">Use at least 6 characters. You’ll get a verification email for new email sign-ups.</p>
     <div class="mc-row-btns">
       <button type="button" class="mc-btn mc-btn-primary" id="btn-signin">Sign in</button>
       <button type="button" class="mc-btn mc-btn-ghost" id="btn-signup">Create free account</button>
@@ -199,41 +57,250 @@
 
   <div id="app-panel" class="mc-panel" hidden>
     <div class="mc-chip" id="user-chip"></div>
+
+    <div id="workspace-first-run" class="mc-panel" style="margin-bottom:1rem;padding:1rem;border:2px solid var(--mc-accent);border-radius:12px;background:var(--mc-card);display:none;">
+      <p style="margin:0 0 0.5rem;font-weight:700;color:var(--mc-text);">Name your workspace</p>
+      <p style="margin:0 0 0.75rem;font-size:0.88rem;color:var(--mc-muted);line-height:1.45;">Use the app on your own with a named place, or join a team later. Lists, menu, and team tools need a workspace.</p>
+      <div class="mc-field">
+        <label for="ws-name">Workspace name</label>
+        <input id="ws-name" type="text" autocomplete="organization" placeholder="e.g. Home test kitchen, Pop-up June" maxlength="120" style="width:100%;min-height:48px;padding:0.5rem 0.65rem;border-radius:10px;border:1px solid var(--mc-border);font-size:1rem;" />
+      </div>
+      <div class="mc-field">
+        <label for="ws-about">About this place</label>
+        <textarea id="ws-about" class="mc-textarea" style="min-height:88px;" placeholder="What is this space? City, concept, or how you use Iterum here (optional but helpful)."></textarea>
+      </div>
+      <button type="button" class="mc-btn mc-btn-primary" id="btn-save-workspace-first">Save workspace</button>
+    </div>
+
     <div id="project-workspace" style="margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--mc-border);">
-      <label for="project-picker" style="font-size:0.8rem;font-weight:700;color:var(--mc-muted);display:block;margin-bottom:0.35rem;">Workspace (team project)</label>
+      <label for="project-picker" style="font-size:0.85rem;font-weight:700;color:var(--mc-text);display:block;margin-bottom:0.35rem;">Where are you working today?</label>
       <select id="project-picker" style="width:100%;min-height:48px;padding:0.5rem 0.65rem;border-radius:10px;border:1px solid var(--mc-border);font-size:1rem;background:var(--mc-card);color:var(--mc-text);"></select>
-      <p style="font-size:0.75rem;color:var(--mc-muted);margin:0.5rem 0 0;line-height:1.35;">Give this ID to your manager so they can add you to a project:</p>
-      <code id="my-firebase-uid" style="display:block;word-break:break-all;font-size:0.72rem;margin-top:0.35rem;color:var(--mc-text);"></code>
-      <button type="button" class="mc-btn mc-btn-ghost" id="copy-uid" style="margin-top:0.5rem;">Copy my user ID</button>
-    </div>
-    <div class="mc-tabs" role="tablist">
-      <button type="button" id="tab-fridge" role="tab" aria-selected="true">Refrigerators</button>
-      <button type="button" id="tab-san" role="tab" aria-selected="false">Sanitizer</button>
-    </div>
-    <div id="panel-fridge">
-      <div class="mc-unit-toggle">
-        <input type="checkbox" id="unit-fahrenheit" checked />
-        <label for="unit-fahrenheit">Enter temperature in °F (default for US kitchens)</label>
+      <button type="button" class="mc-btn mc-btn-ghost" id="btn-add-personal-workspace" style="margin-top:0.5rem;display:none;">+ Add another personal workspace</button>
+      <div id="extra-workspace-fields" style="display:none;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--mc-border);">
+        <div class="mc-field">
+          <label for="ws-extra-name">Name</label>
+          <input id="ws-extra-name" type="text" maxlength="120" style="width:100%;min-height:44px;border-radius:10px;border:1px solid var(--mc-border);padding:0.45rem 0.6rem;" />
+        </div>
+        <div class="mc-field">
+          <label for="ws-extra-about">About</label>
+          <textarea id="ws-extra-about" class="mc-textarea" style="min-height:72px;"></textarea>
+        </div>
+        <button type="button" class="mc-btn mc-btn-primary" id="btn-save-extra-workspace">Save</button>
+        <button type="button" class="mc-btn mc-btn-ghost" id="btn-cancel-extra-workspace">Cancel</button>
       </div>
-      <div class="mc-toolbar">
-        <button type="button" class="mc-btn mc-btn-primary" id="btn-add-fridge">+ Add fridge / cooler</button>
-      </div>
-      <ul class="mc-list" id="fridge-list"></ul>
+      <details class="mc-details">
+        <summary>First day? Tap here for your ID</summary>
+        <div class="mc-details-body">
+          <p style="margin:0 0 0.5rem;line-height:1.4;">Send this code to your manager so they can add you to the right location.</p>
+          <code id="my-firebase-uid" style="display:block;word-break:break-all;font-size:0.72rem;padding:8px;background:var(--mc-card);border-radius:8px;border:1px solid var(--mc-border);color:var(--mc-text);"></code>
+          <button type="button" class="mc-btn mc-btn-ghost" id="copy-uid" style="margin-top:0.5rem;">Copy my ID</button>
+        </div>
+      </details>
     </div>
-    <div id="panel-san" hidden>
-      <div class="mc-toolbar">
-        <button type="button" class="mc-btn mc-btn-primary" id="btn-add-san">+ Add sanitizer station</button>
-      </div>
-      <ul class="mc-list" id="san-list"></ul>
+
+    <div class="mc-hub-nav" role="tablist" aria-label="Sections">
+      <button type="button" data-hub-tab="hub" aria-selected="true">Home</button>
+      <button type="button" data-hub-tab="menu" aria-selected="false">Menu</button>
+      <button type="button" data-hub-tab="lists" aria-selected="false">Lists</button>
+      <button type="button" data-hub-tab="notes" aria-selected="false">Notes</button>
+      <button type="button" data-hub-tab="checks" aria-selected="false">Checks</button>
+      <button type="button" data-hub-tab="sops" aria-selected="false">How-to</button>
+      <button type="button" data-hub-tab="bar" aria-selected="false">Bar</button>
+      <button type="button" data-hub-tab="team" aria-selected="false">Team log</button>
+      <button type="button" data-hub-tab="temps" aria-selected="false">Temps</button>
     </div>
+
+    <div id="panel-section-hub" class="mc-section">
+      <p style="margin:0 0 0.65rem;font-size:0.88rem;color:var(--mc-muted);line-height:1.45;">Tap a tile below. Pick your <strong>location</strong> first so menu and team info load.</p>
+      <div class="mc-shift-grid" id="mc-shift-grid" aria-label="Shift tools">
+        <button type="button" class="mc-shift-tile" data-hub-tab="menu" aria-label="Open menu">
+          <span class="mc-shift-icon" aria-hidden="true">M</span>
+          <strong>Today’s menu</strong>
+          <small>What’s on for guests</small>
+        </button>
+        <button type="button" class="mc-shift-tile" data-hub-tab="lists" aria-label="Open prep and stock lists">
+          <span class="mc-shift-icon" aria-hidden="true">L</span>
+          <strong>Prep &amp; stock</strong>
+          <small>Your shift lists</small>
+        </button>
+        <button type="button" class="mc-shift-tile" data-hub-tab="notes" aria-label="Open notes">
+          <span class="mc-shift-icon" aria-hidden="true">N</span>
+          <strong>Notes</strong>
+          <small>Menu &amp; ingredients</small>
+        </button>
+        <button type="button" class="mc-shift-tile" data-hub-tab="checks" aria-label="Open checks">
+          <span class="mc-shift-icon" aria-hidden="true">C</span>
+          <strong>Station check</strong>
+          <small>Log a quick round</small>
+        </button>
+        <button type="button" class="mc-shift-tile" data-hub-tab="sops" aria-label="Open how-to guides">
+          <span class="mc-shift-icon" aria-hidden="true">H</span>
+          <strong>How we do it</strong>
+          <small>Opening &amp; standards</small>
+        </button>
+        <button type="button" class="mc-shift-tile" data-hub-tab="bar" aria-label="Open bar station">
+          <span class="mc-shift-icon" aria-hidden="true">B</span>
+          <strong>Bar station</strong>
+          <small>Drinks, stock, notes</small>
+        </button>
+        <button type="button" class="mc-shift-tile" data-hub-tab="team" aria-label="Open team log for managers">
+          <span class="mc-shift-icon" aria-hidden="true">@</span>
+          <strong>Team log</strong>
+          <small>Shift &amp; stock for managers</small>
+        </button>
+        <button type="button" class="mc-shift-tile" data-hub-tab="temps" aria-label="Open temperatures">
+          <span class="mc-shift-icon" aria-hidden="true">T</span>
+          <strong>Temps &amp; sanitizer</strong>
+          <small>Fridge &amp; buckets</small>
+        </button>
+      </div>
+    </div>
+
+    <div id="panel-section-menu" class="mc-section" hidden>
+      <div id="menu-published-body"></div>
+    </div>
+
+    <div id="panel-section-notes" class="mc-section" hidden>
+      <div class="mc-field">
+        <label for="note-type">About</label>
+        <select id="note-type" style="min-height:48px;border-radius:10px;border:1px solid var(--mc-border);width:100%;font-size:1rem;">
+          <option value="menu_note">The menu</option>
+          <option value="ingredient_note">An ingredient</option>
+        </select>
+      </div>
+      <div class="mc-field">
+        <label for="note-title">Title (optional)</label>
+        <input id="note-title" type="text" placeholder="e.g. Friday brunch / onions" />
+      </div>
+      <div class="mc-field">
+        <label for="note-body">Note</label>
+        <textarea id="note-body" class="mc-textarea" placeholder="e.g. 86 salmon until Friday, extra veg prep for brunch…"></textarea>
+      </div>
+      <button type="button" class="mc-btn mc-btn-primary" id="btn-save-note">Save note</button>
+      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Recent notes</h3>
+      <ul class="mc-list" id="notes-my-list"></ul>
+    </div>
+
+    <div id="panel-section-lists" class="mc-section" hidden>
+      <p class="mc-hint">Your lists save automatically to your account. Latest version for this location.</p>
+      <h3 style="font-size:0.95rem;margin:0 0 0.5rem;">Prep</h3>
+      <textarea id="prep-list-body" class="mc-textarea" placeholder="Mise tasks, pulls, labels…"></textarea>
+      <button type="button" class="mc-btn mc-btn-primary" id="btn-save-prep" style="margin-top:0.5rem;">Save prep</button>
+      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Stock</h3>
+      <textarea id="stock-list-body" class="mc-textarea" placeholder="Items, rough counts…"></textarea>
+      <button type="button" class="mc-btn mc-btn-primary" id="btn-save-stock" style="margin-top:0.5rem;">Save stock</button>
+    </div>
+
+    <div id="panel-section-checks" class="mc-section" hidden>
+      <h3 style="font-size:0.95rem;margin:0 0 0.5rem;">Recent checks</h3>
+      <div id="checks-project-list"></div>
+      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Log a station check</h3>
+      <div class="mc-field">
+        <label for="check-station">Station or area</label>
+        <input id="check-station" type="text" placeholder="e.g. Grill, expo, bar" />
+      </div>
+      <div class="mc-field">
+        <label for="check-notes">What you checked</label>
+        <textarea id="check-notes" class="mc-textarea" style="min-height:72px;" placeholder="Temps OK, mise set, sanitizer in range…"></textarea>
+      </div>
+      <button type="button" class="mc-btn mc-btn-primary" id="btn-save-quick-check">Save check</button>
+    </div>
+
+    <div id="panel-section-sops" class="mc-section" hidden>
+      <p class="mc-hint" style="margin-top:0;">Guides from your team (opening, standards, recipes). If nothing shows, ask a manager to publish them.</p>
+      <div id="sops-body"></div>
+    </div>
+
+    <div id="panel-section-bar" class="mc-section" hidden>
+      <p class="mc-hint" style="margin-top:0;">Published by your manager for this location. Your notes save to your account.</p>
+      <h3 style="font-size:0.95rem;margin:0 0 0.5rem;">Drink builds &amp; specs</h3>
+      <div id="bar-drinks-body"></div>
+      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Liquors &amp; bar stock</h3>
+      <div id="bar-liquor-body"></div>
+      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Bar notes</h3>
+      <div class="mc-field">
+        <label for="bar-note-topic">About</label>
+        <select id="bar-note-topic" style="min-height:48px;border-radius:10px;border:1px solid var(--mc-border);width:100%;font-size:1rem;">
+          <option value="drink">A drink / cocktail</option>
+          <option value="stock">Liquor &amp; stock</option>
+          <option value="general">General bar</option>
+        </select>
+      </div>
+      <div class="mc-field" id="bar-note-drink-wrap">
+        <label for="bar-note-drink">Drink name (optional)</label>
+        <input id="bar-note-drink" type="text" placeholder="e.g. House old fashioned" />
+      </div>
+      <div class="mc-field">
+        <label for="bar-note-title">Title (optional)</label>
+        <input id="bar-note-title" type="text" placeholder="Short label" />
+      </div>
+      <div class="mc-field">
+        <label for="bar-note-body">Note</label>
+        <textarea id="bar-note-body" class="mc-textarea" style="min-height:88px;" placeholder="86’d bourbon, substitute, garnish change…"></textarea>
+      </div>
+      <button type="button" class="mc-btn mc-btn-primary" id="btn-save-bar-note">Save bar note</button>
+      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Recent bar notes</h3>
+      <ul class="mc-list" id="bar-notes-list"></ul>
+    </div>
+
+    <div id="panel-section-team" class="mc-section" hidden>
+      <p class="mc-hint" style="margin-top:0;">
+        Same thread managers see under <strong>Daily restaurant notes</strong> on the dashboard. Pick the calendar date to match theirs (defaults to today).
+      </p>
+      <div class="mc-field">
+        <label for="team-board-date">Log date</label>
+        <input id="team-board-date" type="date" style="width:100%;min-height:48px;padding:0.5rem 0.65rem;border-radius:10px;border:1px solid var(--mc-border);font-size:1rem;background:var(--mc-card);color:var(--mc-text);" />
+      </div>
+      <h3 style="font-size:0.95rem;margin:0 0 0.5rem;">Thread</h3>
+      <div id="team-board-feed"></div>
+      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Add a note</h3>
+      <div class="mc-field">
+        <label for="team-board-kind">Type</label>
+        <select id="team-board-kind" style="min-height:48px;border-radius:10px;border:1px solid var(--mc-border);width:100%;font-size:1rem;">
+          <option value="shift">Shift update</option>
+          <option value="inv_low">Low stock</option>
+          <option value="inv_out">Out of stock</option>
+        </select>
+      </div>
+      <div class="mc-field">
+        <label for="team-board-body">Message</label>
+        <textarea id="team-board-body" class="mc-textarea" style="min-height:96px;" placeholder="Handoff, 86, counts, anything management should know…"></textarea>
+      </div>
+      <button type="button" class="mc-btn mc-btn-primary" id="btn-team-board-post">Post to team log</button>
+    </div>
+
+    <div id="panel-section-temps" class="mc-section" hidden>
+      <div class="mc-tabs" role="tablist">
+        <button type="button" id="tab-fridge" role="tab" aria-selected="true">Refrigerators</button>
+        <button type="button" id="tab-san" role="tab" aria-selected="false">Sanitizer</button>
+      </div>
+      <div id="panel-fridge">
+        <div class="mc-unit-toggle">
+          <input type="checkbox" id="unit-fahrenheit" checked />
+          <label for="unit-fahrenheit">Enter temperature in °F (default for US kitchens)</label>
+        </div>
+        <div class="mc-toolbar">
+          <button type="button" class="mc-btn mc-btn-primary" id="btn-add-fridge">+ Add fridge / cooler</button>
+        </div>
+        <ul class="mc-list" id="fridge-list"></ul>
+      </div>
+      <div id="panel-san" hidden>
+        <div class="mc-toolbar">
+          <button type="button" class="mc-btn mc-btn-primary" id="btn-add-san">+ Add sanitizer station</button>
+        </div>
+        <ul class="mc-list" id="san-list"></ul>
+      </div>
+    </div>
+
     <p id="status-line-app" style="margin-top:0.75rem;font-size:0.8rem;min-height:1.25rem;"></p>
     <button type="button" class="mc-btn mc-btn-ghost" id="btn-signout" style="margin-top:0.5rem;">Sign out</button>
   </div>
 
   <footer class="mc-foot">
-    <a href="/dashboard.html">Open full dashboard</a>
+    <span class="mc-foot__brand">Iterum Shift</span>
+    <a href="/dashboard.html">Manager / office app</a>
     ·
-    <a href="/">Iterum home</a>
+    <a href="/">Iterum</a>
   </footer>
 
   <script type="module">

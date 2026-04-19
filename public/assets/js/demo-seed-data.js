@@ -129,12 +129,16 @@
     ];
 
     var notes = {};
+    var nowIso = new Date().toISOString();
     notes[t] = {
-      content:
-        'Demo shift notes — ' +
+      daily:
+        'Demo daily notes — ' +
         userLabel +
         ':\n• Tasting at 4pm — allergens flagged on beet tart.\n• Pastry bench: proof % logged in kitchen hub.\n• Keep yuzu foam off hot pass until pick-up.',
-      updatedAt: new Date().toISOString()
+      dailyUpdatedAt: nowIso,
+      manager:
+        'Manager handoff (demo): review walk-in alarm log; schedule vendor for Friday dairy; private: performance check-in with AM lead.',
+      managerUpdatedAt: nowIso
     };
 
     return { tasks: tasks, notes: notes };
@@ -1646,4 +1650,5 @@
   };
 
   global.ITERUM_DEMO_PROJECT_ID = DEMO_PROJECT_ID;
+  global.ITERUM_DEMO_EMAILS = ['demo@iterumfoods.com'];
 })(typeof window !== 'undefined' ? window : this);

@@ -6,8 +6,10 @@
   "scripts": {
     "start": "http-server public -p 8080 -o",
     "dev": "http-server public -p 8080 -o -c-1",
+    "mobile:serve": "http-server public -p 8080 -a 0.0.0.0 -c-1",
     "serve:test": "http-server public -p 8080 -c-1",
     "test": "playwright test",
+    "test:chromium": "playwright test --project=chromium",
     "test:smoke:prod": "playwright test -c playwright.prod.config.js --project=chromium",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
@@ -20,6 +22,7 @@
     "cap:copy": "npx cap copy",
     "cap:open:android": "npx cap open android",
     "cap:open:ios": "npx cap open ios",
+    "cap:android": "npx cap sync android && npx cap open android",
     "prepare": "husky install"
   },
   "keywords": [

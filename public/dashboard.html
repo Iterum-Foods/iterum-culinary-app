@@ -10,6 +10,8 @@
   <script src="assets/js/firebase-config.js"></script>
   <script type="module" src="assets/js/firebase-auth.js"></script>
   <script src="assets/js/auth-manager.js"></script>
+  <script src="assets/js/demo-seed-data.js"></script>
+  <script src="assets/js/demo-auto-loader.js"></script>
   <script src="assets/js/auth-api-helper.js"></script>
   <script src="assets/js/auth-diagnostics.js"></script>
   
@@ -397,6 +399,19 @@
       <!-- Grid Layout for Cards: 2 equal columns with better spacing -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
+        <div class="lg:col-span-2 card-style" id="workspace-positions-card">
+          <div class="dash-card-head">
+            <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
+              <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-id-badge"></i></span>
+              Your positions
+            </h2>
+          </div>
+          <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
+            Default role from workspace setup, plus how you work on each team project. <strong>Team access</strong> is assigned by an admin; your per-project position is saved for you and does not override permissions.
+          </p>
+          <div id="workspace-positions-root"></div>
+        </div>
+
         <!-- COLUMN 1: R&D, IDEAS, AND PERFORMANCE (Left Column) -->
         <div class="space-y-5">
           
@@ -566,10 +581,76 @@
               </button>
             </div>
             <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Define areas (line, dry storage, restrooms), checklist items, who it’s assigned to, and target times. Saving a completed round records it on <a href="calendar.html" class="underline font-medium" style="color: var(--brand-primary-accent);">Calendar</a> by day.
+              Use <strong>zones</strong> to group areas (line, BOH, FOH). Pick a <strong>program</strong>: inspection, or daily / weekly / monthly cleaning. Set <strong>alarm times</strong> for browser reminders (optional). Saving a completed round logs it for that day on <a href="calendar.html" class="underline font-medium" style="color: var(--brand-primary-accent);">Calendar</a>.
             </p>
+            <div class="rounded-md border p-3 mb-3" style="border-color: var(--brand-border-light); background: var(--brand-bg-primary);">
+              <div class="text-xs font-semibold mb-2" style="color: var(--brand-text-secondary);">
+                <i class="fa-solid fa-clock-rotate-left mr-1" aria-hidden="true"></i>Today’s log (this project)
+              </div>
+              <div id="health-today-log-list" class="text-sm space-y-1" style="color: var(--brand-text-muted);">Loading…</div>
+            </div>
             <div id="inspection-area-list" class="space-y-2">
               <p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">Loading…</p>
+            </div>
+          </div>
+
+          <div id="health-area-modal" class="fixed inset-0 z-[10050] hidden flex items-center justify-center p-4" style="background: rgba(15,23,42,0.55);" aria-modal="true" role="dialog">
+            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto" style="border: 1px solid var(--brand-border-light);">
+              <div class="p-4 border-b flex justify-between items-center" style="border-color: var(--brand-border-light);">
+                <h3 id="health-area-modal-title" class="text-lg font-bold m-0" style="color: var(--brand-text-primary);">Add area / program</h3>
+                <button type="button" id="health-area-modal-close" class="text-2xl leading-none px-2" style="color: var(--brand-text-muted);" aria-label="Close">&times;</button>
+              </div>
+              <div class="p-4 space-y-3 text-sm">
+                <div>
+                  <label class="block font-semibold mb-1" for="health-f-zone">Zone</label>
+                  <input id="health-f-zone" type="text" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);" placeholder="e.g. Back of house, Line, FOH">
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1" for="health-f-name">Area name</label>
+                  <input id="health-f-name" type="text" required class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);" placeholder="e.g. Dry storage, Restrooms">
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1" for="health-f-program">Program</label>
+                  <select id="health-f-program" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);">
+                    <option value="inspection">Health inspection round</option>
+                    <option value="cleaning_daily">Daily cleaning</option>
+                    <option value="cleaning_weekly">Weekly cleaning</option>
+                    <option value="cleaning_monthly">Monthly cleaning</option>
+                  </select>
+                  <p id="health-f-program-hint" class="text-xs mt-1" style="color: var(--brand-text-muted);">Checklist below starts from a template—edit freely.</p>
+                </div>
+                <div id="health-f-weekly-wrap" class="hidden">
+                  <label class="block font-semibold mb-1" for="health-f-weekday">Day of week (weekly)</label>
+                  <select id="health-f-weekday" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);">
+                    <option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option>
+                    <option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option>
+                  </select>
+                </div>
+                <div id="health-f-monthly-wrap" class="hidden">
+                  <label class="block font-semibold mb-1" for="health-f-monthday">Day of month (1–31)</label>
+                  <input id="health-f-monthday" type="number" min="1" max="31" value="1" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);">
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1" for="health-f-checklist">Checklist items (one per line)</label>
+                  <textarea id="health-f-checklist" rows="6" class="w-full rounded-md border px-3 py-2 font-mono text-xs" style="border-color: var(--brand-border-light);"></textarea>
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1" for="health-f-times">Reminder times (24h, comma-separated)</label>
+                  <input id="health-f-times" type="text" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);" placeholder="09:00, 15:00, 21:00">
+                </div>
+                <div>
+                  <label class="block font-semibold mb-1" for="health-f-assign">Assigned to (optional)</label>
+                  <input id="health-f-assign" type="text" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);" placeholder="Name or role">
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="health-f-alarm" checked>
+                  <span>Browser reminders at the times above (when this tab has been opened and you allow notifications)</span>
+                </label>
+              </div>
+              <div class="p-4 border-t flex justify-end gap-2" style="border-color: var(--brand-border-light);">
+                <button type="button" id="health-area-cancel" class="px-4 py-2 rounded-md text-sm font-medium border" style="border-color: var(--brand-border-light);">Cancel</button>
+                <button type="button" id="health-area-save" class="px-4 py-2 rounded-md text-sm font-bold text-white" style="background: var(--brand-primary-accent);">Save</button>
+              </div>
             </div>
           </div>
           
@@ -614,12 +695,29 @@
               </h2>
             </div>
             <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Kitchen pulse, service feedback, or anything the team should remember.
+              Daily notes are visible to everyone on the team. Manager handoff is for leads only (nightly / EOD).
             </p>
-            <textarea id="notes-content" class="w-full h-32 resize-none mb-3 text-sm" placeholder="Document today's takeaways, issues to escalate, or wins worth sharing."></textarea>
-            <div class="flex gap-2">
-              <button id="save-notes" class="btn-primary flex-1 text-sm py-2">Save Notes</button>
-              <button id="clear-notes" class="btn-ghost text-sm py-2 px-3">Clear</button>
+            <div class="mb-4">
+              <label for="notes-daily-content" class="block text-xs font-semibold mb-1" style="color: var(--brand-text-secondary);">Daily restaurant notes</label>
+              <p class="text-xs mb-1" style="color: var(--brand-text-muted);">Open channel — line, FOH, anyone on shift.</p>
+              <textarea id="notes-daily-content" class="w-full h-28 resize-none mb-2 text-sm" placeholder="Service wins, 86 list, prep reminders, anything the whole team should see."></textarea>
+              <div id="notes-team-shift-wrap" class="mb-3">
+                <label class="block text-xs font-semibold mb-1" style="color: var(--brand-text-secondary);">From the team (shift app)</label>
+                <p class="text-xs mb-1" style="color: var(--brand-text-muted);">Shift and stock notes for this project and the working date above — updates live.</p>
+                <div id="notes-team-shift-feed" class="text-sm rounded-md border p-2 max-h-52 overflow-y-auto" style="border-color: var(--brand-border-light); background: var(--brand-bg-primary); min-height: 2.5rem;">
+                  <p class="text-xs" style="color: var(--brand-text-muted);">Loading…</p>
+                </div>
+              </div>
+            </div>
+            <div id="notes-manager-section" class="mb-4" hidden aria-hidden="true">
+              <label for="notes-manager-content" class="block text-xs font-semibold mb-1" style="color: var(--brand-text-secondary);">Manager notes (nightly handoff)</label>
+              <p class="text-xs mb-1" style="color: var(--brand-text-muted);">Sensitive handoff — not shown to line-only roles.</p>
+              <textarea id="notes-manager-content" class="w-full h-24 resize-none mb-2 text-sm" placeholder="EOD recap, scheduling, HR, vendor issues — leads and managers only."></textarea>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" id="save-notes" class="btn-primary flex-1 min-w-[8rem] text-sm py-2">Save notes</button>
+              <button type="button" id="clear-notes-daily" class="btn-ghost text-sm py-2 px-3">Clear daily</button>
+              <button type="button" id="clear-notes-manager" class="btn-ghost text-sm py-2 px-3" hidden>Clear handoff</button>
             </div>
             <div id="notes-status" class="text-xs mt-2" style="color: var(--brand-text-muted);">No saved notes yet</div>
           </div>
@@ -665,6 +763,7 @@
     import {
       addDoc,
       collection,
+      deleteDoc,
       doc,
       getFirestore,
       onSnapshot,
@@ -683,6 +782,26 @@
     const INS_AREAS = 'inspection_areas';
     const INS_LOGS = 'inspection_logs';
     let inspectionAreasCache = [];
+    let healthLogsCache = [];
+    let healthAreaEditingId = null;
+
+    const HEALTH_CHECKLIST_PRESETS = {
+      inspection:
+        'Floors and drains tight\nEquipment stored correctly\nNo pest activity\nHand wash stocked',
+      cleaning_daily:
+        'Floors swept and mopped\nSanitizer buckets fresh\nTrash emptied\nEquipment wiped down',
+      cleaning_weekly:
+        'Deep clean under equipment\nVent hood area wiped\nWalk-in shelves tidied\nGrease trap noted',
+      cleaning_monthly:
+        'Light fixtures dusted\nDry storage rotated and dusted\nPest monitoring checked\nFire tags verified'
+    };
+
+    const HEALTH_PROGRAM_SHORT = {
+      inspection: 'Inspection',
+      cleaning_daily: 'Daily clean',
+      cleaning_weekly: 'Weekly clean',
+      cleaning_monthly: 'Monthly clean'
+    };
 
     function getProjectId() {
       try {
@@ -710,21 +829,131 @@
         .replace(/"/g, '&quot;');
     }
 
+    function healthAreaDueToday(area) {
+      const pt = area.programType || 'inspection';
+      if (pt === 'cleaning_weekly') {
+        const wd = area.weekday != null ? Number(area.weekday) : 1;
+        return new Date().getDay() === wd;
+      }
+      if (pt === 'cleaning_monthly') {
+        const md = area.monthDay != null ? Number(area.monthDay) : 1;
+        return new Date().getDate() === md;
+      }
+      return true;
+    }
+
+    function healthDueHint(area) {
+      const pt = area.programType || 'inspection';
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      if (pt === 'cleaning_weekly') {
+        const wd = area.weekday != null ? Number(area.weekday) : 1;
+        return `Weekly · ${days[wd]}`;
+      }
+      if (pt === 'cleaning_monthly') {
+        const md = area.monthDay != null ? Number(area.monthDay) : 1;
+        return `Monthly · day ${md}`;
+      }
+      return '';
+    }
+
+    function renderHealthTodayLog() {
+      const el = document.getElementById('health-today-log-list');
+      if (!el) return;
+      const pid = getProjectId();
+      const today = new Date();
+      const rows = healthLogsCache.filter(log => {
+        if (log.projectId && log.projectId !== pid) return false;
+        const raw = log.timestamp?.toDate?.() || log.timestamp;
+        if (!raw) return false;
+        const d = raw instanceof Date ? raw : new Date(raw);
+        return d.toDateString() === today.toDateString();
+      });
+      if (!rows.length) {
+        el.innerHTML =
+          '<span class="text-xs">No rounds logged yet today for this project.</span>';
+        return;
+      }
+      function logTime(x) {
+        try {
+          const raw = x.timestamp?.toDate?.() || x.timestamp;
+          return raw instanceof Date ? raw.getTime() : new Date(raw).getTime();
+        } catch {
+          return 0;
+        }
+      }
+      rows.sort((a, b) => logTime(b) - logTime(a));
+      el.innerHTML = rows
+        .slice(0, 14)
+        .map(log => {
+          const raw = log.timestamp?.toDate?.() || log.timestamp;
+          const d = raw instanceof Date ? raw : new Date(raw);
+          const t = d.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          const z = log.zone ? `${escapeHtml(log.zone)} · ` : '';
+          const prog =
+            HEALTH_PROGRAM_SHORT[log.programType] ||
+            HEALTH_PROGRAM_SHORT.inspection;
+          return `<div class="flex justify-between gap-2 border-b pb-1" style="border-color:var(--brand-border-light)"><span>${z}<strong>${escapeHtml(log.areaName)}</strong> <span class="text-xs opacity-80">(${escapeHtml(prog)})</span></span><span class="text-xs shrink-0">${t}</span></div>`;
+        })
+        .join('');
+    }
+
+    function healthAlarmTick() {
+      try {
+        if (typeof Notification === 'undefined' || Notification.permission !== 'granted') {
+          return;
+        }
+        const now = new Date();
+        const hm = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        const todayKey = now.toDateString();
+        inspectionAreasCache.forEach(area => {
+          if (area.alarmEnabled !== true) return;
+          const times = Array.isArray(area.scheduleTimes) ? area.scheduleTimes : [];
+          if (!times.length || !healthAreaDueToday(area)) return;
+          times.forEach(t => {
+            const slot = String(t).trim().slice(0, 5);
+            if (slot !== hm) return;
+            const key = `health_alarm_fired_${area.id}_${slot}_${todayKey}`;
+            if (sessionStorage.getItem(key)) return;
+            sessionStorage.setItem(key, '1');
+            const sub = area.zone ? `${area.zone} · ` : '';
+            new Notification(`Health / cleaning: ${area.name || 'Area'}`, {
+              body: `${sub}Time for this round. Open the dashboard to complete checkboxes and save.`
+            });
+          });
+        });
+      } catch (e) {
+        console.warn('Health alarm tick:', e);
+      }
+    }
+
     function renderInspectionAreas(areas) {
       const container = document.getElementById('inspection-area-list');
       if (!container) return;
       container.innerHTML = '';
       inspectionAreasCache = areas.slice();
+      if (typeof window !== 'undefined') {
+        window._healthInspectionAreas = inspectionAreasCache;
+      }
       if (areas.length === 0) {
         container.innerHTML =
-          '<p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">No inspection areas yet. Click <strong>Add area</strong> to define a zone, checklist, schedule, and assignment.</p>';
+          '<p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">No programs yet. Click <strong>Add area</strong> to add a zone, customize the checklist, set times, and optional browser reminders.</p>';
         return;
       }
       areas
         .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
         .forEach(area => {
-          const items = Array.isArray(area.checklistItems) ? area.checklistItems : [];
+          const items = Array.isArray(area.checklistItems)
+            ? area.checklistItems
+            : [];
           const times = Array.isArray(area.scheduleTimes) ? area.scheduleTimes : [];
+          const due = healthAreaDueToday(area);
+          const hint = healthDueHint(area);
+          const progLabel =
+            HEALTH_PROGRAM_SHORT[area.programType] ||
+            HEALTH_PROGRAM_SHORT.inspection;
           const div = document.createElement('div');
           div.className = 'rounded-md border p-3 mb-2';
           div.style.borderColor = 'var(--brand-border-light)';
@@ -735,19 +964,35 @@
           });
           if (!checks) {
             checks =
-              '<p class="text-xs" style="color: var(--brand-text-muted);">Add checklist items when editing this area (re-create area with items).</p>';
+              '<p class="text-xs" style="color: var(--brand-text-muted);">Edit this program and add checklist lines (one per line).</p>';
           }
           const timeChips = times.length
             ? `<div class="flex flex-wrap gap-1 mt-1">${times.map(t => `<span class="text-xs px-2 py-0.5 rounded-full" style="background:var(--brand-bg-tertiary);color:var(--brand-text-secondary)">${escapeHtml(t)}</span>`).join('')}</div>`
             : '';
+          const zoneLine = area.zone
+            ? `<div class="text-xs font-semibold mb-1" style="color: var(--brand-secondary-accent);">Zone: ${escapeHtml(area.zone)}</div>`
+            : '';
+          const dueBadge = due
+            ? `<span class="text-xs px-2 py-0.5 rounded-full" style="background:rgba(107,142,111,0.2);color:var(--brand-text-secondary);">Due today</span>`
+            : `<span class="text-xs px-2 py-0.5 rounded-full" style="background:var(--brand-bg-tertiary);color:var(--brand-text-muted);">${escapeHtml(hint)} — optional if you need an off-cycle log</span>`;
           div.innerHTML = `
-            <div class="font-semibold text-sm mb-1" style="color: var(--brand-text-primary);">${escapeHtml(area.name)}</div>
+            <div class="flex flex-wrap justify-between gap-2 items-start mb-1">
+              <div>
+                <div class="font-semibold text-sm" style="color: var(--brand-text-primary);">${escapeHtml(area.name)} <span class="text-xs font-normal opacity-80">(${escapeHtml(progLabel)})</span></div>
+                ${zoneLine}
+              </div>
+              ${dueBadge}
+            </div>
             ${area.assignedTo ? `<div class="text-xs mb-1" style="color: var(--brand-text-muted);"><i class="fa-solid fa-user-tag mr-1"></i>${escapeHtml(area.assignedTo)}</div>` : ''}
             ${timeChips}
             <div class="mt-2 mb-2">${checks}</div>
-            <button type="button" class="btn-primary text-xs w-full py-2 insp-save-btn" data-area-id="${area.id}">
-              <i class="fa-solid fa-floppy-disk mr-1"></i>Save completed round
-            </button>`;
+            <button type="button" class="btn-primary text-xs w-full py-2 insp-save-btn mb-2" data-area-id="${area.id}">
+              <i class="fa-solid fa-floppy-disk mr-1"></i>Save completed round (logged today + calendar)
+            </button>
+            <div class="flex gap-2">
+              <button type="button" class="flex-1 text-xs py-2 rounded-md border insp-edit-btn" style="border-color:var(--brand-border-light);background:var(--brand-bg-primary);" data-area-id="${area.id}"><i class="fa-solid fa-pen mr-1"></i>Edit setup</button>
+              <button type="button" class="flex-1 text-xs py-2 rounded-md border border-red-200 text-red-700 insp-del-btn" style="background:#fff;" data-area-id="${area.id}"><i class="fa-solid fa-trash mr-1"></i>Delete</button>
+            </div>`;
           container.appendChild(div);
         });
       container.querySelectorAll('.insp-save-btn').forEach(btn => {
@@ -756,47 +1001,23 @@
           if (id) window.submitHealthInspectionRound(id);
         });
       });
+      container.querySelectorAll('.insp-edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-area-id');
+          if (id) window.openHealthAreaModal(id);
+        });
+      });
+      container.querySelectorAll('.insp-del-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-area-id');
+          if (id) window.deleteHealthInspectionArea(id);
+        });
+      });
     }
 
     window.inspectionManager = {
-      addArea: async function () {
-        const uid = getComplianceUserId();
-        if (!db || !uid) {
-          alert('Sign in required.');
-          return;
-        }
-        const name = prompt('Area name (e.g. Dry storage, Line prep, Restrooms)');
-        if (!name || !name.trim()) return;
-        const checklistRaw = prompt(
-          'Checklist items (comma-separated)',
-          'Floors and drains clean,Equipment stored correctly,No pest activity'
-        );
-        const checklistItems = (checklistRaw || '')
-          .split(',')
-          .map(s => s.trim())
-          .filter(Boolean);
-        const timesRaw = prompt(
-          'Target check times — 24h format, comma-separated (e.g. 09:00,15:00,21:00)',
-          '09:00,15:00'
-        );
-        const scheduleTimes = (timesRaw || '')
-          .split(',')
-          .map(s => s.trim())
-          .filter(Boolean);
-        const assignedTo = (prompt('Assigned to (optional — name or role)', '') || '').trim();
-        try {
-          await addDoc(collection(db, 'users', uid, INS_AREAS), {
-            name: name.trim(),
-            checklistItems,
-            scheduleTimes,
-            assignedTo: assignedTo || null,
-            projectId: getProjectId(),
-            createdAt: serverTimestamp()
-          });
-        } catch (e) {
-          console.error(e);
-          alert('Could not save area. Deploy Firestore rules if this persists.');
-        }
+      addArea() {
+        window.openHealthAreaModal(null);
       },
       startListener: function () {
         if (!db) {
@@ -816,6 +1037,17 @@
             renderInspectionAreas(list);
           },
           err => console.error('❌ Inspection areas listener:', err)
+        );
+        onSnapshot(
+          query(collection(db, 'users', uid, INS_LOGS)),
+          snapshot => {
+            healthLogsCache = [];
+            snapshot.forEach(d =>
+              healthLogsCache.push({ id: d.id, ...d.data() })
+            );
+            renderHealthTodayLog();
+          },
+          err => console.error('❌ Inspection logs listener:', err)
         );
       }
     };
@@ -845,18 +1077,22 @@
         if (!ok) allPassed = false;
       });
       const notes = (prompt('Optional notes for this round', '') || '').trim();
+      const pt = area.programType || 'inspection';
       try {
         await addDoc(collection(db, 'users', uid, INS_LOGS), {
           areaId,
           areaName: area.name || 'Area',
+          zone: area.zone || null,
+          programType: pt,
           checklistResults,
           allPassed,
           notes: notes || null,
           projectId: getProjectId(),
+          logDateLocal: new Date().toISOString().slice(0, 10),
           timestamp: serverTimestamp()
         });
         alert(
-          'Inspection round saved. View it on Calendar for this date.'
+          'Round saved for today. Open Calendar to see it on this date.'
         );
         items.forEach((_, i) => {
           const el = Array.from(document.querySelectorAll('input.insp-cb')).find(
@@ -871,6 +1107,227 @@
         alert('Could not save. Deploy Firestore rules if this persists.');
       }
     };
+
+    window.deleteHealthInspectionArea = async function (areaId) {
+      const uid = getComplianceUserId();
+      if (!db || !uid) {
+        alert('Sign in required.');
+        return;
+      }
+      if (
+        !confirm(
+          'Delete this area/program? Completed rounds stay on the calendar.'
+        )
+      ) {
+        return;
+      }
+      try {
+        await deleteDoc(doc(db, 'users', uid, INS_AREAS, areaId));
+      } catch (e) {
+        console.error(e);
+        alert('Could not delete.');
+      }
+    };
+
+    function healthSyncProgramFields() {
+      const program = document.getElementById('health-f-program');
+      const w = document.getElementById('health-f-weekly-wrap');
+      const m = document.getElementById('health-f-monthly-wrap');
+      if (!program || !w || !m) return;
+      const v = program.value;
+      w.classList.toggle('hidden', v !== 'cleaning_weekly');
+      m.classList.toggle('hidden', v !== 'cleaning_monthly');
+    }
+
+    function healthRequestNotifyOnce() {
+      try {
+        if (
+          typeof Notification !== 'undefined' &&
+          Notification.permission === 'default'
+        ) {
+          Notification.requestPermission();
+        }
+      } catch (e) {
+        /* ignore */
+      }
+    }
+
+    window.openHealthAreaModal = function (areaId) {
+      const modal = document.getElementById('health-area-modal');
+      if (!modal) return;
+      healthAreaEditingId = areaId || null;
+      const title = document.getElementById('health-area-modal-title');
+      const zone = document.getElementById('health-f-zone');
+      const name = document.getElementById('health-f-name');
+      const program = document.getElementById('health-f-program');
+      const checklist = document.getElementById('health-f-checklist');
+      const times = document.getElementById('health-f-times');
+      const assign = document.getElementById('health-f-assign');
+      const alarm = document.getElementById('health-f-alarm');
+      const weekday = document.getElementById('health-f-weekday');
+      const monthday = document.getElementById('health-f-monthday');
+      if (areaId) {
+        const a = inspectionAreasCache.find(x => x.id === areaId);
+        if (title) title.textContent = 'Edit area / program';
+        if (a) {
+          if (zone) zone.value = a.zone || '';
+          if (name) name.value = a.name || '';
+          if (program) {
+            const allowed = [
+              'inspection',
+              'cleaning_daily',
+              'cleaning_weekly',
+              'cleaning_monthly'
+            ];
+            program.value = allowed.includes(a.programType)
+              ? a.programType
+              : 'inspection';
+          }
+          const items = Array.isArray(a.checklistItems) ? a.checklistItems : [];
+          if (checklist) checklist.value = items.join('\n');
+          if (times)
+            times.value = (Array.isArray(a.scheduleTimes) ? a.scheduleTimes : []).join(', ');
+          if (assign) assign.value = a.assignedTo || '';
+          if (alarm) alarm.checked = a.alarmEnabled === true;
+          if (weekday) weekday.value = String(a.weekday != null ? a.weekday : 1);
+          if (monthday) monthday.value = String(a.monthDay != null ? a.monthDay : 1);
+        }
+      } else {
+        if (title) title.textContent = 'Add area / program';
+        if (zone) zone.value = '';
+        if (name) name.value = '';
+        if (program) program.value = 'inspection';
+        if (checklist)
+          checklist.value = HEALTH_CHECKLIST_PRESETS.inspection;
+        if (times) times.value = '09:00, 15:00';
+        if (assign) assign.value = '';
+        if (alarm) alarm.checked = true;
+        if (weekday) weekday.value = '1';
+        if (monthday) monthday.value = '1';
+      }
+      healthSyncProgramFields();
+      modal.classList.remove('hidden');
+    };
+
+    function closeHealthAreaModal() {
+      const modal = document.getElementById('health-area-modal');
+      if (modal) modal.classList.add('hidden');
+      healthAreaEditingId = null;
+    }
+
+    async function saveHealthAreaFromModal() {
+      const uid = getComplianceUserId();
+      if (!db || !uid) {
+        alert('Sign in required.');
+        return;
+      }
+      const nameEl = document.getElementById('health-f-name');
+      const name = (nameEl && nameEl.value.trim()) || '';
+      if (!name) {
+        alert('Enter an area name.');
+        return;
+      }
+      const zone = (
+        document.getElementById('health-f-zone').value || ''
+      ).trim();
+      const programType = document.getElementById('health-f-program').value;
+      const checklistItems = (
+        document.getElementById('health-f-checklist').value || ''
+      )
+        .split(/\r?\n/)
+        .map(s => s.trim())
+        .filter(Boolean);
+      const scheduleTimes = (
+        document.getElementById('health-f-times').value || ''
+      )
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
+      const assignedTo = (
+        document.getElementById('health-f-assign').value || ''
+      ).trim();
+      const alarmEnabled = document.getElementById('health-f-alarm').checked;
+      const weekday = Number(
+        document.getElementById('health-f-weekday').value || '1'
+      );
+      const monthDay = Math.min(
+        31,
+        Math.max(
+          1,
+          Number(document.getElementById('health-f-monthday').value || '1')
+        )
+      );
+      if (alarmEnabled) healthRequestNotifyOnce();
+      const payload = {
+        name,
+        zone: zone || null,
+        programType,
+        checklistItems,
+        scheduleTimes,
+        assignedTo: assignedTo || null,
+        alarmEnabled,
+        weekday,
+        monthDay,
+        projectId: getProjectId()
+      };
+      try {
+        if (healthAreaEditingId) {
+          await updateDoc(
+            doc(db, 'users', uid, INS_AREAS, healthAreaEditingId),
+            { ...payload, updatedAt: serverTimestamp() }
+          );
+        } else {
+          await addDoc(collection(db, 'users', uid, INS_AREAS), {
+            ...payload,
+            createdAt: serverTimestamp()
+          });
+        }
+        closeHealthAreaModal();
+      } catch (e) {
+        console.error(e);
+        alert('Could not save. Deploy Firestore rules if this persists.');
+      }
+    }
+
+    function wireHealthAreaModal() {
+      const modal = document.getElementById('health-area-modal');
+      const btnAdd = document.getElementById('btn-add-inspection-area');
+      const closeBtn = document.getElementById('health-area-modal-close');
+      const cancel = document.getElementById('health-area-cancel');
+      const save = document.getElementById('health-area-save');
+      const program = document.getElementById('health-f-program');
+      if (btnAdd) btnAdd.addEventListener('click', () => window.openHealthAreaModal(null));
+      if (closeBtn) closeBtn.addEventListener('click', closeHealthAreaModal);
+      if (cancel) cancel.addEventListener('click', closeHealthAreaModal);
+      if (save) save.addEventListener('click', saveHealthAreaFromModal);
+      if (modal) {
+        modal.addEventListener('click', e => {
+          if (e.target === modal) closeHealthAreaModal();
+        });
+      }
+      if (program) {
+        program.addEventListener('change', () => {
+          healthSyncProgramFields();
+          if (!healthAreaEditingId) {
+            const p = program.value;
+            const ta = document.getElementById('health-f-checklist');
+            if (ta && HEALTH_CHECKLIST_PRESETS[p]) {
+              ta.value = HEALTH_CHECKLIST_PRESETS[p];
+            }
+          }
+        });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      wireHealthAreaModal();
+    });
+
+    window.addEventListener('projectChanged', () => {
+      renderHealthTodayLog();
+    });
+
+    setInterval(healthAlarmTick, 30000);
 
     function renderRefrigerationUnits(units) {
       const container = document.getElementById('refrigeration-unit-list');
@@ -1351,6 +1808,10 @@
         gateDashboardAccess();
       }
     })();
+  </script>
+  <script type="module">
+    import { mountWorkspacePositionsCard } from 'assets/js/workspace-positions-card.js';
+    mountWorkspacePositionsCard('workspace-positions-root');
   </script>
 </body>
 </html>

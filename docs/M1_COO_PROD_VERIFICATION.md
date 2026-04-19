@@ -3,7 +3,15 @@
 **Purpose:** Close the **human + prod** gate for milestone **M1** after engineering landed **`2e28c70`** (`projectId` alignment).  
 **Persona:** [LEADERSHIP_ROLE_ASSIGNMENTS.md](../LEADERSHIP_ROLE_ASSIGNMENTS.md#coo-agent) — use `@iterum-persona-coo` or paste the COO agent block first.  
 **Context:** [M1_CTO_AGENT_DELEGATION.md](./M1_CTO_AGENT_DELEGATION.md) · [M1_PROJECTID_AUDIT.md](./M1_PROJECTID_AUDIT.md)  
-**Last updated:** 14 April 2026  
+**Last updated:** 29 March 2026  
+
+---
+
+## Engineering handoff (after each `main` deploy)
+
+1. Wait for **Vercel** production deployment for the latest `main` commit (dashboard shows green).  
+2. If the commit changed **`firestore.rules`**, **`firestore.indexes.json`**, or **`storage.rules`**, confirm [**Deploy Firebase**](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml) completed successfully on `main`.  
+3. Run the **three checks** below on **`https://iterum-culinary-app.vercel.app`** only.
 
 ---
 

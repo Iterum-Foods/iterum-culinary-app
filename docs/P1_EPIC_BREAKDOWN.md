@@ -73,10 +73,10 @@
 
 | Slice | Scope | Done when |
 |-------|--------|-----------|
-| E3a | **Data model** implemented in Firestore + rules (use sketch below); read path from one screen (e.g. vendor list). | CTO + Eng sign off rules deploy + smoke. |
-| E3b | **Import / sync** from existing `iterum_vendors` + ingredient vendor arrays (one-time or incremental). | No data loss on test account; rollback doc. |
-| E3c | **Project override** — price or SKU differs by `projectId` while vendor **name/identity** is shared. | Pilot can set two prices for same vendor item across two workspaces. |
-| E3d | **Menu costing** reads shared + override layers (align with [cost-calculator.js](../public/assets/js/cost-calculator.js) / ingredients path). | Costing completeness measurable per pilot bar. |
+| E3a | **Data model** in Firestore + rules (sketch below); read/write from vendor UI. | **Partial (2026-03-29):** Rules path **`users/{uid}/vendors`** already existed; client **`syncVendorsToFirestore` / `fetchVendorsFromFirestore`** + **`vendorManager`** merge-on-load and push-on-save on **vendor-management** surface. **Remaining:** prod smoke sign-off; optional **`vendor_prices`** / org-wide catalog decisions. |
+| E3b | **Import / sync** from existing `iterum_vendors` + ingredient vendor arrays (one-time or incremental). | **Partial (2026-03-29):** client merge in **`vendorManager`** + Import modal **Merge legacy data**; [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md) E3b + rollback. **Remaining:** bulk migration tooling / admin reporting if needed. |
+| E3c | **Project override** — price or SKU differs by `projectId` while vendor **name/identity** is shared. | **Partial (2026-03-29):** `users/{uid}/vendor_prices` + rules; **`syncVendorPriceRowToFirestore`** / cache / **`getVendorPriceOverridesMap`**. **Remaining:** product UI to edit overrides without console. |
+| E3d | **Menu costing** reads shared + override layers (align with [cost-calculator.js](../public/assets/js/cost-calculator.js) / ingredients path). | **Partial (2026-03-29):** **`applyFirestoreVendorPriceOverrides`** after local prices; reload on **`projectChanged`** and after vendor price fetch. **Remaining:** full ingredient-library alignment + tests. |
 
 **Estimate:** **5–8** eng-weeks total (E3a alone **1.5–2.5** if rules are straightforward).
 
@@ -123,14 +123,14 @@
 | Path | Contents |
 |------|----------|
 | `users/{accountOwnerUid}/vendors/{vendorId}` | Stable vendor record: `displayName`, optional `externalRef`, `createdAt`, `archived`. |
-| `users/{accountOwnerUid}/vendor_prices/{priceRowId}` *(or fields on vendor doc)* | `vendorId`, `ingredientKey` or `sku`, `unit`, `basePrice`, **`projectId` nullable** for workspace override. *New subcollection needs a **rules patch** + deploy.* |
+| `users/{accountOwnerUid}/vendor_prices/{priceRowId}` | **Shipped (rules + client):** `vendorDocId`, **`projectId` nullable**, `ingredientName` / `ingredientId` / `sku`, `unitCost`, `unit`, `vendorName`. *Deploy **`firestore.rules`** to enable in prod.* |
 | `projects/{projectId}/...` (existing) | Menus, checklists, etc. unchanged; **menu costing** resolves price by: project override → account default → ingredient local fallback (policy TBD in E3). |
 
 **Rules:** Today, `users/.../vendors` is **isOwner(userId) || userProfileEmailMatches**; delegated `account_admin` on a **project** does not automatically grant another user’s `users/{slug}` path—**E3** may need `firebaseUid`-keyed user docs or catalog under `projects/{id}` for multi-admin accounts (CTO decision).
 
 **Alternatives (defer):** Top-level `organizations/{orgId}`; multi-user org billing.
 
-**Client:** Thin module for `users/{uid}/vendors` (and future `vendor_prices` if added); migrate [vendorManager.js](../public/assets/js/vendorManager.js) / [vendor-price-comparator.js](../public/assets/js/vendor-price-comparator.js) gradually.
+**Client:** `users/{uid}/vendors` implemented in [firestore-sync.js](../public/assets/js/firestore-sync.js); [vendorManager.js](../public/assets/js/vendorManager.js) calls sync on save and merges from cloud on load. Still migrate [vendor-price-comparator.js](../public/assets/js/vendor-price-comparator.js) and costing (E3d) gradually.
 
 **This sketch closes:** EXEC_CHECKLIST row *Data model sketch: vendor directory, site/location linkage, price rows* — refine after first pilot feedback.
 
@@ -163,6 +163,7 @@ Adjust in PM tool when sprint capacity is known.
 
 | Date | Change |
 |------|--------|
+| 2026-03-29 | **E3a–d (partial):** vendor sync + E3b legacy merge + **`vendor_prices`** / **`cost-calculator`** overrides; rules deploy for `vendor_prices`. |
 | 2026-04-14 | Initial breakdown after ICP lock; eng-week ranges; vendor_catalog sketch. |
 | 2026-04-14 | **M1 kickoff:** [M1_CTO_AGENT_DELEGATION.md](./M1_CTO_AGENT_DELEGATION.md), [M1_PROJECTID_AUDIT.md](./M1_PROJECTID_AUDIT.md), [ADD_TEAMMATE_UID_PATH.md](./ADD_TEAMMATE_UID_PATH.md). |
 | 2026-04-14 | **`2e28c70`:** `resolveProjectId` + menu/menu-recipe `projectId` cascade; [M1_PROJECTID_AUDIT.md](./M1_PROJECTID_AUDIT.md) updated. M1 awaits human E1a + prod verification. |

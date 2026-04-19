@@ -95,8 +95,11 @@ class CloudPhotoManager {
       // Compress image if needed
       const compressedFile = await this.compressImage(file);
 
-      // Generate storage path
-      const userId = window.authManager.currentUser.userId;
+      // Path segment must match Firebase Auth uid (storage.rules tenant isolation)
+      const userId =
+        window.firebaseAuth?.auth?.currentUser?.uid ||
+        window.authManager.currentUser.uid ||
+        window.authManager.currentUser.userId;
       const timestamp = Date.now();
       const fileName = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
       const storagePath = `users/${userId}/${category}/${entityId}/${fileName}`;

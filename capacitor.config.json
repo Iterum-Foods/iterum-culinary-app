@@ -1,6 +1,6 @@
 {
   "appId": "com.iterumfoods.linelog",
-  "appName": "Iterum Line Log",
+  "appName": "Iterum Shift",
   "webDir": "public",
   "server": {
     "url": "https://iterum-culinary-app.vercel.app/mobile-compliance.html",

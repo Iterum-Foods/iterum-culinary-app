@@ -20,6 +20,7 @@
       dashboard_compliance_block: true,
       dashboard_daily_tasks: true,
       dashboard_shift_notes: true,
+      dashboard_manager_notes: true,
       dashboard_quick_stats: true,
       quick_stats_ideas_column: true,
       header_cta: 'recipe_experiment'
@@ -32,6 +33,7 @@
       dashboard_compliance_block: true,
       dashboard_daily_tasks: true,
       dashboard_shift_notes: true,
+      dashboard_manager_notes: true,
       dashboard_quick_stats: true,
       quick_stats_ideas_column: false,
       header_cta: 'kitchen_hub'
@@ -44,6 +46,7 @@
       dashboard_compliance_block: false,
       dashboard_daily_tasks: true,
       dashboard_shift_notes: true,
+      dashboard_manager_notes: true,
       dashboard_quick_stats: true,
       quick_stats_ideas_column: false,
       header_cta: 'vendors'
@@ -56,6 +59,7 @@
       dashboard_compliance_block: false,
       dashboard_daily_tasks: true,
       dashboard_shift_notes: true,
+      dashboard_manager_notes: true,
       dashboard_quick_stats: true,
       quick_stats_ideas_column: true,
       header_cta: 'recipe_experiment'
@@ -68,11 +72,38 @@
       dashboard_compliance_block: true,
       dashboard_daily_tasks: true,
       dashboard_shift_notes: true,
+      dashboard_manager_notes: false,
       dashboard_quick_stats: true,
       quick_stats_ideas_column: false,
       header_cta: 'kitchen_hub'
     }
   };
+
+  /** Setup + profile: primary dashboard role (keys must exist in ITERUM_ROLE_PERMISSIONS). */
+  global.ITERUM_PRIMARY_ROLE_OPTIONS = [
+    { value: 'chef_leadership', label: 'Executive chef / Kitchen lead' },
+    { value: 'operations_gm', label: 'GM & operations' },
+    { value: 'purchasing', label: 'Purchasing & costing' },
+    { value: 'consultant_rd', label: 'Consultant / R&D' },
+    {
+      value: 'employee_line',
+      label: 'Shift team — kitchen, FOH, or support (daily ops focus)'
+    }
+  ];
+
+  /** Per-project self-service position (also used for members.role labels). */
+  global.ITERUM_TEAM_MEMBER_ROLE_OPTIONS = [
+    { value: 'employee_line', label: 'Kitchen line / crew' },
+    { value: 'kitchen_staff', label: 'Kitchen / prep' },
+    { value: 'front_of_house', label: 'Front of house' },
+    { value: 'support_staff', label: 'Support' },
+    { value: 'location_manager', label: 'Location manager' },
+    { value: 'chef_leadership', label: 'Chef / leadership' },
+    { value: 'account_admin', label: 'Account admin' },
+    { value: 'operations_gm', label: 'Operations / GM' },
+    { value: 'purchasing', label: 'Purchasing' },
+    { value: 'consultant_rd', label: 'Consultant / R&D' }
+  ];
 
   global.iterumGetRolePermissions = function (optionalRoleKey) {
     var perms = global.ITERUM_ROLE_PERMISSIONS;
@@ -83,6 +114,12 @@
         : 'chef_leadership');
     if (!perms[k]) k = 'chef_leadership';
     return perms[k];
+  };
+
+  /** Nightly manager handoff notes (UI-level; not a server secret). */
+  global.iterumCanViewManagerNotes = function () {
+    var p = global.iterumGetRolePermissions();
+    return !!(p && p.dashboard_manager_notes);
   };
 
   function parseProfile() {

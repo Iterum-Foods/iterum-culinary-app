@@ -9,11 +9,14 @@ Snapshot for supply-chain / security review. Regenerate diffs with ripgrep as co
 |--------------|------------|--------|
 | `users/{userId}` | setDoc merge, getDoc, updateDoc, deleteDoc, collection query | `userId` often normalized email/id from app, not always Firebase Auth UID |
 | `users/{userId}/snapshots/recipeLibrary` | setDoc merge, getDoc | Recipe library blob snapshot |
-| `users/{userId}/vendors/{vendorId}` | allow read/write per `firestore.rules` (owner or email-matched profile) | **E3 target:** wire `vendorManager` / costing to this path; today often **localStorage** `iterum_vendors` only |
+| `users/{userId}/vendors/{vendorId}` | allow read/write per `firestore.rules` (owner or email-matched profile) | **E3a (client):** `firestore-sync.js` — `syncVendorsToFirestore` / `fetchVendorsFromFirestore`; **`vendorManager.js`** merges on load (cloud wins per stable doc key) and pushes on **`saveVendorsToFile`**. Local / `iterum_vendors` still used offline or when sync is unavailable. |
+| `users/{userId}/vendor_prices/{priceId}` | allow read/write same as `vendors` subcollection (`isOwner` + size) | **E3c:** `syncVendorPriceRowToFirestore`, `fetchVendorPricesFromFirestore`, in-memory **`vendorPriceRows`** + **`getVendorPriceOverridesMap(projectId)`**. **`projectId` null** = account-wide default; non-null = workspace-specific (wins over default). **E3d:** **`cost-calculator.js`** applies overrides after local ingredient prices. **Deploy `firestore.rules`** when promoting. |
 | `projects/{projectId}` | setDoc merge (`ensureProjectDoc`) | Metadata: `ownerId`, `ownerEmail`, `firebaseUid` (new), tags, names |
 | `projects/{projectId}/members/{userId}` | setDoc merge (`ensureProjectMemberDoc`) | Company role: `role`, `email`, `updatedAt` — see [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md) |
 | `projects/{projectId}/menus/{menuId}` | setDoc merge, getDoc | Menu + items + links snapshot |
 | `projects/{projectId}/checklists/{entryId}` | setDoc merge, collection query | Checklists / HACCP-style entries |
+| `projects/{projectId}/snapshots/bar_line_pack` | getDoc (shift app) | Bar: `drinks[]` (title + spec/build), `liquorsInStock` (string or list) — managers publish; same read rules as other snapshots |
+| `users/{userId}/notes/{id}` (`lineAppType: bar_note`) | owner read/write | Shift app bar notes: optional `barTopic` drink\|stock\|general, `relatedDrink` |
 
 **Queries:** `collection('users')` (all users, trial filter).
 
@@ -46,12 +49,39 @@ Rules must allow: **`users/*/snapshots/*`** and **`projects/*/checklists/*`** (p
 | `iterum_projects`, `iterum_current_project`, `iterum_current_project_user_{userId}`, `active_project` | Projects |
 | `recipes`, `recipe_ideas`, `recipe_stubs`, `pendingRecipes`, `recipe_library_{userId}` | Recipes |
 | `ingredients`, `ingredients_database` | Ingredients |
-| `iterum_vendors`, vendor connector keys | Vendors |
+| `iterum_vendors`, `iterum_vendors_e3b_imported_v1_*`, vendor connector keys | Vendors; E3b one-shot import flag per profile |
 | `menus_{userId}`, `menu_data`, `menu_recipe_links` | Menus |
 | `recipe_photos_{recipeId}` | Recipe photos metadata (local) |
 | `user_file_{filepath}` | `userControlledStorage` virtual FS |
 | `storage_encryption_key` | `secure-storage-manager` |
 | `onboarding_completed`, `audit_log`, `robust_notes`, etc. | UX / misc |
+
+### E3b — legacy vendor import (`vendorManager.js`)
+
+| Item | Detail |
+|------|--------|
+| **Sources** | `iterum_vendors`; ingredient arrays **`ingredients_database`**, **`custom_ingredients`**, **`ingredients`** (`supplier`, `primaryVendor`, `vendor_info`, `vendorPrices[].vendor`). |
+| **When** | Once per profile after cloud merge on vendor page load; **Import → Merge legacy data** re-runs with `force` (clears flag first). |
+| **Merge** | Same stable key as E3a; **current list wins** over legacy rows and ingredient stubs. |
+| **Flag** | `iterum_vendors_e3b_imported_v1__guest` or `iterum_vendors_e3b_imported_v1_{userId}` — delete key to treat next load as first import again. |
+| **Rollback** | Export vendors before merging; restore prior **`iterum_vendors`** / user vendor file from backup; remove E3b flag and reload. |
+
+### E3c — `vendor_prices` row (console / integration)
+
+Minimal write (signed in, Firestore initialized):
+
+```javascript
+await window.firestoreSync.syncVendorPriceRowToFirestore({
+  vendorDocId: 'normalized_vendor_doc_id',
+  projectId: 'your_workspace_id_or_null',
+  ingredientName: 'heavy cream',
+  unitCost: 4.25,
+  unit: 'qt',
+  vendorName: 'Supplier display name'
+});
+```
+
+`vendorDocId` should match **`iterumVendorDocId`** / stable id used under **`users/{uid}/vendors`**. Optional: **`ingredientId`**, **`sku`**.
 
 ## Firestore rules alignment (after patch)
 

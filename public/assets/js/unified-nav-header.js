@@ -218,8 +218,25 @@ class UnifiedNavHeader {
 
     this.injectWorkspaceFeaturesScript();
     this.injectRestaurantLocationSidebarScript();
+    this.injectHelpChefWidgetScript();
 
     console.log('✅ Navigation sidebar injected');
+  }
+
+  injectHelpChefWidgetScript() {
+    if (window.__iterumHelpChefScriptLoading) {
+      return;
+    }
+    window.__iterumHelpChefScriptLoading = true;
+    const s = document.createElement('script');
+    s.src = 'assets/js/help-chef-widget.js';
+    s.defer = true;
+    s.onload = () => {
+      if (typeof window.initIterumHelpChefWidget === 'function') {
+        window.initIterumHelpChefWidget();
+      }
+    };
+    document.head.appendChild(s);
   }
 
   injectWorkspaceFeaturesScript() {
@@ -808,9 +825,14 @@ class UnifiedNavHeader {
   }
 
   updateProjectChip(projectName = 'Master Project') {
-    const chip = document.getElementById('nav-project-chip');
-    if (chip) {
-      chip.textContent = `Project: ${projectName}`;
+    const name = projectName || 'Master Project';
+    const navChip = document.getElementById('nav-project-chip');
+    const headerChip = document.getElementById('header-project-chip');
+    if (navChip) {
+      navChip.textContent = `Project: ${name}`;
+    }
+    if (headerChip) {
+      headerChip.textContent = `Project: ${name}`;
     }
   }
 

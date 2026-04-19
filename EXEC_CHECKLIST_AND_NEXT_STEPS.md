@@ -2,7 +2,7 @@
 
 **Purpose:** Single page for leadership to track launch readiness and foundation work.  
 **Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](./NEXT_STEPS_LEADERSHIP.md) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) · [docs/CEO_TEAM_TASK_LIST_TO_MARKET.md](./docs/CEO_TEAM_TASK_LIST_TO_MARKET.md) (delegated CEO task list) · [docs/PILOT_APP_COMPLETION_MASTER.md](./docs/PILOT_APP_COMPLETION_MASTER.md) (completion definition + backlog) · [docs/P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md) (E1–E5) · [docs/M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md) (M1 human gate) · [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) · [docs/HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md) · [docs/SOURCE_OF_TRUTH.md](./docs/SOURCE_OF_TRUTH.md) · [docs/workflows/](./docs/workflows/) (e.g. sign-in UI redesign)  
-**Last updated:** 14 April 2026  
+**Last updated:** 29 March 2026  
 
 ---
 
@@ -11,6 +11,8 @@
 <a id="leadership-log-ceo-cto"></a>
 
 _Use this section for short, dated notes that do not belong in a checkbox row._
+
+**2026-03-29 — M1 engineering ship batch (pre–human GO):** Pushed to **`main`** — Iterum **Shift** branded mobile layer (`mobile-shift-brand.css`, `mobile-compliance.html`, `manifest-compliance.json`), Playwright smoke fix for Shift landing (`tests/e2e/smoke.spec.js`), **`npm run test:chromium`** for local/CI parity. **COO next:** run [M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md) on Vercel prod after deploy lands; **CTO:** confirm **Deploy Firebase** green if this batch touched `firestore.rules` / `firestore.indexes.json` / `storage.rules`.
 
 **2026-03-29 — Phase 0 closed (production trust):** Deploy Firebase CI green on `main`; Firestore **members** / **authUid** collection group index verified; [A1_P0_PROD_SMOKE_RECORD.md](./docs/A1_P0_PROD_SMOKE_RECORD.md) → **GO** (human steps **2** + **4**); COO executive pack + **CEO P0 approval** recorded below. **Next organizational gate:** Phase 1 — [CEO_TEAM_TASK_LIST_TO_MARKET.md](./docs/CEO_TEAM_TASK_LIST_TO_MARKET.md#phase-1--web-app-pilot-ready) (ICP lock, teammate path, support playbook, pilot acceptance criteria).
 

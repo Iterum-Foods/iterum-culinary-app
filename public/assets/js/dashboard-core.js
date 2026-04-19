@@ -8,6 +8,8 @@
     storagePrefix: 'iterum.dashboard.simplified',
     projectId: 'master',
     activeDate: '',
+    /** @type {null | (() => void)} */
+    teamShiftFeedUnsub: null,
     init() {
       this.cacheElements();
       this.syncProjectContext();
@@ -17,14 +19,27 @@
       document.addEventListener('projectChanged', event =>
         this.handleProjectChanged(event)
       );
+      window.addEventListener('firestoreSyncReady', () => {
+        this.attachTeamShiftFeedListener();
+      });
     },
     cacheElements() {
       this.dateInput = document.getElementById('dashboard-date');
       this.projectChip = document.getElementById('header-project-chip');
-      this.notesContent = document.getElementById('notes-content');
+      this.notesDaily = document.getElementById('notes-daily-content');
+      this.notesManager = document.getElementById('notes-manager-content');
+      this.notesManagerSection = document.getElementById(
+        'notes-manager-section'
+      );
       this.notesStatus = document.getElementById('notes-status');
+      this.notesTeamShiftFeed = document.getElementById(
+        'notes-team-shift-feed'
+      );
       this.saveNotesBtn = document.getElementById('save-notes');
-      this.clearNotesBtn = document.getElementById('clear-notes');
+      this.clearNotesDailyBtn = document.getElementById('clear-notes-daily');
+      this.clearNotesManagerBtn = document.getElementById(
+        'clear-notes-manager'
+      );
       this.taskForm = document.getElementById('task-form');
       this.taskInput = document.getElementById('task-input');
       this.taskList = document.getElementById('task-list');
@@ -54,10 +69,16 @@
           this.saveNotes();
         });
       }
-      if (this.clearNotesBtn) {
-        this.clearNotesBtn.addEventListener('click', e => {
+      if (this.clearNotesDailyBtn) {
+        this.clearNotesDailyBtn.addEventListener('click', e => {
           e.preventDefault();
-          this.notesContent.value = '';
+          if (this.notesDaily) this.notesDaily.value = '';
+        });
+      }
+      if (this.clearNotesManagerBtn) {
+        this.clearNotesManagerBtn.addEventListener('click', e => {
+          e.preventDefault();
+          if (this.notesManager) this.notesManager.value = '';
         });
       }
       if (this.taskForm) {
@@ -137,7 +158,7 @@
       }
       if (this.quickStatNotes) {
         const notesMap = this.getNotesMap();
-        this.quickStatNotes.textContent = Object.keys(notesMap).length;
+        this.quickStatNotes.textContent = this.countDaysWithNotes(notesMap);
       }
     },
     syncProjectContext() {
@@ -209,40 +230,242 @@
       const key = `${this.storagePrefix}.notes.${this.projectId}`;
       localStorage.setItem(key, JSON.stringify(map));
     },
+    canViewManagerNotes() {
+      return (
+        typeof window.iterumCanViewManagerNotes === 'function' &&
+        window.iterumCanViewManagerNotes()
+      );
+    },
+    normalizeDayEntry(raw) {
+      if (!raw || typeof raw !== 'object') {
+        return {
+          daily: '',
+          manager: '',
+          dailyUpdatedAt: null,
+          managerUpdatedAt: null
+        };
+      }
+      if (
+        typeof raw.content === 'string' &&
+        raw.daily === undefined &&
+        raw.manager === undefined
+      ) {
+        return {
+          daily: raw.content,
+          manager: '',
+          dailyUpdatedAt: raw.updatedAt || null,
+          managerUpdatedAt: null
+        };
+      }
+      return {
+        daily: typeof raw.daily === 'string' ? raw.daily : '',
+        manager: typeof raw.manager === 'string' ? raw.manager : '',
+        dailyUpdatedAt: raw.dailyUpdatedAt || null,
+        managerUpdatedAt: raw.managerUpdatedAt || null
+      };
+    },
+    countDaysWithNotes(map) {
+      let n = 0;
+      Object.keys(map).forEach(dateKey => {
+        const e = this.normalizeDayEntry(map[dateKey]);
+        const hasDaily = !!(e.daily && e.daily.trim());
+        const hasManager = !!(e.manager && e.manager.trim());
+        if (hasDaily || hasManager) n += 1;
+      });
+      return n;
+    },
     saveNotes() {
       const map = this.getNotesMap();
-      const content = this.notesContent.value.trim();
-      if (content) {
-        map[this.activeDate] = {
-          content,
-          updatedAt: new Date().toISOString()
-        };
-      } else {
+      const prev = this.normalizeDayEntry(map[this.activeDate]);
+      const daily = (this.notesDaily && this.notesDaily.value.trim()) || '';
+      const manager = this.canViewManagerNotes()
+        ? (this.notesManager && this.notesManager.value.trim()) || ''
+        : prev.manager;
+      const now = new Date().toISOString();
+      const hasDaily = !!daily;
+      const hasManager = !!manager;
+      if (!hasDaily && !hasManager) {
         delete map[this.activeDate];
+      } else {
+        const next = {
+          daily,
+          manager,
+          dailyUpdatedAt: hasDaily ? now : prev.dailyUpdatedAt || null,
+          managerUpdatedAt: hasManager ? now : prev.managerUpdatedAt || null
+        };
+        if (!hasDaily) next.dailyUpdatedAt = prev.dailyUpdatedAt || null;
+        if (!hasManager) next.managerUpdatedAt = prev.managerUpdatedAt || null;
+        map[this.activeDate] = next;
       }
       this.setNotesMap(map);
       this.setStatus(this.notesStatus, 'Saved');
       this.renderNotes();
     },
     renderNotes() {
+      const showManager = this.canViewManagerNotes();
+      if (this.notesManagerSection) {
+        this.notesManagerSection.hidden = !showManager;
+        this.notesManagerSection.setAttribute(
+          'aria-hidden',
+          showManager ? 'false' : 'true'
+        );
+      }
+      if (this.clearNotesManagerBtn) {
+        this.clearNotesManagerBtn.hidden = !showManager;
+      }
       const map = this.getNotesMap();
-      const entry = map[this.activeDate];
-      this.notesContent.value = entry ? entry.content : '';
-      const totalDays = Object.keys(map).length;
+      const entry = this.normalizeDayEntry(map[this.activeDate]);
+      if (this.notesDaily) this.notesDaily.value = entry.daily;
+      if (this.notesManager) {
+        this.notesManager.value = showManager ? entry.manager : '';
+      }
+      const totalDays = this.countDaysWithNotes(map);
       if (totalDays === 0) {
         this.notesStatus.textContent = 'No saved notes yet';
       } else {
-        const lastUpdated = entry?.updatedAt
-          ? new Date(entry.updatedAt).toLocaleTimeString([], {
+        const times = [];
+        if (entry.daily && entry.dailyUpdatedAt) {
+          times.push(new Date(entry.dailyUpdatedAt).getTime());
+        }
+        if (showManager && entry.manager && entry.managerUpdatedAt) {
+          times.push(new Date(entry.managerUpdatedAt).getTime());
+        }
+        const lastMs = times.length ? Math.max.apply(null, times) : null;
+        const lastUpdated = lastMs
+          ? new Date(lastMs).toLocaleTimeString([], {
               hour: '2-digit',
               minute: '2-digit'
             })
           : '—';
-        this.notesStatus.textContent = entry
+        const hasToday =
+          (entry.daily && entry.daily.trim()) ||
+          (showManager && entry.manager && entry.manager.trim());
+        this.notesStatus.textContent = hasToday
           ? `Saved · ${lastUpdated}`
           : `${totalDays} day${totalDays === 1 ? '' : 's'} logged`;
       }
       this.updateQuickStats();
+      this.attachTeamShiftFeedListener();
+    },
+    formatShiftPostRow(p) {
+      const body = this.escapeHtml(String(p.body || '')).replace(/\n/g, '<br>');
+      const who = this.escapeHtml(String(p.authorName || 'Team'));
+      const pr =
+        p.priority === 'out' ? 'out' : p.priority === 'low' ? 'low' : 'normal';
+      const cat = p.category === 'inventory' ? 'inventory' : 'shift';
+      let badge =
+        cat === 'inventory'
+          ? pr === 'out'
+            ? '<span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold mr-1" style="background:#fee2e2;color:#991b1b;">OUT</span>'
+            : pr === 'low'
+              ? '<span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold mr-1" style="background:#fef3c7;color:#92400e;">LOW STOCK</span>'
+              : '<span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold mr-1" style="background:#e0e7ff;color:#3730a3;">INVENTORY</span>'
+          : '<span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold mr-1" style="background:var(--brand-bg-tertiary);color:var(--brand-text-secondary);">SHIFT</span>';
+      const time =
+        p.createdAt && typeof p.createdAt.toDate === 'function'
+          ? p.createdAt.toDate().toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit'
+            })
+          : '';
+      return `<div class="mb-2 pb-2 border-b last:border-0 last:pb-0 last:mb-0" style="border-color: var(--brand-border-light);">${badge}<span class="text-xs font-semibold" style="color: var(--brand-text-primary);">${who}</span>${time ? ` <span class="text-xs" style="color: var(--brand-text-muted);">${time}</span>` : ''}<div class="mt-1" style="color: var(--brand-text-secondary);">${body}</div></div>`;
+    },
+    detachTeamShiftFeedListener() {
+      if (typeof this.teamShiftFeedUnsub === 'function') {
+        try {
+          this.teamShiftFeedUnsub();
+        } catch (e) {
+          /* ignore */
+        }
+        this.teamShiftFeedUnsub = null;
+      }
+    },
+    attachTeamShiftFeedListener() {
+      const el = this.notesTeamShiftFeed;
+      if (!el) {
+        return;
+      }
+      this.detachTeamShiftFeedListener();
+      const fs = window.firestoreSync;
+      if (!fs || !fs.initialized || !fs.db) {
+        el.innerHTML =
+          '<p class="text-xs" style="color: var(--brand-text-muted);">Team posts appear when you’re signed in and Firestore is on.</p>';
+        return;
+      }
+      if (typeof fs.subscribeShiftDayPosts !== 'function') {
+        void this.refreshTeamShiftFeedOnce();
+        return;
+      }
+      const pid = this.projectId;
+      if (!pid || pid === 'mobile-default') {
+        el.innerHTML =
+          '<p class="text-xs" style="color: var(--brand-text-muted);">Select a project to load shift-app posts.</p>';
+        return;
+      }
+      const dateKey = this.activeDate;
+      if (!dateKey) {
+        return;
+      }
+      el.innerHTML =
+        '<p class="text-xs" style="color: var(--brand-text-muted);">Loading team posts…</p>';
+      this.teamShiftFeedUnsub = fs.subscribeShiftDayPosts(
+        pid,
+        dateKey,
+        posts => {
+          if (!this.notesTeamShiftFeed) {
+            return;
+          }
+          if (this.projectId !== pid || this.activeDate !== dateKey) {
+            return;
+          }
+          if (!posts.length) {
+            el.innerHTML =
+              '<p class="text-xs" style="color: var(--brand-text-muted);">No shift-app posts for this date yet.</p>';
+            return;
+          }
+          el.innerHTML = posts.map(p => this.formatShiftPostRow(p)).join('');
+        },
+        err => {
+          console.warn('team shift feed', err);
+          if (this.notesTeamShiftFeed === el) {
+            el.innerHTML =
+              '<p class="text-xs" style="color: var(--brand-text-muted);">Could not load team posts. Deploy Firestore rules and indexes if needed.</p>';
+          }
+        }
+      );
+    },
+    async refreshTeamShiftFeedOnce() {
+      const el = this.notesTeamShiftFeed;
+      if (!el) {
+        return;
+      }
+      const fs = window.firestoreSync;
+      if (!fs || !fs.initialized || !fs.db) {
+        el.innerHTML =
+          '<p class="text-xs" style="color: var(--brand-text-muted);">Team posts appear when you’re signed in and Firestore is on.</p>';
+        return;
+      }
+      const pid = this.projectId;
+      if (!pid || pid === 'mobile-default') {
+        el.innerHTML =
+          '<p class="text-xs" style="color: var(--brand-text-muted);">Select a project to load shift-app posts.</p>';
+        return;
+      }
+      el.innerHTML =
+        '<p class="text-xs" style="color: var(--brand-text-muted);">Loading team posts…</p>';
+      try {
+        const posts = await fs.getShiftDayPosts(pid, this.activeDate);
+        if (!posts.length) {
+          el.innerHTML =
+            '<p class="text-xs" style="color: var(--brand-text-muted);">No shift-app posts for this date yet.</p>';
+          return;
+        }
+        el.innerHTML = posts.map(p => this.formatShiftPostRow(p)).join('');
+      } catch (err) {
+        console.warn('refreshTeamShiftFeedOnce', err);
+        el.innerHTML =
+          '<p class="text-xs" style="color: var(--brand-text-muted);">Could not load team posts. Deploy Firestore rules and indexes if needed.</p>';
+      }
     },
     getTasksMap() {
       const key = `${this.storagePrefix}.tasks.${this.projectId}`;

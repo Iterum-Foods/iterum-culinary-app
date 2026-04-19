@@ -108,6 +108,13 @@
               <span class="text-sm text-slate">Experiments and ideas; lighter daily ops surface.</span>
             </span>
           </label>
+          <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-200 p-4 has-[:checked]:border-moss has-[:checked]:bg-emerald-50/50 transition-colors">
+            <input type="radio" name="roleKey" value="employee_line" class="mt-1 text-moss focus:ring-moss">
+            <span>
+              <span class="font-medium text-ink block">Shift team — kitchen, FOH, or support</span>
+              <span class="text-sm text-slate">Daily ops, compliance, and team app — streamlined dashboard.</span>
+            </span>
+          </label>
         </div>
       </fieldset>
 
@@ -197,7 +204,7 @@
     </form>
 
     <p class="text-center text-xs text-slate mt-8">
-      You can change this anytime from the dashboard sidebar under your profile.
+      Change your default role in profile or workspace setup. Per-project <strong>access</strong> is set by your manager; on the dashboard you can record your <strong>position</strong> for each team site.
     </p>
   </div>
 
@@ -234,7 +241,8 @@
           chef_leadership: 'Executive chef / Kitchen lead',
           operations_gm: 'GM & operations',
           purchasing: 'Purchasing & costing',
-          consultant_rd: 'Consultant / R&D'
+          consultant_rd: 'Consultant / R&D',
+          employee_line: 'Shift team (kitchen, FOH, support)'
         };
         return map[key] || key;
       }

@@ -85,6 +85,28 @@ class RecipePhotoManager {
   }
 
   /**
+   * Firebase Auth uid for Storage paths (tenant isolation in storage.rules).
+   */
+  resolveFirebaseStorageUid() {
+    const uid =
+      window.firebaseAuth?.auth?.currentUser?.uid ||
+      window.authManager?.currentUser?.uid ||
+      window.authManager?.currentUser?.id ||
+      null;
+    return uid || null;
+  }
+
+  /**
+   * Canonical Storage path; legacy two-segment path (pre–tenant-isolation) for cleanup only.
+   */
+  storagePathForPhoto(recipeId, photoId, uid) {
+    if (uid) {
+      return `recipes/${uid}/${recipeId}/${photoId}`;
+    }
+    return `recipes/${recipeId}/${photoId}`;
+  }
+
+  /**
    * Convert file to base64
    */
   fileToBase64(file) {
@@ -126,8 +148,15 @@ class RecipePhotoManager {
       }
     }
 
-    // Use new Storage SDK
-    const storagePath = `recipes/${photo.recipeId}/${photo.id}`;
+    const uid = this.resolveFirebaseStorageUid();
+    if (!uid) {
+      throw new Error(
+        'Sign in required to upload recipe photos to cloud storage'
+      );
+    }
+
+    // Use new Storage SDK (tenant path: recipes/{uid}/{recipeId}/{photoId})
+    const storagePath = this.storagePathForPhoto(photo.recipeId, photo.id, uid);
     const result = await window.firebaseStorage.uploadFile(file, storagePath, {
       contentType: file.type || 'image/jpeg',
       customMetadata: {
@@ -198,12 +227,21 @@ class RecipePhotoManager {
 
     // Delete from Firebase Storage if it exists (using new SDK)
     if (window.firebaseStorage && window.firebaseStorage.isInitialized) {
-      try {
-        const storagePath = `recipes/${recipeId}/${photoId}`;
-        await window.firebaseStorage.deleteFile(storagePath);
-        console.log(`✅ Photo deleted from Firebase Storage: ${storagePath}`);
-      } catch (error) {
-        console.warn('Firebase Storage delete failed:', error);
+      const uid = this.resolveFirebaseStorageUid();
+      const paths = uid
+        ? [this.storagePathForPhoto(recipeId, photoId, uid)]
+        : [];
+      paths.push(this.storagePathForPhoto(recipeId, photoId, null));
+      const tried = new Set();
+      for (const storagePath of paths) {
+        if (tried.has(storagePath)) continue;
+        tried.add(storagePath);
+        try {
+          await window.firebaseStorage.deleteFile(storagePath);
+          console.log(`✅ Photo deleted from Firebase Storage: ${storagePath}`);
+        } catch (error) {
+          console.warn('Firebase Storage delete failed:', storagePath, error);
+        }
       }
     }
 

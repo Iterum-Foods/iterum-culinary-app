@@ -13,6 +13,14 @@
       "destination": "/signin.html"
     },
     {
+      "source": "/mobile-compliance.html",
+      "destination": "/mobile-compliance.html"
+    },
+    {
+      "source": "/shift",
+      "destination": "/mobile-compliance.html"
+    },
+    {
       "source": "/app/(.*)",
       "destination": "/index.html"
     },

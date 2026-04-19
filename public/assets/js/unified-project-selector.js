@@ -223,8 +223,9 @@ class UnifiedProjectSelector {
         }
       }
 
-      window.dispatchEvent(
+      document.dispatchEvent(
         new CustomEvent('projectChanged', {
+          bubbles: true,
           detail: {
             projectId,
             project: resolvedProject,

@@ -1156,16 +1156,16 @@ class ProjectManagementSystem {
    * Dispatch project change event
    */
   dispatchProjectChangeEvent() {
-    // Dispatch the main project change event
-    window.dispatchEvent(
-      new CustomEvent('projectChanged', {
-        detail: {
-          projectId: this.currentProject?.id ?? null,
-          project: this.currentProject,
-          isMaster: this.isMasterProject(),
-          userId: this.currentUserId
-        }
-      })
+    // Use document + bubbles so listeners on document (dashboard chips, nav) and
+    // window (firestore-sync, state-persistence, etc.) all receive the same change.
+    const detail = {
+      projectId: this.currentProject?.id ?? null,
+      project: this.currentProject,
+      isMaster: this.isMasterProject(),
+      userId: this.currentUserId
+    };
+    document.dispatchEvent(
+      new CustomEvent('projectChanged', { bubbles: true, detail })
     );
 
     // Also dispatch a storage event to sync across tabs

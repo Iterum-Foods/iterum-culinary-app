@@ -1,12 +1,12 @@
 {
-  "name": "Iterum Line Log",
-  "short_name": "Line log",
-  "description": "Fridge temperature and sanitizer checks for kitchens. Free with an Iterum account.",
+  "name": "Iterum Shift",
+  "short_name": "Shift",
+  "description": "Menu, prep lists, notes, station checks, guides, fridge and sanitizer logs. For hourly teams.",
   "start_url": "/mobile-compliance.html",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f4f6f4",
-  "theme_color": "#1a2e1f",
+  "background_color": "#f3f6f4",
+  "theme_color": "#1e3d28",
   "icons": [
     {
       "src": "/favicon.ico",

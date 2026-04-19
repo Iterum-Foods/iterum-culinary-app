@@ -28,7 +28,7 @@
 |------|--------|-------------|
 | **P0 / Phase A** | Closed in trackers | Maintain **Ship & verify** on rules changes. |
 | **M1 (E1 + E2a–b)** | Code on `main` (**`2e28c70`**); human gate open | [M1_COO_PROD_VERIFICATION.md](./M1_COO_PROD_VERIFICATION.md) on Vercel + Deploy Firebase green. |
-| **E3 Vendors / Firestore** | **Rules already allow** `users/{userId}/vendors/{vendorId}` — client still mostly localStorage; E3 = wire + schema + costing | CTO-sized epic; see [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md) update + P1 sketch. |
+| **E3 Vendors / Firestore** | **E3a–d (partial):** vendor sync, legacy import, **`vendor_prices`** + costing overrides in **`cost-calculator`**. UI for price overrides still thin (console / integration). **Deploy rules** for `vendor_prices`. | [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) E3; [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md). |
 | **E4 Compare / export** | After E3 MVP | PM + Eng. |
 | **E5 Auth E2E** | Open | Test user + Playwright path. |
 | **Mobile store (Phase 2)** | Capacitor present; listings/legal | [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md) Phase 2. |
@@ -51,8 +51,8 @@
 ## Ordered backlog (do not skip for paid pilots)
 
 1. **M1 human GO** — teammate flow + two-workspace demo + CI.  
-2. **E3a–b** — Persist vendor catalog to Firestore under existing `users/{uid}/vendors` (or agreed schema); import from `iterum_vendors` / ingredients.  
-3. **E3c–d** — Per-`projectId` price overrides; costing reads layered data.  
+2. **E3a–b** — Client sync + legacy import **shipped** (2026-03-29); finish smoke sign-off + any **bulk** migration needs.  
+3. **E3c–d** — **`vendor_prices`** + costing overrides **in code**; add **operator UI** + verification; costing tests.  
 4. **E4** — Cross-workspace compare / export for sponsor reviews.  
 5. **E5** — One authenticated E2E in CI.  
 6. **Phase 2** — Store-ready mobile shell + assets.  
@@ -64,4 +64,5 @@
 
 | Date | Change |
 |------|--------|
+| 2026-03-29 | E3a–d partial: vendor sync, legacy merge, `vendor_prices` + cost-calculator overrides; deploy Firestore rules. |
 | 2026-04-14 | Initial owner runbook; aligns “complete” with APP_COMPLETION_PLAN + P1. |

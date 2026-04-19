@@ -43,6 +43,7 @@
   <script src="assets/js/unified-project-selector.js" defer></script>
   <script src="assets/js/header-user-display.js" defer></script>
   <script src="assets/js/project-management-system.js" defer></script>
+  <script src="assets/js/user-role-setup.js"></script>
   
   <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
   
@@ -558,24 +559,104 @@
         );
       }
 
-      loadLocalData() {
-        // Load notes from dashboard (project-aware)
+      normalizeDashboardDayEntry(raw) {
+        if (!raw || typeof raw !== 'object') {
+          return { daily: '', manager: '' };
+        }
+        if (
+          typeof raw.content === 'string' &&
+          raw.daily === undefined &&
+          raw.manager === undefined
+        ) {
+          return { daily: raw.content, manager: '' };
+        }
+        return {
+          daily: typeof raw.daily === 'string' ? raw.daily : '',
+          manager: typeof raw.manager === 'string' ? raw.manager : ''
+        };
+      }
+
+      /**
+       * Align with dashboard: iterum.dashboard.simplified.notes.{projectId}
+       * Manager lines only when iterumCanViewManagerNotes() is true.
+       */
+      loadDashboardShiftNotes() {
+        const lists = [];
+        const canMgr =
+          typeof window.iterumCanViewManagerNotes === 'function' &&
+          window.iterumCanViewManagerNotes();
+        const addMap = projectId => {
+          const key = `iterum.dashboard.simplified.notes.${projectId}`;
+          try {
+            const map = JSON.parse(localStorage.getItem(key)) || {};
+            Object.entries(map).forEach(([dateStr, raw]) => {
+              const e = this.normalizeDashboardDayEntry(raw);
+              if (e.daily && e.daily.trim()) {
+                lists.push({
+                  date: `${dateStr}T12:00:00`,
+                  content: e.daily,
+                  kind: 'daily',
+                  projectId
+                });
+              }
+              if (e.manager && e.manager.trim() && canMgr) {
+                lists.push({
+                  date: `${dateStr}T15:00:00`,
+                  content: e.manager,
+                  kind: 'manager',
+                  projectId
+                });
+              }
+            });
+          } catch (err) {
+            console.warn('Calendar shift notes map:', projectId, err);
+          }
+        };
+        if (this.currentProjectId) {
+          addMap(this.currentProjectId);
+        } else {
+          const ids = new Set(['master']);
+          try {
+            const projects = JSON.parse(
+              localStorage.getItem('iterum_projects') || '[]'
+            );
+            projects.forEach(p => {
+              if (p && p.id) ids.add(p.id);
+            });
+          } catch (e) {
+            /* ignore */
+          }
+          ids.forEach(id => addMap(id));
+        }
         try {
-          const notesData = localStorage.getItem('dashboard_notes');
-          if (notesData) {
-            const parsed = JSON.parse(notesData);
-            this.notes = Array.isArray(parsed) ? parsed : [];
-            
-            // Filter by project if project is selected
-            if (this.currentProjectId) {
-              this.notes = this.notes.filter(note => 
-                !note.projectId || note.projectId === this.currentProjectId || note.projectId === 'master'
-              );
+          const legacyRaw = localStorage.getItem('dashboard_notes');
+          if (legacyRaw) {
+            const parsed = JSON.parse(legacyRaw);
+            if (Array.isArray(parsed)) {
+              const filtered = this.currentProjectId
+                ? parsed.filter(
+                    note =>
+                      !note.projectId ||
+                      note.projectId === this.currentProjectId ||
+                      note.projectId === 'master'
+                  )
+                : parsed;
+              filtered.forEach(note => {
+                lists.push({
+                  ...note,
+                  kind: note.kind || 'legacy'
+                });
+              });
             }
           }
         } catch (e) {
-          this.notes = [];
+          /* ignore */
         }
+        this.notes = lists;
+      }
+
+      loadLocalData() {
+        this.loadDashboardShiftNotes();
 
         // Load recipes from localStorage (project-aware)
         try {
@@ -961,13 +1042,24 @@
           return;
         }
 
+        const progNice = {
+          inspection: 'Inspection',
+          cleaning_daily: 'Daily cleaning',
+          cleaning_weekly: 'Weekly cleaning',
+          cleaning_monthly: 'Monthly cleaning'
+        };
         container.innerHTML = logs.map(log => {
           const results = log.checklistResults || {};
           const lines = Object.keys(results).map(k => `${k}: ${results[k] ? '✓' : '—'}`).join(' · ');
           const pass = log.allPassed !== false ? 'All items checked' : 'Some items unchecked';
+          const z = log.zone ? `[${log.zone}] ` : '';
+          const p = log.programType
+            ? progNice[log.programType] || log.programType
+            : '';
+          const sub = p ? ` · ${p}` : '';
           return `
           <div class="activity-item" style="border-left-color: #0d9488;">
-            <div class="font-medium">${log.areaName || 'Inspection area'}</div>
+            <div class="font-medium">${z}${log.areaName || 'Inspection area'}${sub}</div>
             <div class="text-sm" style="color: var(--brand-text-secondary);">${pass}</div>
             ${lines ? `<div class="text-xs mt-1" style="color: var(--brand-text-muted);">${lines}</div>` : ''}
             ${log.notes ? `<div class="text-xs mt-1">${log.notes}</div>` : ''}
@@ -991,12 +1083,28 @@
           return;
         }
 
-        container.innerHTML = notes.map(note => `
+        container.innerHTML = notes
+          .map(note => {
+            const body =
+              note.content || note.text || note.notes || 'No content';
+            const kind = note.kind;
+            const label =
+              kind === 'manager'
+                ? 'Manager handoff'
+                : kind === 'daily'
+                  ? 'Daily restaurant'
+                  : kind === 'legacy'
+                    ? 'Note'
+                    : 'Note';
+            return `
           <div class="activity-item">
-            <div class="text-sm whitespace-pre-wrap">${note.content || note.text || note.notes || 'No content'}</div>
+            <div class="text-xs font-semibold mb-1" style="color: var(--brand-text-secondary);">${label}</div>
+            <div class="text-sm whitespace-pre-wrap">${body}</div>
             <div class="activity-item-time">${this.formatTime(note.date || note.timestamp)}</div>
           </div>
-        `).join('');
+        `;
+          })
+          .join('');
       }
 
       updateRecipesCreated(date) {

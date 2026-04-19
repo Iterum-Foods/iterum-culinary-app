@@ -1,33 +1,27 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // User uploads - only authenticated users can upload to their own folder
+    // User uploads — same tenant for read + write (no cross-user reads for authed users)
     match /users/{userId}/{allPaths=**} {
-      allow read: if request.auth != null;
+      allow read: if request.auth != null && request.auth.uid == userId;
       allow write: if request.auth != null && request.auth.uid == userId;
     }
-    
-    // Legacy first: recipe-photo-manager.js uses recipes/{recipeId}/{fileName} (3 path segments total)
-    match /recipes/{recipeId}/{fileName} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
-    }
 
-    // Canonical tenant path: recipes/{uid}/{recipeId}/…
+    // Canonical recipe photos/files: recipes/{uid}/{recipeId}/…
     match /recipes/{userId}/{recipeId}/{allPaths=**} {
-      allow read: if request.auth != null;
+      allow read: if request.auth != null && request.auth.uid == userId;
       allow write: if request.auth != null && request.auth.uid == userId;
     }
     
     // Menu images
     match /menus/{userId}/{menuId}/{allPaths=**} {
-      allow read: if request.auth != null;
+      allow read: if request.auth != null && request.auth.uid == userId;
       allow write: if request.auth != null && request.auth.uid == userId;
     }
     
     // Ingredient photos
     match /ingredients/{userId}/{ingredientId}/{allPaths=**} {
-      allow read: if request.auth != null;
+      allow read: if request.auth != null && request.auth.uid == userId;
       allow write: if request.auth != null && request.auth.uid == userId;
     }
     
