@@ -5,6 +5,14 @@
 **Context:** [M1_CTO_AGENT_DELEGATION.md](./M1_CTO_AGENT_DELEGATION.md) · [M1_PROJECTID_AUDIT.md](./M1_PROJECTID_AUDIT.md)  
 **Last updated:** 29 March 2026  
 
+### At a glance (prod: `https://iterum-culinary-app.vercel.app`)
+
+| # | Check | Pass? |
+|---|--------|-------|
+| 1 | [Teammate flow](./PHASE_1_TEAMMATE_FLOW_CHECKLIST.md) steps **1–8** | ☐ |
+| 2 | [Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml) **green** since last rules change | ☐ |
+| 3 | Two-workspace demo (menu-builder + Shift) — no stuck **permission-denied** / index errors | ☐ |
+
 ---
 
 ## Engineering handoff (after each `main` deploy)

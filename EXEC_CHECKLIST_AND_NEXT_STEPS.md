@@ -6,6 +6,26 @@
 
 ---
 
+## Next steps (pick up here)
+
+**Close M1 (human + prod)** — [M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md)
+
+- [ ] **Vercel** production reflects latest `main` (dashboard green).
+- [ ] **Deploy Firebase** last run on `main` is **success** ([workflow](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml)).
+- [ ] **M1 — three checks** on `https://iterum-culinary-app.vercel.app`: teammate flow, Firebase status, two-workspace demo.
+- [ ] **Teammate checklist** — [PHASE_1_TEAMMATE_FLOW_CHECKLIST.md](./docs/PHASE_1_TEAMMATE_FLOW_CHECKLIST.md) steps **1–8** on prod.
+
+**After M1 GO — E3 (vendor catalog)**
+
+- [ ] Answer **E3 prep** in [HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md) (shared list vs per-venue, price overrides, owner role).
+- [ ] Eng sequences **E3** in [P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md).
+
+**CI / automation (optional)**
+
+- [ ] If you use **Automated Dependency Updates**: repo **Settings → Actions → General** — allow Actions to **create pull requests** (see comment in [dependency-update.yml](./.github/workflows/dependency-update.yml)).
+
+---
+
 ## Leadership log (CEO / CTO)
 
 <a id="leadership-log-ceo-cto"></a>
