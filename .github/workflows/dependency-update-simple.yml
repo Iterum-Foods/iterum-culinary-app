@@ -3,6 +3,9 @@ name: Automated Dependency Updates (Simple - No PR)
 # Alternative version that doesn't create PRs
 # Use this if you can't enable write permissions
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   schedule:
     # Run every Monday at 2 AM UTC
@@ -22,9 +25,9 @@ jobs:
         token: ${{ github.token }}
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
-        node-version: '20.x'
+        node-version: '24.x'
         cache: 'npm'
         
     - name: Check current dependencies

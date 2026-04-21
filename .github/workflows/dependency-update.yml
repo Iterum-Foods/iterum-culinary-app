@@ -1,6 +1,18 @@
 # Use "Run workflow" on latest main. Re-running an old failed job re-executes that job's
 # commit — it will not pick up workflow fixes merged later.
+#
+# If PR creation fails with "not permitted to create or approve pull requests":
+#   Repo → Settings → Actions → General → Workflow permissions:
+#   - "Read and write permissions"
+#   - Enable "Allow GitHub Actions to create and approve pull requests"
+#   (Org owners may need to allow this at the org level.)
+#
+# PRs only include package.json + package-lock.json (not node_modules), so symlinks under
+# node_modules/.bin are not committed by this workflow.
 name: Automated Dependency Updates
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 on:
   schedule:
@@ -25,9 +37,9 @@ jobs:
         token: ${{ github.token }}
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
-        node-version: '20.x'
+        node-version: '24.x'
         cache: 'npm'
         
     - name: Update npm dependencies
@@ -49,7 +61,7 @@ jobs:
     - name: Check for changes
       id: check-changes
       run: |
-        if [ -n "$(git status --porcelain)" ]; then
+        if [ -n "$(git status --porcelain -- package.json package-lock.json)" ]; then
           echo "has_changes=true" >> $GITHUB_OUTPUT
         else
           echo "has_changes=false" >> $GITHUB_OUTPUT
@@ -62,6 +74,9 @@ jobs:
         token: ${{ github.token }}
         commit-message: 'chore: update dependencies'
         title: 'Automated Dependency Updates'
+        add-paths: |
+          package.json
+          package-lock.json
         body: |
           ## Automated Dependency Updates
           
