@@ -826,13 +826,22 @@ class UnifiedNavHeader {
 
   updateProjectChip(projectName = 'Master Project') {
     const name = projectName || 'Master Project';
+    const label = `Project: ${name}`;
     const navChip = document.getElementById('nav-project-chip');
     const headerChip = document.getElementById('header-project-chip');
+    const kitchenChip = document.getElementById('kitchen-project-chip');
+    const menuChip = document.getElementById('menu-project-chip');
     if (navChip) {
-      navChip.textContent = `Project: ${name}`;
+      navChip.textContent = label;
     }
     if (headerChip) {
-      headerChip.textContent = `Project: ${name}`;
+      headerChip.textContent = label;
+    }
+    if (kitchenChip) {
+      kitchenChip.textContent = label;
+    }
+    if (menuChip) {
+      menuChip.textContent = label;
     }
   }
 
