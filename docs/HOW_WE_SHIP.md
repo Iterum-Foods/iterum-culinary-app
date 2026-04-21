@@ -3,7 +3,7 @@
 **Purpose:** One short runbook so deploy and smoke are repeatable.  
 **Canonical app URL (pilots):** https://iterum-culinary-app.vercel.app/  
 **Firebase project:** `iterum-culinary-app2`  
-**Last updated:** March 2026
+**Last updated:** 29 March 2026  
 
 ---
 
