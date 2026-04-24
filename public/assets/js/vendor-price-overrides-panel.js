@@ -82,6 +82,114 @@
     });
   }
 
+  function startEdit(mount, docId) {
+    const fs = getFs();
+    if (!fs || !Array.isArray(fs.vendorPriceRows)) {
+      return;
+    }
+    const row = fs.vendorPriceRows.find(
+      r => r && String(r.iterumVendorPriceDocId) === String(docId)
+    );
+    if (!row) {
+      return;
+    }
+    const ing = mount.querySelector('#vp-ing');
+    const sku = mount.querySelector('#vp-sku');
+    const cost = mount.querySelector('#vp-cost');
+    const unit = mount.querySelector('#vp-unit');
+    const sel = mount.querySelector('#vp-vendor');
+    const hide = mount.querySelector('#vp-editing-doc');
+    if (ing) {
+      ing.value = String(row.ingredientName || '').trim();
+    }
+    if (sku) {
+      sku.value = String(row.sku || '').trim();
+    }
+    if (cost) {
+      cost.value =
+        row.unitCost !== null &&
+        row.unitCost !== undefined &&
+        !Number.isNaN(Number(row.unitCost))
+          ? String(row.unitCost)
+          : '';
+    }
+    if (unit) {
+      unit.value = String(row.unit || 'ea');
+    }
+    if (sel) {
+      const vdoc = row.vendorDocId ? String(row.vendorDocId) : '';
+      sel.value = vdoc;
+    }
+    if (
+      row.projectId !== undefined &&
+      row.projectId !== null &&
+      String(row.projectId).trim() !== ''
+    ) {
+      const w = mount.querySelector(
+        'input[name="vp-scope"][value="workspace"]'
+      );
+      if (w) {
+        w.checked = true;
+      }
+    } else {
+      const a = mount.querySelector('input[name="vp-scope"][value="account"]');
+      if (a) {
+        a.checked = true;
+      }
+    }
+    if (hide) {
+      hide.value = String(docId);
+    }
+    const sub = mount.querySelector('#vp-submit-override');
+    if (sub) {
+      sub.textContent = 'Update override';
+    }
+    const cancel = mount.querySelector('#vp-cancel-edit');
+    if (cancel) {
+      cancel.classList.remove('hidden');
+    }
+    const statusEl = mount.querySelector('#vp-status');
+    if (statusEl) {
+      statusEl.textContent =
+        'Adjusting this row — change values, then update or cancel.';
+    }
+    const form = mount.querySelector('#vp-form');
+    if (form) {
+      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function clearEdit(mount) {
+    const form = mount.querySelector('#vp-form');
+    if (form) {
+      form.reset();
+    }
+    const u = mount.querySelector('#vp-unit');
+    if (u) {
+      u.value = 'ea';
+    }
+    const w = mount.querySelector('input[name="vp-scope"][value="workspace"]');
+    if (w) {
+      w.checked = true;
+    }
+    const hide = mount.querySelector('#vp-editing-doc');
+    if (hide) {
+      hide.value = '';
+    }
+    const sub = mount.querySelector('#vp-submit-override');
+    if (sub) {
+      sub.textContent = 'Save override';
+    }
+    const cancel = mount.querySelector('#vp-cancel-edit');
+    if (cancel) {
+      cancel.classList.add('hidden');
+    }
+    const statusEl = mount.querySelector('#vp-status');
+    if (statusEl) {
+      statusEl.textContent = '';
+    }
+  }
+
   function buildVendorOptions() {
     const vendors =
       window.vendorManager && Array.isArray(window.vendorManager.vendors)
@@ -123,16 +231,19 @@
                   ? String(r.projectId)
                   : '';
               const scopeLabel = rpid ? 'This workspace' : 'All workspaces';
-              const docId = escapeHtml(
-                String(r.iterumVendorPriceDocId || '').trim()
-              );
+              const docIdRaw = String(r.iterumVendorPriceDocId || '').trim();
+              const docIdAttr = escapeHtml(docIdRaw);
+              const actions =
+                docIdRaw.length > 0
+                  ? `<button type="button" class="vp-adj-btn text-sky-700 font-medium hover:underline mr-2" data-vp-doc="${docIdAttr}">Adjust</button><button type="button" class="vp-del-btn text-red-600 font-medium hover:underline" data-vp-doc="${docIdAttr}">Remove</button>`
+                  : '<span class="text-slate-400">—</span>';
               return `<tr>
               <td class="py-2 pr-2">${escapeHtml(r.ingredientName || '—')}</td>
               <td class="py-2 pr-2">${escapeHtml(r.sku || '—')}</td>
               <td class="py-2 pr-2">${escapeHtml(r.vendorName || '—')}</td>
               <td class="py-2 pr-2">${escapeHtml(String(r.unitCost ?? ''))} / ${escapeHtml(String(r.unit || 'ea'))}</td>
               <td class="py-2 pr-2 text-xs">${escapeHtml(scopeLabel)}</td>
-              <td class="py-2 pr-2"><button type="button" class="vp-del-btn text-red-600 font-medium hover:underline" data-vp-doc="${docId}">Remove</button></td>
+              <td class="py-2 pr-2 whitespace-nowrap">${actions}</td>
             </tr>`;
             })
             .join('');
@@ -148,7 +259,12 @@
           <button type="button" id="vp-refresh-btn" class="px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50">Refresh from cloud</button>
         </div>
         <p id="vp-status" class="text-sm mb-3 min-h-[1.25rem]" role="status">${ready ? '' : 'Waiting for cloud sync…'}</p>
+        <details class="mb-3 text-slate-600 text-sm">
+          <summary class="cursor-pointer font-semibold text-slate-800">How matching and adjusting work</summary>
+          <p class="mt-2 pl-2 border-l-2 border-emerald-200">Recipe costing matches <strong>ingredient name</strong> (or SKU). Workspace rows override account-wide defaults. <strong>Adjust</strong> loads a row into the form so you can change the price without removing it first.</p>
+        </details>
         <form id="vp-form" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <input type="hidden" id="vp-editing-doc" name="vp-editing-doc" value="" />
           <div class="sm:col-span-2 lg:col-span-1">
             <label class="block text-xs font-semibold text-slate-600 mb-1" for="vp-ing">Ingredient name *</label>
             <input id="vp-ing" required class="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder="e.g. Heavy cream" autocomplete="off" />
@@ -184,8 +300,9 @@
             <label class="inline-flex items-center gap-2 mr-4"><input type="radio" name="vp-scope" value="workspace" checked /> This workspace only</label>
             <label class="inline-flex items-center gap-2"><input type="radio" name="vp-scope" value="account" /> All my workspaces (default)</label>
           </div>
-          <div class="sm:col-span-2 lg:col-span-3 flex flex-wrap gap-2">
-            <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-700 text-white font-semibold hover:bg-emerald-800">Save override</button>
+          <div class="sm:col-span-2 lg:col-span-3 flex flex-wrap items-center gap-2">
+            <button type="submit" id="vp-submit-override" class="px-4 py-2 rounded-lg bg-emerald-700 text-white font-semibold hover:bg-emerald-800">Save override</button>
+            <button type="button" id="vp-cancel-edit" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-100 hidden">Cancel</button>
           </div>
         </form>
         <div class="overflow-x-auto border border-slate-200 rounded-xl">
@@ -197,7 +314,7 @@
                 <th class="py-2 px-3 font-semibold">Vendor</th>
                 <th class="py-2 px-3 font-semibold">Cost</th>
                 <th class="py-2 px-3 font-semibold">Scope</th>
-                <th class="py-2 px-3 font-semibold"></th>
+                <th class="py-2 px-3 font-semibold whitespace-nowrap w-[1%]">Actions</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">${rowsHtml}</tbody>
@@ -252,6 +369,10 @@
         statusEl.textContent = 'Ingredient name and unit cost are required.';
         return;
       }
+      const existingDocEl = mount.querySelector('#vp-editing-doc');
+      const existingId = existingDocEl
+        ? String(existingDocEl.value || '').trim()
+        : '';
       statusEl.textContent = 'Saving…';
       const row = {
         vendorDocId: vid || null,
@@ -262,15 +383,15 @@
         unit,
         vendorName
       };
+      if (existingId) {
+        row.iterumVendorPriceDocId = existingId;
+      }
       const res = await f.syncVendorPriceRowToFirestore(row);
       if (res && res.ok) {
-        statusEl.textContent =
-          'Saved. Recipe costing will pick this up for the active workspace.';
-        form.reset();
-        mount.querySelector('#vp-unit').value = 'ea';
-        mount.querySelector(
-          'input[name="vp-scope"][value="workspace"]'
-        ).checked = true;
+        statusEl.textContent = existingId
+          ? 'Updated. Recipe costing will use the new values.'
+          : 'Saved. Recipe costing will pick this up for the active workspace.';
+        clearEdit(mount);
         await f.refreshVendorPricesFromFirestore();
         redraw(mount);
       } else {
@@ -337,6 +458,26 @@
         return;
       }
       mount.dataset.vpBound = '1';
+      if (!mount.dataset.vpClickDeleg) {
+        mount.dataset.vpClickDeleg = '1';
+        mount.addEventListener('click', e => {
+          const adj = e.target.closest
+            ? e.target.closest('button.vp-adj-btn')
+            : null;
+          if (adj) {
+            const id = adj.getAttribute('data-vp-doc');
+            if (id) {
+              startEdit(mount, id);
+            }
+            e.preventDefault();
+            return;
+          }
+          if (e.target && e.target.id === 'vp-cancel-edit') {
+            e.preventDefault();
+            clearEdit(mount);
+          }
+        });
+      }
       waitInitAndRedraw(mount);
       [1500, 3500].forEach(ms => {
         setTimeout(() => {

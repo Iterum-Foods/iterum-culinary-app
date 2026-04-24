@@ -187,6 +187,36 @@
                 padding: 24px;
             }
         }
+        .vendor-onboarding-rail {
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+            padding: 24px 28px;
+        }
+        .vendor-onboarding-rail h2 {
+            margin: 0 0 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .vendor-onboarding-rail ol {
+            margin: 0;
+            padding-left: 1.25rem;
+            color: #334155;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        .vendor-onboarding-rail li {
+            margin-bottom: 0.5rem;
+        }
+        .vendor-onboarding-rail a {
+            color: #047857;
+            font-weight: 600;
+        }
+        .vendor-onboarding-rail a:hover {
+            text-decoration: underline;
+        }
         .vendor-quick-actions {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -262,15 +292,23 @@
             <div class="vendor-hero-main">
                 <div class="vendor-eyebrow">Iterum Kitchen OS · Sourcing</div>
                 <h1>Vendor &amp; Purchasing Hub</h1>
-                <p>Keep supplier profiles, signature products, and invoice evidence aligned with your culinary workflow so the team always has sourcing answers. When you are signed in and cloud sync is active, vendors also merge from your account&rsquo;s Firestore copy on load and save back on each save.</p>
+                <p>Build your supplier list, then tune <strong>ingredient unit costs</strong> for this workspace so menu and recipe costing match reality. When you&rsquo;re signed in, data syncs to the cloud; cloud values win on merge.</p>
                 <div class="vendor-hero-actions">
+                    <button type="button" onclick="window.vendorManager?.showAddVendorModal?.() || window.vendorImporter?.showAddVendorModal?.()" class="btn btn-primary" title="Add a new supplier to your list">
+                        <span>➕</span>
+                        <span>Add your first vendor</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('vendor-pricing-workspace')?.scrollIntoView({ behavior: 'smooth' });" title="Jump to price overrides for costing">
+                        <span>💡</span>
+                        <span>Set ingredient prices</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('vendor-directory')?.scrollIntoView({ behavior: 'smooth' });" title="Scroll to the vendor table">
+                        <span>📋</span>
+                        <span>View / edit list</span>
+                    </button>
                     <button onclick="window.location.href='price-list-upload.html'" class="btn btn-primary" style="background: linear-gradient(135deg, rgba(255,255,255,0.45), rgba(255,255,255,0.2));">
                         <span>💰</span>
-                        <span>Upload Price List</span>
-                    </button>
-                    <button onclick="window.vendorManager?.showAddVendorModal?.() || window.vendorImporter?.showAddVendorModal?.()" class="btn btn-primary">
-                        <span>➕</span>
-                        <span>Add Vendor</span>
+                        <span>Upload price list</span>
                     </button>
                     <button id="import-vendors-btn" class="btn btn-secondary">
                         <span>📥</span>
@@ -283,27 +321,32 @@
                 </div>
             </div>
             <div class="vendor-hero-side">
-                <h3>Workflow Highlights</h3>
+                <h3>Three quick steps</h3>
                 <div class="vendor-checklist">
                     <div class="vendor-checklist-item">
-                        <span>✅</span>
-                        <span>Capture catalogue items, pack sizes, and pricing while you add vendors.</span>
+                        <span>1</span>
+                        <span><strong>Add vendors</strong> (or import) so you have a supplier to attach to items.</span>
                     </div>
                     <div class="vendor-checklist-item">
-                        <span>🧾</span>
-                        <span>Attach invoice snapshots or quotes for instant reference during costing.</span>
+                        <span>2</span>
+                        <span><strong>Price overrides</strong> — set unit cost per ingredient for this workspace or account-wide.</span>
                     </div>
                     <div class="vendor-checklist-item">
-                        <span>📦</span>
-                        <span>Link vendor intelligence back to menu workflows and prep briefs automatically.</span>
-                    </div>
-                    <div class="vendor-checklist-item">
-                        <span>&#9729;&#65039;</span>
-                        <span>Signed in with cloud sync: vendors load from and save to your Firestore vendor collection; if the same vendor exists locally and in the cloud, cloud field values take precedence.</span>
+                        <span>3</span>
+                        <span><strong>Match names</strong> to <a href="ingredients.html" style="color:#c7f0d0;text-decoration:underline;">ingredients</a> so recipe costing lines up.</span>
                     </div>
                 </div>
             </div>
         </header>
+
+        <nav class="vendor-onboarding-rail" id="vendor-onboard-steps" aria-label="Vendor setup steps">
+            <h2>Onboarding: suppliers, then costs</h2>
+            <ol>
+                <li><strong>Directory</strong> — <a href="#vendor-directory">Open your vendor list</a> and add or import suppliers.</li>
+                <li><strong>Adjust pricing</strong> — <a href="#vendor-pricing-workspace">Use workspace price overrides</a> for the ingredient + vendor pair; names should match the ingredient library for best results.</li>
+                <li><strong>Fine-tune</strong> — Use <em>Edit</em> on a vendor row to change contact or notes; use <em>Adjust</em> in the price table to change a locked-in unit cost.</li>
+            </ol>
+        </nav>
 
         <section class="vendor-quick-actions">
             <article class="quick-card primary" onclick="window.vendorManager?.showAddVendorModal?.() || window.vendorImporter?.showAddVendorModal?.()">
@@ -330,9 +373,17 @@
                 </div>
                 <div class="quick-cta">Export</div>
             </article>
+            <article class="quick-card" role="link" tabindex="0" onclick="document.getElementById('vendor-pricing-workspace')?.scrollIntoView({ behavior: 'smooth' })" onkeydown="if(event.key==='Enter')document.getElementById('vendor-pricing-workspace')?.scrollIntoView({behavior:'smooth'})">
+                <div class="quick-icon">💡</div>
+                <div class="quick-content">
+                    <h3>Ingredient price overrides</h3>
+                    <p>Set or adjust unit costs for this workspace — ties into recipe &amp; menu costing.</p>
+                </div>
+                <div class="quick-cta">Set prices</div>
+            </article>
         </section>
 
-        <section class="vendor-surface" style="margin-top: 0;">
+        <section class="vendor-surface" id="vendor-pricing-workspace" style="margin-top: 0;">
             <div class="vendor-section-title">Workspace price overrides</div>
             <p style="margin:0 0 16px;max-width:52rem;font-size:0.95rem;line-height:1.55;color:#475569;">
                 Set a <strong>unit cost</strong> for an ingredient tied to a vendor for <strong>this workspace</strong> or as an <strong>account default</strong> (all workspaces). Recipe and menu costing apply these after local ingredient prices when the name or SKU matches.
@@ -340,7 +391,7 @@
             <div id="vendor-price-overrides-panel-root"></div>
         </section>
 
-        <section class="vendor-surface">
+        <section class="vendor-surface" id="vendor-directory">
             <div class="vendor-section-title">At a glance</div>
             <div class="stats-grid">
                 <div class="stat-card">
