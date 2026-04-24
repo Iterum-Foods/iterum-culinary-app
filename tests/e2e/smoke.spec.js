@@ -30,7 +30,10 @@ test.describe('Smoke', () => {
     expect(res?.ok()).toBeTruthy();
     await expect(page).toHaveTitle(/Shift|Iterum/i);
     await expect(
-      page.getByRole('heading', { level: 1, name: /what you need for your shift/i })
+      page.getByRole('heading', {
+        level: 1,
+        name: /what you need for your shift/i
+      })
     ).toBeVisible();
   });
 
@@ -38,5 +41,30 @@ test.describe('Smoke', () => {
     const res = await page.goto('/project-hub.html');
     expect(res?.ok()).toBeTruthy();
     await expect(page.locator('body')).toBeVisible();
+  });
+
+  test('vendor management page loads', async ({ page }) => {
+    const res = await page.goto('/vendor-management.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(page.locator('h1')).toContainText(/Vendor/i);
+    await expect(page.locator('body')).toContainText(
+      /workspace price overrides/i
+    );
+  });
+
+  test('workspace setup page loads', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('session_active', 'true');
+      localStorage.setItem(
+        'current_user',
+        JSON.stringify({ name: 'Smoke Test', email: 'smoke@test.local' })
+      );
+    });
+    const res = await page.goto('/setup.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(
+      page.getByRole('heading', { name: /set up your workspace/i })
+    ).toBeVisible();
+    await expect(page.getByText(/first 10 minutes/i)).toBeVisible();
   });
 });

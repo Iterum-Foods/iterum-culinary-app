@@ -1146,6 +1146,29 @@ class FirestoreSync {
   }
 
   /**
+   * E3c — Remove one vendor price override by Firestore document id.
+   */
+  async deleteVendorPriceFromFirestore(docId) {
+    if (!this.initialized || !docId || String(docId).trim() === '') {
+      return { ok: false, reason: 'bad_args' };
+    }
+    const uid = this.resolveUserId();
+    if (!uid || uid === 'local-testing') {
+      return { ok: false, reason: 'no_user' };
+    }
+    try {
+      const userRef = doc(this.db, 'users', uid);
+      const pRef = doc(collection(userRef, 'vendor_prices'), String(docId));
+      await deleteDoc(pRef);
+      await this.refreshVendorPricesFromFirestore();
+      return { ok: true };
+    } catch (error) {
+      console.warn('Vendor price delete failed:', docId, error.message);
+      return { ok: false, reason: error.message };
+    }
+  }
+
+  /**
    * E3c — Load all vendor price rows for the current resolved user.
    */
   async fetchVendorPricesFromFirestore(explicitUserId) {

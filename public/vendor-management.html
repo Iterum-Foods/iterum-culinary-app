@@ -332,6 +332,14 @@
             </article>
         </section>
 
+        <section class="vendor-surface" style="margin-top: 0;">
+            <div class="vendor-section-title">Workspace price overrides</div>
+            <p style="margin:0 0 16px;max-width:52rem;font-size:0.95rem;line-height:1.55;color:#475569;">
+                Set a <strong>unit cost</strong> for an ingredient tied to a vendor for <strong>this workspace</strong> or as an <strong>account default</strong> (all workspaces). Recipe and menu costing apply these after local ingredient prices when the name or SKU matches.
+            </p>
+            <div id="vendor-price-overrides-panel-root"></div>
+        </section>
+
         <section class="vendor-surface">
             <div class="vendor-section-title">At a glance</div>
             <div class="stats-grid">
@@ -634,6 +642,7 @@
     <!-- Load Auth System at End -->
     <script type="module" defer src="assets/js/firebase-auth.js"></script>
     <script type="module" defer src="assets/js/firestore-sync.js"></script>
+    <script defer src="assets/js/vendor-price-overrides-panel.js"></script>
     <script defer src="assets/js/header-user-display.js"></script>
     <script defer src="assets/js/profile-editor.js"></script>
     
