@@ -2728,23 +2728,13 @@
                 existingRecipes.push(recipeData);
             }
             
-            // Save to user file (with localStorage fallback)
+            // Save to user file only (avoid clear-text recipe writes in localStorage)
             let saveSuccess = false;
             
             try {
                 saveSuccess = saveUserFile('recipes_in_progress.json', existingRecipes);
             } catch (error) {
-                console.warn('⚠️ Error saving to user file, using localStorage fallback:', error);
-            }
-            
-            // Always save to localStorage as backup
-            try {
-                localStorage.setItem('recipes', JSON.stringify(existingRecipes));
-                localStorage.setItem(`user_${currentUser?.id || 'guest'}_recipes_in_progress`, JSON.stringify(existingRecipes));
-                console.log('✅ Recipe saved to localStorage');
-                saveSuccess = true; // Mark as successful if localStorage works
-            } catch (error) {
-                console.error('❌ Error saving to localStorage:', error);
+                console.error('❌ Error saving recipe to user file:', error);
             }
             
             if (saveSuccess) {
@@ -3801,9 +3791,15 @@
             if (window.universalRecipeManager) {
                 window.universalRecipeManager.addToLibrary(stub, 'prep-item');
             } else {
-                const allRecipes = JSON.parse(localStorage.getItem('recipes') || '[]');
-                allRecipes.push(stub);
-                localStorage.setItem('recipes', JSON.stringify(allRecipes));
+                try {
+                    const existingRecipes = loadInProgressRecipesFromFile();
+                    if (!existingRecipes.find(r => r.id === stub.id)) {
+                        existingRecipes.push(stub);
+                    }
+                    saveUserFile('recipes_in_progress.json', existingRecipes);
+                } catch (error) {
+                    console.warn('⚠️ Unable to persist prep stub via user file:', error);
+                }
             }
 
             prepItem.status = 'queued';
