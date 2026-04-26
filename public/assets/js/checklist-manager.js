@@ -4,9 +4,59 @@ class ChecklistManager {
     this.entries = {};
     this.listeners = [];
     this.localPrefix = 'iterum_checklists_';
+    this.correctivePrefix = 'iterum_corrective_actions_';
     this.activeProjectId = null;
     this.currentUserId = null;
     this.initialized = false;
+  }
+
+  persistCorrectiveAction(projectId, correctiveAction) {
+    if (!projectId || !correctiveAction?.id) {
+      return;
+    }
+    try {
+      const key = `${this.correctivePrefix}${projectId}`;
+      const existing = JSON.parse(localStorage.getItem(key) || '[]');
+      const rows = Array.isArray(existing) ? existing : [];
+      rows.unshift(correctiveAction);
+      localStorage.setItem(key, JSON.stringify(rows.slice(0, 300)));
+    } catch (error) {
+      console.warn('⚠️ Unable to persist corrective actions:', error);
+    }
+  }
+
+  buildCorrectiveAction(entry, template, formData) {
+    if (!entry?.requiresCorrectiveAction) {
+      return null;
+    }
+    const correctiveActionText = String(formData.correctiveAction || '').trim();
+    const failureNotes = String(formData.failureNotes || '').trim();
+    const summary = [correctiveActionText, failureNotes].filter(Boolean).join(
+      ' | '
+    );
+    const nowIso = new Date().toISOString();
+    const actionId =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `ca_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+    return {
+      id: actionId,
+      projectId: entry.projectId,
+      title: `${template.name} corrective action`,
+      status: 'open',
+      priority: 'high',
+      sourceType: 'checklist',
+      sourceId: entry.id,
+      checklistLogId: entry.id,
+      owner: entry.ownerId,
+      resolutionNotes: '',
+      summary:
+        summary ||
+        'Checklist failed and requires follow-up action before service.',
+      createdAt: nowIso,
+      updatedAt: nowIso,
+      entityRefs: [{ type: 'checklist', id: template.id }]
+    };
   }
 
   init() {
@@ -441,6 +491,27 @@ class ChecklistManager {
     this.persistProject(projectId);
 
     this.notify('entryAdded', { projectId, entry, template });
+
+    const correctiveAction = this.buildCorrectiveAction(entry, template, formData);
+    if (correctiveAction) {
+      entry.correctiveActionId = correctiveAction.id;
+      this.persistCorrectiveAction(projectId, correctiveAction);
+      this.notify('correctiveActionAdded', {
+        projectId,
+        entryId: entry.id,
+        correctiveAction
+      });
+      if (window.firestoreSync?.saveCorrectiveAction) {
+        window.firestoreSync
+          .saveCorrectiveAction(correctiveAction)
+          .catch(error => {
+            console.warn(
+              '⚠️ Failed to sync corrective action with Firestore:',
+              error
+            );
+          });
+      }
+    }
 
     if (window.firestoreSync?.saveChecklistEntry) {
       window.firestoreSync

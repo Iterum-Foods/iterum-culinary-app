@@ -50,8 +50,8 @@
           message: `Missing product spec for ingredient: ${
             ing.name || 'Unnamed ingredient'
           }`,
-          actionHref: 'spec-library.html',
-          actionLabel: 'Open spec library'
+          actionHref: 'spec-library.html#missing-specs',
+          actionLabel: 'Add spec now'
         });
       }
     });
@@ -84,8 +84,8 @@
           message: `Price is stale (${age}d): ${
             ing.name || 'Unnamed ingredient'
           }`,
-          actionHref: 'ingredients.html',
-          actionLabel: 'Review ingredient'
+          actionHref: 'ingredients.html#stale-pricing',
+          actionLabel: 'Refresh price'
         });
       }
     });
@@ -110,8 +110,8 @@
         message: `Opening checklist failed: ${
           entry.data?.station || 'station not set'
         }`,
-        actionHref: 'dashboard.html',
-        actionLabel: 'Open checklist'
+        actionHref: 'dashboard.html#checklist-opening',
+        actionLabel: 'Resolve checklist'
       }));
   }
 

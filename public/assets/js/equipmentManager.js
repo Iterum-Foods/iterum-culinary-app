@@ -1,3 +1,7 @@
+// Legacy module notice:
+// This file is retained for backward compatibility only.
+// Active pages currently load `assets/js/equipment-manager.js`.
+// Avoid adding new functionality here unless a page explicitly depends on it.
 // Equipment Manager for Iterum R&D Chef Notebook
 // Handles equipment database browsing and user equipment management
 

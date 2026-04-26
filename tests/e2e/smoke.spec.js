@@ -2,28 +2,33 @@
 const { test, expect } = require('@playwright/test');
 
 test.describe('Smoke', () => {
-  test('landing / index loads', async ({ page }) => {
-    await page.goto('/');
-    await expect(page).toHaveTitle(/Iterum/i);
+  const basicPages = [
+    { name: 'landing / index', path: '/', title: /Iterum/i },
+    { name: 'dashboard HTML', path: '/dashboard.html' },
+    { name: 'menu builder', path: '/menu-builder.html' },
+    { name: 'project hub', path: '/project-hub.html' }
+  ];
+
+  basicPages.forEach(({ name, path, title }) => {
+    test(`${name} loads`, async ({ page }) => {
+      const res = await page.goto(path);
+      expect(res?.ok()).toBeTruthy();
+      await expect(page.locator('body')).toBeVisible();
+      if (title) {
+        await expect(page).toHaveTitle(title);
+      }
+      if (path === '/dashboard.html') {
+        await expect(page.locator('body')).toContainText(
+          /Operations exceptions/i
+        );
+      }
+    });
   });
 
   test('sign-in page loads', async ({ page }) => {
     await page.goto('/signin.html');
     await expect(page.locator('body')).toBeVisible();
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  });
-
-  test('dashboard HTML is served', async ({ page }) => {
-    const res = await page.goto('/dashboard.html');
-    expect(res?.ok()).toBeTruthy();
-    await expect(page.locator('body')).toBeVisible();
-    await expect(page.locator('body')).toContainText(/Operations exceptions/i);
-  });
-
-  test('menu builder page loads', async ({ page }) => {
-    const res = await page.goto('/menu-builder.html');
-    expect(res?.ok()).toBeTruthy();
-    await expect(page.locator('body')).toBeVisible();
   });
 
   test('mobile compliance (line log) page loads', async ({ page }) => {
@@ -36,12 +41,17 @@ test.describe('Smoke', () => {
         name: /what you need for your shift/i
       })
     ).toBeVisible();
+    await expect(page.locator('#today-panel')).toHaveCount(1);
   });
 
-  test('project hub page loads', async ({ page }) => {
-    const res = await page.goto('/project-hub.html');
+  test('dashboard checklist deep link opens opening checklist modal', async ({
+    page
+  }) => {
+    const res = await page.goto('/dashboard.html#checklist-opening');
     expect(res?.ok()).toBeTruthy();
-    await expect(page.locator('body')).toBeVisible();
+    await expect(
+      page.locator('.checklist-modal h3', { hasText: /Daily Opening Checklist/i })
+    ).toBeVisible();
   });
 
   test('vendor management page loads', async ({ page }) => {

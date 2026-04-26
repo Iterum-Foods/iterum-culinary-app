@@ -42,6 +42,20 @@ class ChecklistUI {
       this.renderStatus();
       this.renderRecent();
     });
+
+    this.handleDeepLink(window.location.hash);
+    window.addEventListener('hashchange', () => {
+      this.handleDeepLink(window.location.hash);
+    });
+  }
+
+  handleDeepLink(hash) {
+    if (!hash) {
+      return;
+    }
+    if (hash === '#checklist-opening') {
+      this.openEntryModal('opening_line_check');
+    }
   }
 
   renderBase() {
@@ -386,7 +400,7 @@ class ChecklistUI {
   }
 
   renderFormFields(template) {
-    return template.fields
+    const fieldMarkup = template.fields
       .map(field => {
         const fieldId = `chk-field-${template.id}-${field.id}`;
         const requiredAttr = field.required ? 'required' : '';
@@ -395,7 +409,7 @@ class ChecklistUI {
           return `
                         <div class="form-group">
                             <label for="${fieldId}" class="form-label">${field.label}${field.requiredOnAlert ? ' *' : ''}</label>
-                            <textarea id="${fieldId}" name="${field.id}" class="form-textarea" ${requiredAttr} placeholder="${field.placeholder || ''}"></textarea>
+                            <textarea id="${fieldId}" name="${field.id}" class="form-textarea" data-corrective-action="${field.id === 'correctiveAction' ? 'true' : 'false'}" ${requiredAttr} placeholder="${field.placeholder || ''}"></textarea>
                         </div>
                     `;
         }
@@ -451,6 +465,18 @@ class ChecklistUI {
                 `;
       })
       .join('');
+    const hasPassFail = (template.fields || []).some(
+      field => field.type === 'pass_fail'
+    );
+    const failureNotesMarkup = hasPassFail
+      ? `
+        <div class="form-group">
+          <label for="chk-failure-notes-${template.id}" class="form-label">Failure notes (required when any check fails)</label>
+          <textarea id="chk-failure-notes-${template.id}" name="failureNotes" class="form-textarea" placeholder="What failed and immediate containment steps."></textarea>
+        </div>
+      `
+      : '';
+    return `${fieldMarkup}${failureNotesMarkup}`;
   }
 
   handleFormSubmit(template) {
@@ -478,6 +504,26 @@ class ChecklistUI {
         }
 
         payload[field.id] = value;
+      }
+
+      const failureNotesValue = String(formData.get('failureNotes') || '').trim();
+      if (failureNotesValue) {
+        payload.failureNotes = failureNotesValue;
+      }
+
+      const failedChecks = (template.fields || []).filter(field => {
+        if (field.type !== 'pass_fail') {
+          return false;
+        }
+        const value = String(payload[field.id] || '')
+          .trim()
+          .toLowerCase();
+        return value === 'fail';
+      });
+      if (failedChecks.length && !failureNotesValue) {
+        throw new Error(
+          'Failure notes are required when any pass/fail check is marked as fail.'
+        );
       }
 
       const entry = this.manager.addEntry(template.id, payload);

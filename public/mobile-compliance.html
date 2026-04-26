@@ -57,6 +57,22 @@
 
   <div id="app-panel" class="mc-panel" hidden>
     <div class="mc-chip" id="user-chip"></div>
+    <div
+      id="today-panel"
+      class="mc-panel"
+      style="margin-top:0.75rem;margin-bottom:0.9rem;padding:0.85rem;border:1px solid var(--mc-border);border-radius:12px;background:var(--mc-card);"
+      aria-live="polite"
+    >
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;">
+        <strong style="font-size:0.95rem;color:var(--mc-text);">Today at a glance</strong>
+        <span id="today-role-chip" class="mc-chip" style="font-size:0.72rem;">Role: Team</span>
+      </div>
+      <p id="today-summary" style="margin:0.45rem 0 0.35rem;font-size:0.86rem;color:var(--mc-muted);line-height:1.4;">
+        Pick your workspace to load shift priorities.
+      </p>
+      <div id="today-metrics" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.5rem;"></div>
+      <div id="today-actions" style="display:flex;flex-wrap:wrap;gap:0.45rem;margin-top:0.55rem;"></div>
+    </div>
 
     <div id="workspace-first-run" class="mc-panel" style="margin-bottom:1rem;padding:1rem;border:2px solid var(--mc-accent);border-radius:12px;background:var(--mc-card);display:none;">
       <p style="margin:0 0 0.5rem;font-weight:700;color:var(--mc-text);">Name your workspace</p>

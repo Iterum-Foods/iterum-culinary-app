@@ -28,7 +28,9 @@ import {
   getDoc,
   getDocs,
   getFirestore,
+  limit,
   onSnapshot,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
@@ -311,6 +313,214 @@ function setStatus(msg, isErr) {
       el.style.color = color;
     }
   });
+}
+
+function isoDayKey(value = new Date()) {
+  const d = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(d.getTime())) {
+    return '';
+  }
+  return d.toISOString().slice(0, 10);
+}
+
+function parseEntryDay(entry) {
+  const raw = entry?.timestamp || entry?.createdAt || entry?.updatedAt || null;
+  if (!raw) {
+    return '';
+  }
+  if (raw?.toDate) {
+    return isoDayKey(raw.toDate());
+  }
+  return isoDayKey(raw);
+}
+
+function currentRoleForProject(projectId) {
+  if (!projectId || projectId === 'master') {
+    return 'account_admin';
+  }
+  const matched = myProjectRows.find(row => row.id === projectId);
+  return matched?.role || 'employee_line';
+}
+
+function roleLabel(role) {
+  const mapping = {
+    account_admin: 'Admin',
+    location_manager: 'Manager',
+    operations_gm: 'Manager',
+    employee_line: 'Line',
+    kitchen_staff: 'Kitchen',
+    front_of_house: 'FOH',
+    support_staff: 'Support'
+  };
+  return mapping[role] || 'Team';
+}
+
+function renderTodayPanel(model) {
+  const summaryEl = document.getElementById('today-summary');
+  const metricsEl = document.getElementById('today-metrics');
+  const actionsEl = document.getElementById('today-actions');
+  const roleChip = document.getElementById('today-role-chip');
+  if (!summaryEl || !metricsEl || !actionsEl || !roleChip) {
+    return;
+  }
+
+  roleChip.textContent = `Role: ${roleLabel(model.role)}`;
+  summaryEl.textContent = model.summary;
+  metricsEl.innerHTML = model.metrics
+    .map(
+      item => `<div style="border:1px solid var(--mc-border);border-radius:10px;padding:0.5rem 0.55rem;">
+        <div style="font-size:0.72rem;color:var(--mc-muted);">${escapeHtml(item.label)}</div>
+        <div style="font-size:1rem;font-weight:700;color:var(--mc-text);">${escapeHtml(String(item.value))}</div>
+      </div>`
+    )
+    .join('');
+  actionsEl.innerHTML = model.actions
+    .map(
+      action =>
+        `<button type="button" class="mc-btn mc-btn-ghost" data-today-action="${escapeHtml(action.key)}">${escapeHtml(action.label)}</button>`
+    )
+    .join('');
+
+  actionsEl.querySelectorAll('[data-today-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.getAttribute('data-today-action');
+      const tab = key || 'hub';
+      document
+        .querySelector(`[data-hub-tab="${tab}"]`)
+        ?.dispatchEvent(new Event('click', { bubbles: true }));
+    });
+  });
+}
+
+async function refreshTodayPanel(uid) {
+  const projectId = getProjectId();
+  if (!uid) {
+    renderTodayPanel({
+      role: 'employee_line',
+      summary: 'Sign in to load your shift priorities.',
+      metrics: [
+        { label: 'Opening checks', value: '—' },
+        { label: 'Attention flags', value: '—' },
+        { label: 'Temp logs today', value: '—' },
+        { label: 'Team posts today', value: '—' }
+      ],
+      actions: [{ key: 'hub', label: 'Open Home' }]
+    });
+    return;
+  }
+
+  if (!db || !projectId || projectId === 'mobile-default') {
+    renderTodayPanel({
+      role: currentRoleForProject(projectId),
+      summary: 'Pick a workspace above to load checks, logs, and handoff activity.',
+      metrics: [
+        { label: 'Opening checks', value: '0' },
+        { label: 'Attention flags', value: '0' },
+        { label: 'Temp logs today', value: '0' },
+        { label: 'Team posts today', value: '0' }
+      ],
+      actions: [
+        { key: 'hub', label: 'Open Home' },
+        { key: 'temps', label: 'Log temps' }
+      ]
+    });
+    return;
+  }
+
+  const today = isoDayKey();
+  const model = {
+    role: currentRoleForProject(projectId),
+    summary: 'Loading today’s priorities…',
+    metrics: [
+      { label: 'Opening checks', value: '0' },
+      { label: 'Attention flags', value: '0' },
+      { label: 'Temp logs today', value: '0' },
+      { label: 'Team posts today', value: '0' }
+    ],
+    actions: [
+      { key: 'checks', label: 'Run checks' },
+      { key: 'team', label: 'Open team log' },
+      { key: 'temps', label: 'Log temps' }
+    ]
+  };
+
+  try {
+    const checksSnap = await getDocs(
+      query(
+        collection(db, 'projects', projectId, 'checklists'),
+        orderBy('timestamp', 'desc'),
+        limit(40)
+      )
+    );
+    let openingCount = 0;
+    let attentionCount = 0;
+    checksSnap.forEach(docSnap => {
+      const data = docSnap.data() || {};
+      if (parseEntryDay(data) !== today) {
+        return;
+      }
+      openingCount += 1;
+      if (data.status === 'attention' || data.requiresAttention) {
+        attentionCount += 1;
+      }
+    });
+    model.metrics[0].value = String(openingCount);
+    model.metrics[1].value = String(attentionCount);
+  } catch (error) {
+    console.warn('refreshTodayPanel checklists', error);
+  }
+
+  try {
+    const tempSnap = await getDocs(
+      query(
+        collection(db, 'users', uid, 'temperature_readings'),
+        orderBy('timestamp', 'desc'),
+        limit(40)
+      )
+    );
+    let tempCount = 0;
+    tempSnap.forEach(docSnap => {
+      const data = docSnap.data() || {};
+      if (parseEntryDay(data) !== today) {
+        return;
+      }
+      if (data.projectId === projectId || !data.projectId) {
+        tempCount += 1;
+      }
+    });
+    model.metrics[2].value = String(tempCount);
+  } catch (error) {
+    console.warn('refreshTodayPanel temps', error);
+  }
+
+  try {
+    const dayPostsSnap = await getDocs(
+      query(
+        collection(db, 'projects', projectId, 'shift_day_posts'),
+        where('postDate', '==', today),
+        limit(40)
+      )
+    );
+    model.metrics[3].value = String(dayPostsSnap.size || 0);
+  } catch (error) {
+    console.warn('refreshTodayPanel team posts', error);
+  }
+
+  const attention = Number(model.metrics[1].value) || 0;
+  model.summary =
+    attention > 0
+      ? `${attention} check${attention === 1 ? '' : 's'} need corrective action before service.`
+      : 'Shift checks look healthy. Keep logs current and post handoff notes.';
+
+  if (
+    model.role === 'account_admin' ||
+    model.role === 'location_manager' ||
+    model.role === 'operations_gm'
+  ) {
+    model.actions.unshift({ key: 'team', label: 'Review team handoff' });
+  }
+
+  renderTodayPanel(model);
 }
 
 function showPanel(name) {
@@ -792,6 +1002,7 @@ async function refreshProjectPicker(uid) {
       setStatus('Workspace saved.');
     }
     setWorkspaceReadyGlobally(uid);
+    void refreshTodayPanel(uid);
   };
 
   updateWorkspaceFirstRunVisibility(uid);
@@ -957,6 +1168,7 @@ export function initMobileCompliance() {
       switchTab('fridge');
       refreshProjectPicker(user.uid)
         .then(() => {
+          void refreshTodayPanel(user.uid);
           ensureSiteIdIfNoTeamProjects();
           setStatus(
             isWorkspaceReady(user.uid)
@@ -972,6 +1184,7 @@ export function initMobileCompliance() {
       showPanel('auth');
       $('user-chip').textContent = '';
       myProjectRows = [];
+      void refreshTodayPanel('');
       setStatus('Sign in to use shift tools.');
     }
   });

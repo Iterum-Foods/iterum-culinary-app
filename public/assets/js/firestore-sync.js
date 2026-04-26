@@ -700,6 +700,40 @@ class FirestoreSync {
   }
 
   /**
+   * Save corrective action to Firestore under project scope
+   */
+  async saveCorrectiveAction(action) {
+    if (!this.initialized) {
+      console.warn('⚠️ Firestore not initialized, skipping corrective action sync');
+      return false;
+    }
+
+    if (!action?.id) {
+      return false;
+    }
+
+    try {
+      const projectId = action.projectId || 'master';
+      const projectRef = doc(this.db, 'projects', projectId);
+      const actionRef = doc(collection(projectRef, 'corrective_actions'), action.id);
+      const payload = {
+        ...action,
+        projectId,
+        updatedAt: serverTimestamp()
+      };
+      if (!payload.createdAt) {
+        payload.createdAt = new Date().toISOString();
+      }
+      await setDoc(actionRef, payload, { merge: true });
+      console.log('✅ Corrective action saved to Firestore');
+      return true;
+    } catch (error) {
+      console.error('❌ Error saving corrective action:', error);
+      return false;
+    }
+  }
+
+  /**
    * Fetch checklist entries for a project
    */
   async getChecklistEntries(projectId, options = {}) {
