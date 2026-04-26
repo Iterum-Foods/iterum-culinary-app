@@ -15,25 +15,30 @@ class ChecklistUI {
     }
 
     this.renderBase();
+    this.renderOpeningFlow();
     this.renderStatus();
     this.renderRecent();
 
     this.manager.on('projectChanged', () => {
+      this.renderOpeningFlow();
       this.renderStatus();
       this.renderRecent();
     });
 
     this.manager.on('entriesLoaded', () => {
+      this.renderOpeningFlow();
       this.renderStatus();
       this.renderRecent();
     });
 
     this.manager.on('entryAdded', () => {
+      this.renderOpeningFlow();
       this.renderStatus();
       this.renderRecent();
     });
 
     this.manager.on('entrySynced', () => {
+      this.renderOpeningFlow();
       this.renderStatus();
       this.renderRecent();
     });
@@ -47,10 +52,12 @@ class ChecklistUI {
                     <div class="text-xs text-gray-500">Track refrigeration temps and sanitizer levels across all projects.</div>
                 </div>
                 <div class="checklist-action-buttons">
+                    <button class="btn btn-primary btn-sm" data-template="opening_line_check">Opening Checklist</button>
                     <button class="btn btn-primary btn-sm" data-template="refrigeration_temp">Log Temperature</button>
                     <button class="btn btn-secondary btn-sm" data-template="sanitizer_log">Log Sanitizer</button>
                 </div>
             </div>
+            <div id="opening-checklist-panel" class="opening-checklist-panel"></div>
             <div class="checklist-status" id="checklist-status-list"></div>
             <div class="checklist-recent-wrapper">
                 <div class="checklist-recent-header">
@@ -81,6 +88,60 @@ class ChecklistUI {
     reviewButton.addEventListener('click', () => {
       this.openHistoryModal();
     });
+  }
+
+  renderOpeningFlow() {
+    if (!this.container) {
+      return;
+    }
+    const panel = this.container.querySelector('#opening-checklist-panel');
+    if (!panel) {
+      return;
+    }
+    const template = this.manager.getTemplate('opening_line_check');
+    if (!template) {
+      panel.innerHTML = '';
+      return;
+    }
+    const todayEntries = this.manager.getEntriesForTemplateOnDate(
+      template.id,
+      new Date().toLocaleDateString('en-CA')
+    );
+    const latest = todayEntries.length ? todayEntries[0] : null;
+    const progress = this.manager.calculateCompletion(template, latest);
+    const statusLabel = latest
+      ? latest.requiresAttention
+        ? 'Needs corrective action'
+        : 'Completed for today'
+      : 'Not completed yet';
+    const statusClass = latest
+      ? latest.requiresAttention
+        ? 'status-pill status-pill-danger'
+        : 'status-pill status-pill-safe'
+      : 'status-pill';
+    panel.innerHTML = `
+      <div class="opening-row">
+        <div>
+          <div class="opening-title">Daily Opening Checklist</div>
+          <div class="opening-subtitle">Run once per station before service starts.</div>
+        </div>
+        <span class="${statusClass}">${statusLabel}</span>
+      </div>
+      <div class="opening-progress-track">
+        <div class="opening-progress-fill" style="width:${progress.percent}%"></div>
+      </div>
+      <div class="opening-meta">${progress.complete}/${progress.total} checks passed${latest ? ` • last update ${this.formatRelativeTime(latest.timestamp)}` : ''}</div>
+      <div class="opening-actions">
+        <button class="btn btn-sm btn-primary" data-opening-action="start">Run checklist</button>
+        <button class="btn btn-sm btn-secondary" data-opening-action="history">View today</button>
+      </div>
+    `;
+    panel
+      .querySelector('[data-opening-action="start"]')
+      ?.addEventListener('click', () => this.openEntryModal(template.id));
+    panel
+      .querySelector('[data-opening-action="history"]')
+      ?.addEventListener('click', () => this.openHistoryModal());
   }
 
   renderStatus() {
@@ -369,6 +430,19 @@ class ChecklistUI {
                     `;
         }
 
+        if (field.type === 'pass_fail') {
+          return `
+                        <div class="form-group">
+                            <label for="${fieldId}" class="form-label">${field.label}${field.required ? ' *' : ''}</label>
+                            <select id="${fieldId}" name="${field.id}" class="form-input" ${requiredAttr}>
+                                <option value="">Select</option>
+                                <option value="pass">Pass</option>
+                                <option value="fail">Fail</option>
+                            </select>
+                        </div>
+                    `;
+        }
+
         return `
                     <div class="form-group">
                         <label for="${fieldId}" class="form-label">${field.label}${field.required ? ' *' : ''}</label>
@@ -380,34 +454,32 @@ class ChecklistUI {
   }
 
   handleFormSubmit(template) {
-    const form = this.modal.querySelector('#checklist-entry-form');
-    const formData = new FormData(form);
-    const payload = {};
-
-    template.fields.forEach(field => {
-      let value = formData.get(field.id);
-      if (value === null || value === undefined || value === '') {
-        if (field.required) {
-          value = '';
-        } else {
-          return;
-        }
-      }
-
-      if (field.type === 'number') {
-        value = Number(value);
-        if (Number.isNaN(value)) {
-          window.showError?.(`${field.label} must be a valid number.`);
-          throw new Error('Invalid numeric entry');
-        }
-      } else {
-        value = value.toString();
-      }
-
-      payload[field.id] = value;
-    });
-
     try {
+      const form = this.modal.querySelector('#checklist-entry-form');
+      const formData = new FormData(form);
+      const payload = {};
+
+      for (const field of template.fields) {
+        let value = formData.get(field.id);
+        if (value === null || value === undefined || value === '') {
+          if (field.required) {
+            throw new Error(`${field.label} is required.`);
+          }
+          continue;
+        }
+
+        if (field.type === 'number') {
+          value = Number(value);
+          if (Number.isNaN(value)) {
+            throw new Error(`${field.label} must be a valid number.`);
+          }
+        } else {
+          value = String(value);
+        }
+
+        payload[field.id] = value;
+      }
+
       const entry = this.manager.addEntry(template.id, payload);
       if (entry.requiresAttention) {
         window.showWarning?.(
@@ -488,6 +560,51 @@ class ChecklistUI {
                 margin-top: 16px;
             }
 
+            .opening-checklist-panel {
+                margin: 14px 0 12px;
+                border: 1px solid rgba(148, 163, 184, 0.28);
+                border-radius: 14px;
+                padding: 14px;
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(59, 130, 246, 0.06));
+            }
+            .opening-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .opening-title {
+                font-weight: 700;
+                color: #0f172a;
+            }
+            .opening-subtitle {
+                font-size: 12px;
+                color: #475569;
+            }
+            .opening-progress-track {
+                width: 100%;
+                height: 10px;
+                border-radius: 999px;
+                background: rgba(148, 163, 184, 0.25);
+                margin-top: 10px;
+                overflow: hidden;
+            }
+            .opening-progress-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #10b981, #059669);
+                transition: width .2s ease;
+            }
+            .opening-meta {
+                margin-top: 8px;
+                font-size: 12px;
+                color: #334155;
+            }
+            .opening-actions {
+                margin-top: 10px;
+                display: flex;
+                gap: 8px;
+            }
+
             .checklist-status-card {
                 background: linear-gradient(135deg, rgba(15, 23, 42, 0.04), rgba(148, 163, 184, 0.08));
                 border: 1px solid rgba(148, 163, 184, 0.2);
@@ -546,6 +663,8 @@ class ChecklistUI {
                 display: inline-flex;
                 align-items: center;
                 gap: 4px;
+                background: rgba(148, 163, 184, 0.18);
+                color: #334155;
             }
 
             .status-pill-danger {

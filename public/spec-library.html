@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spec Library - Iterum Culinary</title>
+  <link rel="stylesheet" href="assets/css/tailwind-output.css">
+  <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+  <script src="assets/js/unified-nav-header.js" defer></script>
+  <script src="assets/js/spec-library.js" defer></script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-900">
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <header class="mb-6">
+      <h1 class="text-3xl font-bold tracking-tight">Spec Library</h1>
+      <p class="text-slate-600 mt-2 max-w-3xl">
+        Central index of product specification links and notes captured from Ingredients and Vendor Management.
+      </p>
+      <p id="spec-summary" class="text-sm text-slate-500 mt-2"></p>
+    </header>
+
+    <section class="bg-white border border-slate-200 rounded-xl p-4 mb-5 flex flex-wrap gap-3 items-center">
+      <input id="spec-search" type="text" class="flex-1 min-w-[220px] rounded-lg border border-slate-300 px-3 py-2" placeholder="Search ingredient, vendor, or notes">
+      <select id="spec-type-filter" class="rounded-lg border border-slate-300 px-3 py-2">
+        <option value="all">All types</option>
+        <option value="ingredient">Ingredient specs</option>
+        <option value="vendor_product">Vendor item specs</option>
+      </select>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+      <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="bg-slate-100 text-slate-700">
+          <tr>
+            <th class="p-3 font-semibold">Type</th>
+            <th class="p-3 font-semibold">Item</th>
+            <th class="p-3 font-semibold">Vendor</th>
+            <th class="p-3 font-semibold">Spec Link</th>
+            <th class="p-3 font-semibold">Spec Notes</th>
+            <th class="p-3 font-semibold">Updated</th>
+          </tr>
+        </thead>
+        <tbody id="spec-library-body"></tbody>
+      </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
+

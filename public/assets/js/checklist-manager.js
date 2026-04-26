@@ -53,6 +53,63 @@ class ChecklistManager {
   }
 
   registerDefaultTemplates() {
+    const openingChecklistTemplate = {
+      id: 'opening_line_check',
+      name: 'Daily Opening Checklist',
+      description: 'Confirm line readiness before service starts.',
+      category: 'operations',
+      projectTags: ['opening', 'line-ready'],
+      schedule: {
+        intervalMinutes: 1440,
+        label: 'Daily before service'
+      },
+      fields: [
+        {
+          id: 'station',
+          label: 'Station / Area',
+          type: 'select',
+          options: ['Hot Line', 'Cold Line', 'Prep', 'Expo', 'FOH Support'],
+          allowCustom: true,
+          required: true
+        },
+        {
+          id: 'miseEnPlaceReady',
+          label: 'Mise en place complete',
+          type: 'pass_fail',
+          required: true,
+          requiredOnAlert: true
+        },
+        {
+          id: 'equipmentSanitized',
+          label: 'Equipment sanitized and calibrated',
+          type: 'pass_fail',
+          required: true,
+          requiredOnAlert: true
+        },
+        {
+          id: 'allergenLabelsSet',
+          label: 'Allergen labels and specs confirmed',
+          type: 'pass_fail',
+          required: true,
+          requiredOnAlert: true
+        },
+        {
+          id: 'openingTempChecksDone',
+          label: 'Opening temperature checks complete',
+          type: 'pass_fail',
+          required: true,
+          requiredOnAlert: true
+        },
+        {
+          id: 'correctiveAction',
+          label: 'Corrective Action',
+          type: 'textarea',
+          placeholder: 'What was fixed before service?',
+          requiredOnAlert: true
+        }
+      ]
+    };
+
     const refrigerationTemplate = {
       id: 'refrigeration_temp',
       name: 'Refrigeration Temp Log',
@@ -180,6 +237,7 @@ class ChecklistManager {
       ]
     };
 
+    this.registerTemplate(openingChecklistTemplate);
     this.registerTemplate(refrigerationTemplate);
     this.registerTemplate(sanitizerTemplate);
   }
@@ -449,6 +507,23 @@ class ChecklistManager {
             requiresCorrectiveAction || field.requiredOnAlert;
         }
       }
+
+      if (field.type === 'pass_fail') {
+        const normalized = String(value || '')
+          .trim()
+          .toLowerCase();
+        if (normalized === 'fail') {
+          flags.push({
+            fieldId: field.id,
+            type: 'failed_check',
+            message: `${field.label} is marked as fail.`,
+            actual: normalized
+          });
+          status = 'attention';
+          requiresCorrectiveAction =
+            requiresCorrectiveAction || field.requiredOnAlert;
+        }
+      }
     });
 
     return { status, flags, requiresCorrectiveAction };
@@ -492,6 +567,51 @@ class ChecklistManager {
 
   getRecentEntries(projectId = this.getActiveProjectId(), limit = 6) {
     return this.getEntries(projectId).slice(0, limit);
+  }
+
+  getEntriesForTemplateOnDate(
+    templateId,
+    dateString,
+    projectId = this.getActiveProjectId()
+  ) {
+    const target =
+      dateString || new Date().toLocaleDateString('en-CA');
+    return this.getEntries(projectId).filter(entry => {
+      if (entry.templateId !== templateId) {
+        return false;
+      }
+      const ts = this.parseTimestamp(entry.timestamp || entry.createdAt);
+      if (!ts) {
+        return false;
+      }
+      const day = new Date(ts).toLocaleDateString('en-CA');
+      return day === target;
+    });
+  }
+
+  calculateCompletion(template, entry) {
+    if (!template || !entry || !entry.data) {
+      return { percent: 0, complete: 0, total: 0 };
+    }
+    const gradedFields = (template.fields || []).filter(
+      field => field.type === 'pass_fail' || field.type === 'boolean'
+    );
+    if (!gradedFields.length) {
+      return { percent: 0, complete: 0, total: 0 };
+    }
+    let complete = 0;
+    gradedFields.forEach(field => {
+      const value = entry.data[field.id];
+      if (field.type === 'pass_fail') {
+        if (String(value || '').toLowerCase() === 'pass') {
+          complete += 1;
+        }
+      } else if (field.type === 'boolean' && Boolean(value)) {
+        complete += 1;
+      }
+    });
+    const total = gradedFields.length;
+    return { percent: Math.round((complete / total) * 100), complete, total };
   }
 
   parseTimestamp(value) {

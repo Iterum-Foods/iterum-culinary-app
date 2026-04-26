@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "iterum.corrective-action.v1",
+  "title": "CorrectiveAction",
+  "type": "object",
+  "required": [
+    "id",
+    "projectId",
+    "title",
+    "status",
+    "priority",
+    "sourceType",
+    "sourceId",
+    "version",
+    "createdAt",
+    "updatedAt",
+    "createdBy",
+    "updatedBy"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["open", "in_progress", "blocked", "resolved", "cancelled"]
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "critical"]
+    },
+    "sourceType": {
+      "type": "string",
+      "enum": ["checklist_log", "manual", "temperature_log", "audit"]
+    },
+    "sourceId": { "type": "string", "minLength": 1 },
+    "checklistLogId": { "type": "string" },
+    "owner": {
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" }
+      },
+      "additionalProperties": false
+    },
+    "dueAt": { "type": "string", "format": "date-time" },
+    "resolutionNotes": { "type": "string" },
+    "resolvedAt": { "type": "string", "format": "date-time" },
+    "resolvedBy": { "type": "string" },
+    "entityRefs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "id"],
+        "properties": {
+          "type": { "type": "string" },
+          "id": { "type": "string" },
+          "name": { "type": "string" }
+        },
+        "additionalProperties": false
+      },
+      "default": []
+    },
+    "version": { "type": "integer", "minimum": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "createdBy": { "type": "string", "minLength": 1 },
+    "updatedBy": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "status": { "const": "resolved" } },
+        "required": ["status"]
+      },
+      "then": { "required": ["resolvedAt", "resolvedBy"] }
+    }
+  ],
+  "additionalProperties": false
+}
+

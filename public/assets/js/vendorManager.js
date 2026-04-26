@@ -636,10 +636,100 @@ class VendorManager {
                     </tbody>
                 </table>
             </div>
+            ${this.renderVendorIngredientsTable(filteredVendors)}
         `;
 
     // Re-attach event listeners
     this.attachRowEventListeners();
+  }
+
+  renderVendorIngredientsTable(vendors) {
+    const list = Array.isArray(vendors) ? vendors : [];
+    const rows = [];
+    list.forEach(vendor => {
+      const products = Array.isArray(vendor?.products) ? vendor.products : [];
+      if (!products.length) {
+        rows.push({
+          vendorName: vendor?.name || 'Unknown Vendor',
+          companyName: vendor?.company || '',
+          itemName: 'No items tracked',
+          sku: '',
+          packSize: '',
+          unitCost: null,
+          notes: ''
+        });
+        return;
+      }
+      products.forEach(product => {
+        rows.push({
+          vendorName: vendor?.name || 'Unknown Vendor',
+          companyName: vendor?.company || '',
+          itemName: product?.name || '',
+          sku: product?.sku || '',
+          packSize: product?.packSize || '',
+          specUrl: product?.specUrl || '',
+          specNotes: product?.specNotes || '',
+          unitCost:
+            product?.unitCost !== null && product?.unitCost !== undefined
+              ? Number(product.unitCost)
+              : null,
+          notes: product?.notes || ''
+        });
+      });
+    });
+
+    const bodyHtml = rows.length
+      ? rows
+          .map(
+            row => `<tr>
+                <td>${this.escapeHtml(row.vendorName)}</td>
+                <td>${this.escapeHtml(row.companyName || '—')}</td>
+                <td>${this.escapeHtml(row.itemName || '—')}</td>
+                <td>${this.escapeHtml(row.sku || '—')}</td>
+                <td>${this.escapeHtml(row.packSize || '—')}</td>
+                <td>${
+                  row.specUrl
+                    ? `<a href="${this.escapeHtml(row.specUrl)}" target="_blank" rel="noopener" style="color:#2563eb;font-weight:600;text-decoration:none;">View spec</a>`
+                    : '—'
+                }</td>
+                <td>${this.escapeHtml(row.specNotes || '—')}</td>
+                <td>${
+                  Number.isFinite(row.unitCost)
+                    ? `$${row.unitCost.toFixed(2)}`
+                    : '—'
+                }</td>
+                <td>${this.escapeHtml(row.notes || '—')}</td>
+            </tr>`
+          )
+          .join('')
+      : `<tr><td colspan="9" class="text-center text-slate-500 py-4">No vendor ingredient rows yet.</td></tr>`;
+
+    return `
+      <div class="vendors-table-container mt-6">
+        <div class="px-3 py-2 border-b border-slate-200 bg-slate-50">
+          <h3 class="text-sm font-semibold text-slate-700">Vendor ingredients list (spreadsheet view)</h3>
+          <p class="text-xs text-slate-500 mt-1">One row per vendor item for quick scanning and copy/paste workflows.</p>
+        </div>
+        <table class="vendors-table">
+          <thead>
+            <tr>
+              <th>Vendor</th>
+              <th>Company</th>
+              <th>Ingredient / Item</th>
+              <th>SKU</th>
+              <th>Pack Size</th>
+              <th>Spec Link</th>
+              <th>Spec Notes</th>
+              <th>Unit Cost</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${bodyHtml}
+          </tbody>
+        </table>
+      </div>
+    `;
   }
 
   renderVendorRow(vendor) {
@@ -647,6 +737,7 @@ class VendorManager {
     const specialties = Array.isArray(vendor.specialties)
       ? vendor.specialties
       : [];
+    const products = Array.isArray(vendor.products) ? vendor.products : [];
     const specialtyBadges = specialties.length
       ? specialties
           .map(
@@ -656,9 +747,25 @@ class VendorManager {
           .join('')
       : '<span class="text-xs text-slate-400">No specialties</span>';
     const productBadge =
-      Array.isArray(vendor.products) && vendor.products.length
+      products.length
         ? `<span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700">🧾 ${vendor.products.length} item${vendor.products.length === 1 ? '' : 's'}</span>`
         : '';
+    const productPreview = products
+      .map(item => this.escapeHtml(item?.name || '').trim())
+      .filter(Boolean)
+      .slice(0, 3);
+    const remainingProducts = Math.max(products.length - productPreview.length, 0);
+    const productPreviewHtml = productPreview.length
+      ? `<div class="mt-2 flex flex-wrap gap-1.5">
+            ${productPreview
+              .map(
+                name =>
+                  `<span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">🥬 ${name}</span>`
+              )
+              .join('')}
+            ${remainingProducts > 0 ? `<span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">+${remainingProducts} more</span>` : ''}
+          </div>`
+      : '';
     const invoiceBadge = vendor.invoiceAttachment
       ? '<span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700">📎 Invoice</span>'
       : '';
@@ -674,6 +781,7 @@ class VendorManager {
                     <div class="vendor-info">
                         <div class="vendor-name">${this.escapeHtml(vendor.name)}</div>
                         <div class="vendor-email">${vendor.email ? this.escapeHtml(vendor.email) : 'No email'}</div>
+                        ${productPreviewHtml}
                     </div>
                 </td>
                 <td>
@@ -1012,6 +1120,12 @@ class VendorManager {
                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                        placeholder="Enter website URL"
                                        value="${vendor?.website || ''}">
+                                <div class="mt-2 flex items-center gap-3">
+                                    <button type="button" data-action="import-website-info" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-700 text-sm font-medium hover:bg-blue-100 transition">
+                                        🌐 Import from website
+                                    </button>
+                                    <span id="vendor-website-import-status" class="text-xs text-gray-500"></span>
+                                </div>
                             </div>
                         </div>
                         
@@ -1180,7 +1294,158 @@ class VendorManager {
         this.addProductRow(productContainer);
       });
     }
+    const importWebsiteButton = modal.querySelector(
+      '[data-action="import-website-info"]'
+    );
+    if (importWebsiteButton) {
+      importWebsiteButton.addEventListener('click', async event => {
+        event.preventDefault();
+        await this.importVendorInfoFromWebsite(modal);
+      });
+    }
     this.setupInvoiceCapture(modal, vendor);
+  }
+
+  async importVendorInfoFromWebsite(modal) {
+    const websiteInput = modal?.querySelector('#vendor-website');
+    const statusEl = modal?.querySelector('#vendor-website-import-status');
+    const websiteUrl = websiteInput?.value.trim();
+    if (!websiteUrl) {
+      if (statusEl) {
+        statusEl.textContent = 'Enter a website URL first.';
+      }
+      this.showNotification('Enter a website URL first.', 'error');
+      return;
+    }
+    let normalizedUrl = websiteUrl;
+    if (!/^https?:\/\//i.test(normalizedUrl)) {
+      normalizedUrl = `https://${normalizedUrl}`;
+      websiteInput.value = normalizedUrl;
+    }
+    try {
+      new URL(normalizedUrl);
+    } catch (error) {
+      if (statusEl) {
+        statusEl.textContent = 'Invalid URL format.';
+      }
+      this.showNotification('Please enter a valid URL.', 'error');
+      return;
+    }
+
+    if (statusEl) {
+      statusEl.textContent = 'Importing website details...';
+    }
+    try {
+      let vendorInfo = null;
+      if (window.vendorImporter?.fetchVendorInfo) {
+        vendorInfo = await window.vendorImporter.fetchVendorInfo(normalizedUrl);
+      } else {
+        vendorInfo = await this.fetchVendorInfoFromWebsite(normalizedUrl);
+      }
+      this.prefillVendorModalFromWebsite(modal, vendorInfo || {}, normalizedUrl);
+      if (statusEl) {
+        statusEl.textContent = 'Imported. Review fields before saving.';
+      }
+      this.showNotification(
+        'Vendor details imported from website. Review before saving.',
+        'success'
+      );
+    } catch (error) {
+      console.warn('Website vendor import fallback:', error);
+      this.prefillVendorModalFromWebsite(modal, {}, normalizedUrl);
+      if (statusEl) {
+        statusEl.textContent = 'Could not extract full details; basic data filled.';
+      }
+      this.showNotification(
+        'Could not extract full details; complete any missing fields.',
+        'info'
+      );
+    }
+  }
+
+  async fetchVendorInfoFromWebsite(url) {
+    const corsProxy = 'https://api.allorigins.win/get?url=';
+    const proxyUrl = corsProxy + encodeURIComponent(url);
+    const response = await fetch(proxyUrl);
+    if (!response.ok) {
+      throw new Error(`Import request failed: ${response.status}`);
+    }
+    const data = await response.json();
+    const html = String(data?.contents || '');
+    if (!html) {
+      throw new Error('No site contents returned');
+    }
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const bodyText = doc.body?.textContent || '';
+    const metaDescription =
+      doc.querySelector('meta[name="description"]')?.content ||
+      doc.querySelector('meta[property="og:description"]')?.content ||
+      '';
+    const titleText = doc.querySelector('title')?.textContent || '';
+    const email =
+      doc.querySelector('a[href^="mailto:"]')?.getAttribute('href')?.replace(
+        /^mailto:/i,
+        ''
+      ) ||
+      bodyText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}/i)?.[0] ||
+      '';
+    const phone =
+      doc.querySelector('a[href^="tel:"]')?.textContent?.trim() ||
+      bodyText.match(/(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/)?.[0] ||
+      '';
+    return {
+      name: titleText.split('|')[0].split('-')[0].trim(),
+      description: metaDescription,
+      email,
+      phone,
+      website: url
+    };
+  }
+
+  prefillVendorModalFromWebsite(modal, vendorInfo, websiteUrl) {
+    const parsedUrl = (() => {
+      try {
+        return new URL(websiteUrl);
+      } catch (error) {
+        return null;
+      }
+    })();
+    const domainLabel = parsedUrl
+      ? parsedUrl.hostname.replace(/^www\./i, '')
+      : '';
+    const suggestedName = domainLabel
+      ? domainLabel.split('.')[0].replace(/[-_]/g, ' ')
+      : '';
+    const website = vendorInfo?.website || websiteUrl;
+    const name = vendorInfo?.name || suggestedName;
+    const notes = vendorInfo?.description || '';
+
+    const map = {
+      '#vendor-name': name,
+      '#vendor-company': vendorInfo?.name || name,
+      '#vendor-email': vendorInfo?.email || '',
+      '#vendor-phone': vendorInfo?.phone || '',
+      '#vendor-website': website
+    };
+    Object.entries(map).forEach(([selector, value]) => {
+      const field = modal.querySelector(selector);
+      if (!field || !value || String(field.value || '').trim()) {
+        return;
+      }
+      field.value = String(value).trim();
+      field.classList.add('ring-2', 'ring-emerald-200');
+      setTimeout(() => {
+        field.classList.remove('ring-2', 'ring-emerald-200');
+      }, 1800);
+    });
+    const notesField = modal.querySelector('#vendor-notes');
+    if (notesField && notes) {
+      const current = String(notesField.value || '').trim();
+      if (!current) {
+        notesField.value = notes;
+      }
+    }
   }
 
   addProductRow(container, product = {}) {
@@ -1194,6 +1459,8 @@ class VendorManager {
     const safePack = this.escapeHtml(product?.packSize || '');
     const safeSku = this.escapeHtml(product?.sku || '');
     const safeNotes = this.escapeHtml(product?.notes || '');
+    const safeSpecUrl = this.escapeHtml(product?.specUrl || '');
+    const safeSpecNotes = this.escapeHtml(product?.specNotes || '');
     const priceValue = product?.unitCost ?? '';
     row.innerHTML = `
             <div class="grid gap-3 md:grid-cols-4">
@@ -1213,10 +1480,14 @@ class VendorManager {
                     </div>
                 </div>
             </div>
-            <div class="grid gap-3 md:grid-cols-5 md:items-end">
+            <div class="grid gap-3 md:grid-cols-7 md:items-end">
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">SKU / Code</label>
                     <input type="text" data-field="sku" value="${safeSku}" placeholder="Vendor ref" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-400 focus:ring focus:ring-indigo-200">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Spec link</label>
+                    <input type="url" data-field="specUrl" value="${safeSpecUrl}" placeholder="https://vendor.com/spec-sheet" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-400 focus:ring focus:ring-indigo-200">
                 </div>
                 <div class="md:col-span-3">
                     <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Notes</label>
@@ -1227,6 +1498,10 @@ class VendorManager {
                         ✕ Remove
                     </button>
                 </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">Spec highlights</label>
+                <input type="text" data-field="specNotes" value="${safeSpecNotes}" placeholder="e.g., UHT, 36% fat, kosher-certified" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-400 focus:ring focus:ring-indigo-200">
             </div>
         `;
     container.appendChild(row);
@@ -1246,8 +1521,13 @@ class VendorManager {
         const sku = row.querySelector('[data-field="sku"]')?.value.trim() || '';
         const notes =
           row.querySelector('[data-field="notes"]')?.value.trim() || '';
+        const specUrl =
+          row.querySelector('[data-field="specUrl"]')?.value.trim() || '';
+        const specNotes =
+          row.querySelector('[data-field="specNotes"]')?.value.trim() || '';
         const priceRaw = row.querySelector('[data-field="price"]')?.value;
-        const hasContent = name || packSize || sku || notes || priceRaw;
+        const hasContent =
+          name || packSize || sku || notes || specUrl || specNotes || priceRaw;
         if (!hasContent) {
           return null;
         }
@@ -1258,6 +1538,8 @@ class VendorManager {
           packSize,
           sku,
           notes,
+          specUrl,
+          specNotes,
           unitCost: Number.isFinite(unitCost) ? unitCost : null
         };
       })
@@ -2295,6 +2577,8 @@ VendorManager.prototype.viewVendorProfile = function (vendorId) {
             const safeNotes = this.escapeHtml(
               item?.notes || 'No additional notes'
             );
+            const safeSpecUrl = this.escapeHtml(item?.specUrl || '');
+            const safeSpecNotes = this.escapeHtml(item?.specNotes || '');
             const price = Number.isFinite(item?.unitCost)
               ? `$${Number(item.unitCost).toFixed(2)}`
               : 'Pricing TBD';
@@ -2310,7 +2594,9 @@ VendorManager.prototype.viewVendorProfile = function (vendorId) {
                     <div style="display: flex; gap: 18px; margin-top: 12px; font-size: 0.8rem; color: #475569; flex-wrap: wrap;">
                         <span style="display: inline-flex; align-items: center; gap: 6px;">📦 ${safePack}</span>
                         <span style="display: inline-flex; align-items: center; gap: 6px;">🆔 ${safeSku}</span>
+                        ${safeSpecUrl ? `<a href="${safeSpecUrl}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:6px; color:#2563eb; font-weight:600; text-decoration:none;">📄 Spec Sheet</a>` : ''}
                     </div>
+                    ${safeSpecNotes ? `<div style="margin-top:10px; font-size:0.78rem; color:#475569; background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:8px 10px;">${safeSpecNotes}</div>` : ''}
                 </div>
             `;
           })

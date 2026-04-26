@@ -17,6 +17,7 @@ test.describe('Smoke', () => {
     const res = await page.goto('/dashboard.html');
     expect(res?.ok()).toBeTruthy();
     await expect(page.locator('body')).toBeVisible();
+    await expect(page.locator('body')).toContainText(/Operations exceptions/i);
   });
 
   test('menu builder page loads', async ({ page }) => {
@@ -49,6 +50,15 @@ test.describe('Smoke', () => {
     await expect(page.locator('h1')).toContainText(/Vendor/i);
     await expect(page.locator('body')).toContainText(
       /workspace price overrides/i
+    );
+  });
+
+  test('spec library page loads', async ({ page }) => {
+    const res = await page.goto('/spec-library.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(page.locator('h1')).toContainText(/Spec Library/i);
+    await expect(page.locator('body')).toContainText(
+      /Central index of product specification links/i
     );
   });
 

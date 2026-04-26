@@ -210,6 +210,16 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ingredient-spec-url" class="form-label">Product Spec Link</label>
+                            <input type="url" id="ingredient-spec-url" class="form-input" placeholder="https://vendor.com/spec-sheet">
+                        </div>
+                        <div class="form-group">
+                            <label for="ingredient-spec-notes" class="form-label">Spec Notes</label>
+                            <input type="text" id="ingredient-spec-notes" class="form-input" placeholder="e.g., 18% fat, NSF certified, 40 lb case">
+                        </div>
+                    </div>
                     
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">➕ Add Ingredient</button>
@@ -809,8 +819,10 @@
                         <tr style="border-bottom: ${variantCount > 0 ? 'none' : '1px solid #e2e8f0'}; transition: background 0.2s; background: white;">
                             <td style="padding: 14px 16px; font-weight: 700; color: #2C4A52; position: sticky; left: 0; background: white; z-index: 1; font-size: 1rem;">
                                 ${item.name || 'N/A'}
+                                ${item.productSpecUrl ? `<a href="${item.productSpecUrl}" target="_blank" rel="noopener" style="margin-left:8px; font-size:0.72rem; font-weight:600; color:#2563eb; text-decoration:none;">📄 Spec</a>` : ''}
                                 ${ingredientsManager.isBuiltIn(item) ? `<span style="display: inline-block; padding: 2px 8px; background: #667eea; color: white; border-radius: 8px; font-size: 0.7rem; font-weight: 600; margin-left: 8px;">📦 Built-in</span>` : `<span style="display: inline-block; padding: 2px 8px; background: #10b981; color: white; border-radius: 8px; font-size: 0.7rem; font-weight: 600; margin-left: 8px;">➕ My Product</span>`}
                                 ${variantCount > 0 ? `<span style="color: #64748b; font-weight: 500; font-size: 0.75rem; margin-left: 8px;">(${variantCount} vendor${variantCount !== 1 ? 's' : ''})</span>` : ''}
+                                ${item.productSpecNotes ? `<div style="margin-top:4px; font-size:0.7rem; color:#64748b; font-weight:500;">${item.productSpecNotes}</div>` : ''}
                             </td>
                             <td style="padding: 14px 16px; color: #3E4C54; font-weight: 500;">
                                 ${item.category || 'Uncategorized'}
@@ -853,6 +865,7 @@
                             <td style="padding: 14px 16px; text-align: center;">
                                 <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
                                     <button onclick="editIngredient('${item.id}')" style="padding: 6px 12px; background: #5B9BAD; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500;">✏️ Edit</button>
+                                    <button onclick="showMergeIngredientModal('${item.id}')" style="padding: 6px 12px; background: #7c3aed; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500;">🔀 Merge</button>
                                     <button onclick="addVariantPrice('${item.id}')" style="padding: 6px 12px; background: #D4A574; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500;">💰 Add Vendor</button>
                                     <button onclick="viewIngredient('${item.id}')" style="padding: 6px 12px; background: #6B8E6F; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500;">👁️ View</button>
                                     <button onclick="deleteIngredient('${item.id}')" style="padding: 6px 12px; background: #C97676; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500;">🗑️ Delete</button>
@@ -900,6 +913,13 @@
                     ${bestPrice ? `<div style="font-size: 0.65rem; color: #64748b;">Best: $${bestPrice.price.toFixed(2)}/${bestPrice.unit} from ${bestPrice.vendor}</div>` : ''}
                 </div>`
                 : '';
+            const productSpecInfo = ingredient.productSpecUrl || ingredient.productSpecNotes
+                ? `<div style="padding: 8px; background: #eff6ff; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid #2563eb;">
+                    <div style="font-size: 0.7rem; color: #1d4ed8; font-weight: 700; margin-bottom: 2px;">📄 Product Specs</div>
+                    ${ingredient.productSpecUrl ? `<a href="${ingredient.productSpecUrl}" target="_blank" rel="noopener" style="font-size:0.7rem; color:#2563eb; font-weight:600; text-decoration:none;">Open spec sheet</a>` : ''}
+                    ${ingredient.productSpecNotes ? `<div style="font-size:0.68rem; color:#475569; margin-top:2px;">${ingredient.productSpecNotes}</div>` : ''}
+                </div>`
+                : '';
 
             card.innerHTML = `
                 <div class="card-header-gradient">
@@ -918,6 +938,7 @@
                         </div>
                     </div>
                     ${vendorInfo}
+                    ${productSpecInfo}
                     ${ingredient.casePricing ? `
                         <div style="padding: 10px; background: #F5F7F9; border-radius: 8px; margin-bottom: 12px; border-left: 3px solid #5B9BAD;">
                             <div style="font-size: 0.7rem; color: #3E4C54; font-weight: 600; margin-bottom: 4px;">📦 Case Pricing:</div>
@@ -927,7 +948,8 @@
                         </div>
                     ` : ''}
                     <div class="button-group">
-                        ${!isBuiltIn ? `<button class="btn btn-sm btn-secondary" onclick="editIngredient('${ingredient.id}')">✏️ Edit</button>` : ''}
+                        <button class="btn btn-sm btn-secondary" onclick="editIngredient('${ingredient.id}')">✏️ Edit</button>
+                        <button class="btn btn-sm btn-secondary" onclick="showMergeIngredientModal('${ingredient.id}')">🔀 Merge</button>
                         <button class="btn btn-sm btn-secondary" onclick="viewIngredient('${ingredient.id}')">👁️ View</button>
                         <button class="btn btn-sm btn-secondary" onclick="manageVendorPrices('${ingredient.id}')">💰 Vendors</button>
                         ${!isBuiltIn ? `<button class="btn btn-sm btn-danger" onclick="deleteIngredient('${ingredient.id}')">🗑️ Delete</button>` : ''}
@@ -1003,6 +1025,8 @@
             const unit = document.getElementById('ingredient-unit').value;
             const cost = parseFloat(document.getElementById('ingredient-cost').value) || 0;
             const supplier = document.getElementById('ingredient-supplier').value.trim();
+            const productSpecUrl = document.getElementById('ingredient-spec-url').value.trim();
+            const productSpecNotes = document.getElementById('ingredient-spec-notes').value.trim();
             
             // Phase 1: Case pricing data
             const pricePerCase = parseFloat(document.getElementById('price-per-case').value) || 0;
@@ -1036,6 +1060,8 @@
                 unit: unit, // Base unit (for recipes)
                 cost: calculatedCost, // Cost per base unit (calculated)
                 supplier: supplier,
+                productSpecUrl: productSpecUrl || '',
+                productSpecNotes: productSpecNotes || '',
                 dateAdded: new Date().toISOString(),
                 priceHistory: calculatedCost > 0 ? [{
                     price: calculatedCost,
@@ -1873,6 +1899,16 @@
                                 <input type="text" id="edit-ing-vendor" value="${ingredient.supplier || ingredient.preferred_vendor || ''}" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 1rem;">
                             </div>
                         </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display: block; font-weight: 600; color: #0f172a; margin-bottom: 8px;">Product Spec Link</label>
+                                <input type="url" id="edit-ing-spec-url" value="${ingredient.productSpecUrl || ''}" placeholder="https://vendor.com/spec-sheet" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 1rem;">
+                            </div>
+                            <div>
+                                <label style="display: block; font-weight: 600; color: #0f172a; margin-bottom: 8px;">Spec Notes</label>
+                                <input type="text" id="edit-ing-spec-notes" value="${ingredient.productSpecNotes || ''}" placeholder="Quality/spec highlights" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 1rem;">
+                            </div>
+                        </div>
                         
                         <!-- Phase 1: Case Pricing Section -->
                         <div style="background: #F5F7F9; border: 2px solid #5B9BAD; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
@@ -1983,6 +2019,8 @@
             const storage = document.getElementById('edit-ing-storage').value;
             const shelfLife = parseInt(document.getElementById('edit-ing-shelf-life').value) || null;
             const vendor = document.getElementById('edit-ing-vendor').value.trim();
+            const productSpecUrl = document.getElementById('edit-ing-spec-url').value.trim();
+            const productSpecNotes = document.getElementById('edit-ing-spec-notes').value.trim();
             
             // Phase 1: Get case pricing values
             const pricePerCase = parseFloat(document.getElementById('edit-price-per-case').value) || 0;
@@ -2016,7 +2054,9 @@
                 storage,
                 shelf_life_days: shelfLife,
                 supplier: vendor,
-                preferred_vendor: vendor // Legacy support
+                preferred_vendor: vendor, // Legacy support
+                productSpecUrl: productSpecUrl || '',
+                productSpecNotes: productSpecNotes || ''
             };
             
             // Phase 1: Update case pricing (Source of Truth)
@@ -2075,6 +2115,185 @@
             document.body.appendChild(toast);
             
             setTimeout(() => toast.remove(), 2000);
+        }
+
+        function showMergeIngredientModal(sourceId) {
+            const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || localStorage.getItem('ingredients') || '[]');
+            const source = ingredients.find(i => i.id === sourceId);
+            if (!source) {
+                alert('Source ingredient not found');
+                return;
+            }
+            if (source.isVariant) {
+                alert('Merge is available for main ingredients only. Edit/delete vendor variants directly.');
+                return;
+            }
+
+            const candidates = ingredients.filter(i => !i.isVariant && i.id !== sourceId);
+            if (!candidates.length) {
+                alert('No other ingredients available to merge into.');
+                return;
+            }
+
+            const optionsHtml = candidates
+                .map(c => `<option value="${c.id}">${c.name} (${c.category || 'Uncategorized'})</option>`)
+                .join('');
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.78);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 99999;
+                padding: 20px;
+            `;
+            modal.innerHTML = `
+                <div style="background: white; width: min(560px, 95vw); border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.35); overflow: hidden;">
+                    <div style="padding: 18px 20px; background: linear-gradient(135deg, #7c3aed, #5b21b6); color: white;">
+                        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">Merge Ingredients</h3>
+                        <p style="margin: 6px 0 0; opacity: .9; font-size: .9rem;">Move data from duplicate into keep record, then remove duplicate.</p>
+                    </div>
+                    <div style="padding: 20px;">
+                        <div style="margin-bottom: 12px; font-size: .9rem; color: #334155;"><strong>Duplicate to remove:</strong> ${source.name}</div>
+                        <label style="display:block; font-size:.85rem; font-weight:600; color:#334155; margin-bottom:8px;">Keep this ingredient</label>
+                        <select id="merge-target-id" style="width:100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 14px;">
+                            ${optionsHtml}
+                        </select>
+                        <label style="display:flex; align-items:center; gap:8px; font-size:.85rem; color:#334155;">
+                            <input type="checkbox" id="merge-overwrite-empty" checked>
+                            Fill empty fields on target with values from duplicate
+                        </label>
+                        <p style="margin:12px 0 0; font-size:.8rem; color:#64748b;">Variants and vendor pricing from the duplicate will be moved to the kept ingredient.</p>
+                    </div>
+                    <div style="padding: 14px 20px; border-top: 1px solid #e2e8f0; display:flex; gap:10px;">
+                        <button type="button" id="confirm-merge-btn" style="flex:1; padding: 11px; border: none; border-radius: 8px; background:#7c3aed; color:white; font-weight:600; cursor:pointer;">Merge Now</button>
+                        <button type="button" id="cancel-merge-btn" style="padding: 11px 18px; border: 1px solid #cbd5e1; border-radius: 8px; background:white; color:#334155; cursor:pointer;">Cancel</button>
+                    </div>
+                </div>
+            `;
+
+            modal.onclick = (e) => {
+                if (e.target === modal) modal.remove();
+            };
+            document.body.appendChild(modal);
+
+            modal.querySelector('#cancel-merge-btn').onclick = () => modal.remove();
+            modal.querySelector('#confirm-merge-btn').onclick = () => {
+                const targetId = modal.querySelector('#merge-target-id')?.value;
+                const fillEmpty = !!modal.querySelector('#merge-overwrite-empty')?.checked;
+                const result = mergeIngredients(sourceId, targetId, { fillEmptyFields: fillEmpty });
+                if (result.ok) {
+                    modal.remove();
+                    showToast(`✅ Merged into ${result.targetName}`);
+                } else {
+                    alert(`Merge failed: ${result.reason || 'Unknown error'}`);
+                }
+            };
+        }
+
+        function mergeIngredients(sourceId, targetId, options = {}) {
+            const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || localStorage.getItem('ingredients') || '[]');
+            const sourceIndex = ingredients.findIndex(i => i.id === sourceId);
+            const targetIndex = ingredients.findIndex(i => i.id === targetId);
+            if (sourceIndex === -1 || targetIndex === -1 || sourceId === targetId) {
+                return { ok: false, reason: 'invalid_selection' };
+            }
+            const source = ingredients[sourceIndex];
+            const target = ingredients[targetIndex];
+            if (source?.isVariant || target?.isVariant) {
+                return { ok: false, reason: 'variants_not_supported' };
+            }
+
+            const fillEmpty = options.fillEmptyFields !== false;
+            const merged = { ...target };
+            const scalarFields = [
+                'category', 'subcategory', 'unit', 'default_unit', 'storage',
+                'shelf_life_days', 'supplier', 'preferred_vendor', 'notes'
+            ];
+            scalarFields.forEach(field => {
+                const current = merged[field];
+                const incoming = source[field];
+                const currentEmpty =
+                    current === undefined || current === null || String(current).trim() === '';
+                const incomingHasValue =
+                    incoming !== undefined && incoming !== null && String(incoming).trim() !== '';
+                if ((fillEmpty && currentEmpty && incomingHasValue) || (!fillEmpty && incomingHasValue)) {
+                    merged[field] = incoming;
+                }
+            });
+
+            if ((!merged.cost || merged.cost === 0) && source.cost) {
+                merged.cost = source.cost;
+            }
+            if ((!merged.avg_price_per_lb || merged.avg_price_per_lb === 0) && source.avg_price_per_lb) {
+                merged.avg_price_per_lb = source.avg_price_per_lb;
+            }
+
+            const targetVendorPrices = Array.isArray(merged.vendorPrices) ? merged.vendorPrices : [];
+            const sourceVendorPrices = Array.isArray(source.vendorPrices) ? source.vendorPrices : [];
+            const vendorPriceKey = vp =>
+                `${String(vp?.vendor || vp?.vendorName || '').toLowerCase().trim()}::${String(vp?.unit || '').toLowerCase().trim()}`;
+            const seenVendorPrices = new Set(targetVendorPrices.map(vendorPriceKey));
+            sourceVendorPrices.forEach(vp => {
+                const key = vendorPriceKey(vp);
+                if (!seenVendorPrices.has(key)) {
+                    targetVendorPrices.push(vp);
+                    seenVendorPrices.add(key);
+                }
+            });
+            if (targetVendorPrices.length) {
+                merged.vendorPrices = targetVendorPrices;
+            }
+
+            const targetVariants = Array.isArray(merged.variants) ? merged.variants : [];
+            const sourceVariants = Array.isArray(source.variants) ? source.variants : [];
+            merged.variants = [...targetVariants, ...sourceVariants];
+
+            const targetNameLc = String(target.name || '').toLowerCase().trim();
+            ingredients.forEach(ing => {
+                if (!ing || typeof ing !== 'object' || !ing.isVariant) return;
+                const shouldMove = ing.parentIngredientId === sourceId ||
+                    String(ing.baseName || '').toLowerCase().trim() === String(source.name || '').toLowerCase().trim();
+                if (shouldMove) {
+                    ing.parentIngredientId = targetId;
+                    ing.baseName = target.name || ing.baseName;
+                    if (ing.name && source.name && String(ing.name).toLowerCase().includes(String(source.name).toLowerCase())) {
+                        ing.name = String(ing.name).replace(new RegExp(source.name, 'ig'), target.name);
+                    }
+                }
+                if (ing.ingredientId === sourceId) {
+                    ing.ingredientId = targetId;
+                }
+                if (String(ing.ingredientName || '').toLowerCase().trim() === String(source.name || '').toLowerCase().trim()) {
+                    ing.ingredientName = target.name;
+                }
+                if (ing.baseName && String(ing.baseName).toLowerCase().trim() === targetNameLc) {
+                    ing.baseName = target.name;
+                }
+            });
+
+            ingredients[targetIndex] = {
+                ...merged,
+                lastModified: new Date().toISOString()
+            };
+            const filtered = ingredients.filter(i => i.id !== sourceId);
+
+            localStorage.setItem('ingredients_database', JSON.stringify(filtered));
+            localStorage.setItem('ingredients', JSON.stringify(filtered));
+            if (window.ingredientsManager?.updateLegacyStorage) {
+                try {
+                    window.ingredientsManager.updateLegacyStorage();
+                } catch (e) {
+                    console.warn('Legacy sync after merge skipped:', e);
+                }
+            }
+
+            displayIngredients(filtered);
+            updateStats(filtered);
+            return { ok: true, targetName: merged.name || 'target ingredient' };
         }
 
         function deleteIngredient(id) {

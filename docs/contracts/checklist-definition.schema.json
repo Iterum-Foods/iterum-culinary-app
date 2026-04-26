@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "iterum.checklist-definition.v1",
+  "title": "ChecklistDefinition",
+  "type": "object",
+  "required": [
+    "id",
+    "projectId",
+    "name",
+    "status",
+    "frequency",
+    "items",
+    "version",
+    "createdAt",
+    "updatedAt",
+    "createdBy",
+    "updatedBy"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "status": { "type": "string", "enum": ["active", "archived"] },
+    "frequency": {
+      "type": "string",
+      "enum": ["once", "daily", "weekly", "monthly", "per_shift"]
+    },
+    "roleScope": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "inputType"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "inputType": {
+            "type": "string",
+            "enum": ["boolean", "pass_fail", "number", "text", "temperature"]
+          },
+          "required": { "type": "boolean", "default": true },
+          "minValue": { "type": "number" },
+          "maxValue": { "type": "number" },
+          "unit": { "type": "string" },
+          "severityOnFail": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "critical"],
+            "default": "medium"
+          },
+          "notes": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "entityRefs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "id"],
+        "properties": {
+          "type": { "type": "string" },
+          "id": { "type": "string" },
+          "name": { "type": "string" }
+        },
+        "additionalProperties": false
+      },
+      "default": []
+    },
+    "version": { "type": "integer", "minimum": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "createdBy": { "type": "string", "minLength": 1 },
+    "updatedBy": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}
+

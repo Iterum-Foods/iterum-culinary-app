@@ -31,8 +31,18 @@
 
 ---
 
+## Week 1 contracts (operations workflows)
+
+- Canonical contracts for checklist definitions, checklist logs, corrective actions, and spec docs live in:
+  - [contracts/WEEK1_CANONICAL_CONTRACTS.md](./contracts/WEEK1_CANONICAL_CONTRACTS.md)
+  - [contracts/checklist-definition.schema.json](./contracts/checklist-definition.schema.json)
+  - [contracts/checklist-log-entry.schema.json](./contracts/checklist-log-entry.schema.json)
+  - [contracts/corrective-action.schema.json](./contracts/corrective-action.schema.json)
+  - [contracts/spec-document.schema.json](./contracts/spec-document.schema.json)
+
 ## Change log
 
 | Date | Change |
 |------|--------|
+| 2026-04-25 | Added Week 1 canonical operations contract pack references (checklist, logs, corrective actions, specs). |
 | 2026-03-29 | Initial v1 table + exceptions + employee_line note. |

@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "iterum.checklist-log-entry.v1",
+  "title": "ChecklistLogEntry",
+  "type": "object",
+  "required": [
+    "id",
+    "projectId",
+    "checklistId",
+    "status",
+    "responses",
+    "resultSummary",
+    "version",
+    "createdAt",
+    "updatedAt",
+    "createdBy",
+    "updatedBy"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "checklistId": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["in_progress", "completed", "cancelled"]
+    },
+    "startedAt": { "type": "string", "format": "date-time" },
+    "completedAt": { "type": "string", "format": "date-time" },
+    "shiftContext": {
+      "type": "object",
+      "properties": {
+        "shiftName": { "type": "string" },
+        "station": { "type": "string" },
+        "serviceDate": { "type": "string", "format": "date" }
+      },
+      "additionalProperties": false
+    },
+    "responses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["itemId"],
+        "properties": {
+          "itemId": { "type": "string", "minLength": 1 },
+          "value": {},
+          "passed": { "type": "boolean" },
+          "notes": { "type": "string" },
+          "recordedAt": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "resultSummary": {
+      "type": "object",
+      "required": ["outcome"],
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "enum": ["passed", "failed", "needs_review"]
+        },
+        "failedItemCount": { "type": "integer", "minimum": 0, "default": 0 },
+        "notes": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "linkedCorrectiveActionIds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "version": { "type": "integer", "minimum": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "createdBy": { "type": "string", "minLength": 1 },
+    "updatedBy": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "status": { "const": "completed" } },
+        "required": ["status"]
+      },
+      "then": { "required": ["completedAt"] }
+    }
+  ],
+  "additionalProperties": false
+}
+

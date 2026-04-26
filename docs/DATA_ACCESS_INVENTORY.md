@@ -15,6 +15,10 @@ Snapshot for supply-chain / security review. Regenerate diffs with ripgrep as co
 | `projects/{projectId}/members/{userId}` | setDoc merge (`ensureProjectMemberDoc`) | Company role: `role`, `email`, `updatedAt` — see [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md) |
 | `projects/{projectId}/menus/{menuId}` | setDoc merge, getDoc | Menu + items + links snapshot |
 | `projects/{projectId}/checklists/{entryId}` | setDoc merge, collection query | Checklists / HACCP-style entries |
+| `projects/{projectId}/checklist_definitions/{checklistId}` | planned write/read shape in Week 1 contracts | Canonical checklist template path for new implementation work. |
+| `projects/{projectId}/checklist_logs/{logId}` | planned write/read shape in Week 1 contracts | Canonical checklist execution log path. |
+| `projects/{projectId}/corrective_actions/{actionId}` | planned write/read shape in Week 1 contracts | Canonical remediation tracking path. |
+| `projects/{projectId}/spec_documents/{specId}` | planned write/read shape in Week 1 contracts | Canonical ingredient/vendor/product spec document path. |
 | `projects/{projectId}/snapshots/bar_line_pack` | getDoc (shift app) | Bar: `drinks[]` (title + spec/build), `liquorsInStock` (string or list) — managers publish; same read rules as other snapshots |
 | `users/{userId}/notes/{id}` (`lineAppType: bar_note`) | owner read/write | Shift app bar notes: optional `barTopic` drink\|stock\|general, `relatedDrink` |
 
@@ -95,3 +99,4 @@ await window.firestoreSync.syncVendorPriceRowToFirestore({
 1. Prefer **Firebase Auth UID** in Storage paths and in `projects.firebaseUid` for rules.
 2. Migrate `recipe-photo-manager` to `recipes/{uid}/{recipeId}/{photoId}` and remove the permissive legacy Storage rule.
 3. Gradually move Firestore reads/writes for projects/menus through `project-data-access.js`.
+4. Enforce Week 1 schema validation for checklist/spec workflow writes in client adapters.

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "iterum.spec-document.v1",
+  "title": "SpecDocument",
+  "type": "object",
+  "required": [
+    "id",
+    "projectId",
+    "title",
+    "status",
+    "specType",
+    "entityRefs",
+    "version",
+    "createdAt",
+    "updatedAt",
+    "createdBy",
+    "updatedBy"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "deprecated", "archived"]
+    },
+    "specType": {
+      "type": "string",
+      "enum": [
+        "ingredient_spec",
+        "vendor_spec",
+        "product_sheet",
+        "allergen_sheet",
+        "sds",
+        "other"
+      ]
+    },
+    "specUrl": { "type": "string", "format": "uri" },
+    "summary": { "type": "string" },
+    "attributes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["key", "value"],
+        "properties": {
+          "key": { "type": "string", "minLength": 1 },
+          "value": { "type": "string" },
+          "unit": { "type": "string" }
+        },
+        "additionalProperties": false
+      },
+      "default": []
+    },
+    "complianceTags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "entityRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["type", "id"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "ingredient",
+              "vendor",
+              "vendor_product",
+              "recipe",
+              "menu_item",
+              "checklist"
+            ]
+          },
+          "id": { "type": "string", "minLength": 1 },
+          "name": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "effectiveDate": { "type": "string", "format": "date" },
+    "expiryDate": { "type": "string", "format": "date" },
+    "reviewStatus": {
+      "type": "string",
+      "enum": ["unreviewed", "approved", "rejected", "needs_update"],
+      "default": "unreviewed"
+    },
+    "version": { "type": "integer", "minimum": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "createdBy": { "type": "string", "minLength": 1 },
+    "updatedBy": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}
+
