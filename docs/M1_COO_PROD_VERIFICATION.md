@@ -3,7 +3,7 @@
 **Purpose:** Close the **human + prod** gate for milestone **M1** after engineering landed **`2e28c70`** (`projectId` alignment).  
 **Persona:** [LEADERSHIP_ROLE_ASSIGNMENTS.md](../LEADERSHIP_ROLE_ASSIGNMENTS.md#coo-agent) — use `@iterum-persona-coo` or paste the COO agent block first.  
 **Context:** [M1_CTO_AGENT_DELEGATION.md](./M1_CTO_AGENT_DELEGATION.md) · [M1_PROJECTID_AUDIT.md](./M1_PROJECTID_AUDIT.md)  
-**Last updated:** 29 March 2026  
+**Last updated:** 2026-03-29  
 
 ### At a glance (prod: `https://iterum-culinary-app.vercel.app`)
 

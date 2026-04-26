@@ -3,7 +3,7 @@
 **Use when:** Starting a **CTO-shaped** Cursor Agent thread for **milestone M1** after [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md).  
 **Persona baseline:** [LEADERSHIP_ROLE_ASSIGNMENTS.md](../LEADERSHIP_ROLE_ASSIGNMENTS.md#cto-agent) (`@iterum-persona-cto`).  
 **Human verification (COO):** [M1_COO_PROD_VERIFICATION.md](./M1_COO_PROD_VERIFICATION.md) — three prod checks (teammate checklist, Deploy Firebase status, two-workspace demo).  
-**Last updated:** 14 April 2026  
+**Last updated:** 2026-04-14  
 
 **Engineering shipped (`main` `2e28c70`):** `firestore-sync.js` — `resolveProjectId()` uses the same cascade as the rest of the app (explicit → unified selector → `projectManager` → user-scoped storage → fallbacks). `menuManager.js` (`MenuManagerLegacy`) — same cascade; `projectChanged` reloads draft key/draft. `menu-recipe-integration.js` — aligned; `default` → `master`. [M1_PROJECTID_AUDIT.md](./M1_PROJECTID_AUDIT.md) filled (E1/E2, P0s marked fixed in repo).  
 

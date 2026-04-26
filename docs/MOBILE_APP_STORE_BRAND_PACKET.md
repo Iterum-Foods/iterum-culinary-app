@@ -3,7 +3,7 @@
 **Audience:** Home cooks, busy households, hobby bakers, side hustles, and small food operations who want one calm place for recipes, lists, and simple food-safety habits—not pro kitchens only.  
 **Visual source of truth:** `public/assets/css/iterum-brand-kit.css` and `iterum-unified-colors.css`.  
 **Tech context:** Capacitor wraps the web app (`cap:sync` / `cap:open:ios`). Treat this packet as the marketing and UX voice layer for the **phone** experience.  
-**Last updated:** March 2026  
+**Last updated:** 2026-03-01  
 
 ---
 
