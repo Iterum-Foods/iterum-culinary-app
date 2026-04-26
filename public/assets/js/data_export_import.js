@@ -287,7 +287,7 @@ class DataExportImport {
   /**
    * Export users
    */
-  async exportUsers(options = {}) {
+  async exportUsers() {
     const users = await this.getAllUsers();
 
     // Remove sensitive information
@@ -375,7 +375,7 @@ class DataExportImport {
    * Convert workbook to blob
    * Note: Requires SheetJS library for full implementation
    */
-  async workbookToBlob(workbook) {
+  async workbookToBlob() {
     console.warn('XLSX export requires SheetJS library');
     return new Blob(['CSV export recommended'], { type: 'text/plain' });
   }
@@ -423,7 +423,7 @@ class DataExportImport {
    * Parse XLSX file
    * Note: Requires SheetJS library for full implementation
    */
-  async parseXLSXFile(file) {
+  async parseXLSXFile() {
     console.warn('XLSX import requires SheetJS library');
     throw new Error('XLSX import not available - use CSV import instead');
   }
@@ -619,13 +619,13 @@ class DataExportImport {
    */
   downloadFile(content, filename, contentType) {
     const blob = new Blob([content], { type: contentType });
-    this.downloadBlob(blob, filename, contentType);
+    this.downloadBlob(blob, filename);
   }
 
   /**
    * Download blob
    */
-  downloadBlob(blob, filename, contentType) {
+  downloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;

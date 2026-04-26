@@ -253,7 +253,7 @@ class DataTaggingSystem {
   getTagSuggestions(projectId, itemType) {
     // This could be enhanced with AI suggestions in the future
     const suggestions = [];
-    const existingItems = this.getProjectItems(projectId)[itemType];
+    void this.getProjectItems(projectId)[itemType];
 
     // For now, return empty suggestions
     // In the future, this could analyze patterns and suggest relevant items

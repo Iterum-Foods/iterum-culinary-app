@@ -72,13 +72,17 @@
       if (this.clearNotesDailyBtn) {
         this.clearNotesDailyBtn.addEventListener('click', e => {
           e.preventDefault();
-          if (this.notesDaily) this.notesDaily.value = '';
+          if (this.notesDaily) {
+            this.notesDaily.value = '';
+          }
         });
       }
       if (this.clearNotesManagerBtn) {
         this.clearNotesManagerBtn.addEventListener('click', e => {
           e.preventDefault();
-          if (this.notesManager) this.notesManager.value = '';
+          if (this.notesManager) {
+            this.notesManager.value = '';
+          }
         });
       }
       if (this.taskForm) {
@@ -270,7 +274,9 @@
         const e = this.normalizeDayEntry(map[dateKey]);
         const hasDaily = !!(e.daily && e.daily.trim());
         const hasManager = !!(e.manager && e.manager.trim());
-        if (hasDaily || hasManager) n += 1;
+        if (hasDaily || hasManager) {
+          n += 1;
+        }
       });
       return n;
     },
@@ -293,8 +299,12 @@
           dailyUpdatedAt: hasDaily ? now : prev.dailyUpdatedAt || null,
           managerUpdatedAt: hasManager ? now : prev.managerUpdatedAt || null
         };
-        if (!hasDaily) next.dailyUpdatedAt = prev.dailyUpdatedAt || null;
-        if (!hasManager) next.managerUpdatedAt = prev.managerUpdatedAt || null;
+        if (!hasDaily) {
+          next.dailyUpdatedAt = prev.dailyUpdatedAt || null;
+        }
+        if (!hasManager) {
+          next.managerUpdatedAt = prev.managerUpdatedAt || null;
+        }
         map[this.activeDate] = next;
       }
       this.setNotesMap(map);
@@ -315,7 +325,9 @@
       }
       const map = this.getNotesMap();
       const entry = this.normalizeDayEntry(map[this.activeDate]);
-      if (this.notesDaily) this.notesDaily.value = entry.daily;
+      if (this.notesDaily) {
+        this.notesDaily.value = entry.daily;
+      }
       if (this.notesManager) {
         this.notesManager.value = showManager ? entry.manager : '';
       }
