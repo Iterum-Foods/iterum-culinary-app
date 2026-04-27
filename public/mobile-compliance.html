@@ -117,6 +117,8 @@
     <div class="mc-hub-nav" role="tablist" aria-label="Sections">
       <button type="button" data-hub-tab="hub" aria-selected="true">Home</button>
       <button type="button" data-hub-tab="menu" aria-selected="false">Menu</button>
+      <button type="button" data-hub-tab="recipes" aria-selected="false">Recipes</button>
+      <button type="button" data-hub-tab="jobs" aria-selected="false">Jobs</button>
       <button type="button" data-hub-tab="lists" aria-selected="false">Lists</button>
       <button type="button" data-hub-tab="notes" aria-selected="false">Notes</button>
       <button type="button" data-hub-tab="checks" aria-selected="false">Checks</button>
@@ -133,6 +135,16 @@
           <span class="mc-shift-icon" aria-hidden="true">M</span>
           <strong>Today’s menu</strong>
           <small>What’s on for guests</small>
+        </button>
+        <button type="button" class="mc-shift-tile" data-hub-tab="recipes" aria-label="Open recipes">
+          <span class="mc-shift-icon" aria-hidden="true">R</span>
+          <strong>Recipes</strong>
+          <small>Read-only service view</small>
+        </button>
+        <button type="button" class="mc-shift-tile" data-hub-tab="jobs" aria-label="Open jobs">
+          <span class="mc-shift-icon" aria-hidden="true">J</span>
+          <strong>Jobs</strong>
+          <small>Set role for this workspace</small>
         </button>
         <button type="button" class="mc-shift-tile" data-hub-tab="lists" aria-label="Open prep and stock lists">
           <span class="mc-shift-icon" aria-hidden="true">L</span>
@@ -176,6 +188,22 @@
       <div id="menu-published-body"></div>
     </div>
 
+    <div id="panel-section-recipes" class="mc-section" hidden>
+      <p class="mc-hint" style="margin-top:0;">Published/readable recipes for this workspace.</p>
+      <div id="recipes-mobile-body"></div>
+    </div>
+
+    <div id="panel-section-jobs" class="mc-section" hidden>
+      <p class="mc-hint" style="margin-top:0;">Set your role label for this workspace and view the team roster.</p>
+      <div class="mc-field">
+        <label for="job-position-select">My job for this workspace</label>
+        <select id="job-position-select" style="min-height:48px;border-radius:10px;border:1px solid var(--mc-border);width:100%;font-size:1rem;"></select>
+      </div>
+      <button type="button" class="mc-btn mc-btn-primary" id="btn-save-job-position">Save my job</button>
+      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Team jobs</h3>
+      <div id="jobs-team-list"></div>
+    </div>
+
     <div id="panel-section-notes" class="mc-section" hidden>
       <div class="mc-field">
         <label for="note-type">About</label>
@@ -200,7 +228,15 @@
     <div id="panel-section-lists" class="mc-section" hidden>
       <p class="mc-hint">Your lists save automatically to your account. Latest version for this location.</p>
       <h3 style="font-size:0.95rem;margin:0 0 0.5rem;">Prep</h3>
-      <textarea id="prep-list-body" class="mc-textarea" placeholder="Mise tasks, pulls, labels…"></textarea>
+      <div class="mc-field" style="margin-bottom:0.55rem;">
+        <label for="prep-check-item-input">Prep checklist item</label>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <input id="prep-check-item-input" type="text" placeholder="Add one prep task at a time…" />
+          <button type="button" class="mc-btn" id="btn-add-prep-item">Add item</button>
+        </div>
+      </div>
+      <ul class="mc-list" id="prep-checklist-items"></ul>
+      <textarea id="prep-list-body" class="mc-textarea" hidden></textarea>
       <button type="button" class="mc-btn mc-btn-primary" id="btn-save-prep" style="margin-top:0.5rem;">Save prep</button>
       <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Stock</h3>
       <textarea id="stock-list-body" class="mc-textarea" placeholder="Items, rough counts…"></textarea>

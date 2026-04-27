@@ -42,6 +42,8 @@ test.describe('Smoke', () => {
       })
     ).toBeVisible();
     await expect(page.locator('#today-panel')).toHaveCount(1);
+    await expect(page.locator('[data-hub-tab="recipes"]')).toHaveCount(2);
+    await expect(page.locator('[data-hub-tab="jobs"]')).toHaveCount(2);
   });
 
   test('dashboard checklist deep link opens opening checklist modal', async ({

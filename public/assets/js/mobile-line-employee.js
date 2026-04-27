@@ -19,6 +19,10 @@ import {
 
 const SNAPSHOT_SOP_DOC = 'employee_line_pack';
 const SNAPSHOT_BAR_DOC = 'bar_line_pack';
+const SAFETY_PREP_BLOCK_START = '--- AUTO SAFETY CHECKS (6h) ---';
+const SAFETY_PREP_BLOCK_END = '--- END AUTO SAFETY CHECKS ---';
+const SAFETY_INTERVAL_MS = 6 * 60 * 60 * 1000;
+const PREP_CHECK_RE = /^-\s*\[( |x|X)\]\s*(.+)$/;
 
 /** @typedef {{ getDb: () => import('firebase/firestore').Firestore | null, getAuth: () => import('firebase/auth').Auth | null, getProjectId: () => string, setStatus: (msg: string, isErr?: boolean) => void, escapeHtml: (s: unknown) => string }} LineHubApi */
 
@@ -27,10 +31,14 @@ const SNAPSHOT_BAR_DOC = 'bar_line_pack';
  */
 export function attachLineEmployeeHub(api) {
   const { getDb, getAuth, getProjectId, setStatus, escapeHtml } = api;
+  /** @type {{ text: string, done: boolean }[]} */
+  let prepChecklistItems = [];
 
   const sections = [
     'hub',
     'menu',
+    'recipes',
+    'jobs',
     'notes',
     'lists',
     'checks',
@@ -42,6 +50,23 @@ export function attachLineEmployeeHub(api) {
 
   /** @type {null | (() => void)} */
   let teamBoardUnsub = null;
+
+  const FALLBACK_JOB_OPTIONS = [
+    { value: 'employee_line', label: 'Kitchen line / crew' },
+    { value: 'front_of_house', label: 'Front of house' },
+    { value: 'kitchen_staff', label: 'Kitchen staff' },
+    { value: 'location_manager', label: 'Location manager' },
+    { value: 'operations_gm', label: 'Operations GM' },
+    { value: 'account_admin', label: 'Account admin' }
+  ];
+
+  function roleLabel(role) {
+    const options = Array.isArray(window.ITERUM_TEAM_MEMBER_ROLE_OPTIONS)
+      ? window.ITERUM_TEAM_MEMBER_ROLE_OPTIONS
+      : FALLBACK_JOB_OPTIONS;
+    const matched = options.find(opt => opt.value === role);
+    return matched?.label || role || 'Team member';
+  }
 
   function localDateKey() {
     const d = new Date();
@@ -100,6 +125,175 @@ export function attachLineEmployeeHub(api) {
     return v !== '' && v !== 'mobile-default';
   }
 
+  function timestampToMs(value) {
+    if (!value) {
+      return 0;
+    }
+    if (typeof value === 'number') {
+      return value;
+    }
+    if (typeof value === 'string') {
+      const parsed = Date.parse(value);
+      return Number.isNaN(parsed) ? 0 : parsed;
+    }
+    if (typeof value?.toDate === 'function') {
+      return value.toDate().getTime();
+    }
+    if (typeof value?.seconds === 'number') {
+      return value.seconds * 1000;
+    }
+    if (typeof value?._seconds === 'number') {
+      return value._seconds * 1000;
+    }
+    return 0;
+  }
+
+  function shouldCountReadingForProject(reading, projectId) {
+    if (!reading || !projectId) {
+      return true;
+    }
+    if (!reading.projectId) {
+      return true;
+    }
+    return reading.projectId === projectId;
+  }
+
+  async function readLatestSafetyTimestamp(
+    collectionName,
+    db,
+    uid,
+    projectId
+  ) {
+    const snap = await getDocs(
+      query(collection(db, 'users', uid, collectionName), limit(60))
+    );
+    let latest = 0;
+    snap.forEach(docSnap => {
+      const row = docSnap.data() || {};
+      if (!shouldCountReadingForProject(row, projectId)) {
+        return;
+      }
+      const ts = timestampToMs(row.timestamp || row.createdAt || row.updatedAt);
+      if (ts > latest) {
+        latest = ts;
+      }
+    });
+    return latest;
+  }
+
+  async function buildSafetyReminderItems() {
+    const db = getDb();
+    const uid = getAuth()?.currentUser?.uid;
+    const projectId = pid();
+    if (!db || !uid) {
+      return [];
+    }
+    const now = Date.now();
+    const latestTemp = await readLatestSafetyTimestamp(
+      'temperature_readings',
+      db,
+      uid,
+      projectId
+    );
+    const latestSan = await readLatestSafetyTimestamp(
+      'sanitizer_readings',
+      db,
+      uid,
+      projectId
+    );
+    const reminders = [];
+    if (!latestTemp || now - latestTemp >= SAFETY_INTERVAL_MS) {
+      reminders.push('Log fridge temperature check (required every 6 hours)');
+    }
+    if (!latestSan || now - latestSan >= SAFETY_INTERVAL_MS) {
+      reminders.push('Log sanitizer PPM check (required every 6 hours)');
+    }
+    return reminders;
+  }
+
+  function injectSafetyBlock(prepText, reminders) {
+    const source = String(prepText || '');
+    const pattern = new RegExp(
+      `${SAFETY_PREP_BLOCK_START}[\\s\\S]*?${SAFETY_PREP_BLOCK_END}\\n?`,
+      'g'
+    );
+    const cleaned = source.replace(pattern, '').trim();
+    if (!reminders.length) {
+      return cleaned;
+    }
+    const block = `${SAFETY_PREP_BLOCK_START}
+- [ ] ${reminders.join('\n- [ ] ')}
+${SAFETY_PREP_BLOCK_END}`.trim();
+    return cleaned ? `${block}\n\n${cleaned}` : block;
+  }
+
+  function parsePrepChecklistItems(text) {
+    const source = String(text || '')
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(Boolean)
+      .filter(
+        line =>
+          line !== SAFETY_PREP_BLOCK_START && line !== SAFETY_PREP_BLOCK_END
+      );
+    return source
+      .map(line => {
+        const checkMatch = line.match(PREP_CHECK_RE);
+        if (checkMatch) {
+          return { text: checkMatch[2].trim(), done: checkMatch[1] !== ' ' };
+        }
+        if (line.startsWith('- ')) {
+          return { text: line.slice(2).trim(), done: false };
+        }
+        return { text: line, done: false };
+      })
+      .filter(item => item.text);
+  }
+
+  function serializePrepChecklistItems(items) {
+    return items.map(item => `- [${item.done ? 'x' : ' '}] ${item.text}`).join('\n');
+  }
+
+  function renderPrepChecklist() {
+    const listEl = document.getElementById('prep-checklist-items');
+    const prepBodyEl = document.getElementById('prep-list-body');
+    if (!listEl || !prepBodyEl) {
+      return;
+    }
+    prepBodyEl.value = serializePrepChecklistItems(prepChecklistItems);
+    if (!prepChecklistItems.length) {
+      listEl.innerHTML =
+        '<li class="mc-card"><span class="mc-hint">No prep items yet. Add your first checklist task above.</span></li>';
+      return;
+    }
+    listEl.innerHTML = prepChecklistItems
+      .map(
+        (item, idx) => `<li class="mc-card" style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.6rem;">
+          <label style="display:flex;align-items:flex-start;gap:0.55rem;flex:1;cursor:pointer;">
+            <input type="checkbox" data-prep-check-index="${idx}" ${item.done ? 'checked' : ''} style="margin-top:0.2rem;" />
+            <span style="${item.done ? 'text-decoration:line-through;opacity:0.72;' : ''}">${escapeHtml(item.text)}</span>
+          </label>
+          <button type="button" class="mc-btn" data-prep-remove-index="${idx}" aria-label="Remove prep item">Remove</button>
+        </li>`
+      )
+      .join('');
+  }
+
+  function addPrepChecklistItem() {
+    const inputEl = document.getElementById('prep-check-item-input');
+    if (!inputEl) {
+      return;
+    }
+    const text = String(inputEl.value || '').trim();
+    if (!text) {
+      setStatus('Enter a prep checklist item first.', true);
+      return;
+    }
+    prepChecklistItems.push({ text, done: false });
+    inputEl.value = '';
+    renderPrepChecklist();
+  }
+
   async function loadPublishedMenu() {
     const db = getDb();
     const body = document.getElementById('menu-published-body');
@@ -149,6 +343,169 @@ export function attachLineEmployeeHub(api) {
       console.error(e);
       body.innerHTML =
         '<p class="mc-empty">Can’t load the menu. Check your location above, or ask a manager if you’re on the team.</p>';
+    }
+  }
+
+  async function loadPublishedRecipes() {
+    const db = getDb();
+    const uid = getAuth()?.currentUser?.uid;
+    const body = document.getElementById('recipes-mobile-body');
+    if (!db || !uid || !body) return;
+    if (!teamProjectSelected()) {
+      body.innerHTML =
+        '<p class="mc-empty">Pick your <strong>location</strong> above to view recipes.</p>';
+      return;
+    }
+    body.innerHTML = '<p class="mc-hint">Loading recipes…</p>';
+    try {
+      const userSnap = await getDoc(doc(db, 'users', uid, 'snapshots', 'recipeLibrary'));
+      if (!userSnap.exists()) {
+        body.innerHTML =
+          '<p class="mc-empty">No recipes found yet. Publish or sync recipes from the web app first.</p>';
+        return;
+      }
+      const recipes = Array.isArray(userSnap.data()?.recipes)
+        ? userSnap.data().recipes
+        : [];
+      if (!recipes.length) {
+        body.innerHTML =
+          '<p class="mc-empty">Recipe list is empty for this account.</p>';
+        return;
+      }
+      body.innerHTML = `<ul class="mc-list">${recipes
+        .slice(0, 80)
+        .map(recipe => {
+          const name = recipe.name || recipe.title || recipe.recipeName || 'Recipe';
+          const yieldText = recipe.yield
+            ? `Yield: ${recipe.yield}`
+            : recipe.servings
+              ? `Servings: ${recipe.servings}`
+              : '';
+          const noteText = recipe.description || recipe.notes || '';
+          return `<li class="mc-card">
+            <strong>${escapeHtml(name)}</strong>
+            ${yieldText ? `<div class="mc-hint">${escapeHtml(String(yieldText))}</div>` : ''}
+            ${noteText ? `<div style="margin-top:0.35rem;white-space:pre-wrap;font-size:0.88rem;line-height:1.45;">${escapeHtml(String(noteText).slice(0, 240))}</div>` : ''}
+          </li>`;
+        })
+        .join('')}</ul>`;
+    } catch (e) {
+      console.error(e);
+      body.innerHTML = '<p class="mc-empty">Could not load recipes.</p>';
+    }
+  }
+
+  async function loadJobsPanel() {
+    const db = getDb();
+    const uid = getAuth()?.currentUser?.uid;
+    const selectEl = document.getElementById('job-position-select');
+    const listEl = document.getElementById('jobs-team-list');
+    if (!db || !uid || !selectEl || !listEl) return;
+    if (!teamProjectSelected()) {
+      selectEl.innerHTML = '<option value="">Pick a location first</option>';
+      listEl.innerHTML =
+        '<p class="mc-empty">Pick your workspace to load team jobs.</p>';
+      return;
+    }
+    const options = Array.isArray(window.ITERUM_TEAM_MEMBER_ROLE_OPTIONS)
+      ? window.ITERUM_TEAM_MEMBER_ROLE_OPTIONS
+      : FALLBACK_JOB_OPTIONS;
+    selectEl.innerHTML = options
+      .map(opt => `<option value="${escapeHtml(opt.value)}">${escapeHtml(opt.label)}</option>`)
+      .join('');
+    try {
+      const prefSnap = await getDoc(doc(db, 'users', uid, 'workspace_prefs', pid()));
+      if (prefSnap.exists()) {
+        const pref = prefSnap.data() || {};
+        if (pref.positionKey) {
+          selectEl.value = pref.positionKey;
+        }
+      }
+    } catch (e) {
+      console.warn('load workspace_prefs', e);
+    }
+
+    listEl.innerHTML = '<p class="mc-hint">Loading team jobs…</p>';
+    try {
+      const memberSnap = await getDocs(
+        query(collection(db, 'projects', pid(), 'members'), limit(100))
+      );
+      if (memberSnap.empty) {
+        listEl.innerHTML = '<p class="mc-empty">No team members found for this workspace.</p>';
+        return;
+      }
+      const rows = [];
+      for (const memberDoc of memberSnap.docs) {
+        const m = memberDoc.data() || {};
+        const memberUid = memberDoc.id;
+        let display = m.email || memberUid;
+        try {
+          const userSnap = await getDoc(doc(db, 'users', memberUid));
+          if (userSnap.exists()) {
+            const u = userSnap.data() || {};
+            display = u.name || u.displayName || u.email || display;
+          }
+        } catch {
+          /* ignore profile lookup failures */
+        }
+        let positionKey = m.role || '';
+        try {
+          const prefSnap = await getDoc(doc(db, 'users', memberUid, 'workspace_prefs', pid()));
+          if (prefSnap.exists()) {
+            const pref = prefSnap.data() || {};
+            positionKey = pref.positionKey || positionKey;
+          }
+        } catch {
+          /* ignore preference lookup failures */
+        }
+        rows.push({
+          id: memberUid,
+          display,
+          role: positionKey || m.role || ''
+        });
+      }
+      listEl.innerHTML = `<ul class="mc-list">${rows
+        .map(
+          row => `<li class="mc-card">
+            <strong>${escapeHtml(row.display)}</strong>
+            <div class="mc-hint">${escapeHtml(roleLabel(row.role))}</div>
+          </li>`
+        )
+        .join('')}</ul>`;
+    } catch (e) {
+      console.error(e);
+      listEl.innerHTML = '<p class="mc-empty">Could not load team jobs.</p>';
+    }
+  }
+
+  async function saveMyJobPosition() {
+    const db = getDb();
+    const uid = getAuth()?.currentUser?.uid;
+    const selectEl = document.getElementById('job-position-select');
+    if (!db || !uid || !selectEl) {
+      setStatus('Sign in to save your job.', true);
+      return;
+    }
+    if (!teamProjectSelected()) {
+      setStatus('Pick a workspace first.', true);
+      return;
+    }
+    const positionKey = String(selectEl.value || '').trim();
+    if (!positionKey) {
+      setStatus('Choose a job position first.', true);
+      return;
+    }
+    try {
+      await setDoc(
+        doc(db, 'users', uid, 'workspace_prefs', pid()),
+        { positionKey, updatedAt: serverTimestamp() },
+        { merge: true }
+      );
+      setStatus('Job updated for this workspace.');
+      await loadJobsPanel();
+    } catch (e) {
+      console.error(e);
+      setStatus('Could not save job position.', true);
     }
   }
 
@@ -285,6 +642,12 @@ export function attachLineEmployeeHub(api) {
       };
       if (prepEl) prepEl.value = latestBody('prep_list');
       if (stockEl) stockEl.value = latestBody('stock_list');
+      if (prepEl) {
+        const reminders = await buildSafetyReminderItems();
+        prepEl.value = injectSafetyBlock(prepEl.value, reminders);
+        prepChecklistItems = parsePrepChecklistItems(prepEl.value);
+        renderPrepChecklist();
+      }
     } catch (e) {
       console.error(e);
     }
@@ -302,6 +665,9 @@ export function attachLineEmployeeHub(api) {
       which === 'stock'
         ? document.getElementById('stock-list-body')
         : document.getElementById('prep-list-body');
+    if (which === 'prep' && ta) {
+      ta.value = serializePrepChecklistItems(prepChecklistItems);
+    }
     const body = (ta?.value || '').trim();
     const id =
       typeof crypto !== 'undefined' && crypto.randomUUID
@@ -839,6 +1205,8 @@ export function attachLineEmployeeHub(api) {
       if (!k) return;
       showSection(k);
       if (k === 'menu') void loadPublishedMenu();
+      if (k === 'recipes') void loadPublishedRecipes();
+      if (k === 'jobs') void loadJobsPanel();
       if (k === 'notes') void loadMyNotes();
       if (k === 'lists') void loadPrepStock();
       if (k === 'checks') void loadStationChecks();
@@ -858,6 +1226,59 @@ export function attachLineEmployeeHub(api) {
   if (savePrepBtn)
     savePrepBtn.addEventListener('click', () => savePrepStock('prep'));
 
+  const addPrepItemBtn = document.getElementById('btn-add-prep-item');
+  if (addPrepItemBtn) {
+    addPrepItemBtn.addEventListener('click', addPrepChecklistItem);
+  }
+
+  const prepItemInput = document.getElementById('prep-check-item-input');
+  if (prepItemInput) {
+    prepItemInput.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        addPrepChecklistItem();
+      }
+    });
+  }
+
+  const prepChecklistList = document.getElementById('prep-checklist-items');
+  if (prepChecklistList) {
+    prepChecklistList.addEventListener('change', event => {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement)) {
+        return;
+      }
+      const index = Number.parseInt(
+        target.getAttribute('data-prep-check-index') || '',
+        10
+      );
+      if (!Number.isInteger(index) || !prepChecklistItems[index]) {
+        return;
+      }
+      prepChecklistItems[index].done = !!target.checked;
+      renderPrepChecklist();
+    });
+    prepChecklistList.addEventListener('click', event => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
+      const button = target.closest('[data-prep-remove-index]');
+      if (!button) {
+        return;
+      }
+      const index = Number.parseInt(
+        button.getAttribute('data-prep-remove-index') || '',
+        10
+      );
+      if (!Number.isInteger(index) || !prepChecklistItems[index]) {
+        return;
+      }
+      prepChecklistItems.splice(index, 1);
+      renderPrepChecklist();
+    });
+  }
+
   const saveStockBtn = document.getElementById('btn-save-stock');
   if (saveStockBtn)
     saveStockBtn.addEventListener('click', () => savePrepStock('stock'));
@@ -874,6 +1295,10 @@ export function attachLineEmployeeHub(api) {
   if (teamPostBtn)
     teamPostBtn.addEventListener('click', () => submitTeamBoardPost());
 
+  const saveJobBtn = document.getElementById('btn-save-job-position');
+  if (saveJobBtn)
+    saveJobBtn.addEventListener('click', () => saveMyJobPosition());
+
   const barTopicSel = document.getElementById('bar-note-topic');
   if (barTopicSel) {
     barTopicSel.addEventListener('change', syncBarDrinkFieldVisibility);
@@ -888,6 +1313,8 @@ export function attachLineEmployeeHub(api) {
       );
       const k = active?.getAttribute('data-hub-tab');
       if (k === 'menu') void loadPublishedMenu();
+      if (k === 'recipes') void loadPublishedRecipes();
+      if (k === 'jobs') void loadJobsPanel();
       if (k === 'notes') void loadMyNotes();
       if (k === 'lists') void loadPrepStock();
       if (k === 'checks') void loadStationChecks();

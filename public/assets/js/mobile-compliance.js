@@ -672,8 +672,18 @@ async function recordSan(locationId, locationName) {
     return;
   }
   const raw = window.prompt(`Sanitizer PPM at ${locationName}?`, '');
-  if (raw == null || raw === '' || Number.isNaN(Number(raw))) return;
-  const ppm = parseFloat(raw);
+  if (raw == null || raw.trim() === '') {
+    return;
+  }
+  const sanitized = raw.replace(/[^0-9.-]/g, '');
+  const ppm = Number.parseFloat(sanitized);
+  if (!Number.isFinite(ppm)) {
+    setStatus(
+      'Enter sanitizer PPM as a number (for example: 150 or 150 ppm).',
+      true
+    );
+    return;
+  }
   const passed = ppm >= 100 && ppm <= 200;
   try {
     await addDoc(collection(db, 'users', uid, 'sanitizer_readings'), {
