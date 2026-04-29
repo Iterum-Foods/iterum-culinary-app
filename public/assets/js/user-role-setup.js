@@ -93,15 +93,28 @@
 
   /** Per-project self-service position (also used for members.role labels). */
   global.ITERUM_TEAM_MEMBER_ROLE_OPTIONS = [
+    { value: 'account_admin', label: 'Account admin / owner' },
+    { value: 'operations_gm', label: 'Operations / GM' },
+    { value: 'location_manager', label: 'Location manager' },
+    { value: 'chef_leadership', label: 'Executive chef / chef lead' },
+    { value: 'sous_chef', label: 'Sous chef' },
+    { value: 'kitchen_manager', label: 'Kitchen manager' },
     { value: 'employee_line', label: 'Kitchen line / crew' },
     { value: 'kitchen_staff', label: 'Kitchen / prep' },
+    { value: 'prep_cook', label: 'Prep cook' },
+    { value: 'line_cook', label: 'Line cook' },
+    { value: 'expeditor', label: 'Expo / pass' },
+    { value: 'dishwasher', label: 'Dish / porter' },
+    { value: 'bakery_pastry', label: 'Bakery / pastry' },
+    { value: 'bar_manager', label: 'Bar manager' },
+    { value: 'bartender', label: 'Bartender' },
+    { value: 'host', label: 'Host / hostess' },
     { value: 'front_of_house', label: 'Front of house' },
+    { value: 'server', label: 'Server' },
+    { value: 'runner', label: 'Runner / busser' },
     { value: 'support_staff', label: 'Support' },
-    { value: 'location_manager', label: 'Location manager' },
-    { value: 'chef_leadership', label: 'Chef / leadership' },
-    { value: 'account_admin', label: 'Account admin' },
-    { value: 'operations_gm', label: 'Operations / GM' },
     { value: 'purchasing', label: 'Purchasing' },
+    { value: 'inventory_clerk', label: 'Inventory / receiving' },
     { value: 'consultant_rd', label: 'Consultant / R&D' }
   ];
 

@@ -1533,6 +1533,140 @@ class FirestoreSync {
     });
     return { ok: true, id: ref.id };
   }
+
+  /**
+   * Save one employee list row under the project so managers can review it.
+   * Document id is stable per user + type so latest value is always visible.
+   * @param {object} opts
+   * @param {string} opts.projectId
+   * @param {'prep_list'|'stock_list'} opts.type
+   * @param {string} opts.body
+   * @param {string} [opts.authorName]
+   * @param {string} [opts.source]
+   */
+  async saveProjectPrepListEntry(opts) {
+    if (!this.initialized || !this.db) {
+      return { ok: false };
+    }
+    const authUid =
+      window.firebaseAuth?.auth?.currentUser?.uid ||
+      window.authManager?.currentUser?.uid ||
+      null;
+    if (!authUid) {
+      return { ok: false };
+    }
+    const projectId = this.resolveProjectId(opts.projectId);
+    const type = opts.type === 'stock_list' ? 'stock_list' : 'prep_list';
+    const body = String(opts.body || '')
+      .trim()
+      .slice(0, 40000);
+    const authorName =
+      String(
+        opts.authorName ||
+          window.authManager?.currentUser?.name ||
+          window.firebaseAuth?.auth?.currentUser?.displayName ||
+          'Team member'
+      )
+        .trim()
+        .slice(0, 120) || 'Team member';
+    const docId = `${type}__${authUid}`;
+    const ref = doc(this.db, 'projects', projectId, 'prep_lists', docId);
+    await setDoc(
+      ref,
+      {
+        id: docId,
+        projectId,
+        type,
+        body,
+        authorUid: authUid,
+        authorName,
+        source: String(opts.source || 'mobile_line_app').slice(0, 80),
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+    return { ok: true, id: docId };
+  }
+
+  /**
+   * Managers can attach handoff notes to employee prep/stock lists.
+   * @param {string} projectId
+   * @param {string} docId
+   * @param {string} managerNote
+   */
+  async saveProjectPrepListManagerNote(projectId, docId, managerNote) {
+    if (!this.initialized || !this.db || !docId) {
+      return { ok: false };
+    }
+    const project = this.resolveProjectId(projectId);
+    const authUid =
+      window.firebaseAuth?.auth?.currentUser?.uid ||
+      window.authManager?.currentUser?.uid ||
+      null;
+    const managerName =
+      String(
+        window.authManager?.currentUser?.name ||
+          window.firebaseAuth?.auth?.currentUser?.displayName ||
+          'Manager'
+      )
+        .trim()
+        .slice(0, 120) || 'Manager';
+    const ref = doc(this.db, 'projects', project, 'prep_lists', String(docId));
+    await setDoc(
+      ref,
+      {
+        managerNote: String(managerNote || '')
+          .trim()
+          .slice(0, 4000),
+        managerNoteByUid: authUid || null,
+        managerNoteByName: managerName,
+        managerNoteUpdatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+    return { ok: true };
+  }
+
+  /**
+   * Live feed: project employee prep + stock lists for manager review.
+   * @param {string} projectId
+   * @param {(rows: Array<Record<string, unknown>>) => void} onUpdate
+   * @param {(err: Error) => void} [onError]
+   * @returns {() => void}
+   */
+  subscribeProjectPrepLists(projectId, onUpdate, onError) {
+    if (!this.initialized || !this.db) {
+      return () => {};
+    }
+    const project = this.resolveProjectId(projectId);
+    const col = collection(this.db, 'projects', project, 'prep_lists');
+    return onSnapshot(
+      col,
+      snap => {
+        const out = [];
+        snap.forEach(d => out.push({ id: d.id, ...d.data() }));
+        out.sort((a, b) => {
+          const ta =
+            a.updatedAt && typeof a.updatedAt.toMillis === 'function'
+              ? a.updatedAt.toMillis()
+              : 0;
+          const tb =
+            b.updatedAt && typeof b.updatedAt.toMillis === 'function'
+              ? b.updatedAt.toMillis()
+              : 0;
+          return tb - ta;
+        });
+        onUpdate(out);
+      },
+      err => {
+        if (typeof onError === 'function') {
+          onError(err);
+        } else {
+          console.warn('subscribeProjectPrepLists:', err);
+        }
+      }
+    );
+  }
 }
 
 // Initialize Firestore Sync

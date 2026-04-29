@@ -276,6 +276,16 @@
                 Then paste their <strong>Firebase User UID</strong> (they can copy it from the team app after sign-in, or find it in Firebase Console Authentication users list).
             </p>
             <div style="display: grid; gap: 14px; max-width: 520px;">
+                <div style="padding: 12px 14px; border-radius: 10px; border: 1px solid #dbeafe; background: #eff6ff;">
+                    <div style="font-weight: 700; color: #1e3a8a; margin-bottom: 6px;">Invite helper</div>
+                    <p style="font-size: 13px; color: #334155; line-height: 1.5; margin: 0 0 10px;">
+                        Send this to an employee first so they know exactly how to get and share their UID.
+                    </p>
+                    <button type="button" id="team-copy-invite-btn" style="padding: 9px 12px; border-radius: 8px; border: 1px solid #93c5fd; background: white; color: #1d4ed8; font-weight: 700; font-size: 13px; cursor: pointer;">
+                        Copy employee invite message
+                    </button>
+                    <div id="team-invite-msg" style="margin-top: 8px; min-height: 1.1em; font-size: 12px; color: #1e40af;"></div>
+                </div>
                 <div>
                     <label for="team-project-select" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Project</label>
                     <select id="team-project-select" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;"></select>

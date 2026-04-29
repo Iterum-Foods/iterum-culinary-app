@@ -346,13 +346,90 @@ function roleLabel(role) {
   const mapping = {
     account_admin: 'Admin',
     location_manager: 'Manager',
+    kitchen_manager: 'Manager',
     operations_gm: 'Manager',
+    chef_leadership: 'Chef lead',
+    sous_chef: 'Sous chef',
     employee_line: 'Line',
     kitchen_staff: 'Kitchen',
+    prep_cook: 'Prep',
+    line_cook: 'Line cook',
+    expeditor: 'Expo',
+    dishwasher: 'Dish',
+    bakery_pastry: 'Pastry',
+    bar_manager: 'Bar manager',
+    bartender: 'Bartender',
+    host: 'Host',
     front_of_house: 'FOH',
+    server: 'Server',
+    runner: 'Runner',
+    purchasing: 'Purchasing',
+    inventory_clerk: 'Inventory',
+    consultant_rd: 'R&D',
     support_staff: 'Support'
   };
   return mapping[role] || 'Team';
+}
+
+function actionsForRole(role) {
+  if (
+    role === 'account_admin' ||
+    role === 'location_manager' ||
+    role === 'operations_gm' ||
+    role === 'kitchen_manager'
+  ) {
+    return [
+      { key: 'team', label: 'Review team handoff' },
+      { key: 'checks', label: 'Run checks' },
+      { key: 'jobs', label: 'Update team jobs' },
+      { key: 'temps', label: 'Log temps' }
+    ];
+  }
+  if (role === 'purchasing' || role === 'inventory_clerk') {
+    return [
+      { key: 'lists', label: 'Review prep/stock' },
+      { key: 'team', label: 'Open team log' },
+      { key: 'jobs', label: 'Set my job' },
+      { key: 'temps', label: 'Log temps' }
+    ];
+  }
+  if (
+    role === 'chef_leadership' ||
+    role === 'sous_chef' ||
+    role === 'consultant_rd'
+  ) {
+    return [
+      { key: 'recipes', label: 'Open recipes' },
+      { key: 'checks', label: 'Run checks' },
+      { key: 'lists', label: 'Open prep list' },
+      { key: 'team', label: 'Open team log' }
+    ];
+  }
+  if (
+    role === 'front_of_house' ||
+    role === 'server' ||
+    role === 'runner' ||
+    role === 'host'
+  ) {
+    return [
+      { key: 'menu', label: 'Open menu' },
+      { key: 'team', label: 'Open team log' },
+      { key: 'jobs', label: 'Set my job' }
+    ];
+  }
+  if (role === 'bartender' || role === 'bar_manager') {
+    return [
+      { key: 'bar', label: 'Open bar pack' },
+      { key: 'team', label: 'Open team log' },
+      { key: 'checks', label: 'Run checks' }
+    ];
+  }
+  return [
+    { key: 'checks', label: 'Run checks' },
+    { key: 'lists', label: 'Open prep list' },
+    { key: 'team', label: 'Open team log' },
+    { key: 'temps', label: 'Log temps' }
+  ];
 }
 
 function renderTodayPanel(model) {
@@ -437,11 +514,7 @@ async function refreshTodayPanel(uid) {
       { label: 'Temp logs today', value: '0' },
       { label: 'Team posts today', value: '0' }
     ],
-    actions: [
-      { key: 'checks', label: 'Run checks' },
-      { key: 'team', label: 'Open team log' },
-      { key: 'temps', label: 'Log temps' }
-    ]
+    actions: actionsForRole(currentRoleForProject(projectId))
   };
 
   try {
@@ -511,14 +584,6 @@ async function refreshTodayPanel(uid) {
     attention > 0
       ? `${attention} check${attention === 1 ? '' : 's'} need corrective action before service.`
       : 'Shift checks look healthy. Keep logs current and post handoff notes.';
-
-  if (
-    model.role === 'account_admin' ||
-    model.role === 'location_manager' ||
-    model.role === 'operations_gm'
-  ) {
-    model.actions.unshift({ key: 'team', label: 'Review team handoff' });
-  }
 
   renderTodayPanel(model);
 }

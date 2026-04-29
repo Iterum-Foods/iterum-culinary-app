@@ -52,12 +52,29 @@ export function attachLineEmployeeHub(api) {
   let teamBoardUnsub = null;
 
   const FALLBACK_JOB_OPTIONS = [
-    { value: 'employee_line', label: 'Kitchen line / crew' },
-    { value: 'front_of_house', label: 'Front of house' },
-    { value: 'kitchen_staff', label: 'Kitchen staff' },
+    { value: 'account_admin', label: 'Account admin / owner' },
+    { value: 'operations_gm', label: 'Operations / GM' },
     { value: 'location_manager', label: 'Location manager' },
-    { value: 'operations_gm', label: 'Operations GM' },
-    { value: 'account_admin', label: 'Account admin' }
+    { value: 'chef_leadership', label: 'Executive chef / chef lead' },
+    { value: 'sous_chef', label: 'Sous chef' },
+    { value: 'kitchen_manager', label: 'Kitchen manager' },
+    { value: 'employee_line', label: 'Kitchen line / crew' },
+    { value: 'kitchen_staff', label: 'Kitchen staff' },
+    { value: 'prep_cook', label: 'Prep cook' },
+    { value: 'line_cook', label: 'Line cook' },
+    { value: 'expeditor', label: 'Expo / pass' },
+    { value: 'dishwasher', label: 'Dish / porter' },
+    { value: 'bakery_pastry', label: 'Bakery / pastry' },
+    { value: 'bar_manager', label: 'Bar manager' },
+    { value: 'bartender', label: 'Bartender' },
+    { value: 'host', label: 'Host / hostess' },
+    { value: 'front_of_house', label: 'Front of house' },
+    { value: 'server', label: 'Server' },
+    { value: 'runner', label: 'Runner / busser' },
+    { value: 'support_staff', label: 'Support' },
+    { value: 'purchasing', label: 'Purchasing' },
+    { value: 'inventory_clerk', label: 'Inventory / receiving' },
+    { value: 'consultant_rd', label: 'Consultant / R&D' }
   ];
 
   function roleLabel(role) {
@@ -685,6 +702,19 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
         },
         { merge: true }
       );
+      const fs = window.firestoreSync;
+      if (
+        fs &&
+        typeof fs.saveProjectPrepListEntry === 'function' &&
+        teamProjectSelected()
+      ) {
+        await fs.saveProjectPrepListEntry({
+          projectId: pid(),
+          type,
+          body,
+          source: 'mobile_line_app'
+        });
+      }
       setStatus(which === 'stock' ? 'Stock list saved.' : 'Prep list saved.');
     } catch (e) {
       console.error(e);

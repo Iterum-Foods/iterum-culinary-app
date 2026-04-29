@@ -42,6 +42,57 @@ function getFirebaseUid() {
   );
 }
 
+function buildInviteText() {
+  const projectSel = document.getElementById('team-project-select');
+  const projectName =
+    projectSel?.selectedOptions?.[0]?.textContent?.trim() || 'our project';
+  const origin =
+    (typeof window !== 'undefined' && window.location && window.location.origin) ||
+    '';
+  const mobileUrl = origin
+    ? `${origin}/mobile-compliance.html`
+    : 'mobile-compliance.html';
+  return (
+    `You are invited to join ${projectName} in Iterum.\n\n` +
+    `Steps:\n` +
+    `1) Open the mobile app (or ${mobileUrl}).\n` +
+    `2) Sign in / create your account.\n` +
+    `3) In the app, tap Copy ID (Firebase UID).\n` +
+    `4) Send that UID back to me.\n\n` +
+    `Reply format: UID: <paste your full Firebase UID>\n\n` +
+    `Once I add your UID to the project, reopen the app and choose the workspace.`
+  );
+}
+
+async function onCopyInviteClick() {
+  const msg = document.getElementById('team-invite-msg');
+  if (msg) {
+    msg.textContent = '';
+  }
+  const text = buildInviteText();
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(text);
+      if (msg) {
+        msg.textContent = 'Invite message copied.';
+      }
+      return;
+    }
+  } catch (e) {
+    console.warn('clipboard write failed', e);
+  }
+  try {
+    window.prompt('Copy this invite message:', text);
+    if (msg) {
+      msg.textContent = 'Invite message ready to copy.';
+    }
+  } catch (e) {
+    if (msg) {
+      msg.textContent = 'Could not open copy helper. Please copy manually.';
+    }
+  }
+}
+
 async function onAddTeamMemberClick() {
   const msg = document.getElementById('team-access-msg');
   const targetUid = document.getElementById('team-target-uid')?.value?.trim();
@@ -126,6 +177,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const btn = document.getElementById('team-add-member-btn');
   if (btn) {
     btn.addEventListener('click', () => onAddTeamMemberClick());
+  }
+  const inviteBtn = document.getElementById('team-copy-invite-btn');
+  if (inviteBtn) {
+    inviteBtn.addEventListener('click', () => {
+      void onCopyInviteClick();
+    });
   }
   let ticks = 0;
   const t = setInterval(() => {

@@ -10,6 +10,8 @@
     activeDate: '',
     /** @type {null | (() => void)} */
     teamShiftFeedUnsub: null,
+    /** @type {null | (() => void)} */
+    managerPrepBoardUnsub: null,
     init() {
       this.cacheElements();
       this.syncProjectContext();
@@ -21,6 +23,7 @@
       );
       window.addEventListener('firestoreSyncReady', () => {
         this.attachTeamShiftFeedListener();
+        this.attachManagerPrepBoardListener();
       });
     },
     cacheElements() {
@@ -55,6 +58,12 @@
       this.quickStatTasks = document.getElementById('quick-stat-tasks');
       this.quickStatIdeas = document.getElementById('quick-stat-ideas');
       this.quickStatNotes = document.getElementById('quick-stat-notes');
+      this.managerPrepBoardFeed = document.getElementById(
+        'manager-prep-board-feed'
+      );
+      this.managerPrepBoardStatus = document.getElementById(
+        'manager-prep-board-status'
+      );
     },
     bindEvents() {
       if (this.dateInput) {
@@ -145,6 +154,20 @@
           } else if (target.dataset.action === 'toggle') {
             this.toggleIdeaStatus(ideaId);
           }
+        });
+      }
+      if (this.managerPrepBoardFeed) {
+        this.managerPrepBoardFeed.addEventListener('click', e => {
+          const target = e.target;
+          const saveBtn = target.closest('[data-prep-note-save-id]');
+          if (!saveBtn) {
+            return;
+          }
+          const docId = saveBtn.getAttribute('data-prep-note-save-id');
+          if (!docId) {
+            return;
+          }
+          void this.savePrepManagerNote(docId);
         });
       }
     },
@@ -446,6 +469,161 @@
         }
       );
     },
+    canManagePrepBoard() {
+      return this.canViewManagerNotes();
+    },
+    formatPrepBoardTime(value) {
+      if (!value) {
+        return '';
+      }
+      const d =
+        typeof value?.toDate === 'function'
+          ? value.toDate()
+          : value instanceof Date
+            ? value
+            : new Date(value);
+      if (!d || Number.isNaN(d.getTime())) {
+        return '';
+      }
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    },
+    formatPrepListBody(body) {
+      const lines = String(body || '')
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .filter(
+          line =>
+            line !== '--- AUTO SAFETY CHECKS (6h) ---' &&
+            line !== '--- END AUTO SAFETY CHECKS ---'
+        );
+      if (!lines.length) {
+        return '<div class="text-xs" style="color: var(--brand-text-muted);">No items yet.</div>';
+      }
+      return `<ul class="space-y-1">${lines
+        .map(line => {
+          const check = line.match(/^-\s*\[( |x|X)\]\s*(.+)$/);
+          if (check) {
+            const done = check[1] !== ' ';
+            return `<li class="flex items-start gap-2"><span>${done ? '✅' : '⬜'}</span><span style="${done ? 'text-decoration:line-through;opacity:0.72;' : ''}">${this.escapeHtml(check[2])}</span></li>`;
+          }
+          return `<li class="flex items-start gap-2"><span>•</span><span>${this.escapeHtml(
+            line.replace(/^-+\s*/, '')
+          )}</span></li>`;
+        })
+        .join('')}</ul>`;
+    },
+    renderManagerPrepBoard(rows) {
+      const feed = this.managerPrepBoardFeed;
+      const status = this.managerPrepBoardStatus;
+      if (!feed || !status) {
+        return;
+      }
+      if (!rows.length) {
+        feed.innerHTML =
+          '<p class="text-xs" style="color: var(--brand-text-muted);">No team lists have been saved yet.</p>';
+        status.textContent = 'No team lists yet';
+        return;
+      }
+      status.textContent = `${rows.length} list${rows.length === 1 ? '' : 's'} loaded`;
+      const canManage = this.canManagePrepBoard();
+      feed.innerHTML = rows
+        .map(row => {
+          const label = row.type === 'stock_list' ? 'Stock list' : 'Prep list';
+          const when = this.formatPrepBoardTime(row.updatedAt);
+          return `<article class="rounded-md border p-3 mb-2" style="border-color: var(--brand-border-light); background: var(--brand-bg-primary);">
+            <div class="flex flex-wrap justify-between gap-2 mb-2">
+              <div>
+                <div class="text-xs font-semibold uppercase" style="color: var(--brand-secondary-accent);">${this.escapeHtml(label)}</div>
+                <div class="font-semibold">${this.escapeHtml(row.authorName || row.authorUid || 'Team member')}</div>
+              </div>
+              <div class="text-xs" style="color: var(--brand-text-muted);">${when ? `Updated ${this.escapeHtml(when)}` : ''}</div>
+            </div>
+            <div class="text-sm mb-2" style="color: var(--brand-text-secondary);">${this.formatPrepListBody(row.body)}</div>
+            <div class="border-t pt-2" style="border-color: var(--brand-border-light);">
+              <label class="block text-xs font-semibold mb-1" style="color: var(--brand-text-secondary);">Manager note</label>
+              <textarea data-prep-note-id="${this.escapeHtml(row.id)}" class="w-full h-20 resize-none text-sm mb-2" ${
+                canManage ? '' : 'disabled'
+              } placeholder="Add follow-up or correction...">${this.escapeHtml(String(row.managerNote || ''))}</textarea>
+              <div class="flex items-center justify-between gap-2">
+                <div class="text-xs" style="color: var(--brand-text-muted);">${
+                  row.managerNoteByName
+                    ? `Last note by ${this.escapeHtml(row.managerNoteByName)}`
+                    : 'No manager note yet'
+                }</div>
+                <button type="button" class="btn-primary text-xs py-1.5 px-3" data-prep-note-save-id="${this.escapeHtml(
+                  row.id
+                )}" ${canManage ? '' : 'disabled'}>Save note</button>
+              </div>
+            </div>
+          </article>`;
+        })
+        .join('');
+    },
+    detachManagerPrepBoardListener() {
+      if (typeof this.managerPrepBoardUnsub === 'function') {
+        try {
+          this.managerPrepBoardUnsub();
+        } catch (e) {
+          /* ignore */
+        }
+        this.managerPrepBoardUnsub = null;
+      }
+    },
+    attachManagerPrepBoardListener() {
+      const feed = this.managerPrepBoardFeed;
+      const status = this.managerPrepBoardStatus;
+      if (!feed || !status) {
+        return;
+      }
+      this.detachManagerPrepBoardListener();
+      const fs = window.firestoreSync;
+      if (!fs || !fs.initialized || typeof fs.subscribeProjectPrepLists !== 'function') {
+        status.textContent = 'Prep board unavailable';
+        feed.innerHTML =
+          '<p class="text-xs" style="color: var(--brand-text-muted);">Prep board loads when Firestore is ready.</p>';
+        return;
+      }
+      if (!this.projectId || this.projectId === 'mobile-default') {
+        status.textContent = 'Select a project';
+        feed.innerHTML =
+          '<p class="text-xs" style="color: var(--brand-text-muted);">Select a project to load prep lists.</p>';
+        return;
+      }
+      const projectId = this.projectId;
+      status.textContent = 'Loading team lists…';
+      this.managerPrepBoardUnsub = fs.subscribeProjectPrepLists(
+        projectId,
+        rows => {
+          if (this.projectId !== projectId) {
+            return;
+          }
+          this.renderManagerPrepBoard(rows);
+        },
+        err => {
+          console.warn('attachManagerPrepBoardListener', err);
+          status.textContent = 'Could not load';
+          feed.innerHTML =
+            '<p class="text-xs" style="color: var(--brand-text-muted);">Could not load team lists.</p>';
+        }
+      );
+    },
+    async savePrepManagerNote(docId) {
+      const fs = window.firestoreSync;
+      if (
+        !fs ||
+        typeof fs.saveProjectPrepListManagerNote !== 'function' ||
+        !this.canManagePrepBoard()
+      ) {
+        return;
+      }
+      const area = this.managerPrepBoardFeed?.querySelector(
+        `textarea[data-prep-note-id="${docId}"]`
+      );
+      const note = area ? area.value : '';
+      await fs.saveProjectPrepListManagerNote(this.projectId, docId, note);
+      this.setStatus(this.managerPrepBoardStatus, 'Manager note saved');
+    },
     async refreshTeamShiftFeedOnce() {
       const el = this.notesTeamShiftFeed;
       if (!el) {
@@ -682,6 +860,7 @@
       this.renderNotes();
       this.renderTasks();
       this.renderIdeas();
+      this.attachManagerPrepBoardListener();
       this.updateQuickStats();
     },
     handleProjectChanged(event) {
@@ -695,6 +874,7 @@
             project?.name || project?.title || 'Active Project'
           );
           this.renderAll();
+          this.attachManagerPrepBoardListener();
         }
       } catch (error) {
         console.warn('⚠️ Failed to handle project change:', error);
