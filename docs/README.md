@@ -14,6 +14,8 @@ Primary navigation for strategy, delivery, and technical references.
 - `GOLDEN_PATH_AUDIT.md` — page-level UX and implementation path.
 - `M1_CTO_AGENT_DELEGATION.md` — engineering delegation for M1.
 - `M1_COO_PROD_VERIFICATION.md` — production verification checklist.
+- `MENU_IMPORT_WORKFLOW.md` — operator workflow for menu imports.
+- `MENU_IMPORT_STAFF_QUICK_CARD.md` — one-page checklist for staff.
 
 ## Leadership / Pilot Docs
 
