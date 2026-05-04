@@ -68,6 +68,9 @@ class UnifiedNavHeader {
     if (path.includes('kitchen-management')) {
       return 'kitchen';
     }
+    if (path.includes('mobile-compliance')) {
+      return 'shift';
+    }
     if (path.includes('inventory-variance')) {
       return 'invvar';
     }
@@ -95,6 +98,9 @@ class UnifiedNavHeader {
     if (path.includes('audit-log')) {
       return 'audit';
     }
+    if (path.includes('spec-library')) {
+      return 'spec_library';
+    }
     if (path.includes('setup')) {
       return 'setup';
     }
@@ -109,6 +115,7 @@ class UnifiedNavHeader {
     const inMore = [
       'highlights',
       'server',
+      'spec_library',
       'vendorprice',
       'equipment',
       'production',
@@ -211,6 +218,7 @@ class UnifiedNavHeader {
 
     // Touch / click: open Settings & More menus (hover alone fails on mobile)
     this.setupDropdownClickToggle();
+    this.setupSignOutLink();
 
     // Setup mobile toggle
     this.setupMobileToggle();
@@ -294,15 +302,44 @@ class UnifiedNavHeader {
         sidebar
           .querySelectorAll('.nav-dropdown-content.show')
           .forEach(c => c.classList.remove('show'));
-        if (!isShown) content.classList.add('show');
+        if (!isShown) {
+          content.classList.add('show');
+        }
+        const nowShown = content.classList.contains('show');
+        if (btn.classList.contains('nav-dropdown-btn')) {
+          btn.setAttribute('aria-expanded', nowShown ? 'true' : 'false');
+        }
+        if (btn.classList.contains('nav-user-menu-btn')) {
+          btn.setAttribute('aria-expanded', nowShown ? 'true' : 'false');
+        }
       });
     });
 
     document.addEventListener('click', e => {
       if (e.target.closest('.unified-nav-sidebar .nav-dropdown')) return;
-      sidebar
-        .querySelectorAll('.nav-dropdown-content.show')
-        .forEach(c => c.classList.remove('show'));
+      sidebar.querySelectorAll('.nav-dropdown-content.show').forEach(c => {
+        c.classList.remove('show');
+      });
+      sidebar.querySelectorAll('.nav-dropdown-btn[aria-expanded]').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+      });
+      sidebar.querySelectorAll('.nav-user-menu-btn[aria-expanded]').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  setupSignOutLink() {
+    const link = document.querySelector(
+      '.nav-sign-out-link[data-iterum-sign-out="1"]'
+    );
+    if (!link) return;
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      if (window.authManager) {
+        window.authManager.signOut();
+      }
+      window.location.href = 'index.html';
     });
   }
 
@@ -392,10 +429,10 @@ class UnifiedNavHeader {
                     </a>
 
                     <div class="nav-dropdown">
-                        <button type="button" class="nav-link nav-dropdown-btn ${moreActive}">
-                            <span>☰</span> More
+                        <button type="button" class="nav-link nav-dropdown-btn ${moreActive}" aria-expanded="false" aria-haspopup="true" aria-controls="nav-more-panel" id="nav-more-toggle">
+                            <span class="nav-more-chevron" aria-hidden="true">▸</span> More tools
                         </button>
-                        <div class="nav-dropdown-content">
+                        <div class="nav-dropdown-content" id="nav-more-panel" aria-labelledby="nav-more-toggle">
                             <div class="nav-dropdown-category">Kitchen tools</div>
                             <a href="kitchen-management.html?tab=pdf" data-iterum-feature="kitchen">📕 Recipe book PDF</a>
                             <a href="kitchen-management.html?tab=preplist" data-iterum-feature="kitchen">📝 Prep lists</a>
@@ -403,6 +440,7 @@ class UnifiedNavHeader {
                             <a href="server-info-sheet.html" class="${p('server')}" data-iterum-feature="kitchen">🗣️ Server info</a>
                             <hr>
                             <div class="nav-dropdown-category">Operations</div>
+                            <a href="spec-library.html" class="${p('spec_library')}" data-iterum-feature="ingredients">📄 Spec library</a>
                             <a href="vendor-price-comparison.html" class="${p('vendorprice')}" data-iterum-feature="vendors">💰 Price compare</a>
                             <a href="equipment-management.html" class="${p('equipment')}" data-iterum-feature="equipment">🔧 Equipment</a>
                             <a href="production-planning.html" class="${p('production')}" data-iterum-feature="production">📋 Production</a>
@@ -443,18 +481,17 @@ class UnifiedNavHeader {
                         </div>
                     </div>
                     
-                    <!-- User Menu Dropdown -->
+                    <!-- User Menu Dropdown (no duplicate links — Projects / group onboarding live under Main + More) -->
                     <div class="nav-dropdown" style="width: 100%;">
-                        <button class="nav-user-menu-btn" style="width: 100%; text-align: left; padding: 8px; border-radius: 4px; border: 1px solid rgba(252, 211, 77, 0.3); background: rgba(255, 251, 235, 0.5); cursor: pointer;">
-                            <span style="font-size: 0.75rem;">⚙️ Settings</span>
+                        <button type="button" class="nav-user-menu-btn" id="nav-settings-toggle" aria-expanded="false" aria-haspopup="true" aria-controls="nav-settings-panel"
+                            style="width: 100%; text-align: left; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(180, 83, 9, 0.22); background: rgba(255, 251, 235, 0.85); cursor: pointer; font-weight: 600; color: #451a03; font-size: 0.8rem;">
+                            <span aria-hidden="true">⚙️</span> Account
                         </button>
-                        <div class="nav-dropdown-content nav-user-menu">
+                        <div class="nav-dropdown-content nav-user-menu" id="nav-settings-panel" aria-labelledby="nav-settings-toggle">
                             <a href="user-profile.html">👤 Profile &amp; settings</a>
                             <a href="setup.html">🛠️ Workspace setup</a>
-                            <a href="project-hub.html" data-iterum-feature="projects">📂 Project hub</a>
-                            <a href="restaurant-group-onboarding.html" data-iterum-feature="projects">📍 Add a restaurant group</a>
                             <hr>
-                            <a href="#" onclick="event.preventDefault(); if (window.authManager) { window.authManager.signOut(); } window.location.href='index.html';">🚪 Sign out</a>
+                            <a href="#" class="nav-sign-out-link" data-iterum-sign-out="1">🚪 Sign out</a>
                         </div>
                     </div>
                 </div>
@@ -623,6 +660,16 @@ class UnifiedNavHeader {
                 .sidebar-toggle-mobile {
                     display: block;
                 }
+
+                /* Flyout to the right overflows the viewport — open below the toggle */
+                .unified-nav-sidebar .nav-dropdown-content {
+                    left: 0;
+                    right: 0;
+                    top: 100%;
+                    margin-left: 0;
+                    margin-top: 6px;
+                    min-width: unset;
+                }
             }
 
             .nav-logo {
@@ -667,17 +714,28 @@ class UnifiedNavHeader {
                 text-decoration: none;
                 padding: 12px 16px;
                 border-radius: 8px;
-                transition: all 0.2s ease;
+                transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
                 display: flex;
                 align-items: center;
                 gap: 12px;
                 font-weight: 500;
-                font-size: 0.95rem;
+                font-size: 0.9375rem;
                 background: transparent;
                 border: 1px solid transparent;
                 cursor: pointer;
-                font-size: 0.98rem;
                 white-space: nowrap;
+            }
+
+            .nav-more-chevron {
+                display: inline-block;
+                transition: transform 0.2s ease;
+                font-size: 0.75rem;
+                opacity: 0.75;
+                margin-right: 2px;
+            }
+
+            .nav-dropdown-btn[aria-expanded="true"] .nav-more-chevron {
+                transform: rotate(90deg);
             }
 
             .nav-link span:first-child {
@@ -699,17 +757,18 @@ class UnifiedNavHeader {
             }
 
             .nav-link-emphasis {
-                background: rgba(59, 130, 246, 0.16);
-                border-color: rgba(59, 130, 246, 0.35);
-                color: rgba(226, 232, 240, 0.95);
+                background: rgba(59, 130, 246, 0.12);
+                border-color: rgba(59, 130, 246, 0.28);
+                color: #1e40af;
+                font-weight: 600;
             }
 
             .nav-link-emphasis:hover,
             .nav-link-emphasis:focus {
-                background: linear-gradient(135deg, rgba(59, 130, 246, 0.62) 0%, rgba(37, 99, 235, 0.82) 100%);
+                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
                 color: #ffffff;
                 border-color: transparent;
-                box-shadow: 0 18px 36px rgba(37, 99, 235, 0.45);
+                box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
             }
 
             .nav-right {
@@ -755,21 +814,22 @@ class UnifiedNavHeader {
                 align-items: center;
                 gap: 12px;
                 padding: 11px 12px;
-                color: rgba(226, 232, 240, 0.9);
+                color: #334155;
                 text-decoration: none;
-                border-radius: 12px;
+                border-radius: 10px;
                 transition: background 0.2s ease, color 0.2s ease;
                 font-weight: 500;
-                font-size: 0.94rem;
+                font-size: 0.9rem;
             }
 
-            .nav-dropdown-content a:hover {
-                background: rgba(59, 130, 246, 0.18);
-                color: #ffffff;
+            .nav-dropdown-content a:hover,
+            .nav-dropdown-content a:focus {
+                background: rgba(59, 130, 246, 0.12);
+                color: #1d4ed8;
             }
 
             .nav-dropdown-content a.active {
-                background: rgba(37, 99, 235, 0.85);
+                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
                 color: #ffffff;
             }
 
@@ -786,11 +846,11 @@ class UnifiedNavHeader {
 
             .nav-dropdown-content .nav-dropdown-category {
                 padding: 6px 12px 4px;
-                font-size: 0.72rem;
-                font-weight: 600;
+                font-size: 0.7rem;
+                font-weight: 700;
                 text-transform: uppercase;
-                letter-spacing: 0.08em;
-                color: rgba(148, 163, 184, 0.78);
+                letter-spacing: 0.06em;
+                color: #64748b;
             }
 
             .nav-user-menu {

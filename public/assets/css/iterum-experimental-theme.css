@@ -1,0 +1,8 @@
+/**
+ * Optional visual theme (nordic / vintage / dark helpers). Not loaded by default.
+ * Opt-in: add AFTER iterum-canonical-app.css, or set localStorage.iterum_experimental_theme = '1'
+ * and load this file from a debug menu when you add one.
+ */
+@import url('./nordic-design-system.css');
+@import url('./modern-nordic-vintage.css');
+@import url('./dark-mode-enhancements.css');

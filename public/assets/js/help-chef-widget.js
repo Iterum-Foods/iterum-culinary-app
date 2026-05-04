@@ -171,7 +171,7 @@
         id: 'nav',
         when: ['ready'],
         title: 'Getting around',
-        body: 'Use the menu icon on your phone to open the sidebar. Your name and sign-out live at the bottom. “More” holds extra tools so the main list stays simple.',
+        body: 'Use the menu icon on your phone to open the sidebar. Your name and sign-out live at the bottom. “More tools” holds imports, specs, and admin shortcuts so the main list stays simple.',
         chef: 1,
         links: []
       },

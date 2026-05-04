@@ -1,0 +1,59 @@
+/**
+ * Phase D — shared polish inside .main-content-wrapper (app pages with unified nav).
+ * Load after iterum-brand-kit / canonical stack. Keeps typography and tables calmer.
+ */
+.main-content-wrapper {
+  font-family: var(--font-body, 'Inter', system-ui, -apple-system, sans-serif);
+}
+
+.main-content-wrapper .page-header h1,
+.main-content-wrapper h1.heading-1,
+.main-content-wrapper .vendor-dashboard > h1,
+.main-content-wrapper .page-shell h1 {
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--brand-text-primary, #1a2e35);
+}
+
+.main-content-wrapper h2.heading-2,
+.main-content-wrapper .vendor-section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--brand-text-primary, #1a2e35);
+}
+
+.main-content-wrapper .iterum-workflow-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--brand-border-light, rgba(180, 83, 9, 0.25));
+  background: var(--brand-bg-primary, #fffbeb);
+  color: var(--brand-text-secondary, #78350f);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.main-content-wrapper .iterum-workflow-banner a {
+  font-weight: 600;
+  color: var(--brand-primary-accent, #6b8e6f);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.main-content-wrapper .iterum-workflow-banner a:hover {
+  opacity: 0.92;
+}
+
+/* Data tables: calmer row rhythm where tables use generic classes */
+.main-content-wrapper table.data-table td,
+.main-content-wrapper .vendors-container .vendor-card {
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}

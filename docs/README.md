@@ -8,14 +8,22 @@ Primary navigation for strategy, delivery, and technical references.
 - `DATA_ACCESS_INVENTORY.md` — Firestore/localStorage/indexedDB paths in use.
 - `HOW_WE_SHIP.md` — ship checklist and deployment expectations.
 
+## User and operator workflows
+
+- `USER_WORKFLOW_GUIDE.md` — **new restaurant**, **new user at existing restaurant**, and **task-based** paths (menu, team, mobile, specs).
+- `UI_AND_WORKFLOW_ROADMAP.md` — **phased** design and UI plan (workflow-first, professional polish, role surfaces).
+- `MENU_IMPORT_WORKFLOW.md` — spreadsheet menu import (detailed).
+- `MENU_IMPORT_STAFF_QUICK_CARD.md` — one-page menu import checklist.
+- `ADD_TEAMMATE_UID_PATH.md` — add a teammate via Firebase UID.
+- `PHASE_1_TEAMMATE_FLOW_CHECKLIST.md` — full teammate / membership verification.
+- `QA_FEATURE_TEST_WORKFLOW.md` — release and pilot validation checklist.
+
 ## Current Delivery Tracks
 
 - `P1_EPIC_BREAKDOWN.md` — milestone breakdown and execution slices.
 - `GOLDEN_PATH_AUDIT.md` — page-level UX and implementation path.
 - `M1_CTO_AGENT_DELEGATION.md` — engineering delegation for M1.
 - `M1_COO_PROD_VERIFICATION.md` — production verification checklist.
-- `MENU_IMPORT_WORKFLOW.md` — operator workflow for menu imports.
-- `MENU_IMPORT_STAFF_QUICK_CARD.md` — one-page checklist for staff.
 
 ## Leadership / Pilot Docs
 
