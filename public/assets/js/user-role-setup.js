@@ -162,7 +162,13 @@
   global.iterumOperatorProfileKey = PROFILE_KEY;
 
   global.getPostAuthDestination = function () {
-    return hasOperatorProfile() ? 'dashboard.html' : 'setup.html';
+    if (!hasOperatorProfile()) return 'setup.html';
+    var r =
+      typeof global.iterumGetEffectiveRoleKey === 'function'
+        ? global.iterumGetEffectiveRoleKey()
+        : ((parseProfile() || {}).roleKey || 'chef_leadership');
+    if (r === 'employee_line') return 'mobile-compliance.html';
+    return 'dashboard.html';
   };
 
   global.getOperatorProfile = parseProfile;

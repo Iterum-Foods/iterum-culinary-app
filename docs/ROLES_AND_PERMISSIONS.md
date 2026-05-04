@@ -87,6 +87,20 @@ Legend: **Y** = visible for that role, **—** = hidden by `data-dash-roles` or 
 | `operations_gm`, `employee_line` | **Kitchen hub** (`kitchen-management.html`) |
 | `chef_leadership`, `consultant_rd` (and fallback) | **New experiment** (`recipe-developer.html`) |
 
+### Default post-auth landing (`getPostAuthDestination`)
+
+| Condition | Destination |
+|-----------|---------------|
+| No `iterum_operator_profile` saved | `setup.html` |
+| `roleKey` = `employee_line` | `mobile-compliance.html` (shift tools first) |
+| All other operator roles | `dashboard.html` |
+
+### Manager-only UI (client-side)
+
+| Surface | Rule |
+|---------|------|
+| Dashboard **manager handoff** notes | Hidden for `employee_line`; see `dashboard_manager_notes` in `user-role-setup.js`. Same pattern should be reused for future sensitive fields — **not** a cryptographic boundary (localStorage). |
+
 ---
 
 ## Server-only roles (no setup.html radio)
@@ -123,3 +137,4 @@ Stored only on `projects/{projectId}/members/{uid}.role` (not in `iterum_operato
 |------|--------|
 | 2026-03-29 | Initial matrix: four operator roles + scope; planned employee/admin rows; trust boundary note. |
 | 2026-03-29 | Firestore `members` + rules; `project-membership.js`; `employee_line` UI; owner bootstrap `account_admin`. |
+| 2026-03-29 | Post-auth landing for `employee_line` → `mobile-compliance.html`; manager notes flag documented. |

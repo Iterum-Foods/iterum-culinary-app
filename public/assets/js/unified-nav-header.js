@@ -228,6 +228,9 @@ class UnifiedNavHeader {
     this.injectRestaurantLocationSidebarScript();
     this.injectHelpChefWidgetScript();
 
+    this.ensureUserRoleSetup();
+    this.initNavContextBar();
+
     console.log('✅ Navigation sidebar injected');
   }
 
@@ -383,50 +386,37 @@ class UnifiedNavHeader {
                 </button>
             </div>
 
+            <div class="iterum-nav-context-bar" id="iterum-nav-context-bar" aria-label="Project context">
+                <div class="iterum-nav-context-breadcrumb" id="iterum-nav-context-breadcrumb" hidden></div>
+                <div class="iterum-nav-context-row">
+                    <span class="iterum-nav-context-project" id="iterum-nav-context-project">Select project</span>
+                    <span class="iterum-nav-context-role" id="iterum-nav-context-role"></span>
+                </div>
+            </div>
+
             <nav class="sidebar-nav" id="unified-sidebar-nav" aria-label="Main">
                 <div class="nav-links">
-                    <div class="nav-section-label">Main</div>
-                    <a href="dashboard.html" class="nav-link nav-link-emphasis ${p('dashboard')}">
-                        <span>🏠</span> Dashboard
-                    </a>
-                    <a href="project-hub.html" class="nav-link ${p('projects')}" data-iterum-feature="projects">
-                        <span>📂</span> Projects
-                    </a>
-                    <a href="menu-builder.html" class="nav-link ${p('menu')}" data-iterum-feature="menus">
-                        <span>🍽️</span> Menu Builder
-                    </a>
-                    <a href="recipe-library.html" class="nav-link ${p('recipes')}" data-iterum-feature="recipes">
-                        <span>📚</span> Recipe Index
-                    </a>
-                    <a href="ingredients.html" class="nav-link ${p('ingredients')}" data-iterum-feature="ingredients">
-                        <span>🥬</span> Ingredients
-                    </a>
-                    <a href="recipe-developer.html" class="nav-link ${p('developer')}" data-iterum-feature="recipes">
-                        <span>🧪</span> Recipe Developer
-                    </a>
-                    <a href="calendar.html" class="nav-link ${p('calendar')}" data-iterum-feature="calendar">
-                        <span>📅</span> Calendar
-                    </a>
-                    <a href="kitchen-management.html" class="nav-link ${p('kitchen')}" data-iterum-feature="kitchen">
-                        <span>🔪</span> Kitchen
-                    </a>
-                    <a href="inventory.html" class="nav-link ${p('inventory')}" data-iterum-feature="inventory">
-                        <span>📦</span> Inventory
-                    </a>
-                    <a href="vendor-management.html" class="nav-link ${p('vendors')}" data-iterum-feature="vendors">
-                        <span>🏪</span> Vendors
-                    </a>
+                    <div class="nav-section-label">Daily ops</div>
+                    <a href="dashboard.html" class="nav-link nav-link-emphasis ${p('dashboard')}"><i class="fa-solid fa-table-columns nav-link-fa" aria-hidden="true"></i>Dashboard</a>
+                    <a href="project-hub.html" class="nav-link ${p('projects')}" data-iterum-feature="projects"><i class="fa-solid fa-diagram-project nav-link-fa" aria-hidden="true"></i>Project hub</a>
+                    <a href="mobile-compliance.html" class="nav-link ${p('shift')}" data-iterum-feature="compliance"><i class="fa-solid fa-clipboard-check nav-link-fa" aria-hidden="true"></i>Shift tools</a>
+                    <a href="calendar.html" class="nav-link ${p('calendar')}" data-iterum-feature="calendar"><i class="fa-solid fa-calendar-days nav-link-fa" aria-hidden="true"></i>Calendar</a>
+                    <a href="kitchen-management.html" class="nav-link ${p('kitchen')}" data-iterum-feature="kitchen"><i class="fa-solid fa-fire-burner nav-link-fa" aria-hidden="true"></i>Kitchen</a>
+
+                    <div class="nav-section-label">Menu &amp; recipes</div>
+                    <a href="menu-builder.html" class="nav-link ${p('menu')}" data-iterum-feature="menus"><i class="fa-solid fa-utensils nav-link-fa" aria-hidden="true"></i>Menu builder</a>
+                    <a href="recipe-library.html" class="nav-link ${p('recipes')}" data-iterum-feature="recipes"><i class="fa-solid fa-book nav-link-fa" aria-hidden="true"></i>Recipe index</a>
+                    <a href="recipe-developer.html" class="nav-link ${p('developer')}" data-iterum-feature="recipes"><i class="fa-solid fa-flask nav-link-fa" aria-hidden="true"></i>Recipe developer</a>
+                    <a href="recipe-canvas.html" class="nav-link ${p('canvas')}" data-iterum-feature="recipes"><i class="fa-solid fa-pen-ruler nav-link-fa" aria-hidden="true"></i>Recipe canvas</a>
+
+                    <div class="nav-section-label">Purchasing &amp; inventory</div>
+                    <a href="ingredients.html" class="nav-link ${p('ingredients')}" data-iterum-feature="ingredients"><i class="fa-solid fa-carrot nav-link-fa" aria-hidden="true"></i>Ingredients</a>
+                    <a href="inventory.html" class="nav-link ${p('inventory')}" data-iterum-feature="inventory"><i class="fa-solid fa-warehouse nav-link-fa" aria-hidden="true"></i>Inventory</a>
+                    <a href="vendor-management.html" class="nav-link ${p('vendors')}" data-iterum-feature="vendors"><i class="fa-solid fa-truck-field nav-link-fa" aria-hidden="true"></i>Vendors</a>
 
                     <div class="nav-section-label">Tools</div>
-                    <a href="recipe-photo-studio.html" class="nav-link ${p('photo')}" data-iterum-feature="photo_studio">
-                        <span>📸</span> Photo Studio
-                    </a>
-                    <a href="recipe-scaling-tool.html" class="nav-link ${p('scaling')}" data-iterum-feature="scaling">
-                        <span>🔢</span> Recipe Scaling
-                    </a>
-                    <a href="recipe-canvas.html" class="nav-link ${p('canvas')}" data-iterum-feature="recipes">
-                        <span>🎨</span> Recipe Canvas
-                    </a>
+                    <a href="recipe-photo-studio.html" class="nav-link ${p('photo')}" data-iterum-feature="photo_studio"><i class="fa-solid fa-camera nav-link-fa" aria-hidden="true"></i>Photo studio</a>
+                    <a href="recipe-scaling-tool.html" class="nav-link ${p('scaling')}" data-iterum-feature="scaling"><i class="fa-solid fa-calculator nav-link-fa" aria-hidden="true"></i>Recipe scaling</a>
 
                     <div class="nav-dropdown">
                         <button type="button" class="nav-link nav-dropdown-btn ${moreActive}" aria-expanded="false" aria-haspopup="true" aria-controls="nav-more-panel" id="nav-more-toggle">
@@ -434,29 +424,29 @@ class UnifiedNavHeader {
                         </button>
                         <div class="nav-dropdown-content" id="nav-more-panel" aria-labelledby="nav-more-toggle">
                             <div class="nav-dropdown-category">Kitchen tools</div>
-                            <a href="kitchen-management.html?tab=pdf" data-iterum-feature="kitchen">📕 Recipe book PDF</a>
-                            <a href="kitchen-management.html?tab=preplist" data-iterum-feature="kitchen">📝 Prep lists</a>
-                            <a href="ingredient-highlights.html" class="${p('highlights')}" data-iterum-feature="ingredients">✨ Ingredient stories</a>
-                            <a href="server-info-sheet.html" class="${p('server')}" data-iterum-feature="kitchen">🗣️ Server info</a>
+                            <a href="kitchen-management.html?tab=pdf" data-iterum-feature="kitchen"><i class="fa-solid fa-book fa-fw nav-dd-icon" aria-hidden="true"></i>Recipe book PDF</a>
+                            <a href="kitchen-management.html?tab=preplist" data-iterum-feature="kitchen"><i class="fa-solid fa-list-check fa-fw nav-dd-icon" aria-hidden="true"></i>Prep lists</a>
+                            <a href="ingredient-highlights.html" class="${p('highlights')}" data-iterum-feature="ingredients"><i class="fa-solid fa-wand-magic-sparkles fa-fw nav-dd-icon" aria-hidden="true"></i>Ingredient stories</a>
+                            <a href="server-info-sheet.html" class="${p('server')}" data-iterum-feature="kitchen"><i class="fa-solid fa-comments fa-fw nav-dd-icon" aria-hidden="true"></i>Server info</a>
                             <hr>
                             <div class="nav-dropdown-category">Operations</div>
-                            <a href="spec-library.html" class="${p('spec_library')}" data-iterum-feature="ingredients">📄 Spec library</a>
-                            <a href="vendor-price-comparison.html" class="${p('vendorprice')}" data-iterum-feature="vendors">💰 Price compare</a>
-                            <a href="equipment-management.html" class="${p('equipment')}" data-iterum-feature="equipment">🔧 Equipment</a>
-                            <a href="production-planning.html" class="${p('production')}" data-iterum-feature="production">📋 Production</a>
-                            <a href="inventory-variance.html" class="${p('invvar')}" data-iterum-feature="inventory">📉 Inventory variance</a>
+                            <a href="spec-library.html" class="${p('spec_library')}" data-iterum-feature="ingredients"><i class="fa-solid fa-file-lines fa-fw nav-dd-icon" aria-hidden="true"></i>Spec library</a>
+                            <a href="vendor-price-comparison.html" class="${p('vendorprice')}" data-iterum-feature="vendors"><i class="fa-solid fa-scale-balanced fa-fw nav-dd-icon" aria-hidden="true"></i>Price compare</a>
+                            <a href="equipment-management.html" class="${p('equipment')}" data-iterum-feature="equipment"><i class="fa-solid fa-screwdriver-wrench fa-fw nav-dd-icon" aria-hidden="true"></i>Equipment</a>
+                            <a href="production-planning.html" class="${p('production')}" data-iterum-feature="production"><i class="fa-solid fa-clipboard-list fa-fw nav-dd-icon" aria-hidden="true"></i>Production</a>
+                            <a href="inventory-variance.html" class="${p('invvar')}" data-iterum-feature="inventory"><i class="fa-solid fa-chart-line fa-fw nav-dd-icon" aria-hidden="true"></i>Inventory variance</a>
                             <hr>
                             <div class="nav-dropdown-category">Import</div>
-                            <a href="bulk-recipe-import.html" class="${p('import_recipe')}" data-iterum-feature="import_export">🚀 Recipe import</a>
-                            <a href="bulk-ingredient-import.html" class="${p('import_ing')}" data-iterum-feature="import_export">📥 Ingredient import</a>
+                            <a href="bulk-recipe-import.html" class="${p('import_recipe')}" data-iterum-feature="import_export"><i class="fa-solid fa-file-import fa-fw nav-dd-icon" aria-hidden="true"></i>Recipe import</a>
+                            <a href="bulk-ingredient-import.html" class="${p('import_ing')}" data-iterum-feature="import_export"><i class="fa-solid fa-file-arrow-up fa-fw nav-dd-icon" aria-hidden="true"></i>Ingredient import</a>
                             <hr>
-                            <div class="nav-dropdown-category">Workspace</div>
-                            <a href="restaurant-group-onboarding.html" class="${p('rgo')}" data-iterum-feature="projects">📍 Add a restaurant group</a>
-                            <a href="data-backup-center.html" class="${p('backup')}" data-iterum-feature="backup">💾 Backup center</a>
-                            <a href="data-management-dashboard.html" class="${p('datamgmt')}" data-iterum-feature="data_tools">🧠 Data management</a>
-                            <a href="audit-log.html" class="${p('audit')}" data-iterum-feature="data_tools">📜 Audit log</a>
-                            <a href="contact_management.html" class="${p('crm')}" data-iterum-feature="data_tools">👥 CRM &amp; contacts</a>
-                            <a href="user_management.html" class="${p('admin')}" data-iterum-feature="data_tools">🛡️ User admin</a>
+                            <div class="nav-dropdown-category">Organization &amp; data</div>
+                            <a href="restaurant-group-onboarding.html" class="${p('rgo')}" data-iterum-feature="projects"><i class="fa-solid fa-location-dot fa-fw nav-dd-icon" aria-hidden="true"></i>Add a restaurant group</a>
+                            <a href="data-backup-center.html" class="${p('backup')}" data-iterum-feature="backup"><i class="fa-solid fa-database fa-fw nav-dd-icon" aria-hidden="true"></i>Backup center</a>
+                            <a href="data-management-dashboard.html" class="${p('datamgmt')}" data-iterum-feature="data_tools"><i class="fa-solid fa-network-wired fa-fw nav-dd-icon" aria-hidden="true"></i>Data management</a>
+                            <a href="audit-log.html" class="${p('audit')}" data-iterum-feature="data_tools"><i class="fa-solid fa-scroll fa-fw nav-dd-icon" aria-hidden="true"></i>Audit log</a>
+                            <a href="contact_management.html" class="${p('crm')}" data-iterum-feature="data_tools"><i class="fa-solid fa-address-book fa-fw nav-dd-icon" aria-hidden="true"></i>CRM &amp; contacts</a>
+                            <a href="user_management.html" class="${p('admin')}" data-iterum-feature="data_tools"><i class="fa-solid fa-user-shield fa-fw nav-dd-icon" aria-hidden="true"></i>User admin</a>
                         </div>
                     </div>
                 </div>
@@ -489,7 +479,7 @@ class UnifiedNavHeader {
                         </button>
                         <div class="nav-dropdown-content nav-user-menu" id="nav-settings-panel" aria-labelledby="nav-settings-toggle">
                             <a href="user-profile.html">👤 Profile &amp; settings</a>
-                            <a href="setup.html">🛠️ Workspace setup</a>
+                            <a href="setup.html"><i class="fa-solid fa-sliders fa-fw nav-dd-icon" aria-hidden="true"></i>Operator &amp; project setup</a>
                             <hr>
                             <a href="#" class="nav-sign-out-link" data-iterum-sign-out="1">🚪 Sign out</a>
                         </div>
@@ -874,6 +864,44 @@ class UnifiedNavHeader {
                 letter-spacing: 0.01em;
             }
 
+            .iterum-nav-context-bar {
+                padding: 10px 16px 12px;
+                border-bottom: 1px solid rgba(226, 232, 240, 0.95);
+                background: rgba(248, 250, 252, 0.92);
+            }
+            .iterum-nav-context-breadcrumb {
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+                color: #64748b;
+                margin-bottom: 6px;
+            }
+            .iterum-nav-context-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px 8px;
+                align-items: baseline;
+                font-size: 13px;
+                color: #334155;
+                font-weight: 600;
+            }
+            .iterum-nav-context-role {
+                font-weight: 500;
+                color: #64748b;
+                font-size: 12px;
+            }
+            .nav-link-fa {
+                width: 1.35rem;
+                text-align: center;
+                margin-right: 6px;
+                opacity: 0.88;
+            }
+            .nav-dd-icon {
+                margin-right: 8px;
+                opacity: 0.85;
+            }
+
                 /* Legacy top bars only — avoid .page-header (used by audit-log and others as content heroes) */
                 .legacy-header,
                 .site-header,
@@ -884,8 +912,92 @@ class UnifiedNavHeader {
     document.head.appendChild(style);
   }
 
-  updateProjectChip(projectName = 'Master Project') {
-    const name = projectName || 'Master Project';
+  ensureUserRoleSetup() {
+    if (typeof window.iterumGetEffectiveRoleKey === 'function') {
+      return;
+    }
+    if (document.querySelector('script[src*="user-role-setup.js"]')) {
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = 'assets/js/user-role-setup.js';
+    s.onload = () => this.refreshNavContextBar();
+    document.head.appendChild(s);
+  }
+
+  initNavContextBar() {
+    this.refreshNavContextBar();
+    const refresh = () => this.refreshNavContextBar();
+    window.addEventListener('storage', e => {
+      const k = e.key || '';
+      if (
+        k.indexOf('project') >= 0 ||
+        k === 'iterum_operator_profile' ||
+        k.indexOf('iterum_current_project') >= 0
+      ) {
+        refresh();
+      }
+    });
+  }
+
+  refreshNavContextBar(projectNameOverride) {
+    const projEl = document.getElementById('iterum-nav-context-project');
+    const roleEl = document.getElementById('iterum-nav-context-role');
+    const bcEl = document.getElementById('iterum-nav-context-breadcrumb');
+    let name = projectNameOverride;
+    if (!name) {
+      if (window.projectManager?.currentProject?.name) {
+        name = window.projectManager.currentProject.name;
+      } else {
+        name =
+          localStorage.getItem('active_project_name') ||
+          localStorage.getItem('active_project') ||
+          'Select project';
+      }
+    }
+    if (projEl) {
+      projEl.textContent = name;
+    }
+    let rk = '';
+    if (typeof window.iterumGetEffectiveRoleKey === 'function') {
+      rk = window.iterumGetEffectiveRoleKey();
+    } else {
+      try {
+        const raw = localStorage.getItem('iterum_operator_profile');
+        if (raw) {
+          const p = JSON.parse(raw);
+          if (p && p.roleKey) rk = p.roleKey;
+        }
+      } catch (e) {
+        /* ignore */
+      }
+      if (!rk && window.iterumMembership?.roleKey) {
+        rk = window.iterumMembership.roleKey;
+      }
+    }
+    const ROLE_LABELS = {
+      chef_leadership: 'Kitchen lead',
+      operations_gm: 'Operations',
+      purchasing: 'Purchasing',
+      consultant_rd: 'Consultant / R&D',
+      employee_line: 'Team member'
+    };
+    const rl = rk && ROLE_LABELS[rk] ? ROLE_LABELS[rk] : '';
+    if (roleEl) {
+      roleEl.textContent = rl ? ` · ${rl}` : '';
+    }
+    if (bcEl) {
+      const bc =
+        document.body &&
+        document.body.getAttribute('data-iterum-breadcrumb');
+      if (bc) {
+        bcEl.textContent = bc.replace(/\|/g, ' → ');
+        bcEl.hidden = false;
+      } else {
+        bcEl.textContent = '';
+        bcEl.hidden = true;
+      }
+    }
     const label = `Project: ${name}`;
     const navChip = document.getElementById('nav-project-chip');
     const headerChip = document.getElementById('header-project-chip');
@@ -903,6 +1015,11 @@ class UnifiedNavHeader {
     if (menuChip) {
       menuChip.textContent = label;
     }
+  }
+
+  updateProjectChip(projectName = 'Master Project') {
+    const name = projectName || 'Master Project';
+    this.refreshNavContextBar(name);
   }
 
   updateUserInfo(user) {

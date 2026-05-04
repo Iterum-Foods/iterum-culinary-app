@@ -146,5 +146,6 @@ Priority order (suggested):
 | Date | Change |
 |------|--------|
 | 2026-03-29 | Initial roadmap from full-app UI/workflow review. |
+| 2026-03-29 | **Phases A–D (first pass) shipped in repo:** canonical CSS + `CSS_CANONICAL_STACK.md`; sidebar buckets + nav context bar + breadcrumbs (`data-iterum-breadcrumb`); `employee_line` post-auth → shift tools; ingredients ↔ vendor overrides link; recipe library → menu builder banner; dashboard primary card for line; experimental nordic/dark removed from default golden-path loads. |
 
 When golden path or nav structure changes, update **§3 Phase B** and [USER_WORKFLOW_GUIDE.md](./USER_WORKFLOW_GUIDE.md) together.

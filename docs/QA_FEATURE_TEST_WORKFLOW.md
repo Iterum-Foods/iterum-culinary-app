@@ -32,6 +32,11 @@ Latest run status at time of writing:
 
 ## 2) Mobile Shift App Workflow (`/mobile-compliance.html`)
 
+### 2.0 Role routing (web)
+
+- [ ] Complete `setup.html` as **Kitchen line / crew** (`employee_line`): submit should land on **`mobile-compliance.html`**, not the web dashboard.
+- [ ] Sign in as lead/purchasing profile: destination remains **`dashboard.html`** (or `setup.html` if profile missing).
+
 ### 2.1 Auth and workspace
 
 - [ ] Sign in as line user

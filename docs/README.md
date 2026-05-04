@@ -12,6 +12,7 @@ Primary navigation for strategy, delivery, and technical references.
 
 - `USER_WORKFLOW_GUIDE.md` — **new restaurant**, **new user at existing restaurant**, and **task-based** paths (menu, team, mobile, specs).
 - `UI_AND_WORKFLOW_ROADMAP.md` — **phased** design and UI plan (workflow-first, professional polish, role surfaces).
+- `CSS_CANONICAL_STACK.md` — **golden-path** stylesheet stack (`iterum-canonical-app.css`) and token checklist.
 - `MENU_IMPORT_WORKFLOW.md` — spreadsheet menu import (detailed).
 - `MENU_IMPORT_STAFF_QUICK_CARD.md` — one-page menu import checklist.
 - `ADD_TEAMMATE_UID_PATH.md` — add a teammate via Firebase UID.
@@ -27,6 +28,7 @@ Primary navigation for strategy, delivery, and technical references.
 
 ## Leadership / Pilot Docs
 
+- `COMPANY_LAUNCH_GAMEPLAN.md` — **build, ship, and launch** spine + **chef / local** founding-partner playbook (links to ICP, P1, CEO task list).
 - `P0_EXEC_SIGNOFF_PACKAGE.md`
 - `PILOT_ACCEPTANCE_CRITERIA_WEB.md`
 - `PILOT_APP_COMPLETION_MASTER.md`
