@@ -443,11 +443,15 @@ function renderTodayPanel(model) {
 
   roleChip.textContent = `Role: ${roleLabel(model.role)}`;
   summaryEl.textContent = model.summary;
+  const summaryAlert =
+    typeof model.metrics?.[1]?.value !== 'undefined' &&
+    Number(model.metrics[1].value) > 0;
+  summaryEl.classList.toggle('alert', summaryAlert);
   metricsEl.innerHTML = model.metrics
     .map(
-      item => `<div style="border:1px solid var(--mc-border);border-radius:10px;padding:0.5rem 0.55rem;">
-        <div style="font-size:0.72rem;color:var(--mc-muted);">${escapeHtml(item.label)}</div>
-        <div style="font-size:1rem;font-weight:700;color:var(--mc-text);">${escapeHtml(String(item.value))}</div>
+      item => `<div class="mc-kpi-card">
+        <div class="mc-kpi-label">${escapeHtml(item.label)}</div>
+        <div class="mc-kpi-value">${escapeHtml(String(item.value))}</div>
       </div>`
     )
     .join('');

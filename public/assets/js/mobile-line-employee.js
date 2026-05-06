@@ -285,10 +285,10 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     }
     listEl.innerHTML = prepChecklistItems
       .map(
-        (item, idx) => `<li class="mc-card" style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.6rem;">
-          <label style="display:flex;align-items:flex-start;gap:0.55rem;flex:1;cursor:pointer;">
-            <input type="checkbox" data-prep-check-index="${idx}" ${item.done ? 'checked' : ''} style="margin-top:0.2rem;" />
-            <span style="${item.done ? 'text-decoration:line-through;opacity:0.72;' : ''}">${escapeHtml(item.text)}</span>
+        (item, idx) => `<li class="mc-card mc-card-split">
+          <label class="mc-check-row">
+            <input type="checkbox" data-prep-check-index="${idx}" ${item.done ? 'checked' : ''} class="mc-check-input" />
+            <span class="${item.done ? 'mc-check-text done' : 'mc-check-text'}">${escapeHtml(item.text)}</span>
           </label>
           <button type="button" class="mc-btn" data-prep-remove-index="${idx}" aria-label="Remove prep item">Remove</button>
         </li>`
@@ -355,7 +355,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
           return `<li class="mc-card"><strong>${escapeHtml(name)}</strong>${cat ? `<div class="mc-hint">${escapeHtml(cat)}</div>` : ''}${price ? `<div class="mc-hint">${escapeHtml(price)}</div>` : ''}</li>`;
         })
         .join('');
-      body.innerHTML = `<p style="margin:0 0 0.5rem;font-weight:700;">${escapeHtml(menuName)}</p><ul class="mc-list">${rows}</ul>`;
+      body.innerHTML = `<p class="mc-panel-title">${escapeHtml(menuName)}</p><ul class="mc-list">${rows}</ul>`;
     } catch (e) {
       console.error(e);
       body.innerHTML =
@@ -570,7 +570,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
         .slice(0, 40)
         .map(
           r =>
-            `<li class="mc-card"><span class="mc-hint">${escapeHtml(r.lineAppType === 'menu_note' ? 'Menu' : 'Ingredient')}</span><strong>${escapeHtml(r.title || 'Note')}</strong><div style="margin-top:0.35rem;white-space:pre-wrap;font-size:0.9rem;">${escapeHtml(r.body || '')}</div></li>`
+            `<li class="mc-card"><span class="mc-hint">${escapeHtml(r.lineAppType === 'menu_note' ? 'Menu' : 'Ingredient')}</span><strong>${escapeHtml(r.title || 'Note')}</strong><div class="mc-note-body">${escapeHtml(r.body || '')}</div></li>`
         )
         .join('');
     } catch (e) {
@@ -759,15 +759,15 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
           const n = raw.notes != null ? String(raw.notes) : '';
           if (st || n) {
             detail = st
-              ? `<div style="font-size:0.9rem;margin-top:0.35rem;"><strong>${escapeHtml(st)}</strong>${n ? `<div class="mc-hint" style="margin-top:0.25rem;white-space:pre-wrap;">${escapeHtml(n)}</div>` : ''}</div>`
+              ? `<div class="mc-detail-block"><strong>${escapeHtml(st)}</strong>${n ? `<div class="mc-hint mc-note-inline">${escapeHtml(n)}</div>` : ''}</div>`
               : '';
           }
         }
         if (!detail && raw != null) {
           detail =
             typeof raw === 'object'
-              ? `<div class="mc-hint" style="margin-top:0.35rem;font-size:0.8rem;">${escapeHtml(JSON.stringify(raw).slice(0, 160))}</div>`
-              : `<div class="mc-hint" style="margin-top:0.35rem;">${escapeHtml(String(raw).slice(0, 200))}</div>`;
+              ? `<div class="mc-hint mc-detail-json">${escapeHtml(JSON.stringify(raw).slice(0, 160))}</div>`
+              : `<div class="mc-hint mc-note-inline">${escapeHtml(String(raw).slice(0, 200))}</div>`;
         }
         parts.push(
           `<li class="mc-card"><strong>${escapeHtml(title)}</strong><div class="mc-hint">${escapeHtml(String(ts))}</div>${detail}</li>`
@@ -859,7 +859,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
       body.innerHTML = sops
         .map(
           (s, i) =>
-            `<article class="mc-card" style="margin-bottom:0.65rem;"><strong>${escapeHtml(s.title || `SOP ${i + 1}`)}</strong><div style="margin-top:0.5rem;white-space:pre-wrap;font-size:0.88rem;line-height:1.45;">${escapeHtml(s.body || '')}</div></article>`
+            `<article class="mc-card mc-stack-gap"><strong>${escapeHtml(s.title || `SOP ${i + 1}`)}</strong><div class="mc-note-body mc-note-body-sm">${escapeHtml(s.body || '')}</div></article>`
         )
         .join('');
     } catch (e) {
@@ -883,7 +883,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
             .map(o => {
               const name = o.name || o.title || o.label || 'Item';
               const note = o.note || o.detail || o.line || '';
-              return `<li class="mc-card"><strong>${escapeHtml(name)}</strong>${note ? `<div class="mc-hint" style="margin-top:0.25rem;white-space:pre-wrap;">${escapeHtml(String(note))}</div>` : ''}</li>`;
+              return `<li class="mc-card"><strong>${escapeHtml(name)}</strong>${note ? `<div class="mc-hint mc-note-inline">${escapeHtml(String(note))}</div>` : ''}</li>`;
             })
             .join('') +
           '</ul>'
@@ -897,7 +897,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
         '</ul>'
       );
     }
-    return `<div class="mc-card" style="white-space:pre-wrap;font-size:0.9rem;line-height:1.45;">${escapeHtml(String(raw))}</div>`;
+    return `<div class="mc-card mc-note-body">${escapeHtml(String(raw))}</div>`;
   }
 
   async function loadBarPack() {
@@ -933,7 +933,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
           .map((d, i) => {
             const title = d.title || d.name || `Drink ${i + 1}`;
             const spec = d.spec || d.body || d.recipe || d.build || '';
-            return `<article class="mc-card" style="margin-bottom:0.65rem;"><strong>${escapeHtml(title)}</strong><div style="margin-top:0.5rem;white-space:pre-wrap;font-size:0.88rem;line-height:1.45;">${escapeHtml(spec)}</div></article>`;
+            return `<article class="mc-card mc-stack-gap"><strong>${escapeHtml(title)}</strong><div class="mc-note-body mc-note-body-sm">${escapeHtml(spec)}</div></article>`;
           })
           .join('');
       }
@@ -1002,7 +1002,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
                 ? 'general'
                 : 'drink';
           const chip = barTopicLabel(topic, r.relatedDrink || '');
-          return `<li class="mc-card"><span class="mc-hint">${escapeHtml(chip)}</span><strong>${escapeHtml(r.title || 'Note')}</strong><div style="margin-top:0.35rem;white-space:pre-wrap;font-size:0.9rem;">${escapeHtml(r.body || '')}</div></li>`;
+          return `<li class="mc-card"><span class="mc-hint">${escapeHtml(chip)}</span><strong>${escapeHtml(r.title || 'Note')}</strong><div class="mc-note-body">${escapeHtml(r.body || '')}</div></li>`;
         })
         .join('');
     } catch (e) {
@@ -1134,7 +1134,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
             : '[SHIFT]';
         const who = escapeHtml(r.authorName || 'Team');
         const body = escapeHtml(String(r.body || ''));
-        return `<li class="mc-card"><span class="mc-hint">${escapeHtml(badge)} ${who}</span><div style="margin-top:0.35rem;white-space:pre-wrap;font-size:0.9rem;">${body}</div></li>`;
+        return `<li class="mc-card"><span class="mc-hint">${escapeHtml(badge)} ${who}</span><div class="mc-note-body">${body}</div></li>`;
       })
       .join('');
     listEl.innerHTML = `<ul class="mc-list">${items}</ul>`;

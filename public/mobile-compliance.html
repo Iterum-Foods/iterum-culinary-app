@@ -57,21 +57,16 @@
 
   <div id="app-panel" class="mc-panel" hidden>
     <div class="mc-chip" id="user-chip"></div>
-    <div
-      id="today-panel"
-      class="mc-panel"
-      style="margin-top:0.75rem;margin-bottom:0.9rem;padding:0.85rem;border:1px solid var(--mc-border);border-radius:12px;background:var(--mc-card);"
-      aria-live="polite"
-    >
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;">
-        <strong style="font-size:0.95rem;color:var(--mc-text);">Today at a glance</strong>
-        <span id="today-role-chip" class="mc-chip" style="font-size:0.72rem;">Role: Team</span>
+    <div id="today-panel" class="mc-panel mc-today-panel" aria-live="polite">
+      <div class="mc-today-head">
+        <strong>Today at a glance</strong>
+        <span id="today-role-chip" class="mc-chip mc-role-chip">Role: Team</span>
       </div>
-      <p id="today-summary" style="margin:0.45rem 0 0.35rem;font-size:0.86rem;color:var(--mc-muted);line-height:1.4;">
+      <p id="today-summary" class="mc-today-summary">
         Pick your workspace to load shift priorities.
       </p>
-      <div id="today-metrics" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0.5rem;"></div>
-      <div id="today-actions" style="display:flex;flex-wrap:wrap;gap:0.45rem;margin-top:0.55rem;"></div>
+      <div id="today-metrics" class="mc-today-metrics"></div>
+      <div id="today-actions" class="mc-today-actions"></div>
     </div>
 
     <div id="workspace-first-run" class="mc-panel" style="margin-bottom:1rem;padding:1rem;border:2px solid var(--mc-accent);border-radius:12px;background:var(--mc-card);display:none;">
@@ -189,25 +184,25 @@
     </div>
 
     <div id="panel-section-recipes" class="mc-section" hidden>
-      <p class="mc-hint" style="margin-top:0;">Published/readable recipes for this workspace.</p>
+      <p class="mc-hint mc-hint-top0">Published/readable recipes for this workspace.</p>
       <div id="recipes-mobile-body"></div>
     </div>
 
     <div id="panel-section-jobs" class="mc-section" hidden>
-      <p class="mc-hint" style="margin-top:0;">Set your role label for this workspace and view the team roster.</p>
+      <p class="mc-hint mc-hint-top0">Set your role label for this workspace and view the team roster.</p>
       <div class="mc-field">
         <label for="job-position-select">My job for this workspace</label>
-        <select id="job-position-select" style="min-height:48px;border-radius:10px;border:1px solid var(--mc-border);width:100%;font-size:1rem;"></select>
+        <select id="job-position-select" class="mc-select"></select>
       </div>
       <button type="button" class="mc-btn mc-btn-primary" id="btn-save-job-position">Save my job</button>
-      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Team jobs</h3>
+      <h3 class="mc-section-title">Team jobs</h3>
       <div id="jobs-team-list"></div>
     </div>
 
     <div id="panel-section-notes" class="mc-section" hidden>
       <div class="mc-field">
         <label for="note-type">About</label>
-        <select id="note-type" style="min-height:48px;border-radius:10px;border:1px solid var(--mc-border);width:100%;font-size:1rem;">
+        <select id="note-type" class="mc-select">
           <option value="menu_note">The menu</option>
           <option value="ingredient_note">An ingredient</option>
         </select>
@@ -221,58 +216,58 @@
         <textarea id="note-body" class="mc-textarea" placeholder="e.g. 86 salmon until Friday, extra veg prep for brunch…"></textarea>
       </div>
       <button type="button" class="mc-btn mc-btn-primary" id="btn-save-note">Save note</button>
-      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Recent notes</h3>
+      <h3 class="mc-section-title">Recent notes</h3>
       <ul class="mc-list" id="notes-my-list"></ul>
     </div>
 
     <div id="panel-section-lists" class="mc-section" hidden>
       <p class="mc-hint">Your lists save automatically to your account. Latest version for this location.</p>
-      <h3 style="font-size:0.95rem;margin:0 0 0.5rem;">Prep</h3>
-      <div class="mc-field" style="margin-bottom:0.55rem;">
+      <h3 class="mc-section-title mc-section-title-top0">Prep</h3>
+      <div class="mc-field mc-field-tight">
         <label for="prep-check-item-input">Prep checklist item</label>
-        <div style="display:flex;gap:0.5rem;align-items:center;">
+        <div class="mc-inline-row">
           <input id="prep-check-item-input" type="text" placeholder="Add one prep task at a time…" />
           <button type="button" class="mc-btn" id="btn-add-prep-item">Add item</button>
         </div>
       </div>
       <ul class="mc-list" id="prep-checklist-items"></ul>
       <textarea id="prep-list-body" class="mc-textarea" hidden></textarea>
-      <button type="button" class="mc-btn mc-btn-primary" id="btn-save-prep" style="margin-top:0.5rem;">Save prep</button>
-      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Stock</h3>
+      <button type="button" class="mc-btn mc-btn-primary mc-gap-top-sm" id="btn-save-prep">Save prep</button>
+      <h3 class="mc-section-title">Stock</h3>
       <textarea id="stock-list-body" class="mc-textarea" placeholder="Items, rough counts…"></textarea>
-      <button type="button" class="mc-btn mc-btn-primary" id="btn-save-stock" style="margin-top:0.5rem;">Save stock</button>
+      <button type="button" class="mc-btn mc-btn-primary mc-gap-top-sm" id="btn-save-stock">Save stock</button>
     </div>
 
     <div id="panel-section-checks" class="mc-section" hidden>
-      <h3 style="font-size:0.95rem;margin:0 0 0.5rem;">Recent checks</h3>
+      <h3 class="mc-section-title mc-section-title-top0">Recent checks</h3>
       <div id="checks-project-list"></div>
-      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Log a station check</h3>
+      <h3 class="mc-section-title">Log a station check</h3>
       <div class="mc-field">
         <label for="check-station">Station or area</label>
         <input id="check-station" type="text" placeholder="e.g. Grill, expo, bar" />
       </div>
       <div class="mc-field">
         <label for="check-notes">What you checked</label>
-        <textarea id="check-notes" class="mc-textarea" style="min-height:72px;" placeholder="Temps OK, mise set, sanitizer in range…"></textarea>
+        <textarea id="check-notes" class="mc-textarea mc-textarea-sm" placeholder="Temps OK, mise set, sanitizer in range…"></textarea>
       </div>
       <button type="button" class="mc-btn mc-btn-primary" id="btn-save-quick-check">Save check</button>
     </div>
 
     <div id="panel-section-sops" class="mc-section" hidden>
-      <p class="mc-hint" style="margin-top:0;">Guides from your team (opening, standards, recipes). If nothing shows, ask a manager to publish them.</p>
+      <p class="mc-hint mc-hint-top0">Guides from your team (opening, standards, recipes). If nothing shows, ask a manager to publish them.</p>
       <div id="sops-body"></div>
     </div>
 
     <div id="panel-section-bar" class="mc-section" hidden>
-      <p class="mc-hint" style="margin-top:0;">Published by your manager for this location. Your notes save to your account.</p>
-      <h3 style="font-size:0.95rem;margin:0 0 0.5rem;">Drink builds &amp; specs</h3>
+      <p class="mc-hint mc-hint-top0">Published by your manager for this location. Your notes save to your account.</p>
+      <h3 class="mc-section-title mc-section-title-top0">Drink builds &amp; specs</h3>
       <div id="bar-drinks-body"></div>
-      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Liquors &amp; bar stock</h3>
+      <h3 class="mc-section-title">Liquors &amp; bar stock</h3>
       <div id="bar-liquor-body"></div>
-      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Bar notes</h3>
+      <h3 class="mc-section-title">Bar notes</h3>
       <div class="mc-field">
         <label for="bar-note-topic">About</label>
-        <select id="bar-note-topic" style="min-height:48px;border-radius:10px;border:1px solid var(--mc-border);width:100%;font-size:1rem;">
+        <select id="bar-note-topic" class="mc-select">
           <option value="drink">A drink / cocktail</option>
           <option value="stock">Liquor &amp; stock</option>
           <option value="general">General bar</option>
@@ -288,27 +283,27 @@
       </div>
       <div class="mc-field">
         <label for="bar-note-body">Note</label>
-        <textarea id="bar-note-body" class="mc-textarea" style="min-height:88px;" placeholder="86’d bourbon, substitute, garnish change…"></textarea>
+        <textarea id="bar-note-body" class="mc-textarea mc-textarea-md" placeholder="86’d bourbon, substitute, garnish change…"></textarea>
       </div>
       <button type="button" class="mc-btn mc-btn-primary" id="btn-save-bar-note">Save bar note</button>
-      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Recent bar notes</h3>
+      <h3 class="mc-section-title">Recent bar notes</h3>
       <ul class="mc-list" id="bar-notes-list"></ul>
     </div>
 
     <div id="panel-section-team" class="mc-section" hidden>
-      <p class="mc-hint" style="margin-top:0;">
+      <p class="mc-hint mc-hint-top0">
         Same thread managers see under <strong>Daily restaurant notes</strong> on the dashboard. Pick the calendar date to match theirs (defaults to today).
       </p>
       <div class="mc-field">
         <label for="team-board-date">Log date</label>
-        <input id="team-board-date" type="date" style="width:100%;min-height:48px;padding:0.5rem 0.65rem;border-radius:10px;border:1px solid var(--mc-border);font-size:1rem;background:var(--mc-card);color:var(--mc-text);" />
+        <input id="team-board-date" type="date" class="mc-input-like" />
       </div>
-      <h3 style="font-size:0.95rem;margin:0 0 0.5rem;">Thread</h3>
+      <h3 class="mc-section-title mc-section-title-top0">Thread</h3>
       <div id="team-board-feed"></div>
-      <h3 style="font-size:0.95rem;margin:1rem 0 0.5rem;">Add a note</h3>
+      <h3 class="mc-section-title">Add a note</h3>
       <div class="mc-field">
         <label for="team-board-kind">Type</label>
-        <select id="team-board-kind" style="min-height:48px;border-radius:10px;border:1px solid var(--mc-border);width:100%;font-size:1rem;">
+        <select id="team-board-kind" class="mc-select">
           <option value="shift">Shift update</option>
           <option value="inv_low">Low stock</option>
           <option value="inv_out">Out of stock</option>
@@ -316,7 +311,7 @@
       </div>
       <div class="mc-field">
         <label for="team-board-body">Message</label>
-        <textarea id="team-board-body" class="mc-textarea" style="min-height:96px;" placeholder="Handoff, 86, counts, anything management should know…"></textarea>
+        <textarea id="team-board-body" class="mc-textarea mc-textarea-lg" placeholder="Handoff, 86, counts, anything management should know…"></textarea>
       </div>
       <button type="button" class="mc-btn mc-btn-primary" id="btn-team-board-post">Post to team log</button>
     </div>
@@ -344,8 +339,8 @@
       </div>
     </div>
 
-    <p id="status-line-app" style="margin-top:0.75rem;font-size:0.8rem;min-height:1.25rem;"></p>
-    <button type="button" class="mc-btn mc-btn-ghost" id="btn-signout" style="margin-top:0.5rem;">Sign out</button>
+    <p id="status-line-app" class="mc-status-app"></p>
+    <button type="button" class="mc-btn mc-btn-ghost mc-gap-top-sm" id="btn-signout">Sign out</button>
   </div>
 
   <footer class="mc-foot">
