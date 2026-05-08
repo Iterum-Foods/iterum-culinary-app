@@ -244,7 +244,9 @@
 }
 
 .mc-btn-primary:focus-visible {
-  box-shadow: var(--mc-focus-ring-strong), 0 4px 14px var(--mc-accent-glow);
+  box-shadow:
+    var(--mc-focus-ring-strong),
+    0 4px 14px var(--mc-accent-glow);
 }
 
 .mc-btn-ghost {
@@ -567,7 +569,9 @@
 .mc-shift-tile:focus-visible {
   outline: none;
   border-color: var(--mc-accent);
-  box-shadow: 0 0 0 2px var(--mc-accent-glow), 0 4px 14px rgba(20, 48, 32, 0.08);
+  box-shadow:
+    0 0 0 2px var(--mc-accent-glow),
+    0 4px 14px rgba(20, 48, 32, 0.08);
 }
 
 .mc-shift-tile:active {

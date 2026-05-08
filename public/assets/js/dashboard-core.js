@@ -578,7 +578,11 @@
       }
       this.detachManagerPrepBoardListener();
       const fs = window.firestoreSync;
-      if (!fs || !fs.initialized || typeof fs.subscribeProjectPrepLists !== 'function') {
+      if (
+        !fs ||
+        !fs.initialized ||
+        typeof fs.subscribeProjectPrepLists !== 'function'
+      ) {
         status.textContent = 'Prep board unavailable';
         feed.innerHTML =
           '<p class="text-xs" style="color: var(--brand-text-muted);">Prep board loads when Firestore is ready.</p>';

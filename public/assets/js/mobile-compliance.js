@@ -493,7 +493,8 @@ async function refreshTodayPanel(uid) {
   if (!db || !projectId || projectId === 'mobile-default') {
     renderTodayPanel({
       role: currentRoleForProject(projectId),
-      summary: 'Pick a workspace above to load checks, logs, and handoff activity.',
+      summary:
+        'Pick a workspace above to load checks, logs, and handoff activity.',
       metrics: [
         { label: 'Opening checks', value: '0' },
         { label: 'Attention flags', value: '0' },

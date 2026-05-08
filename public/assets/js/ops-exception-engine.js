@@ -39,7 +39,9 @@
       }
       const hasSpec = Boolean(ing.productSpecUrl || ing.productSpecNotes);
       if (!hasSpec) {
-        const key = String(ing.name || '').toLowerCase().trim();
+        const key = String(ing.name || '')
+          .toLowerCase()
+          .trim();
         if (seen.has(key)) {
           return;
         }
@@ -73,7 +75,9 @@
         null;
       const age = daysSince(stamp);
       if (age > STALE_DAYS) {
-        const key = String(ing.name || '').toLowerCase().trim();
+        const key = String(ing.name || '')
+          .toLowerCase()
+          .trim();
         if (seen.has(key)) {
           return;
         }
@@ -148,8 +152,8 @@
             row.severity === 'critical'
               ? 'border-red-200 bg-red-50 text-red-700'
               : row.severity === 'high'
-              ? 'border-amber-200 bg-amber-50 text-amber-800'
-              : 'border-sky-200 bg-sky-50 text-sky-800'
+                ? 'border-amber-200 bg-amber-50 text-amber-800'
+                : 'border-sky-200 bg-sky-50 text-sky-800'
           }">${row.message}${
             row.actionHref
               ? ` <a href="${row.actionHref}" class="underline font-semibold ml-1">${row.actionLabel || 'Review'}</a>`
@@ -172,4 +176,3 @@
 
   document.addEventListener('DOMContentLoaded', initOpsExceptions);
 })();
-

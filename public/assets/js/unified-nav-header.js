@@ -323,12 +323,16 @@ class UnifiedNavHeader {
       sidebar.querySelectorAll('.nav-dropdown-content.show').forEach(c => {
         c.classList.remove('show');
       });
-      sidebar.querySelectorAll('.nav-dropdown-btn[aria-expanded]').forEach(b => {
-        b.setAttribute('aria-expanded', 'false');
-      });
-      sidebar.querySelectorAll('.nav-user-menu-btn[aria-expanded]').forEach(b => {
-        b.setAttribute('aria-expanded', 'false');
-      });
+      sidebar
+        .querySelectorAll('.nav-dropdown-btn[aria-expanded]')
+        .forEach(b => {
+          b.setAttribute('aria-expanded', 'false');
+        });
+      sidebar
+        .querySelectorAll('.nav-user-menu-btn[aria-expanded]')
+        .forEach(b => {
+          b.setAttribute('aria-expanded', 'false');
+        });
     });
   }
 
@@ -988,8 +992,7 @@ class UnifiedNavHeader {
     }
     if (bcEl) {
       const bc =
-        document.body &&
-        document.body.getAttribute('data-iterum-breadcrumb');
+        document.body && document.body.getAttribute('data-iterum-breadcrumb');
       if (bc) {
         bcEl.textContent = bc.replace(/\|/g, ' → ');
         bcEl.hidden = false;

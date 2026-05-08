@@ -704,7 +704,9 @@ class FirestoreSync {
    */
   async saveCorrectiveAction(action) {
     if (!this.initialized) {
-      console.warn('⚠️ Firestore not initialized, skipping corrective action sync');
+      console.warn(
+        '⚠️ Firestore not initialized, skipping corrective action sync'
+      );
       return false;
     }
 
@@ -715,7 +717,10 @@ class FirestoreSync {
     try {
       const projectId = action.projectId || 'master';
       const projectRef = doc(this.db, 'projects', projectId);
-      const actionRef = doc(collection(projectRef, 'corrective_actions'), action.id);
+      const actionRef = doc(
+        collection(projectRef, 'corrective_actions'),
+        action.id
+      );
       const payload = {
         ...action,
         projectId,

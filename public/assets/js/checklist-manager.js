@@ -31,9 +31,9 @@ class ChecklistManager {
     }
     const correctiveActionText = String(formData.correctiveAction || '').trim();
     const failureNotes = String(formData.failureNotes || '').trim();
-    const summary = [correctiveActionText, failureNotes].filter(Boolean).join(
-      ' | '
-    );
+    const summary = [correctiveActionText, failureNotes]
+      .filter(Boolean)
+      .join(' | ');
     const nowIso = new Date().toISOString();
     const actionId =
       typeof crypto !== 'undefined' && crypto.randomUUID
@@ -492,7 +492,11 @@ class ChecklistManager {
 
     this.notify('entryAdded', { projectId, entry, template });
 
-    const correctiveAction = this.buildCorrectiveAction(entry, template, formData);
+    const correctiveAction = this.buildCorrectiveAction(
+      entry,
+      template,
+      formData
+    );
     if (correctiveAction) {
       entry.correctiveActionId = correctiveAction.id;
       this.persistCorrectiveAction(projectId, correctiveAction);
@@ -645,8 +649,7 @@ class ChecklistManager {
     dateString,
     projectId = this.getActiveProjectId()
   ) {
-    const target =
-      dateString || new Date().toLocaleDateString('en-CA');
+    const target = dateString || new Date().toLocaleDateString('en-CA');
     return this.getEntries(projectId).filter(entry => {
       if (entry.templateId !== templateId) {
         return false;

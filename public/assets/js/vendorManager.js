@@ -746,15 +746,17 @@ class VendorManager {
           )
           .join('')
       : '<span class="text-xs text-slate-400">No specialties</span>';
-    const productBadge =
-      products.length
-        ? `<span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700">🧾 ${vendor.products.length} item${vendor.products.length === 1 ? '' : 's'}</span>`
-        : '';
+    const productBadge = products.length
+      ? `<span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700">🧾 ${vendor.products.length} item${vendor.products.length === 1 ? '' : 's'}</span>`
+      : '';
     const productPreview = products
       .map(item => this.escapeHtml(item?.name || '').trim())
       .filter(Boolean)
       .slice(0, 3);
-    const remainingProducts = Math.max(products.length - productPreview.length, 0);
+    const remainingProducts = Math.max(
+      products.length - productPreview.length,
+      0
+    );
     const productPreviewHtml = productPreview.length
       ? `<div class="mt-2 flex flex-wrap gap-1.5">
             ${productPreview
@@ -1342,7 +1344,11 @@ class VendorManager {
       } else {
         vendorInfo = await this.fetchVendorInfoFromWebsite(normalizedUrl);
       }
-      this.prefillVendorModalFromWebsite(modal, vendorInfo || {}, normalizedUrl);
+      this.prefillVendorModalFromWebsite(
+        modal,
+        vendorInfo || {},
+        normalizedUrl
+      );
       if (statusEl) {
         statusEl.textContent = 'Imported. Review fields before saving.';
       }
@@ -1354,7 +1360,8 @@ class VendorManager {
       console.warn('Website vendor import fallback:', error);
       this.prefillVendorModalFromWebsite(modal, {}, normalizedUrl);
       if (statusEl) {
-        statusEl.textContent = 'Could not extract full details; basic data filled.';
+        statusEl.textContent =
+          'Could not extract full details; basic data filled.';
       }
       this.showNotification(
         'Could not extract full details; complete any missing fields.',
@@ -1384,15 +1391,17 @@ class VendorManager {
       '';
     const titleText = doc.querySelector('title')?.textContent || '';
     const email =
-      doc.querySelector('a[href^="mailto:"]')?.getAttribute('href')?.replace(
-        /^mailto:/i,
-        ''
-      ) ||
+      doc
+        .querySelector('a[href^="mailto:"]')
+        ?.getAttribute('href')
+        ?.replace(/^mailto:/i, '') ||
       bodyText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}/i)?.[0] ||
       '';
     const phone =
       doc.querySelector('a[href^="tel:"]')?.textContent?.trim() ||
-      bodyText.match(/(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/)?.[0] ||
+      bodyText.match(
+        /(\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/
+      )?.[0] ||
       '';
     return {
       name: titleText.split('|')[0].split('-')[0].trim(),

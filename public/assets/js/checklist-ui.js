@@ -506,7 +506,9 @@ class ChecklistUI {
         payload[field.id] = value;
       }
 
-      const failureNotesValue = String(formData.get('failureNotes') || '').trim();
+      const failureNotesValue = String(
+        formData.get('failureNotes') || ''
+      ).trim();
       if (failureNotesValue) {
         payload.failureNotes = failureNotesValue;
       }

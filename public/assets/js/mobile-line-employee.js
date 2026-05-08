@@ -175,12 +175,7 @@ export function attachLineEmployeeHub(api) {
     return reading.projectId === projectId;
   }
 
-  async function readLatestSafetyTimestamp(
-    collectionName,
-    db,
-    uid,
-    projectId
-  ) {
+  async function readLatestSafetyTimestamp(collectionName, db, uid, projectId) {
     const snap = await getDocs(
       query(collection(db, 'users', uid, collectionName), limit(60))
     );
@@ -268,7 +263,9 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
   }
 
   function serializePrepChecklistItems(items) {
-    return items.map(item => `- [${item.done ? 'x' : ' '}] ${item.text}`).join('\n');
+    return items
+      .map(item => `- [${item.done ? 'x' : ' '}] ${item.text}`)
+      .join('\n');
   }
 
   function renderPrepChecklist() {
@@ -375,7 +372,9 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     }
     body.innerHTML = '<p class="mc-hint">Loading recipes…</p>';
     try {
-      const userSnap = await getDoc(doc(db, 'users', uid, 'snapshots', 'recipeLibrary'));
+      const userSnap = await getDoc(
+        doc(db, 'users', uid, 'snapshots', 'recipeLibrary')
+      );
       if (!userSnap.exists()) {
         body.innerHTML =
           '<p class="mc-empty">No recipes found yet. Publish or sync recipes from the web app first.</p>';
@@ -392,7 +391,8 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
       body.innerHTML = `<ul class="mc-list">${recipes
         .slice(0, 80)
         .map(recipe => {
-          const name = recipe.name || recipe.title || recipe.recipeName || 'Recipe';
+          const name =
+            recipe.name || recipe.title || recipe.recipeName || 'Recipe';
           const yieldText = recipe.yield
             ? `Yield: ${recipe.yield}`
             : recipe.servings
@@ -428,10 +428,15 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
       ? window.ITERUM_TEAM_MEMBER_ROLE_OPTIONS
       : FALLBACK_JOB_OPTIONS;
     selectEl.innerHTML = options
-      .map(opt => `<option value="${escapeHtml(opt.value)}">${escapeHtml(opt.label)}</option>`)
+      .map(
+        opt =>
+          `<option value="${escapeHtml(opt.value)}">${escapeHtml(opt.label)}</option>`
+      )
       .join('');
     try {
-      const prefSnap = await getDoc(doc(db, 'users', uid, 'workspace_prefs', pid()));
+      const prefSnap = await getDoc(
+        doc(db, 'users', uid, 'workspace_prefs', pid())
+      );
       if (prefSnap.exists()) {
         const pref = prefSnap.data() || {};
         if (pref.positionKey) {
@@ -448,7 +453,8 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
         query(collection(db, 'projects', pid(), 'members'), limit(100))
       );
       if (memberSnap.empty) {
-        listEl.innerHTML = '<p class="mc-empty">No team members found for this workspace.</p>';
+        listEl.innerHTML =
+          '<p class="mc-empty">No team members found for this workspace.</p>';
         return;
       }
       const rows = [];
@@ -467,7 +473,9 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
         }
         let positionKey = m.role || '';
         try {
-          const prefSnap = await getDoc(doc(db, 'users', memberUid, 'workspace_prefs', pid()));
+          const prefSnap = await getDoc(
+            doc(db, 'users', memberUid, 'workspace_prefs', pid())
+          );
           if (prefSnap.exists()) {
             const pref = prefSnap.data() || {};
             positionKey = pref.positionKey || positionKey;

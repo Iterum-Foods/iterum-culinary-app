@@ -47,7 +47,9 @@ function buildInviteText() {
   const projectName =
     projectSel?.selectedOptions?.[0]?.textContent?.trim() || 'our project';
   const origin =
-    (typeof window !== 'undefined' && window.location && window.location.origin) ||
+    (typeof window !== 'undefined' &&
+      window.location &&
+      window.location.origin) ||
     '';
   const mobileUrl = origin
     ? `${origin}/mobile-compliance.html`
@@ -71,7 +73,10 @@ async function onCopyInviteClick() {
   }
   const text = buildInviteText();
   try {
-    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+    if (
+      navigator.clipboard &&
+      typeof navigator.clipboard.writeText === 'function'
+    ) {
       await navigator.clipboard.writeText(text);
       if (msg) {
         msg.textContent = 'Invite message copied.';
