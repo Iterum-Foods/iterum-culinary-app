@@ -5,6 +5,40 @@
 
 ---
 
+## 2026-05-09 — T1: Vendor + ingredients Phase D polish (shipped)
+
+**Roadmap ref:** [`docs/UI_AND_WORKFLOW_ROADMAP.md`](../UI_AND_WORKFLOW_ROADMAP.md) Phase D items D1, D2, D5, plus C3 cross-link reinforcement.
+
+### Summary
+
+- **`vendor-management.html`** — Replaced the dark navy/purple `vendor-hero` (and its heavy shadow) with a calm light hero aligned to the Iterum green/cream palette; H1 dropped from `2.4rem` to canonical `1.65rem`. Quick cards, stat cards, and bulk-action buttons stripped of emoji and re-toned to match brand. Hero buttons converted to text-only labels.
+- **Cross-link** — Added an `iterum-workflow-banner` above the onboarding rail linking to `ingredients.html` (mirrors the existing C3 link from ingredients to vendor overrides).
+- **`ingredients.html`** — Removed multicolor inline gradients and emoji from the three primary quick-action buttons; tightened heading copy ("Master ingredient library").
+- **Both pages** — Added `data-iterum-breadcrumb` so the unified-nav context bar reads `Purchasing › Vendor management` and `Purchasing › Ingredient library`.
+- **No new global CSS files; no behavior changes; no new scripts loaded.**
+
+### For CTO / engineering
+
+- Touch points: `public/vendor-management.html`, `public/ingredients.html` only.
+- All inline styling kept inline — no migration to a new stylesheet (Phase A anti-pattern guard).
+- Lint: no change to JS, lint untouched. Format: `npm run format:check` clean.
+- `unified-nav-header.js` already auto-wraps content in `.main-content-wrapper`, so [`iterum-workflow-polish.css`](../../public/assets/css/iterum-workflow-polish.css) typography rules apply on both pages without further wrapping.
+- Risk if reverting: the dark hero block was the loudest brand mismatch on a buyer-facing screen — keep the calm version.
+
+### For COO / QA
+
+- New checklist rows added to [`docs/QA_FEATURE_TEST_WORKFLOW.md`](../QA_FEATURE_TEST_WORKFLOW.md) §5.1 and §5.2 marked **UI (T1)**.
+- Pilot/demo: vendors + ingredients now visually match the dashboard and mobile shift surfaces — safe to demo to purchasing leads without commentary.
+- No database, rules, or auth changes — no Console steps required.
+
+### For CEO / product
+
+- Demo gate met for T1: a non-technical purchaser opening either page sees clear page intent, calm typography, scannable rows, and an obvious next step. No remaining "internal tool" feel on these two surfaces.
+- "Workspace" → "project" copy aligned in customer-facing strings on these pages, consistent with Phase B3.
+- Next in sequence per [`docs/UI_AND_WORKFLOW_ROADMAP.md`](../UI_AND_WORKFLOW_ROADMAP.md): **T2 — project-hub.html Phase D**.
+
+---
+
 ## 2026-03-27 — Google OAuth redirect → dashboard (shipped)
 
 **Commits:** `2e6e2d2` (AuthManager sync + post-OAuth redirect); hosting deploy to **`iterum-culinary-app2`**.

@@ -128,11 +128,17 @@ Expected deep links:
 
 - [ ] Open vendor page and verify workspace price overrides section
 - [ ] Add/update/remove a sample override
+- [ ] **UI (T1):** sidebar context bar shows breadcrumb `Purchasing › Vendor management`
+- [ ] **UI (T1):** hero is calm/light (no dark navy/purple gradient); H1 reads as a normal page heading, not a marketing banner
+- [ ] **UI (T1):** primary actions in hero, quick cards, stat cards, and bulk-actions are emoji-free in production chrome
+- [ ] **UI (T1):** workflow banner above the onboarding rail links to `ingredients.html` and the link works
 
 ### 5.2 Ingredients + specs (`/ingredients.html`)
 
 - [ ] Add or edit ingredient with spec URL and notes
 - [ ] Confirm spec is visible in ingredient list/card views
+- [ ] **UI (T1):** sidebar context bar shows breadcrumb `Purchasing › Ingredient library`
+- [ ] **UI (T1):** the three quick-action buttons no longer use multicolor gradients or emoji; the cross-link banner to vendor price overrides still works
 
 ### 5.3 Spec Library (`/spec-library.html`)
 

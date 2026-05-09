@@ -32,22 +32,15 @@
         .vendor-hero {
             position: relative;
             overflow: hidden;
-            background: linear-gradient(135deg, #243c5a 0%, #3b2c67 50%, #141a2b 95%);
-            color: #f8fafc;
-            border-radius: 28px;
-            padding: 40px;
+            background: linear-gradient(180deg, #ffffff 0%, #f6faf7 100%);
+            color: #142018;
+            border: 1px solid rgba(30, 61, 40, 0.12);
+            border-radius: 18px;
+            padding: 28px 32px;
             display: flex;
             flex-wrap: wrap;
-            gap: 36px;
-            box-shadow: 0 32px 80px rgba(15, 23, 42, 0.4);
-        }
-        .vendor-hero::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 45%),
-                        radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.12), transparent 55%);
-            pointer-events: none;
+            gap: 28px;
+            box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
         }
         .vendor-hero-main {
             flex: 1;
@@ -57,66 +50,69 @@
         }
         .vendor-eyebrow {
             text-transform: uppercase;
-            letter-spacing: 0.28em;
+            letter-spacing: 0.18em;
             font-size: 0.7rem;
-            opacity: 0.7;
-            margin-bottom: 12px;
+            font-weight: 700;
+            color: #3d6b47;
+            margin-bottom: 10px;
         }
         .vendor-hero h1 {
             margin: 0;
-            font-size: 2.4rem;
+            font-size: 1.65rem;
             font-weight: 700;
             letter-spacing: -0.02em;
+            line-height: 1.25;
+            color: #1a2e35;
         }
         .vendor-hero p {
-            margin: 16px 0 0;
-            max-width: 520px;
-            font-size: 1rem;
-            line-height: 1.6;
-            color: rgba(248, 250, 252, 0.85);
+            margin: 12px 0 0;
+            max-width: 580px;
+            font-size: 0.95rem;
+            line-height: 1.55;
+            color: #475569;
         }
         .vendor-hero-actions {
-            margin-top: 28px;
+            margin-top: 20px;
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
         .vendor-hero-actions .btn {
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.28);
-            background: rgba(15, 23, 42, 0.28);
-            color: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid rgba(30, 61, 40, 0.14);
+            background: #ffffff;
+            color: #142018;
             font-weight: 600;
-            padding: 12px 18px;
-            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.35);
-            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+            padding: 9px 14px;
+            font-size: 0.88rem;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
         }
         .vendor-hero-actions .btn:hover {
-            transform: translateY(-2px);
-            background: rgba(15, 23, 42, 0.45);
-            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.45);
+            border-color: rgba(30, 61, 40, 0.22);
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
         }
         .vendor-hero-actions .btn.btn-primary {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.18));
-            color: #0f172a;
-            border: none;
+            background: linear-gradient(135deg, #4d7c57 0%, #3d6b47 100%);
+            color: #ffffff;
+            border-color: #1e3d28;
         }
         .vendor-hero-side {
             position: relative;
             z-index: 1;
-            min-width: 260px;
+            min-width: 240px;
             max-width: 320px;
-            background: rgba(15, 23, 42, 0.55);
-            border-radius: 20px;
-            padding: 24px;
-            border: 1px solid rgba(148, 163, 184, 0.28);
-            backdrop-filter: blur(12px);
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 18px 20px;
+            border: 1px solid rgba(30, 61, 40, 0.12);
         }
         .vendor-hero-side h3 {
-            margin: 0 0 16px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            letter-spacing: 0.04em;
+            margin: 0 0 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: #1a2e35;
         }
         .vendor-checklist {
             display: flex;
@@ -125,27 +121,40 @@
         }
         .vendor-checklist-item {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: flex-start;
-            font-size: 0.92rem;
-            color: rgba(248, 250, 252, 0.78);
+            font-size: 0.88rem;
+            color: #475569;
             line-height: 1.5;
         }
         .vendor-checklist-item span:first-child {
-            font-size: 1.4rem;
+            flex: 0 0 22px;
+            height: 22px;
+            border-radius: 999px;
+            background: rgba(61, 107, 71, 0.12);
+            color: #1e3d28;
+            font-size: 0.78rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .vendor-checklist-item strong {
+            color: #1a2e35;
         }
         .vendor-surface {
             background: #ffffff;
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow: 0 28px 70px rgba(15, 23, 42, 0.18);
-            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+            border: 1px solid rgba(30, 61, 40, 0.10);
         }
         .vendor-section-title {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 700;
-            color: #1f2937;
-            margin: 0 0 20px 0;
+            color: #1a2e35;
+            margin: 0 0 16px 0;
+            letter-spacing: -0.01em;
         }
         .vendor-surface .filters-section {
             margin-top: 28px;
@@ -175,29 +184,29 @@
         }
         .vendor-onboarding-rail {
             background: #ffffff;
-            border-radius: 20px;
-            border: 1px solid rgba(16, 185, 129, 0.35);
-            box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
-            padding: 24px 28px;
+            border-radius: 14px;
+            border: 1px solid rgba(30, 61, 40, 0.12);
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+            padding: 20px 22px;
         }
         .vendor-onboarding-rail h2 {
-            margin: 0 0 12px;
-            font-size: 1.1rem;
+            margin: 0 0 10px;
+            font-size: 1rem;
             font-weight: 700;
-            color: #0f172a;
+            color: #1a2e35;
         }
         .vendor-onboarding-rail ol {
             margin: 0;
             padding-left: 1.25rem;
-            color: #334155;
-            line-height: 1.6;
-            font-size: 0.95rem;
+            color: #475569;
+            line-height: 1.55;
+            font-size: 0.9rem;
         }
         .vendor-onboarding-rail li {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
         .vendor-onboarding-rail a {
-            color: #047857;
+            color: #3d6b47;
             font-weight: 600;
         }
         .vendor-onboarding-rail a:hover {
@@ -210,98 +219,88 @@
         }
         .quick-card {
             background: #ffffff;
-            border-radius: 18px;
-            padding: 24px;
+            border-radius: 14px;
+            padding: 18px 20px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            border: 1px solid rgba(148, 163, 184, 0.22);
-            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+            gap: 10px;
+            border: 1px solid rgba(30, 61, 40, 0.12);
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
             cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
         }
         .quick-card.primary {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.16), rgba(37, 99, 235, 0.08));
-            border-color: rgba(37, 99, 235, 0.38);
+            border-color: rgba(61, 107, 71, 0.35);
+            background: linear-gradient(180deg, #ffffff 0%, #f6faf7 100%);
         }
         .quick-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 24px 56px rgba(37, 99, 235, 0.18);
-            border-color: rgba(37, 99, 235, 0.42);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+            border-color: rgba(30, 61, 40, 0.22);
         }
         .quick-icon {
-            font-size: 1.8rem;
-            color: #2563eb;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #1e3d28;
             display: inline-flex;
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
             align-items: center;
             justify-content: center;
-            background: rgba(37, 99, 235, 0.12);
-        }
-        .quick-card.primary .quick-icon {
-            background: rgba(37, 99, 235, 0.22);
-            color: #1d4ed8;
+            background: rgba(61, 107, 71, 0.12);
+            letter-spacing: 0.02em;
         }
         .quick-content h3 {
             margin: 0;
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 700;
-            color: #0f172a;
+            color: #1a2e35;
+            letter-spacing: -0.01em;
         }
         .quick-content p {
             margin: 4px 0 0;
             color: #475569;
-            line-height: 1.6;
-            font-size: 0.95rem;
+            line-height: 1.5;
+            font-size: 0.88rem;
         }
         .quick-cta {
             margin-top: auto;
             font-weight: 600;
-            color: #2563eb;
+            color: #3d6b47;
             letter-spacing: 0.04em;
             text-transform: uppercase;
-            font-size: 0.85rem;
-        }
-        .quick-card.primary .quick-cta {
-            color: #1d4ed8;
+            font-size: 0.78rem;
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50 min-h-screen" data-iterum-breadcrumb="Purchasing|Vendor management">
     <!-- Header injected by unified-nav-header.js -->
 
     <!-- Main Content -->
     <main class="vendor-dashboard">
         <header class="vendor-hero">
             <div class="vendor-hero-main">
-                <div class="vendor-eyebrow">Iterum Kitchen OS · Sourcing</div>
-                <h1>Vendor &amp; Purchasing Hub</h1>
-                <p>Build your supplier list, then tune <strong>ingredient unit costs</strong> for this workspace so menu and recipe costing match reality. When you&rsquo;re signed in, data syncs to the cloud; cloud values win on merge.</p>
+                <div class="vendor-eyebrow">Sourcing</div>
+                <h1>Vendor &amp; purchasing hub</h1>
+                <p>Build your supplier list, then tune <strong>ingredient unit costs</strong> for this project so menu and recipe costing match reality. When signed in, data syncs to the cloud; cloud values win on merge.</p>
                 <div class="vendor-hero-actions">
                     <button type="button" onclick="window.vendorManager?.showAddVendorModal?.() || window.vendorImporter?.showAddVendorModal?.()" class="btn btn-primary" title="Add a new supplier to your list">
-                        <span>➕</span>
-                        <span>Add your first vendor</span>
+                        <span>Add vendor</span>
                     </button>
                     <button type="button" class="btn btn-secondary" onclick="document.getElementById('vendor-pricing-workspace')?.scrollIntoView({ behavior: 'smooth' });" title="Jump to price overrides for costing">
-                        <span>💡</span>
                         <span>Set ingredient prices</span>
                     </button>
                     <button type="button" class="btn btn-secondary" onclick="document.getElementById('vendor-directory')?.scrollIntoView({ behavior: 'smooth' });" title="Scroll to the vendor table">
-                        <span>📋</span>
-                        <span>View / edit list</span>
+                        <span>View list</span>
                     </button>
-                    <button onclick="window.location.href='price-list-upload.html'" class="btn btn-primary" style="background: linear-gradient(135deg, rgba(255,255,255,0.45), rgba(255,255,255,0.2));">
-                        <span>💰</span>
+                    <button type="button" onclick="window.location.href='price-list-upload.html'" class="btn btn-secondary">
                         <span>Upload price list</span>
                     </button>
                     <button id="import-vendors-btn" class="btn btn-secondary">
-                        <span>📥</span>
                         <span>Import</span>
                     </button>
                     <button id="export-vendors-btn" class="btn btn-secondary">
-                        <span>📤</span>
                         <span>Export</span>
                     </button>
                 </div>
@@ -319,11 +318,16 @@
                     </div>
                     <div class="vendor-checklist-item">
                         <span>3</span>
-                        <span><strong>Match names</strong> to <a href="ingredients.html" style="color:#c7f0d0;text-decoration:underline;">ingredients</a> so recipe costing lines up.</span>
+                        <span><strong>Match names</strong> to <a href="ingredients.html" style="color:#3d6b47;font-weight:600;">ingredients</a> so recipe costing lines up.</span>
                     </div>
                 </div>
             </div>
         </header>
+
+        <div class="iterum-workflow-banner" role="note">
+            <span><strong>Tied to costing:</strong> ingredient names should match the <strong>master ingredient library</strong>; price overrides flow into recipe and menu math.</span>
+            <a href="ingredients.html">Open ingredient library</a>
+        </div>
 
         <nav class="vendor-onboarding-rail" id="vendor-onboard-steps" aria-label="Vendor setup steps">
             <h2>Onboarding: suppliers, then costs</h2>
@@ -336,34 +340,34 @@
 
         <section class="vendor-quick-actions">
             <article class="quick-card primary" onclick="window.vendorManager?.showAddVendorModal?.() || window.vendorImporter?.showAddVendorModal?.()">
-                <div class="quick-icon">➕</div>
+                <div class="quick-icon">01</div>
                 <div class="quick-content">
-                    <h3>Add New Vendor</h3>
+                    <h3>Add new vendor</h3>
                     <p>Capture contact details, signature products, and invoice evidence in one step.</p>
                 </div>
                 <div class="quick-cta">Start</div>
             </article>
             <article class="quick-card" onclick="window.vendorManager?.showImportModal?.() || document.getElementById('import-vendors-btn')?.click()">
-                <div class="quick-icon">📥</div>
+                <div class="quick-icon">02</div>
                 <div class="quick-content">
-                    <h3>Import Vendor List</h3>
-                    <p>Pull supplier catalogs from CSV/price sheets to seed your sourcing hub.</p>
+                    <h3>Import vendor list</h3>
+                    <p>Pull supplier catalogs from CSV or price sheets to seed your sourcing hub.</p>
                 </div>
                 <div class="quick-cta">Upload</div>
             </article>
             <article class="quick-card" onclick="window.vendorManager?.exportVendors?.() || document.getElementById('export-vendors-btn')?.click()">
-                <div class="quick-icon">📤</div>
+                <div class="quick-icon">03</div>
                 <div class="quick-content">
-                    <h3>Share Vendor Data</h3>
-                    <p>Export sourcing intel to collaborators or archive snapshots for audits.</p>
+                    <h3>Share vendor data</h3>
+                    <p>Export sourcing data to collaborators or archive snapshots for audits.</p>
                 </div>
                 <div class="quick-cta">Export</div>
             </article>
             <article class="quick-card" role="link" tabindex="0" onclick="document.getElementById('vendor-pricing-workspace')?.scrollIntoView({ behavior: 'smooth' })" onkeydown="if(event.key==='Enter')document.getElementById('vendor-pricing-workspace')?.scrollIntoView({behavior:'smooth'})">
-                <div class="quick-icon">💡</div>
+                <div class="quick-icon">04</div>
                 <div class="quick-content">
                     <h3>Ingredient price overrides</h3>
-                    <p>Set or adjust unit costs for this workspace — ties into recipe &amp; menu costing.</p>
+                    <p>Set or adjust unit costs for this project — ties into recipe and menu costing.</p>
                 </div>
                 <div class="quick-cta">Set prices</div>
             </article>
@@ -381,34 +385,30 @@
             <div class="vendor-section-title">At a glance</div>
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon">🏪</div>
                     <div class="stat-content">
+                        <div class="stat-label">Total vendors</div>
                         <div class="stat-value" id="vendor-count">0</div>
-                        <div class="stat-label">Total Vendors</div>
                     </div>
                 </div>
-                
+
                 <div class="stat-card">
-                    <div class="stat-icon">✅</div>
                     <div class="stat-content">
+                        <div class="stat-label">Active vendors</div>
                         <div class="stat-value" id="active-vendors">0</div>
-                        <div class="stat-label">Active Vendors</div>
                     </div>
                 </div>
-                
+
                 <div class="stat-card">
-                    <div class="stat-icon">🌍</div>
                     <div class="stat-content">
-                        <div class="stat-value" id="vendor-locations">0</div>
                         <div class="stat-label">Locations</div>
+                        <div class="stat-value" id="vendor-locations">0</div>
                     </div>
                 </div>
-                
+
                 <div class="stat-card">
-                    <div class="stat-icon">📊</div>
                     <div class="stat-content">
-                        <div class="stat-value" id="vendor-specialties">0</div>
                         <div class="stat-label">Specialties</div>
+                        <div class="stat-value" id="vendor-specialties">0</div>
                     </div>
                 </div>
             </div>
@@ -459,12 +459,8 @@
                         <span id="selected-count">0</span> vendors selected
                     </span>
                     <div class="bulk-actions-buttons">
-                        <button id="bulk-edit-btn" class="btn btn-sm btn-secondary">
-                            ✏️ Edit Selected
-                        </button>
-                        <button id="bulk-delete-btn" class="btn btn-sm btn-danger">
-                            🗑️ Delete Selected
-                        </button>
+                        <button id="bulk-edit-btn" class="btn btn-sm btn-secondary">Edit selected</button>
+                        <button id="bulk-delete-btn" class="btn btn-sm btn-danger">Delete selected</button>
                     </div>
                 </div>
             </div>
