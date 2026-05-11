@@ -1294,6 +1294,17 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     head.textContent = `${doneN}/${itemCount} done · ${needN} need`;
   }
 
+  let barNeedQueue = Promise.resolve();
+
+  function enqueueBarNeedFollowUp(kind, itemText) {
+    const next = barNeedQueue.then(
+      () => appendBarNeedFollowUp(kind, itemText),
+      () => appendBarNeedFollowUp(kind, itemText)
+    );
+    barNeedQueue = next.catch(() => undefined);
+    return next;
+  }
+
   async function appendBarNeedFollowUp(kind, itemText) {
     const label = BAR_CHECKLIST_LABELS[kind] || kind;
     const prefix =
@@ -1477,14 +1488,15 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
           state.need[kind][idx] = true;
           saveBarChecklistState(state);
           updateBarChecklistSectionHeader(kind, itemCount);
-          const res = await appendBarNeedFollowUp(kind, itemText);
+          const res = await enqueueBarNeedFollowUp(kind, itemText);
           if (
             res &&
             !res.ok &&
             (res.reason === 'signin' || res.reason === 'error')
           ) {
-            delete state.need[kind][idx];
-            saveBarChecklistState(state);
+            const fresh = loadBarChecklistState();
+            if (fresh.need[kind]) delete fresh.need[kind][idx];
+            saveBarChecklistState(fresh);
             cb.checked = false;
             updateBarChecklistSectionHeader(kind, itemCount);
           }
