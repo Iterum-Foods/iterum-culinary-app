@@ -708,6 +708,30 @@
             <div id="checklist-dashboard-card"></div>
           </div>
 
+          <div class="card-style" data-dash-roles="account_admin,operations_gm,chef_leadership,location_manager" data-dash-features="bar">
+            <div class="dash-card-head">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
+                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-martini-glass-citrus"></i></span>
+                Bar drink drafts <span class="text-xs font-normal" style="color: var(--brand-text-muted);">(in progress)</span>
+              </h2>
+            </div>
+            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
+              Drinks captured from the mobile app's Bar tab land here. Review, then <strong>Publish</strong> to push them into the bar pack line staff sees.
+            </p>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <button type="button" id="bar-drafts-refresh" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
+                <i class="fa-solid fa-rotate mr-1" aria-hidden="true"></i>Refresh
+              </button>
+              <button type="button" id="bar-drafts-import-wusong" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" title="Import the Wusong sample cocktails as drafts">
+                <i class="fa-solid fa-file-import mr-1" aria-hidden="true"></i>Import Wusong sample
+              </button>
+            </div>
+            <div id="bar-drafts-status" class="text-xs mb-2" style="color: var(--brand-text-muted);" aria-live="polite"></div>
+            <div id="bar-drafts-list" class="space-y-2">
+              <p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">Loading…</p>
+            </div>
+          </div>
+
           <div class="card-style" data-dash-roles="chef_leadership,operations_gm,purchasing" data-dash-features="compliance,ingredients,vendors">
             <div class="dash-card-head">
               <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
@@ -1797,6 +1821,203 @@
         }
       }, 500);
     });
+  </script>
+
+  <!-- Bar drink drafts card (in-progress drinks captured from mobile) -->
+  <script src="assets/js/wusong-drink-seed.js"></script>
+  <script src="assets/js/bar-drink-drafts.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      function escapeHtml(s) {
+        if (s == null) return '';
+        return String(s).replace(/[&<>"']/g, function (c) {
+          return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+        });
+      }
+
+      function statusEl() { return document.getElementById('bar-drafts-status'); }
+      function listEl() { return document.getElementById('bar-drafts-list'); }
+
+      function setStatus(msg, isErr) {
+        var el = statusEl();
+        if (!el) return;
+        el.textContent = msg || '';
+        el.style.color = isErr ? '#b45309' : 'var(--brand-text-muted)';
+      }
+
+      function getActiveProjectId() {
+        try {
+          if (window.projectManager) {
+            var pm = window.projectManager;
+            if (typeof pm.getActiveProject === 'function') {
+              var p = pm.getActiveProject();
+              if (p && p.id) return p.id;
+            }
+            if (pm.currentProjectId) return pm.currentProjectId;
+            if (pm.currentProject && pm.currentProject.id) return pm.currentProject.id;
+          }
+        } catch (e) { /* ignore */ }
+        var stored = localStorage.getItem('iterum_current_project_id');
+        return stored || 'master';
+      }
+
+      function getDb() {
+        return (window.firestoreSync && window.firestoreSync.db) || window.firestoreDB || null;
+      }
+
+      function renderDrafts(drafts) {
+        var el = listEl();
+        if (!el) return;
+        if (!Array.isArray(drafts) || !drafts.length) {
+          el.innerHTML = '<p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">No in-progress drinks. Capture some from the mobile Bar tab, or import the Wusong sample.</p>';
+          return;
+        }
+        el.innerHTML = drafts.map(function (d) {
+          var idAttr = escapeHtml(d.id || '');
+          var build = Array.isArray(d.build) && d.build.length
+            ? '<ul class="text-xs mt-1 mb-1 pl-4" style="color: var(--brand-text-muted); list-style: disc;">'
+              + d.build.map(function (b) {
+                  return '<li>' + escapeHtml(b.ingredient || '') + ': ' + escapeHtml(b.amount || '') + (b.unit ? ' ' + escapeHtml(b.unit) : '') + '</li>';
+                }).join('')
+              + '</ul>'
+            : '';
+          var meta = [];
+          if (d.glass) meta.push('Glass: ' + escapeHtml(d.glass));
+          if (d.method) meta.push('Method: ' + escapeHtml(d.method));
+          if (d.garnish) meta.push('Garnish: ' + escapeHtml(d.garnish));
+          if (d.allergies) meta.push('Allergies: ' + escapeHtml(d.allergies));
+          var metaHtml = meta.length
+            ? '<div class="text-xs mt-1" style="color: var(--brand-text-muted);">' + meta.join(' · ') + '</div>'
+            : '';
+          var sourceHtml = d.source
+            ? '<span class="text-xs px-2 py-0.5 rounded-full" style="background-color: var(--brand-bg-tertiary); color: var(--brand-text-secondary);">' + escapeHtml(d.source) + '</span>'
+            : '';
+          return '<div class="rounded-md border p-3" style="border-color: var(--brand-border-light); background: var(--brand-bg-primary);">'
+            + '<div class="flex justify-between items-start gap-2">'
+            + '<div class="flex-1 min-w-0">'
+            + '<div class="flex flex-wrap items-center gap-2"><strong style="color: var(--brand-text-primary);">' + escapeHtml(d.title || 'Untitled drink') + '</strong>' + sourceHtml + '</div>'
+            + build
+            + metaHtml
+            + '</div>'
+            + '<div class="flex flex-col gap-1 shrink-0">'
+            + '<button type="button" data-bar-publish="' + idAttr + '" class="text-xs py-1 px-2 rounded-md text-white" style="background: var(--brand-primary-accent);">Publish</button>'
+            + '<button type="button" data-bar-delete="' + idAttr + '" class="text-xs py-1 px-2 rounded-md border" style="border-color: var(--brand-border-light); background: #ffffff; color: var(--brand-text-secondary);">Delete</button>'
+            + '</div>'
+            + '</div>'
+            + '</div>';
+        }).join('');
+      }
+
+      async function refreshDrafts() {
+        var db = getDb();
+        var pid = getActiveProjectId();
+        var el = listEl();
+        if (!el) return;
+        if (!db) {
+          el.innerHTML = '<p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">Sign in to view drafts.</p>';
+          return;
+        }
+        if (!window.iterumBarDrafts) {
+          el.innerHTML = '<p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">Bar drafts module not loaded.</p>';
+          return;
+        }
+        el.innerHTML = '<p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">Loading…</p>';
+        try {
+          var drafts = await window.iterumBarDrafts.loadDrafts(db, pid);
+          renderDrafts(drafts);
+        } catch (e) {
+          console.error('Could not load bar drafts', e);
+          el.innerHTML = '<p class="text-sm text-center py-3" style="color: #b45309;">Could not load drafts. Check project membership.</p>';
+        }
+      }
+
+      async function publishDraft(id) {
+        var db = getDb();
+        if (!db || !window.iterumBarDrafts) return;
+        var pid = getActiveProjectId();
+        setStatus('Publishing…');
+        try {
+          var published = await window.iterumBarDrafts.publishDraft(db, pid, id);
+          setStatus('Published "' + (published.title || 'drink') + '" to the bar pack.');
+          await refreshDrafts();
+        } catch (e) {
+          console.error('publish failed', e);
+          setStatus('Could not publish. Check permissions.', true);
+        }
+      }
+
+      async function deleteDraft(id) {
+        if (!confirm('Delete this in-progress drink?')) return;
+        var db = getDb();
+        if (!db || !window.iterumBarDrafts) return;
+        var pid = getActiveProjectId();
+        try {
+          await window.iterumBarDrafts.deleteDraft(db, pid, id);
+          setStatus('Deleted draft.');
+          await refreshDrafts();
+        } catch (e) {
+          console.error('delete failed', e);
+          setStatus('Could not delete draft.', true);
+        }
+      }
+
+      async function importWusong() {
+        var db = getDb();
+        if (!db || !window.iterumBarDrafts) return;
+        if (!window.ITERUM_WUSONG_DRINKS) {
+          setStatus('Wusong sample not available.', true);
+          return;
+        }
+        if (!confirm('Import the Wusong sample (11 cocktails) as in-progress drafts? Existing Wusong drafts in this project will be replaced.')) return;
+        var pid = getActiveProjectId();
+        var uid = '';
+        try {
+          var raw = localStorage.getItem('current_user');
+          if (raw) uid = (JSON.parse(raw) || {}).uid || '';
+        } catch (e) { /* ignore */ }
+        setStatus('Importing…');
+        try {
+          var count = await window.iterumBarDrafts.importSampleDrafts(
+            db, pid, window.ITERUM_WUSONG_DRINKS, 'Wusong menu cheat sheet', uid
+          );
+          setStatus('Imported ' + count + ' sample drinks as in progress.');
+          await refreshDrafts();
+        } catch (e) {
+          console.error('import failed', e);
+          setStatus('Could not import sample. Check Firestore access.', true);
+        }
+      }
+
+      document.addEventListener('click', function (e) {
+        var t = e.target;
+        if (!(t instanceof HTMLElement)) return;
+        var pub = t.closest('[data-bar-publish]');
+        if (pub) { void publishDraft(pub.getAttribute('data-bar-publish')); return; }
+        var del = t.closest('[data-bar-delete]');
+        if (del) { void deleteDraft(del.getAttribute('data-bar-delete')); return; }
+        if (t.id === 'bar-drafts-refresh') { void refreshDrafts(); return; }
+        if (t.id === 'bar-drafts-import-wusong') { void importWusong(); return; }
+        var hit = t.closest('#bar-drafts-refresh, #bar-drafts-import-wusong');
+        if (hit && hit.id === 'bar-drafts-refresh') void refreshDrafts();
+        if (hit && hit.id === 'bar-drafts-import-wusong') void importWusong();
+      });
+
+      function waitForReady(retries) {
+        retries = retries || 0;
+        if (getDb()) { void refreshDrafts(); return; }
+        if (retries > 30) {
+          var el = listEl();
+          if (el) el.innerHTML = '<p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">Sign in to load drafts.</p>';
+          return;
+        }
+        setTimeout(function () { waitForReady(retries + 1); }, 400);
+      }
+
+      document.addEventListener('DOMContentLoaded', function () { waitForReady(0); });
+      document.addEventListener('projectChanged', function () { void refreshDrafts(); });
+    })();
   </script>
 
   <!-- Wait for Firebase persistence before sending users to sign-in (fixes Vercel / OAuth timing) -->

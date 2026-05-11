@@ -73,6 +73,22 @@ Expected:
 - Valid entries save successfully
 - Invalid entry shows: numeric input guidance message
 
+### 2.5 Bar drink drafts (admin quick-add → web "in progress")
+
+Two surfaces: phone Bar tab (admin/manager only) for capture; dashboard "Bar drink drafts (in progress)" card for review and publish. Persistence under `projects/{pid}/snapshots/bar_drink_drafts` (drafts) and `projects/{pid}/snapshots/bar_line_pack` (published — what line staff see).
+
+- [ ] Sign in as an admin/manager (role with `dashboard_manager_notes: true`)
+- [ ] Mobile app → **Bar** tab → confirm **Quick add a drink (admin)** `<details>` block is visible
+- [ ] Sign in as a line employee (`employee_line`) → confirm Quick add block is **hidden**
+- [ ] As admin: open Quick add → fill name + at least two build lines (`Lime juice — 0.75 oz`) → tap **Save as in progress** → status reads *Saved "<name>" as in progress.* and form clears
+- [ ] Open web `/dashboard.html` → **Bar drink drafts (in progress)** card → confirm the new draft appears with build, glass/method/garnish/allergies summary
+- [ ] Click **Import Wusong sample** → confirm 11 drafts appear (Vic's Mai Tai, Zombie, Enter the Dragon, Mango Sticky Rice Colada, Big Game Hunter, Last Flight to Paradise, Tiger Balm, Flight Risk, Temple Tantrum, Cosmo Cabana, Forbidden Peach) with `Wusong menu cheat sheet` source tag
+- [ ] Click **Import Wusong sample** again → no duplicates: previous Wusong drafts are replaced (importer is idempotent against the `Wusong menu cheat sheet` source)
+- [ ] Click **Publish** on one draft → status reads *Published "<name>" to the bar pack.*, draft disappears from the in-progress list
+- [ ] Mobile app → **Bar** tab → confirm the published drink shows in **Drink builds & specs** with the full text spec (build, glass, method, garnish, allergies)
+- [ ] Click **Delete** on a remaining draft → confirm prompt → draft disappears
+- [ ] Reload dashboard → drafts persist (Firestore round-trip ok)
+
 ### 2.4 Crowd Manager (FP-250) daily checklist
 
 Required for nightclub, dancehall, discotheque, or bar per 527 CMR 1.00 §20.1.5.6.4. The mobile app stores per-day entries at `iterum.checks.crowd_manager.{projectId}.{YYYY-MM-DD}` and (when signed in) writes to Firestore `projects/{projectId}/checklists/{entryId}` with `templateId: crowd_manager_fp250`.

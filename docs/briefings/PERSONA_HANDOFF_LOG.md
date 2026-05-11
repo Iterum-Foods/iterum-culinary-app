@@ -5,6 +5,38 @@
 
 ---
 
+## 2026-05-10 — Bar drink drafts (admin phone capture → web "in progress" review) (shipped)
+
+### Summary
+
+- New flow: admin/manager taps **Quick add a drink** on the phone Bar tab → draft saves to `projects/{pid}/snapshots/bar_drink_drafts` with `status: 'in_progress'` → web dashboard surfaces it in a new **Bar drink drafts (in progress)** card → manager clicks **Publish** to push the drink into the bar pack snapshot (`bar_line_pack.drinks[]`) the line app already reads.
+- Quick-add form gated by `iterumCanViewManagerNotes()` (same UI-level role gate as nightly manager handoff notes).
+- Dashboard card has **Publish**, **Delete**, **Refresh**, and **Import Wusong sample** (one-click seed of 11 Wusong cocktails as drafts; idempotent against re-import).
+- The 11 Wusong drinks are bundled as structured seed data (`public/assets/js/wusong-drink-seed.js`): title, build (ingredient/amount/unit), glass, method, garnish, allergies — transcribed from `C:\Users\chefm\Downloads\Wusong Cheat Sheet - Menu Cocktails.pdf`.
+
+### For CTO / engineering
+
+- New files:
+  - `public/assets/js/wusong-drink-seed.js` — `window.ITERUM_WUSONG_DRINKS` + `window.iterumDrinkSpecToText(drink)` (renders structured build to the plain-text `spec` field the line app's `loadBarPack()` already understands).
+  - `public/assets/js/bar-drink-drafts.js` — `window.iterumBarDrafts` with `loadDrafts`, `upsertDraft`, `deleteDraft`, `publishDraft`, `importSampleDrafts`. Single-doc snapshot pattern (no new rules).
+- Touch points: `public/mobile-compliance.html` (Bar tab form + script tags), `public/assets/js/mobile-line-employee.js` (`canEditBarDrafts`, `syncBarQuickAddVisibility`, `parseBuildLines`, `saveBarDraftFromForm`, listener wiring on tab + project change), `public/dashboard.html` (new admin card + inline JS module).
+- **No new Firestore rules.** Both reads/writes hit `projects/{pid}/snapshots/{docId}` which is already governed by existing project membership rules.
+- Publish path appends/replaces by title in `bar_line_pack.drinks[]`, then removes from `bar_drink_drafts.drinks[]`. Two sequential writes, retry-safe (failure leaves draft in place).
+- `npm run format:check` clean; `ReadLints` clean on touched files. `npx cap sync android` succeeded; iOS bundle synced manually.
+
+### For COO / QA
+
+- New section **§2.5 Bar drink drafts** in [`docs/QA_FEATURE_TEST_WORKFLOW.md`](../QA_FEATURE_TEST_WORKFLOW.md) covers: role-gated Quick add visibility, Save flow, dashboard card, Wusong import (idempotent), Publish round-trip, Delete, persistence.
+- No new permissions surfaced to line staff — they only see drinks **after** the admin publishes.
+
+### For CEO / product
+
+- Phone-first cocktail capture is the right wedge for cocktail-driven bars (Wusong-class). Demo flow: admin opens phone → adds *House Negroni* draft in 20 seconds → walks to office → opens dashboard → publishes → line phone shows it on the Bar tab.
+- "Import Wusong sample" is also a clean way to demo the bar workflow on a fresh account without typing.
+- Follow-up tickets worth considering: (1) draft edit-in-place on dashboard, (2) cost/ABV/photo fields, (3) printable bar menu, (4) version history (so a manager can roll back a bad publish).
+
+---
+
 ## 2026-05-10 — Crowd Manager (FP-250) daily checklist on phone + calendar (shipped)
 
 **Reference:** Massachusetts Department of Fire Services form **FP-250** "Crowd Manager Fire and Building Safety Checklist" (Rev. 12/24); required per **527 CMR 1.00 §20.1.5.6.4** for nightclub, dancehall, discotheque, or bar.

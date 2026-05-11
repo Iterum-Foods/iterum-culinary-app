@@ -1186,6 +1186,111 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     return `<div class="mc-card mc-note-body">${escapeHtml(String(raw))}</div>`;
   }
 
+  function canEditBarDrafts() {
+    if (typeof window === 'undefined') return false;
+    if (typeof window.iterumCanViewManagerNotes === 'function') {
+      return !!window.iterumCanViewManagerNotes();
+    }
+    return false;
+  }
+
+  function syncBarQuickAddVisibility() {
+    const wrap = document.getElementById('bar-quick-add');
+    if (!wrap) return;
+    const allowed = canEditBarDrafts() && teamProjectSelected();
+    wrap.hidden = !allowed;
+  }
+
+  function parseBuildLines(raw) {
+    const lines = String(raw || '')
+      .split(/\r?\n/)
+      .map(s => s.trim())
+      .filter(Boolean);
+    return lines.map(line => {
+      const m = line.match(/^(.*?)\s*[—\-:]\s*([\d./\s]+)\s*(\S+)?\s*$/);
+      if (m) {
+        return {
+          ingredient: m[1].trim(),
+          amount: m[2].trim(),
+          unit: (m[3] || '').trim()
+        };
+      }
+      return { ingredient: line, amount: '', unit: '' };
+    });
+  }
+
+  async function saveBarDraftFromForm() {
+    const setBarStatus = (msg, isErr) => {
+      const el = document.getElementById('bar-draft-status');
+      if (el) {
+        el.textContent = msg || '';
+        el.style.color = isErr ? '#b45309' : '#1e3d28';
+      }
+      setStatus(msg, isErr);
+    };
+    if (!teamProjectSelected()) {
+      setBarStatus('Pick a team location first.', true);
+      return;
+    }
+    if (!canEditBarDrafts()) {
+      setBarStatus('Admin role required to add drinks.', true);
+      return;
+    }
+    const db = getDb();
+    const uid = getAuth()?.currentUser?.uid;
+    if (!db || !uid) {
+      setBarStatus('Sign in to save.', true);
+      return;
+    }
+    if (!window.iterumBarDrafts) {
+      setBarStatus('Bar drafts module not loaded.', true);
+      return;
+    }
+    const titleEl = document.getElementById('bar-draft-title');
+    const title = (titleEl?.value || '').trim();
+    if (!title) {
+      setBarStatus('Drink name is required.', true);
+      return;
+    }
+    const draft = {
+      title,
+      build: parseBuildLines(
+        document.getElementById('bar-draft-build')?.value || ''
+      ),
+      glass: (document.getElementById('bar-draft-glass')?.value || '').trim(),
+      method: (document.getElementById('bar-draft-method')?.value || '').trim(),
+      garnish: (
+        document.getElementById('bar-draft-garnish')?.value || ''
+      ).trim(),
+      allergies: (
+        document.getElementById('bar-draft-allergies')?.value || ''
+      ).trim(),
+      source: 'mobile_admin_quick_add'
+    };
+    try {
+      await window.iterumBarDrafts.upsertDraft(db, pid(), draft, {
+        createdBy: uid,
+        source: draft.source
+      });
+      setBarStatus(`Saved "${title}" as in progress.`);
+      const ids = [
+        'bar-draft-title',
+        'bar-draft-build',
+        'bar-draft-glass',
+        'bar-draft-method',
+        'bar-draft-garnish',
+        'bar-draft-allergies'
+      ];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && 'value' in el) el.value = '';
+      });
+    } catch (e) {
+      console.error('bar draft save failed', e);
+      setBarStatus('Could not save draft. Check team access.', true);
+    }
+  }
+
   async function loadBarPack() {
     const db = getDb();
     const drinksEl = document.getElementById('bar-drinks-body');
@@ -1531,6 +1636,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
       }
       if (k === 'sops') void loadSops();
       if (k === 'bar') {
+        syncBarQuickAddVisibility();
         void loadBarPack();
         void loadBarNotes();
       }
@@ -1612,6 +1718,13 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
       void submitCrowdManager();
     });
 
+  const barDraftBtn = document.getElementById('btn-bar-draft-save');
+  if (barDraftBtn) {
+    barDraftBtn.addEventListener('click', () => {
+      void saveBarDraftFromForm();
+    });
+  }
+
   const saveBarNoteBtn = document.getElementById('btn-save-bar-note');
   if (saveBarNoteBtn)
     saveBarNoteBtn.addEventListener('click', () => saveBarNoteFromForm());
@@ -1648,6 +1761,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
       }
       if (k === 'sops') void loadSops();
       if (k === 'bar') {
+        syncBarQuickAddVisibility();
         void loadBarPack();
         void loadBarNotes();
       }

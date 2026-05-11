@@ -392,7 +392,41 @@
 
     <div id="panel-section-bar" class="mc-section" hidden>
       <p class="mc-hint mc-hint-top0">Published by your manager for this location. Your notes save to your account.</p>
-      <h3 class="mc-section-title mc-section-title-top0">Drink builds &amp; specs</h3>
+
+      <details class="mc-details" id="bar-quick-add" hidden>
+        <summary>Quick add a drink (admin)</summary>
+        <div class="mc-details-body">
+          <p class="mc-hint mc-hint-top0">Saves as <strong>in progress</strong> on the web dashboard for review and publish.</p>
+          <div class="mc-field mc-field-tight">
+            <label for="bar-draft-title">Drink name</label>
+            <input id="bar-draft-title" type="text" class="mc-input-like" placeholder="e.g. Vic's Mai Tai" />
+          </div>
+          <div class="mc-field mc-field-tight">
+            <label for="bar-draft-build">Build (one ingredient per line — e.g. "Lime juice — 0.75 oz")</label>
+            <textarea id="bar-draft-build" class="mc-textarea mc-textarea-md" placeholder="Lime juice — 0.75 oz&#10;Orgeat — 0.5 oz&#10;MT batch — 2.75 oz"></textarea>
+          </div>
+          <div class="mc-field mc-field-tight">
+            <label for="bar-draft-glass">Glass / mug</label>
+            <input id="bar-draft-glass" type="text" class="mc-input-like" placeholder="e.g. MT glass" />
+          </div>
+          <div class="mc-field mc-field-tight">
+            <label for="bar-draft-method">Method</label>
+            <input id="bar-draft-method" type="text" class="mc-input-like" placeholder="Pebble, blend, top pebble…" />
+          </div>
+          <div class="mc-field mc-field-tight">
+            <label for="bar-draft-garnish">Garnish</label>
+            <input id="bar-draft-garnish" type="text" class="mc-input-like" placeholder="Lime wheel, mint, swizzle" />
+          </div>
+          <div class="mc-field mc-field-tight">
+            <label for="bar-draft-allergies">Allergies</label>
+            <input id="bar-draft-allergies" type="text" class="mc-input-like" placeholder="Almond, grapefruit…" />
+          </div>
+          <button type="button" class="mc-btn mc-btn-primary mc-gap-top-sm" id="btn-bar-draft-save">Save as in progress</button>
+          <p id="bar-draft-status" class="mc-status-app" aria-live="polite"></p>
+        </div>
+      </details>
+
+      <h3 class="mc-section-title">Drink builds &amp; specs</h3>
       <div id="bar-drinks-body"></div>
       <h3 class="mc-section-title">Liquors &amp; bar stock</h3>
       <div id="bar-liquor-body"></div>
@@ -482,6 +516,9 @@
     <a href="/">Iterum</a>
   </footer>
 
+  <script src="assets/js/user-role-setup.js"></script>
+  <script src="assets/js/wusong-drink-seed.js"></script>
+  <script src="assets/js/bar-drink-drafts.js"></script>
   <script type="module">
     import { initMobileCompliance } from './assets/js/mobile-compliance.js';
     document.addEventListener('DOMContentLoaded', () => {
