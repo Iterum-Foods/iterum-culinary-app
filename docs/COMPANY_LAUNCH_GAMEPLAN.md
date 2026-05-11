@@ -14,6 +14,7 @@
 | Pilot acceptance + support | [PILOT_ACCEPTANCE_CRITERIA_WEB.md](./PILOT_ACCEPTANCE_CRITERIA_WEB.md), [SUPPORT_PLAYBOOK_PILOT.md](./SUPPORT_PLAYBOOK_PILOT.md) |
 | Operator journeys in the app | [USER_WORKFLOW_GUIDE.md](./USER_WORKFLOW_GUIDE.md) |
 | Release validation | [QA_FEATURE_TEST_WORKFLOW.md](./QA_FEATURE_TEST_WORKFLOW.md) |
+| **Phase 2–3 execution** (stores + GTM checklists) | [PHASE_2_3_EXECUTION.md](./PHASE_2_3_EXECUTION.md) |
 
 ---
 
@@ -22,7 +23,7 @@
 1. **Maintain the ratified ICP** in [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md) for pricing, packaging, and “what we say no to” in deals.
 2. **Ship product in epic order** from [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md): team access → multi-workspace correctness → shared vendor + per-workspace prices → cross-workspace compare → authenticated E2E in parallel where possible.
 3. **Every production change** follows [HOW_WE_SHIP.md](./HOW_WE_SHIP.md): merge to `main`, Vercel green, Deploy Firebase when rules change, human smoke on the **pilot URL**.
-4. **Store and broad GTM** follow [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md) Phase 2–3 when you deliberately widen the funnel; until then, **local pilots** below are enough to learn.
+4. **Store and broad GTM** follow [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md) Phase 2–3 when you deliberately widen the funnel; use [PHASE_2_3_EXECUTION.md](./PHASE_2_3_EXECUTION.md) for ordered tasks; until then, **local pilots** below are enough to learn.
 
 **RACI (short):** CEO — ICP, offer, pilot yes/no; CTO — deploy, rules, technical risk; COO / ops — pilot runbook, acceptance, weekly feedback; Eng — epic delivery; Marketing — store assets and launch comms when you open Phase 3.
 
@@ -108,3 +109,4 @@ Prioritize: fast onboarding, mobile shift reliability, prep/checklists, menu imp
 | Date | Change |
 |------|--------|
 | 2026-05-04 | Initial gameplan: exec spine + chef/local pilot playbook. |
+| 2026-05-09 | Linked Phase 2–3 execution guide ([PHASE_2_3_EXECUTION.md](./PHASE_2_3_EXECUTION.md)). |

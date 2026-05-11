@@ -4,14 +4,14 @@
 **For:** CTO, COO, Engineering, Product/Marketing, Ops  
 **Purpose:** One delegable list from **today** through **first market motion** (pilot + store presence).  
 **Living trackers:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [PILOT_APP_COMPLETION_MASTER.md](./PILOT_APP_COMPLETION_MASTER.md) (what “done” means) · [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) (engineering backlog) · [APP_COMPLETION_PLAN.md](./APP_COMPLETION_PLAN.md) · [HOW_WE_SHIP.md](./HOW_WE_SHIP.md)  
-**Last updated:** 14 April 2026  
+**Last updated:** 9 May 2026  
 
 ---
 
 ## How to use
 
 - Assign a **name** next to each **Owner role** in your standup tool; keep dates in one place (Notion, Asana, etc.).
-- **Phase 0** is **complete** (2026-03-29): evidence on [EXEC_CHECKLIST](../EXEC_CHECKLIST_AND_NEXT_STEPS.md). **Phase 1** is **complete** (2026-04-14): ICP ratified in [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md); handoff [PHASE_1_CEO_HANDOFF.md](./PHASE_1_CEO_HANDOFF.md). **Next:** P1 engineering epic + estimate; Phase 2 mobile / Phase 3 GTM per tables below. Historical: [PHASE_0_ROLE_PROMPTS.md](./PHASE_0_ROLE_PROMPTS.md).
+- **Phase 0** is **complete** (2026-03-29): evidence on [EXEC_CHECKLIST](../EXEC_CHECKLIST_AND_NEXT_STEPS.md). **Phase 1** is **complete** (2026-04-14): ICP ratified in [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md); handoff [PHASE_1_CEO_HANDOFF.md](./PHASE_1_CEO_HANDOFF.md). **Next:** **Phase 2** (store-ready mobile) and **Phase 3** (first-wave GTM) — step-by-step: [PHASE_2_3_EXECUTION.md](./PHASE_2_3_EXECUTION.md). Historical: [PHASE_0_ROLE_PROMPTS.md](./PHASE_0_ROLE_PROMPTS.md).
 - Use `[ ]` / `[x]` here or mirror rows into your PM tool; this file stays the **narrative + links**.
 
 ---
@@ -43,6 +43,8 @@
 
 ## Phase 2 — Phone app (store-ready)
 
+**Execution checklist:** [PHASE_2_3_EXECUTION.md](./PHASE_2_3_EXECUTION.md) § Phase 2 (AAB, TestFlight, assets, data safety, versions).
+
 | Done | Task | Owner | Done when |
 |------|------|-------|-----------|
 | [ ] | **Android** release candidate | Eng, CTO review | Signed **AAB**; device smoke vs production URL. [android/README.md](../android/README.md). |
@@ -54,6 +56,8 @@
 ---
 
 ## Phase 3 — Go-to-market (first wave)
+
+**Execution checklist:** [PHASE_2_3_EXECUTION.md](./PHASE_2_3_EXECUTION.md) § Phase 3 (shortlist, offer, comms, feedback loop, stretch invite).
 
 | Done | Task | Owner | Done when |
 |------|------|-------|-----------|

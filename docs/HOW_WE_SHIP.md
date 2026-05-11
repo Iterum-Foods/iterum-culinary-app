@@ -3,7 +3,15 @@
 **Purpose:** One short runbook so deploy and smoke are repeatable.  
 **Canonical app URL (pilots):** https://iterum-culinary-app.vercel.app/  
 **Firebase project:** `iterum-culinary-app2`  
-**Last updated:** 29 March 2026  
+**Last updated:** 9 May 2026  
+
+---
+
+## Mobile store versioning + privacy URL
+
+- **Android:** bump `versionCode` and `versionName` in `android/app/build.gradle` before **each** Play Console upload.
+- **iOS:** bump `CURRENT_PROJECT_VERSION` and `MARKETING_VERSION` in `ios/App/App.xcodeproj/project.pbxproj` before **each** App Store upload.
+- **Privacy policy (stores + support):** static page [public/privacy.html](../public/privacy.html) — live at **`https://iterum-culinary-app.vercel.app/privacy.html`** after Vercel deploy (or your custom domain + `/privacy.html`). Full checklist: [PHASE_2_3_EXECUTION.md](./PHASE_2_3_EXECUTION.md).
 
 ---
 

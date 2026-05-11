@@ -1,7 +1,9 @@
 # User and operator workflow guide
 
 **Purpose:** One place to orient **new restaurants**, **new users at existing restaurants**, and **any role** around the right screens and deep docs.  
-**Last updated:** 2026-05-01
+**Last updated:** 2026-05-09
+
+**Store listings:** privacy policy for pilots and app stores: `https://iterum-culinary-app.vercel.app/privacy.html` ([public/privacy.html](../public/privacy.html)).
 
 **Related:** [GOLDEN_PATH_AUDIT.md](./GOLDEN_PATH_AUDIT.md) (file map), [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md), [SOURCE_OF_TRUTH.md](./SOURCE_OF_TRUTH.md).
 

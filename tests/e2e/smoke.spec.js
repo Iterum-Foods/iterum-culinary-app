@@ -74,6 +74,13 @@ test.describe('Smoke', () => {
     );
   });
 
+  test('privacy policy page loads', async ({ page }) => {
+    const res = await page.goto('/privacy.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(page.getByRole('heading', { name: /privacy policy/i })).toBeVisible();
+    await expect(page.locator('body')).toContainText(/Firebase/i);
+  });
+
   test('workspace setup page loads', async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem('session_active', 'true');
@@ -85,7 +92,7 @@ test.describe('Smoke', () => {
     const res = await page.goto('/setup.html');
     expect(res?.ok()).toBeTruthy();
     await expect(
-      page.getByRole('heading', { name: /set up your workspace/i })
+      page.getByRole('heading', { name: /set up your operator profile/i })
     ).toBeVisible();
     await expect(page.getByText(/first 10 minutes/i)).toBeVisible();
   });

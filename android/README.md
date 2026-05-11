@@ -21,9 +21,20 @@ Do **not** use Java 25+ on the command line for Gradle yet; AGP will error with 
 
 Android Studio usually creates `local.properties` with `sdk.dir=…`. If Gradle says it can’t find the SDK, copy `local.properties.example` to `local.properties` and set `sdk.dir` to your Android SDK (often `%LOCALAPPDATA%\Android\Sdk` on Windows).
 
+## Versioning (before each store upload)
+
+Bump in `app/build.gradle`:
+
+- `versionCode` — integer; **must increase** for every Play upload.
+- `versionName` — user-visible string (e.g. `1.0.2`).
+
+Document bumps in the commit message. See [docs/PHASE_2_3_EXECUTION.md](../docs/PHASE_2_3_EXECUTION.md) and [docs/HOW_WE_SHIP.md](../docs/HOW_WE_SHIP.md).
+
 ## Release (Play Store)
 
 **Build → Generate Signed App Bundle / APK**, use your upload key, then upload the **.aab** in Play Console.
+
+**Privacy policy URL (listings):** after deploy, use `https://iterum-culinary-app.vercel.app/privacy.html` (or your custom domain + `/privacy.html`). Source: [public/privacy.html](../public/privacy.html).
 
 ## Debug APK location
 

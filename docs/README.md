@@ -28,6 +28,7 @@ Primary navigation for strategy, delivery, and technical references.
 
 ## Leadership / Pilot Docs
 
+- `PHASE_2_3_EXECUTION.md` — **Phase 2** (Play / App Store RC, assets, data safety, versions) + **Phase 3** (shortlist, offer, comms, feedback loop).
 - `COMPANY_LAUNCH_GAMEPLAN.md` — **build, ship, and launch** spine + **chef / local** founding-partner playbook (links to ICP, P1, CEO task list).
 - `P0_EXEC_SIGNOFF_PACKAGE.md`
 - `PILOT_ACCEPTANCE_CRITERIA_WEB.md`
