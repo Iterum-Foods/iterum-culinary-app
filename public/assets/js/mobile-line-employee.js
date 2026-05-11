@@ -1193,6 +1193,49 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     station_stock: 'Station stock list'
   };
 
+  const BAR_CHECKLIST_KINDS = ['opening', 'midday', 'closing', 'station_stock'];
+
+  function emptyBarChecklistFlags() {
+    return {
+      opening: {},
+      midday: {},
+      closing: {},
+      station_stock: {}
+    };
+  }
+
+  /** @returns {{ done: Record<string, Record<string, boolean>>, need: Record<string, Record<string, boolean>> }} */
+  function migrateBarChecklistState(raw) {
+    const done = emptyBarChecklistFlags();
+    const need = emptyBarChecklistFlags();
+    if (!raw || typeof raw !== 'object') {
+      return { done, need };
+    }
+    if (raw.done && typeof raw.done === 'object') {
+      const needSrc = raw.need && typeof raw.need === 'object' ? raw.need : {};
+      BAR_CHECKLIST_KINDS.forEach(k => {
+        if (raw.done[k] && typeof raw.done[k] === 'object') {
+          done[k] = { ...raw.done[k] };
+        }
+        if (needSrc[k] && typeof needSrc[k] === 'object') {
+          need[k] = { ...needSrc[k] };
+        }
+      });
+      return { done, need };
+    }
+    BAR_CHECKLIST_KINDS.forEach(k => {
+      const bucket = raw[k];
+      if (bucket && typeof bucket === 'object' && !Array.isArray(bucket)) {
+        for (const [idx, val] of Object.entries(bucket)) {
+          if (val === true) {
+            done[k][idx] = true;
+          }
+        }
+      }
+    });
+    return { done, need };
+  }
+
   function todayDateStr() {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -1203,13 +1246,15 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
   }
 
   function loadBarChecklistState() {
-    if (!teamProjectSelected()) return {};
+    if (!teamProjectSelected()) {
+      return migrateBarChecklistState(null);
+    }
     const uid = getAuth()?.currentUser?.uid || '';
     try {
       const raw = localStorage.getItem(barChecklistStateKey(pid(), uid));
-      return raw ? JSON.parse(raw) || {} : {};
+      return migrateBarChecklistState(raw ? JSON.parse(raw) : null);
     } catch {
-      return {};
+      return migrateBarChecklistState(null);
     }
   }
 
@@ -1219,10 +1264,92 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     try {
       localStorage.setItem(
         barChecklistStateKey(pid(), uid),
-        JSON.stringify(state || {})
+        JSON.stringify(state || { done: {}, need: {} })
       );
     } catch (e) {
       console.warn('bar checklist state write failed', e);
+    }
+  }
+
+  function barChecklistSectionCounts(kind, itemCount, state) {
+    const doneMap = state?.done?.[kind] || {};
+    const needMap = state?.need?.[kind] || {};
+    let doneN = 0;
+    let needN = 0;
+    for (let i = 0; i < itemCount; i++) {
+      const k = String(i);
+      if (doneMap[k]) doneN += 1;
+      if (needMap[k]) needN += 1;
+    }
+    return { doneN, needN };
+  }
+
+  function updateBarChecklistSectionHeader(kind, itemCount) {
+    const wrap = document.querySelector(`[data-bar-checklist-kind="${kind}"]`);
+    if (!wrap) return;
+    const head = wrap.querySelector('h4 .mc-bar-checklist-progress');
+    if (!head) return;
+    const st = loadBarChecklistState();
+    const { doneN, needN } = barChecklistSectionCounts(kind, itemCount, st);
+    head.textContent = `${doneN}/${itemCount} done · ${needN} need`;
+  }
+
+  async function appendBarNeedFollowUp(kind, itemText) {
+    const label = BAR_CHECKLIST_LABELS[kind] || kind;
+    const prefix =
+      kind === 'station_stock' ? '(Bar · need stock)' : `(Bar · ${label})`;
+    const line = `${prefix} ${String(itemText || '').trim()}`.trim();
+    const db = getDb();
+    const uid = getAuth()?.currentUser?.uid;
+    if (!db || !uid) {
+      setStatus(
+        'Sign in to add Needs to your Prep or Stock list (Lists tab).',
+        true
+      );
+      return { ok: false, reason: 'signin' };
+    }
+    const norm = s =>
+      String(s || '')
+        .trim()
+        .toLowerCase();
+    const keyLine = norm(line);
+    try {
+      await loadPrepStock();
+      if (kind === 'station_stock') {
+        const ta = document.getElementById('stock-list-body');
+        const lines = String(ta?.value || '')
+          .split(/\r?\n/)
+          .map(l => l.trim())
+          .filter(Boolean);
+        if (lines.some(l => norm(l) === keyLine)) {
+          setStatus('Already on your stock list.');
+          return { ok: true, reason: 'duplicate' };
+        }
+        ta.value = lines.length ? `${lines.join('\n')}\n${line}` : line;
+        await savePrepStock('stock');
+        setStatus('Added to Stock list — open Lists tab.');
+        return { ok: true, reason: 'added' };
+      }
+      if (
+        prepChecklistItems.some(
+          it => norm(it.text) === keyLine || norm(it.text) === norm(line)
+        )
+      ) {
+        setStatus('Already on your prep list.');
+        return { ok: true, reason: 'duplicate' };
+      }
+      prepChecklistItems.push({ text: line, done: false });
+      renderPrepChecklist();
+      await savePrepStock('prep');
+      setStatus('Added to Prep list — open Lists tab.');
+      return { ok: true, reason: 'added' };
+    } catch (e) {
+      console.warn('appendBarNeedFollowUp failed', e);
+      setStatus(
+        'Could not add to Prep/Stock list. Try Lists tab → Save.',
+        true
+      );
+      return { ok: false, reason: 'error' };
     }
   }
 
@@ -1234,8 +1361,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
         '<p class="mc-empty">Pick your <strong>location</strong> above for bar checklists.</p>';
       return;
     }
-    const sections = ['opening', 'midday', 'closing', 'station_stock'];
-    const hasAny = sections.some(
+    const hasAny = BAR_CHECKLIST_KINDS.some(
       k => Array.isArray(pack?.[k]) && pack[k].length
     );
     if (!hasAny) {
@@ -1244,47 +1370,46 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
       return;
     }
     const state = loadBarChecklistState();
-    body.innerHTML = sections
-      .map(kind => {
-        const items = Array.isArray(pack?.[kind]) ? pack[kind] : [];
-        if (!items.length) return '';
-        const isStock = kind === 'station_stock';
-        const sectionState = state[kind] || {};
-        const rows = items
-          .map((text, idx) => {
-            const itemKey = String(idx);
-            const done = !!sectionState[itemKey];
-            if (isStock) {
-              return `<li class="mc-card"><div class="mc-note-body-sm">${escapeHtml(text)}</div></li>`;
-            }
-            return `<li class="mc-card mc-card-split">
-              <label class="mc-check-row">
-                <input type="checkbox" data-bar-check-kind="${kind}" data-bar-check-index="${itemKey}" ${done ? 'checked' : ''} class="mc-check-input" />
-                <span class="${done ? 'mc-check-text done' : 'mc-check-text'}">${escapeHtml(text)}</span>
+    body.innerHTML = BAR_CHECKLIST_KINDS.map(kind => {
+      const items = Array.isArray(pack?.[kind]) ? pack[kind] : [];
+      if (!items.length) return '';
+      const { doneN, needN } = barChecklistSectionCounts(
+        kind,
+        items.length,
+        state
+      );
+      const doneMap = state.done?.[kind] || {};
+      const needMap = state.need?.[kind] || {};
+      const rows = items
+        .map((text, idx) => {
+          const itemKey = String(idx);
+          const done = !!doneMap[itemKey];
+          const need = !!needMap[itemKey];
+          return `<li class="mc-card mc-bar-check-item" data-bar-item-kind="${kind}" data-bar-item-index="${itemKey}">
+            <div class="mc-bar-check-actions" role="group" aria-label="Item status">
+              <label class="mc-bar-check-mini">
+                <input type="checkbox" data-bar-check-field="done" data-bar-check-kind="${kind}" data-bar-check-index="${itemKey}" ${done ? 'checked' : ''} class="mc-check-input" />
+                <span>Done</span>
               </label>
-            </li>`;
-          })
-          .join('');
-        const completed = isStock
-          ? ''
-          : (() => {
-              const total = items.length;
-              const checked = items.reduce(
-                (n, _, i) => (sectionState[String(i)] ? n + 1 : n),
-                0
-              );
-              return `<span class="mc-hint" style="margin-left:0.5rem;">${checked}/${total} done</span>`;
-            })();
-        return `
-          <div class="mc-stack-gap" data-bar-checklist-kind="${kind}">
-            <h4 class="mc-section-title mc-section-title-top0" style="display:flex;align-items:center;gap:0.4rem;">
-              ${escapeHtml(BAR_CHECKLIST_LABELS[kind] || kind)}${completed}
+              <label class="mc-bar-check-mini">
+                <input type="checkbox" data-bar-check-field="need" data-bar-check-kind="${kind}" data-bar-check-index="${itemKey}" ${need ? 'checked' : ''} class="mc-check-input" />
+                <span>Need</span>
+              </label>
+            </div>
+            <div class="mc-bar-check-body ${done ? 'mc-check-text done' : ''}">${escapeHtml(text)}</div>
+          </li>`;
+        })
+        .join('');
+      return `
+          <div class="mc-stack-gap" data-bar-checklist-kind="${kind}" data-bar-checklist-count="${items.length}">
+            <h4 class="mc-section-title mc-section-title-top0" style="display:flex;align-items:center;flex-wrap:wrap;gap:0.4rem;">
+              ${escapeHtml(BAR_CHECKLIST_LABELS[kind] || kind)}
+              <span class="mc-hint mc-bar-checklist-progress">${doneN}/${items.length} done · ${needN} need</span>
             </h4>
             <ul class="mc-list">${rows}</ul>
           </div>
         `;
-      })
-      .join('');
+    }).join('');
   }
 
   async function loadBarChecklists() {
@@ -1313,35 +1438,61 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     const body = document.getElementById('bar-checklists-body');
     if (!body || body.dataset.bound === '1') return;
     body.dataset.bound = '1';
-    body.addEventListener('change', e => {
+    body.addEventListener('change', async e => {
       const cb = e.target;
       if (!(cb instanceof HTMLInputElement)) return;
       if (cb.type !== 'checkbox') return;
+      const field = cb.getAttribute('data-bar-check-field');
       const kind = cb.getAttribute('data-bar-check-kind');
       const idx = cb.getAttribute('data-bar-check-index');
-      if (!kind || idx == null) return;
+      if (!field || !kind || idx == null) return;
+      const wrap = cb.closest('[data-bar-checklist-kind]');
+      const itemCount = wrap
+        ? parseInt(wrap.getAttribute('data-bar-checklist-count') || '0', 10)
+        : 0;
+      const itemLi = cb.closest('[data-bar-item-kind]');
+      const bodyEl = itemLi?.querySelector('.mc-bar-check-body');
+      const itemText =
+        bodyEl?.textContent != null ? String(bodyEl.textContent) : '';
+
       const state = loadBarChecklistState();
-      if (!state[kind]) state[kind] = {};
-      if (cb.checked) state[kind][idx] = true;
-      else delete state[kind][idx];
-      saveBarChecklistState(state);
-      const row = cb.closest('.mc-check-row');
-      const span = row ? row.querySelector('.mc-check-text') : null;
-      if (span) {
-        span.className = cb.checked ? 'mc-check-text done' : 'mc-check-text';
+      if (!state.done[kind]) state.done[kind] = {};
+      if (!state.need[kind]) state.need[kind] = {};
+
+      if (field === 'done') {
+        if (cb.checked) state.done[kind][idx] = true;
+        else delete state.done[kind][idx];
+        saveBarChecklistState(state);
+        if (bodyEl) {
+          bodyEl.className = cb.checked
+            ? 'mc-bar-check-body mc-check-text done'
+            : 'mc-bar-check-body';
+        }
+        updateBarChecklistSectionHeader(kind, itemCount);
+        return;
       }
-      const head = cb
-        .closest('[data-bar-checklist-kind]')
-        ?.querySelector('h4 .mc-hint');
-      if (head) {
-        const wrap = cb.closest('[data-bar-checklist-kind]');
-        const total = wrap
-          ? wrap.querySelectorAll('input[type="checkbox"]').length
-          : 0;
-        const checked = wrap
-          ? wrap.querySelectorAll('input[type="checkbox"]:checked').length
-          : 0;
-        head.textContent = `${checked}/${total} done`;
+
+      if (field === 'need') {
+        if (cb.checked) {
+          state.need[kind][idx] = true;
+          saveBarChecklistState(state);
+          updateBarChecklistSectionHeader(kind, itemCount);
+          const res = await appendBarNeedFollowUp(kind, itemText);
+          if (
+            res &&
+            !res.ok &&
+            (res.reason === 'signin' || res.reason === 'error')
+          ) {
+            delete state.need[kind][idx];
+            saveBarChecklistState(state);
+            cb.checked = false;
+            updateBarChecklistSectionHeader(kind, itemCount);
+          }
+        } else {
+          delete state.need[kind][idx];
+          saveBarChecklistState(state);
+          updateBarChecklistSectionHeader(kind, itemCount);
+        }
       }
     });
   }

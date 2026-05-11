@@ -91,7 +91,7 @@ Two surfaces: phone Bar tab (admin/manager only) for capture; dashboard "Bar dri
 
 ### 2.6 Bar checklists (opening / midday / closing / station stock)
 
-Two surfaces: dashboard **Bar checklists** card (admin/manager) publishes; mobile **Bar** tab renders them for bartenders. Pack at `projects/{pid}/snapshots/bar_checklist_pack` with shape `{ opening: [], midday: [], closing: [], station_stock: [] }`. Per-user daily completion stays on the phone under `iterum.bar_checklist_state.{pid}.{uid}.{YYYY-MM-DD}`.
+Two surfaces: dashboard **Bar checklists** card (admin/manager) publishes; mobile **Bar** tab renders them for bartenders. Pack at `projects/{pid}/snapshots/bar_checklist_pack` with shape `{ opening: [], midday: [], closing: [], station_stock: [] }`. Per-user daily **Done** and **Need** flags stay on the phone under `iterum.bar_checklist_state.{pid}.{uid}.{YYYY-MM-DD}` as JSON `{ done: { opening: { "0": true }, ... }, need: { ... } }` (legacy `{ opening: { "0": true } }` is still read as all-Done flags).
 
 - [ ] Sign in as an admin/manager → open `/dashboard.html` → **Bar checklists** card is visible (line role: hidden)
 - [ ] Card shows four textareas (Opening, Midday stock / check, Closing, Station stock list); empty pack shows status "No items yet — try Import sample."
@@ -99,9 +99,13 @@ Two surfaces: dashboard **Bar checklists** card (admin/manager) publishes; mobil
 - [ ] Edit a line in **Opening** (add `Set up POS test transaction`) → click **Save & publish** → status reads "Saved N items — published to the bar tab."
 - [ ] Click **Refresh** → edits round-trip from Firestore
 - [ ] Open the mobile app → **Bar** tab → confirm a **Bar checklists** section appears below Liquors & bar stock, with four subsections (Opening, Midday stock / check, Closing, Station stock list)
-- [ ] Each task-style section shows checkboxes; Station stock list shows plain rows (reference-only, no checkbox)
-- [ ] Tick a couple of opening items → header counter increments (`X/Y done`); reload the Bar tab → ticks persist for the day
-- [ ] Switch the device date forward by one day (or wait until tomorrow) → ticks reset
+- [ ] Every line in all four lists shows two controls: **Done** and **Need**; section headers show `X/Y done · Z need`
+- [ ] Check **Done** on a few items → row text strikes through; header `done` count updates; reload Bar tab → Done persists for the day
+- [ ] While signed in, check **Need** on an **Opening** item → status mentions Prep list; open **Lists** tab → Prep checklist includes a new line prefixed `(Bar · Opening)` with that item text; Bar tab still shows **Need** checked
+- [ ] Check **Need** on the same opening item again (toggle off then on) → no duplicate prep line ("Already on your prep list.")
+- [ ] Check **Need** on a **Station stock** line → new line appears on **Stock** textarea (Lists tab) with prefix `(Bar · need stock)`; status mentions Stock list
+- [ ] Sign out (or use a session with no auth), check **Need** → must show sign-in message and **Need** must not stay checked
+- [ ] Switch the device date forward by one day (or wait until tomorrow) → Done and Need flags reset
 - [ ] Confirm an `employee_line` user sees the lists but never a publish UI on the dashboard
 - [ ] With no project selected on mobile → section reads "Pick your location above for bar checklists."
 - [ ] With an empty pack on mobile → section reads "No bar checklists yet. Ask a manager to publish them from the dashboard."

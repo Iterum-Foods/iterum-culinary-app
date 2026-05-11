@@ -492,6 +492,38 @@
   opacity: 0.72;
 }
 
+/* Bar checklist rows: Done + Need side by side */
+.mc-bar-check-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.mc-bar-check-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+.mc-bar-check-mini {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--mc-text-muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.mc-bar-check-mini .mc-check-input {
+  margin-top: 0;
+}
+.mc-bar-check-body {
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--mc-text);
+}
+
 .mc-panel-title {
   margin: 0 0 0.5rem;
   font-weight: 700;

@@ -1,534 +1,731 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#1e3d28" />
-  <meta name="description" content="Simple shift tools for kitchen and FOH: today’s menu, prep lists, notes, station checks, how-to guides, temps." />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Iterum Shift" />
-  <title>Iterum — Shift tools</title>
-  <link rel="manifest" href="/manifest-compliance.json" />
-  <link rel="icon" href="/favicon.ico" />
-  <link rel="stylesheet" href="/assets/css/mobile-shift-brand.css" />
-  <script src="assets/js/firebase-config.js"></script>
-</head>
-<body class="mc-shift-app">
-  <header class="mc-brand-bar" aria-label="Iterum Shift">
-    <div class="mc-brand-bar__inner">
-      <span class="mc-brand-wordmark">Iterum</span>
-      <span class="mc-brand-product">Shift</span>
-      <span class="mc-brand-tagline">Kitchen &amp; FOH tools for your shift</span>
-    </div>
-  </header>
-
-  <div class="mc-top">
-    <div class="mc-badge">Shift tools</div>
-    <h1>What you need for your shift</h1>
-    <p class="mc-sub">Menu, lists, and checks in one place. Sign in with the same email your manager uses for Iterum.</p>
-  </div>
-
-  <div id="auth-panel" class="mc-panel">
-    <p style="margin:0 0 0.75rem;font-size:0.9rem;color:var(--mc-muted);line-height:1.45;">Sign in with the email your job uses for Iterum. New here? Create a free account — no card needed.</p>
-    <div class="mc-field">
-      <label for="auth-name">Your name <span style="font-weight:400;color:var(--mc-muted);">(for new accounts)</span></label>
-      <input id="auth-name" type="text" autocomplete="name" placeholder="e.g. Jamie Chen" />
-    </div>
-    <div class="mc-field">
-      <label for="auth-email">Email</label>
-      <input id="auth-email" type="email" autocomplete="username" inputmode="email" />
-    </div>
-    <div class="mc-field">
-      <label for="auth-password">Password</label>
-      <input id="auth-password" type="password" autocomplete="current-password" minlength="6" />
-    </div>
-    <div class="mc-field">
-      <label for="auth-password2">Confirm password <span style="font-weight:400;color:var(--mc-muted);">(new accounts only)</span></label>
-      <input id="auth-password2" type="password" autocomplete="new-password" minlength="6" />
-    </div>
-    <p style="margin:-0.25rem 0 0.5rem;font-size:0.78rem;color:var(--mc-muted);">Use at least 6 characters. You’ll get a verification email for new email sign-ups.</p>
-    <div class="mc-row-btns">
-      <button type="button" class="mc-btn mc-btn-primary" id="btn-signin">Sign in</button>
-      <button type="button" class="mc-btn mc-btn-ghost" id="btn-signup">Create free account</button>
-      <button type="button" class="mc-btn mc-btn-ghost" id="btn-google">Continue with Google</button>
-    </div>
-    <p id="status-line"></p>
-  </div>
-
-  <div id="app-panel" class="mc-panel" hidden>
-    <div class="mc-chip" id="user-chip"></div>
-    <div id="today-panel" class="mc-panel mc-today-panel" aria-live="polite">
-      <div class="mc-today-head">
-        <strong>Today at a glance</strong>
-        <span id="today-role-chip" class="mc-chip mc-role-chip">Role: Team</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#1e3d28" />
+    <meta
+      name="description"
+      content="Simple shift tools for kitchen and FOH: today’s menu, prep lists, notes, station checks, how-to guides, temps."
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Iterum Shift" />
+    <title>Iterum — Shift tools</title>
+    <link rel="manifest" href="/manifest-compliance.json" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/assets/css/mobile-shift-brand.css" />
+    <script src="assets/js/firebase-config.js"></script>
+  </head>
+  <body class="mc-shift-app">
+    <header class="mc-brand-bar" aria-label="Iterum Shift">
+      <div class="mc-brand-bar__inner">
+        <span class="mc-brand-wordmark">Iterum</span>
+        <span class="mc-brand-product">Shift</span>
+        <span class="mc-brand-tagline">Kitchen &amp; FOH tools for your shift</span>
       </div>
-      <p id="today-summary" class="mc-today-summary">
-        Pick your workspace to load shift priorities.
+    </header>
+
+    <div class="mc-top">
+      <div class="mc-badge">Shift tools</div>
+      <h1>What you need for your shift</h1>
+      <p class="mc-sub">
+        Menu, lists, and checks in one place. Sign in with the same email your manager uses for Iterum.
       </p>
-      <div id="today-metrics" class="mc-today-metrics"></div>
-      <div id="today-actions" class="mc-today-actions"></div>
     </div>
 
-    <div id="workspace-first-run" class="mc-panel" style="margin-bottom:1rem;padding:1rem;border:2px solid var(--mc-accent);border-radius:12px;background:var(--mc-card);display:none;">
-      <p style="margin:0 0 0.5rem;font-weight:700;color:var(--mc-text);">Name your project</p>
-      <p style="margin:0 0 0.75rem;font-size:0.88rem;color:var(--mc-muted);line-height:1.45;">Use the app on your own with a named place, or join a team later. Lists, menu, and team tools need a project (venue / cost center).</p>
+    <div id="auth-panel" class="mc-panel">
+      <p style="margin: 0 0 0.75rem; font-size: 0.9rem; color: var(--mc-muted); line-height: 1.45">
+        Sign in with the email your job uses for Iterum. New here? Create a free account — no card needed.
+      </p>
       <div class="mc-field">
-        <label for="ws-name">Project name</label>
-        <input id="ws-name" type="text" autocomplete="organization" placeholder="e.g. Home test kitchen, Pop-up June" maxlength="120" style="width:100%;min-height:48px;padding:0.5rem 0.65rem;border-radius:10px;border:1px solid var(--mc-border);font-size:1rem;" />
+        <label for="auth-name"
+          >Your name <span style="font-weight: 400; color: var(--mc-muted)">(for new accounts)</span></label
+        >
+        <input id="auth-name" type="text" autocomplete="name" placeholder="e.g. Jamie Chen" />
       </div>
       <div class="mc-field">
-        <label for="ws-about">About this place</label>
-        <textarea id="ws-about" class="mc-textarea" style="min-height:88px;" placeholder="What is this space? City, concept, or how you use Iterum here (optional but helpful)."></textarea>
+        <label for="auth-email">Email</label>
+        <input id="auth-email" type="email" autocomplete="username" inputmode="email" />
       </div>
-      <button type="button" class="mc-btn mc-btn-primary" id="btn-save-workspace-first">Save workspace</button>
+      <div class="mc-field">
+        <label for="auth-password">Password</label>
+        <input id="auth-password" type="password" autocomplete="current-password" minlength="6" />
+      </div>
+      <div class="mc-field">
+        <label for="auth-password2"
+          >Confirm password <span style="font-weight: 400; color: var(--mc-muted)">(new accounts only)</span></label
+        >
+        <input id="auth-password2" type="password" autocomplete="new-password" minlength="6" />
+      </div>
+      <p style="margin: -0.25rem 0 0.5rem; font-size: 0.78rem; color: var(--mc-muted)">
+        Use at least 6 characters. You’ll get a verification email for new email sign-ups.
+      </p>
+      <div class="mc-row-btns">
+        <button type="button" class="mc-btn mc-btn-primary" id="btn-signin">Sign in</button>
+        <button type="button" class="mc-btn mc-btn-ghost" id="btn-signup">Create free account</button>
+        <button type="button" class="mc-btn mc-btn-ghost" id="btn-google">Continue with Google</button>
+      </div>
+      <p id="status-line"></p>
     </div>
 
-    <div id="project-workspace" style="margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--mc-border);">
-      <label for="project-picker" style="font-size:0.85rem;font-weight:700;color:var(--mc-text);display:block;margin-bottom:0.35rem;">Where are you working today?</label>
-      <select id="project-picker" style="width:100%;min-height:48px;padding:0.5rem 0.65rem;border-radius:10px;border:1px solid var(--mc-border);font-size:1rem;background:var(--mc-card);color:var(--mc-text);"></select>
-      <button type="button" class="mc-btn mc-btn-ghost" id="btn-add-personal-workspace" style="margin-top:0.5rem;display:none;">+ Add another personal workspace</button>
-      <div id="extra-workspace-fields" style="display:none;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--mc-border);">
+    <div id="app-panel" class="mc-panel" hidden>
+      <div class="mc-chip" id="user-chip"></div>
+      <div id="today-panel" class="mc-panel mc-today-panel" aria-live="polite">
+        <div class="mc-today-head">
+          <strong>Today at a glance</strong>
+          <span id="today-role-chip" class="mc-chip mc-role-chip">Role: Team</span>
+        </div>
+        <p id="today-summary" class="mc-today-summary">Pick your workspace to load shift priorities.</p>
+        <div id="today-metrics" class="mc-today-metrics"></div>
+        <div id="today-actions" class="mc-today-actions"></div>
+      </div>
+
+      <div
+        id="workspace-first-run"
+        class="mc-panel"
+        style="
+          margin-bottom: 1rem;
+          padding: 1rem;
+          border: 2px solid var(--mc-accent);
+          border-radius: 12px;
+          background: var(--mc-card);
+          display: none;
+        "
+      >
+        <p style="margin: 0 0 0.5rem; font-weight: 700; color: var(--mc-text)">Name your project</p>
+        <p style="margin: 0 0 0.75rem; font-size: 0.88rem; color: var(--mc-muted); line-height: 1.45">
+          Use the app on your own with a named place, or join a team later. Lists, menu, and team tools need a project
+          (venue / cost center).
+        </p>
         <div class="mc-field">
-          <label for="ws-extra-name">Name</label>
-          <input id="ws-extra-name" type="text" maxlength="120" style="width:100%;min-height:44px;border-radius:10px;border:1px solid var(--mc-border);padding:0.45rem 0.6rem;" />
+          <label for="ws-name">Project name</label>
+          <input
+            id="ws-name"
+            type="text"
+            autocomplete="organization"
+            placeholder="e.g. Home test kitchen, Pop-up June"
+            maxlength="120"
+            style="
+              width: 100%;
+              min-height: 48px;
+              padding: 0.5rem 0.65rem;
+              border-radius: 10px;
+              border: 1px solid var(--mc-border);
+              font-size: 1rem;
+            "
+          />
         </div>
         <div class="mc-field">
-          <label for="ws-extra-about">About</label>
-          <textarea id="ws-extra-about" class="mc-textarea" style="min-height:72px;"></textarea>
+          <label for="ws-about">About this place</label>
+          <textarea
+            id="ws-about"
+            class="mc-textarea"
+            style="min-height: 88px"
+            placeholder="What is this space? City, concept, or how you use Iterum here (optional but helpful)."
+          ></textarea>
         </div>
-        <button type="button" class="mc-btn mc-btn-primary" id="btn-save-extra-workspace">Save</button>
-        <button type="button" class="mc-btn mc-btn-ghost" id="btn-cancel-extra-workspace">Cancel</button>
+        <button type="button" class="mc-btn mc-btn-primary" id="btn-save-workspace-first">Save workspace</button>
       </div>
-      <details class="mc-details">
-        <summary>First day? Tap here for your ID</summary>
-        <div class="mc-details-body">
-          <p style="margin:0 0 0.5rem;line-height:1.4;">Send this code to your manager so they can add you to the right location.</p>
-          <code id="my-firebase-uid" style="display:block;word-break:break-all;font-size:0.72rem;padding:8px;background:var(--mc-card);border-radius:8px;border:1px solid var(--mc-border);color:var(--mc-text);"></code>
-          <button type="button" class="mc-btn mc-btn-ghost" id="copy-uid" style="margin-top:0.5rem;">Copy my ID</button>
-        </div>
-      </details>
-    </div>
 
-    <div class="mc-hub-nav" role="tablist" aria-label="Sections">
-      <button type="button" data-hub-tab="hub" aria-selected="true">Home</button>
-      <button type="button" data-hub-tab="menu" aria-selected="false">Menu</button>
-      <button type="button" data-hub-tab="recipes" aria-selected="false">Recipes</button>
-      <button type="button" data-hub-tab="jobs" aria-selected="false">Jobs</button>
-      <button type="button" data-hub-tab="lists" aria-selected="false">Lists</button>
-      <button type="button" data-hub-tab="notes" aria-selected="false">Notes</button>
-      <button type="button" data-hub-tab="checks" aria-selected="false">Checks</button>
-      <button type="button" data-hub-tab="sops" aria-selected="false">How-to</button>
-      <button type="button" data-hub-tab="bar" aria-selected="false">Bar</button>
-      <button type="button" data-hub-tab="team" aria-selected="false">Team log</button>
-      <button type="button" data-hub-tab="temps" aria-selected="false">Temps</button>
-    </div>
-
-    <div id="panel-section-hub" class="mc-section">
-      <p style="margin:0 0 0.65rem;font-size:0.88rem;color:var(--mc-muted);line-height:1.45;">Tap a tile below. Pick your <strong>location</strong> first so menu and team info load.</p>
-      <div class="mc-shift-grid" id="mc-shift-grid" aria-label="Shift tools">
-        <button type="button" class="mc-shift-tile" data-hub-tab="menu" aria-label="Open menu">
-          <span class="mc-shift-icon" aria-hidden="true">M</span>
-          <strong>Today’s menu</strong>
-          <small>What’s on for guests</small>
+      <div
+        id="project-workspace"
+        style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--mc-border)"
+      >
+        <label
+          for="project-picker"
+          style="font-size: 0.85rem; font-weight: 700; color: var(--mc-text); display: block; margin-bottom: 0.35rem"
+          >Where are you working today?</label
+        >
+        <select
+          id="project-picker"
+          style="
+            width: 100%;
+            min-height: 48px;
+            padding: 0.5rem 0.65rem;
+            border-radius: 10px;
+            border: 1px solid var(--mc-border);
+            font-size: 1rem;
+            background: var(--mc-card);
+            color: var(--mc-text);
+          "
+        ></select>
+        <button
+          type="button"
+          class="mc-btn mc-btn-ghost"
+          id="btn-add-personal-workspace"
+          style="margin-top: 0.5rem; display: none"
+        >
+          + Add another personal workspace
         </button>
-        <button type="button" class="mc-shift-tile" data-hub-tab="recipes" aria-label="Open recipes">
-          <span class="mc-shift-icon" aria-hidden="true">R</span>
-          <strong>Recipes</strong>
-          <small>Read-only service view</small>
-        </button>
-        <button type="button" class="mc-shift-tile" data-hub-tab="jobs" aria-label="Open jobs">
-          <span class="mc-shift-icon" aria-hidden="true">J</span>
-          <strong>Jobs</strong>
-          <small>Set role for this workspace</small>
-        </button>
-        <button type="button" class="mc-shift-tile" data-hub-tab="lists" aria-label="Open prep and stock lists">
-          <span class="mc-shift-icon" aria-hidden="true">L</span>
-          <strong>Prep &amp; stock</strong>
-          <small>Your shift lists</small>
-        </button>
-        <button type="button" class="mc-shift-tile" data-hub-tab="notes" aria-label="Open notes">
-          <span class="mc-shift-icon" aria-hidden="true">N</span>
-          <strong>Notes</strong>
-          <small>Menu &amp; ingredients</small>
-        </button>
-        <button type="button" class="mc-shift-tile" data-hub-tab="checks" aria-label="Open checks">
-          <span class="mc-shift-icon" aria-hidden="true">C</span>
-          <strong>Station check</strong>
-          <small>Log a quick round</small>
-        </button>
-        <button type="button" class="mc-shift-tile" data-hub-tab="sops" aria-label="Open how-to guides">
-          <span class="mc-shift-icon" aria-hidden="true">H</span>
-          <strong>How we do it</strong>
-          <small>Opening &amp; standards</small>
-        </button>
-        <button type="button" class="mc-shift-tile" data-hub-tab="bar" aria-label="Open bar station">
-          <span class="mc-shift-icon" aria-hidden="true">B</span>
-          <strong>Bar station</strong>
-          <small>Drinks, stock, notes</small>
-        </button>
-        <button type="button" class="mc-shift-tile" data-hub-tab="team" aria-label="Open team log for managers">
-          <span class="mc-shift-icon" aria-hidden="true">@</span>
-          <strong>Team log</strong>
-          <small>Shift &amp; stock for managers</small>
-        </button>
-        <button type="button" class="mc-shift-tile" data-hub-tab="temps" aria-label="Open temperatures">
-          <span class="mc-shift-icon" aria-hidden="true">T</span>
-          <strong>Temps &amp; sanitizer</strong>
-          <small>Fridge &amp; buckets</small>
-        </button>
-      </div>
-    </div>
-
-    <div id="panel-section-menu" class="mc-section" hidden>
-      <div id="menu-published-body"></div>
-    </div>
-
-    <div id="panel-section-recipes" class="mc-section" hidden>
-      <p class="mc-hint mc-hint-top0">Published/readable recipes for this workspace.</p>
-      <div id="recipes-mobile-body"></div>
-    </div>
-
-    <div id="panel-section-jobs" class="mc-section" hidden>
-      <p class="mc-hint mc-hint-top0">Set your role label for this workspace and view the team roster.</p>
-      <div class="mc-field">
-        <label for="job-position-select">My job for this workspace</label>
-        <select id="job-position-select" class="mc-select"></select>
-      </div>
-      <button type="button" class="mc-btn mc-btn-primary" id="btn-save-job-position">Save my job</button>
-      <h3 class="mc-section-title">Team jobs</h3>
-      <div id="jobs-team-list"></div>
-    </div>
-
-    <div id="panel-section-notes" class="mc-section" hidden>
-      <div class="mc-field">
-        <label for="note-type">About</label>
-        <select id="note-type" class="mc-select">
-          <option value="menu_note">The menu</option>
-          <option value="ingredient_note">An ingredient</option>
-        </select>
-      </div>
-      <div class="mc-field">
-        <label for="note-title">Title (optional)</label>
-        <input id="note-title" type="text" placeholder="e.g. Friday brunch / onions" />
-      </div>
-      <div class="mc-field">
-        <label for="note-body">Note</label>
-        <textarea id="note-body" class="mc-textarea" placeholder="e.g. 86 salmon until Friday, extra veg prep for brunch…"></textarea>
-      </div>
-      <button type="button" class="mc-btn mc-btn-primary" id="btn-save-note">Save note</button>
-      <h3 class="mc-section-title">Recent notes</h3>
-      <ul class="mc-list" id="notes-my-list"></ul>
-    </div>
-
-    <div id="panel-section-lists" class="mc-section" hidden>
-      <p class="mc-hint">Your lists save automatically to your account. Latest version for this location.</p>
-      <h3 class="mc-section-title mc-section-title-top0">Prep</h3>
-      <div class="mc-field mc-field-tight">
-        <label for="prep-check-item-input">Prep checklist item</label>
-        <div class="mc-inline-row">
-          <input id="prep-check-item-input" type="text" placeholder="Add one prep task at a time…" />
-          <button type="button" class="mc-btn" id="btn-add-prep-item">Add item</button>
-        </div>
-      </div>
-      <ul class="mc-list" id="prep-checklist-items"></ul>
-      <textarea id="prep-list-body" class="mc-textarea" hidden></textarea>
-      <button type="button" class="mc-btn mc-btn-primary mc-gap-top-sm" id="btn-save-prep">Save prep</button>
-      <h3 class="mc-section-title">Stock</h3>
-      <textarea id="stock-list-body" class="mc-textarea" placeholder="Items, rough counts…"></textarea>
-      <button type="button" class="mc-btn mc-btn-primary mc-gap-top-sm" id="btn-save-stock">Save stock</button>
-    </div>
-
-    <div id="panel-section-checks" class="mc-section" hidden>
-      <div id="fp250-today-banner" class="mc-card mc-stack-gap" hidden></div>
-
-      <details class="mc-details" id="fp250-block">
-        <summary>Crowd Manager (FP-250) — daily fire &amp; building safety</summary>
-        <div class="mc-details-body">
-          <p class="mc-hint mc-hint-top0">
-            Required for nightclub, dancehall, discotheque, or bar per <strong>527 CMR 1.00 §20.1.5.6.4</strong>. Complete on each day of operation prior to opening to patrons. Any <em>No</em> answer must be resolved before opening.
-          </p>
+        <div
+          id="extra-workspace-fields"
+          style="display: none; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--mc-border)"
+        >
           <div class="mc-field">
-            <label for="fp250-date">Date</label>
-            <input id="fp250-date" type="date" class="mc-input-like" />
+            <label for="ws-extra-name">Name</label>
+            <input
+              id="ws-extra-name"
+              type="text"
+              maxlength="120"
+              style="
+                width: 100%;
+                min-height: 44px;
+                border-radius: 10px;
+                border: 1px solid var(--mc-border);
+                padding: 0.45rem 0.6rem;
+              "
+            />
           </div>
-
-          <h4 class="mc-section-title mc-section-title-top0">Inspection items</h4>
-          <ul class="mc-list" id="fp250-items">
-            <li class="mc-card" data-fp250-item="crowd_managers_count">
-              <div class="mc-note-body-sm">Crowd managers appropriate for occupancy on the Certificate of Occupancy? (1 per 100–249 occupants; 1 per 250 thereafter.) Certificates of Successful Completion kept on site.</div>
-              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Crowd managers appropriate"></div>
-            </li>
-            <li class="mc-card" data-fp250-item="employees_trained">
-              <div class="mc-note-body-sm">Employees trained to direct occupants to an exit in an emergency and the other duties in the emergency plan?</div>
-              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Employees trained"></div>
-            </li>
-            <li class="mc-card" data-fp250-item="egress_clear">
-              <div class="mc-note-body-sm">All egress paths maintained clear, unlocked, accessible?</div>
-              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Egress paths clear"></div>
-            </li>
-            <li class="mc-card" data-fp250-item="exit_doors_operable">
-              <div class="mc-note-body-sm">All exit doors operable?</div>
-              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Exit doors operable"></div>
-            </li>
-            <li class="mc-card" data-fp250-item="exit_signs_operable">
-              <div class="mc-note-body-sm">All exit sign lighting operable?</div>
-              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Exit sign lighting operable"></div>
-            </li>
-            <li class="mc-card" data-fp250-item="emergency_lighting_operable">
-              <div class="mc-note-body-sm">All emergency lighting operable?</div>
-              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Emergency lighting operable"></div>
-            </li>
-            <li class="mc-card" data-fp250-item="extinguishers_working">
-              <div class="mc-note-body-sm">Fire extinguishers in working order?</div>
-              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Fire extinguishers working"></div>
-              <div class="mc-field mc-field-tight mc-gap-top-sm">
-                <label for="fp250-extinguisher-last">Last extinguisher inspection date</label>
-                <input id="fp250-extinguisher-last" type="date" class="mc-input-like" />
-              </div>
-            </li>
-            <li class="mc-card" data-fp250-item="exterior_clear">
-              <div class="mc-note-body-sm">Exterior stairways and means of egress free of snow and ice?</div>
-              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Exterior egress clear"></div>
-            </li>
-            <li class="mc-card" data-fp250-item="cert_inspection_posted">
-              <div class="mc-note-body-sm">Certificate of Inspection posted?</div>
-              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Certificate of Inspection posted"></div>
-            </li>
-            <li class="mc-card" data-fp250-item="sprinkler_inspection_year">
-              <div class="mc-note-body-sm">Sprinkler system inspected within the last year?</div>
-              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Sprinkler inspected this year"></div>
-              <div class="mc-field mc-field-tight mc-gap-top-sm">
-                <label for="fp250-sprinkler-date">Most recent sprinkler inspection/test date</label>
-                <input id="fp250-sprinkler-date" type="date" class="mc-input-like" />
-              </div>
-            </li>
-            <li class="mc-card" data-fp250-item="fire_alarm_inspection_year">
-              <div class="mc-note-body-sm">Fire alarm system inspected and tested within the last year?</div>
-              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Fire alarm inspected this year"></div>
-              <div class="mc-field mc-field-tight mc-gap-top-sm">
-                <label for="fp250-fire-alarm-date">Most recent fire alarm inspection/test date</label>
-                <input id="fp250-fire-alarm-date" type="date" class="mc-input-like" />
-              </div>
-            </li>
-            <li class="mc-card" data-fp250-item="exhaust_cleaned">
-              <div class="mc-note-body-sm">Commercial cooking exhaust system cleaned at the required frequency?</div>
-              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Cooking exhaust cleaned"></div>
-              <div class="mc-field mc-field-tight mc-gap-top-sm">
-                <label for="fp250-exhaust-date">Date of last cleaning</label>
-                <input id="fp250-exhaust-date" type="date" class="mc-input-like" />
-              </div>
-            </li>
-            <li class="mc-card" data-fp250-item="suppression_six_months">
-              <div class="mc-note-body-sm">Commercial cooking fire suppression system inspected in the last six months?</div>
-              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Cooking suppression inspected"></div>
-              <div class="mc-field mc-field-tight mc-gap-top-sm">
-                <label for="fp250-suppression-date">Date of last inspection</label>
-                <input id="fp250-suppression-date" type="date" class="mc-input-like" />
-              </div>
-            </li>
-          </ul>
-
-          <h4 class="mc-section-title">Responsibility &amp; capacity</h4>
-          <div class="mc-field mc-field-tight">
-            <label for="fp250-exit-announcer">Person responsible for Exit announcement (527 CMR 1.00 §20.1.5.8.3)</label>
-            <input id="fp250-exit-announcer" type="text" class="mc-input-like" placeholder="Full name" />
+          <div class="mc-field">
+            <label for="ws-extra-about">About</label>
+            <textarea id="ws-extra-about" class="mc-textarea" style="min-height: 72px"></textarea>
           </div>
-          <div class="mc-field mc-field-tight">
-            <label for="fp250-occupant-load">Person responsible for occupant-load limit</label>
-            <input id="fp250-occupant-load" type="text" class="mc-input-like" placeholder="Full name" />
-          </div>
-          <div class="mc-field mc-field-tight">
-            <label for="fp250-max-capacity">Maximum capacity</label>
-            <input id="fp250-max-capacity" type="number" min="0" class="mc-input-like" placeholder="e.g. 240" />
-          </div>
-          <div class="mc-field mc-field-tight">
-            <label for="fp250-cap-expiration">Capacity certificate expiration date</label>
-            <input id="fp250-cap-expiration" type="date" class="mc-input-like" />
-          </div>
-
-          <h4 class="mc-section-title">Crowd manager (assignee)</h4>
-          <div class="mc-field mc-field-tight">
-            <label for="fp250-manager-name">Crowd manager name</label>
-            <input id="fp250-manager-name" type="text" class="mc-input-like" placeholder="Today’s on-duty crowd manager" />
-          </div>
-          <div class="mc-field mc-field-tight">
-            <label for="fp250-manager-cert">Crowd Manager Certificate #</label>
-            <input id="fp250-manager-cert" type="text" class="mc-input-like" placeholder="MA DFS certificate number" />
-          </div>
-
-          <h4 class="mc-section-title">E-signature</h4>
-          <p class="mc-hint mc-hint-top0">By typing your name and tapping <strong>Sign &amp; save</strong>, you attest that the inspection items above are accurate as of the time-stamped submission. Your typed name and submission time are recorded with this entry.</p>
-          <div class="mc-field mc-field-tight">
-            <label for="fp250-signature">Typed signature (must match crowd manager name)</label>
-            <input id="fp250-signature" type="text" class="mc-input-like" placeholder="Type your full name to sign" />
-          </div>
-          <label class="mc-inline-row mc-gap-top-sm" style="gap:0.5rem;align-items:flex-start;cursor:pointer;">
-            <input id="fp250-attest" type="checkbox" class="mc-check-input" />
-            <span class="mc-note-body-sm">I attest the answers above are true and complete to the best of my knowledge.</span>
-          </label>
-          <button type="button" class="mc-btn mc-btn-primary mc-gap-top-sm" id="btn-fp250-submit">Sign &amp; save FP-250</button>
-          <p id="fp250-status" class="mc-status-app" aria-live="polite"></p>
+          <button type="button" class="mc-btn mc-btn-primary" id="btn-save-extra-workspace">Save</button>
+          <button type="button" class="mc-btn mc-btn-ghost" id="btn-cancel-extra-workspace">Cancel</button>
         </div>
-      </details>
+        <details class="mc-details">
+          <summary>First day? Tap here for your ID</summary>
+          <div class="mc-details-body">
+            <p style="margin: 0 0 0.5rem; line-height: 1.4">
+              Send this code to your manager so they can add you to the right location.
+            </p>
+            <code
+              id="my-firebase-uid"
+              style="
+                display: block;
+                word-break: break-all;
+                font-size: 0.72rem;
+                padding: 8px;
+                background: var(--mc-card);
+                border-radius: 8px;
+                border: 1px solid var(--mc-border);
+                color: var(--mc-text);
+              "
+            ></code>
+            <button type="button" class="mc-btn mc-btn-ghost" id="copy-uid" style="margin-top: 0.5rem">
+              Copy my ID
+            </button>
+          </div>
+        </details>
+      </div>
 
-      <h3 class="mc-section-title">Recent checks</h3>
-      <div id="checks-project-list"></div>
-      <h3 class="mc-section-title">Log a station check</h3>
-      <div class="mc-field">
-        <label for="check-station">Station or area</label>
-        <input id="check-station" type="text" placeholder="e.g. Grill, expo, bar" />
+      <div class="mc-hub-nav" role="tablist" aria-label="Sections">
+        <button type="button" data-hub-tab="hub" aria-selected="true">Home</button>
+        <button type="button" data-hub-tab="menu" aria-selected="false">Menu</button>
+        <button type="button" data-hub-tab="recipes" aria-selected="false">Recipes</button>
+        <button type="button" data-hub-tab="jobs" aria-selected="false">Jobs</button>
+        <button type="button" data-hub-tab="lists" aria-selected="false">Lists</button>
+        <button type="button" data-hub-tab="notes" aria-selected="false">Notes</button>
+        <button type="button" data-hub-tab="checks" aria-selected="false">Checks</button>
+        <button type="button" data-hub-tab="sops" aria-selected="false">How-to</button>
+        <button type="button" data-hub-tab="bar" aria-selected="false">Bar</button>
+        <button type="button" data-hub-tab="team" aria-selected="false">Team log</button>
+        <button type="button" data-hub-tab="temps" aria-selected="false">Temps</button>
       </div>
-      <div class="mc-field">
-        <label for="check-notes">What you checked</label>
-        <textarea id="check-notes" class="mc-textarea mc-textarea-sm" placeholder="Temps OK, mise set, sanitizer in range…"></textarea>
+
+      <div id="panel-section-hub" class="mc-section">
+        <p style="margin: 0 0 0.65rem; font-size: 0.88rem; color: var(--mc-muted); line-height: 1.45">
+          Tap a tile below. Pick your <strong>location</strong> first so menu and team info load.
+        </p>
+        <div class="mc-shift-grid" id="mc-shift-grid" aria-label="Shift tools">
+          <button type="button" class="mc-shift-tile" data-hub-tab="menu" aria-label="Open menu">
+            <span class="mc-shift-icon" aria-hidden="true">M</span>
+            <strong>Today’s menu</strong>
+            <small>What’s on for guests</small>
+          </button>
+          <button type="button" class="mc-shift-tile" data-hub-tab="recipes" aria-label="Open recipes">
+            <span class="mc-shift-icon" aria-hidden="true">R</span>
+            <strong>Recipes</strong>
+            <small>Read-only service view</small>
+          </button>
+          <button type="button" class="mc-shift-tile" data-hub-tab="jobs" aria-label="Open jobs">
+            <span class="mc-shift-icon" aria-hidden="true">J</span>
+            <strong>Jobs</strong>
+            <small>Set role for this workspace</small>
+          </button>
+          <button type="button" class="mc-shift-tile" data-hub-tab="lists" aria-label="Open prep and stock lists">
+            <span class="mc-shift-icon" aria-hidden="true">L</span>
+            <strong>Prep &amp; stock</strong>
+            <small>Your shift lists</small>
+          </button>
+          <button type="button" class="mc-shift-tile" data-hub-tab="notes" aria-label="Open notes">
+            <span class="mc-shift-icon" aria-hidden="true">N</span>
+            <strong>Notes</strong>
+            <small>Menu &amp; ingredients</small>
+          </button>
+          <button type="button" class="mc-shift-tile" data-hub-tab="checks" aria-label="Open checks">
+            <span class="mc-shift-icon" aria-hidden="true">C</span>
+            <strong>Station check</strong>
+            <small>Log a quick round</small>
+          </button>
+          <button type="button" class="mc-shift-tile" data-hub-tab="sops" aria-label="Open how-to guides">
+            <span class="mc-shift-icon" aria-hidden="true">H</span>
+            <strong>How we do it</strong>
+            <small>Opening &amp; standards</small>
+          </button>
+          <button type="button" class="mc-shift-tile" data-hub-tab="bar" aria-label="Open bar station">
+            <span class="mc-shift-icon" aria-hidden="true">B</span>
+            <strong>Bar station</strong>
+            <small>Drinks, stock, notes</small>
+          </button>
+          <button type="button" class="mc-shift-tile" data-hub-tab="team" aria-label="Open team log for managers">
+            <span class="mc-shift-icon" aria-hidden="true">@</span>
+            <strong>Team log</strong>
+            <small>Shift &amp; stock for managers</small>
+          </button>
+          <button type="button" class="mc-shift-tile" data-hub-tab="temps" aria-label="Open temperatures">
+            <span class="mc-shift-icon" aria-hidden="true">T</span>
+            <strong>Temps &amp; sanitizer</strong>
+            <small>Fridge &amp; buckets</small>
+          </button>
+        </div>
       </div>
-      <button type="button" class="mc-btn mc-btn-primary" id="btn-save-quick-check">Save check</button>
+
+      <div id="panel-section-menu" class="mc-section" hidden>
+        <div id="menu-published-body"></div>
+      </div>
+
+      <div id="panel-section-recipes" class="mc-section" hidden>
+        <p class="mc-hint mc-hint-top0">Published/readable recipes for this workspace.</p>
+        <div id="recipes-mobile-body"></div>
+      </div>
+
+      <div id="panel-section-jobs" class="mc-section" hidden>
+        <p class="mc-hint mc-hint-top0">Set your role label for this workspace and view the team roster.</p>
+        <div class="mc-field">
+          <label for="job-position-select">My job for this workspace</label>
+          <select id="job-position-select" class="mc-select"></select>
+        </div>
+        <button type="button" class="mc-btn mc-btn-primary" id="btn-save-job-position">Save my job</button>
+        <h3 class="mc-section-title">Team jobs</h3>
+        <div id="jobs-team-list"></div>
+      </div>
+
+      <div id="panel-section-notes" class="mc-section" hidden>
+        <div class="mc-field">
+          <label for="note-type">About</label>
+          <select id="note-type" class="mc-select">
+            <option value="menu_note">The menu</option>
+            <option value="ingredient_note">An ingredient</option>
+          </select>
+        </div>
+        <div class="mc-field">
+          <label for="note-title">Title (optional)</label>
+          <input id="note-title" type="text" placeholder="e.g. Friday brunch / onions" />
+        </div>
+        <div class="mc-field">
+          <label for="note-body">Note</label>
+          <textarea
+            id="note-body"
+            class="mc-textarea"
+            placeholder="e.g. 86 salmon until Friday, extra veg prep for brunch…"
+          ></textarea>
+        </div>
+        <button type="button" class="mc-btn mc-btn-primary" id="btn-save-note">Save note</button>
+        <h3 class="mc-section-title">Recent notes</h3>
+        <ul class="mc-list" id="notes-my-list"></ul>
+      </div>
+
+      <div id="panel-section-lists" class="mc-section" hidden>
+        <p class="mc-hint">Your lists save automatically to your account. Latest version for this location.</p>
+        <h3 class="mc-section-title mc-section-title-top0">Prep</h3>
+        <div class="mc-field mc-field-tight">
+          <label for="prep-check-item-input">Prep checklist item</label>
+          <div class="mc-inline-row">
+            <input id="prep-check-item-input" type="text" placeholder="Add one prep task at a time…" />
+            <button type="button" class="mc-btn" id="btn-add-prep-item">Add item</button>
+          </div>
+        </div>
+        <ul class="mc-list" id="prep-checklist-items"></ul>
+        <textarea id="prep-list-body" class="mc-textarea" hidden></textarea>
+        <button type="button" class="mc-btn mc-btn-primary mc-gap-top-sm" id="btn-save-prep">Save prep</button>
+        <h3 class="mc-section-title">Stock</h3>
+        <textarea id="stock-list-body" class="mc-textarea" placeholder="Items, rough counts…"></textarea>
+        <button type="button" class="mc-btn mc-btn-primary mc-gap-top-sm" id="btn-save-stock">Save stock</button>
+      </div>
+
+      <div id="panel-section-checks" class="mc-section" hidden>
+        <div id="fp250-today-banner" class="mc-card mc-stack-gap" hidden></div>
+
+        <details class="mc-details" id="fp250-block">
+          <summary>Crowd Manager (FP-250) — daily fire &amp; building safety</summary>
+          <div class="mc-details-body">
+            <p class="mc-hint mc-hint-top0">
+              Required for nightclub, dancehall, discotheque, or bar per <strong>527 CMR 1.00 §20.1.5.6.4</strong>.
+              Complete on each day of operation prior to opening to patrons. Any <em>No</em> answer must be resolved
+              before opening.
+            </p>
+            <div class="mc-field">
+              <label for="fp250-date">Date</label>
+              <input id="fp250-date" type="date" class="mc-input-like" />
+            </div>
+
+            <h4 class="mc-section-title mc-section-title-top0">Inspection items</h4>
+            <ul class="mc-list" id="fp250-items">
+              <li class="mc-card" data-fp250-item="crowd_managers_count">
+                <div class="mc-note-body-sm">
+                  Crowd managers appropriate for occupancy on the Certificate of Occupancy? (1 per 100–249 occupants; 1
+                  per 250 thereafter.) Certificates of Successful Completion kept on site.
+                </div>
+                <div
+                  class="mc-inline-row mc-gap-top-sm"
+                  role="radiogroup"
+                  aria-label="Crowd managers appropriate"
+                ></div>
+              </li>
+              <li class="mc-card" data-fp250-item="employees_trained">
+                <div class="mc-note-body-sm">
+                  Employees trained to direct occupants to an exit in an emergency and the other duties in the emergency
+                  plan?
+                </div>
+                <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Employees trained"></div>
+              </li>
+              <li class="mc-card" data-fp250-item="egress_clear">
+                <div class="mc-note-body-sm">All egress paths maintained clear, unlocked, accessible?</div>
+                <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Egress paths clear"></div>
+              </li>
+              <li class="mc-card" data-fp250-item="exit_doors_operable">
+                <div class="mc-note-body-sm">All exit doors operable?</div>
+                <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Exit doors operable"></div>
+              </li>
+              <li class="mc-card" data-fp250-item="exit_signs_operable">
+                <div class="mc-note-body-sm">All exit sign lighting operable?</div>
+                <div
+                  class="mc-inline-row mc-gap-top-sm"
+                  role="radiogroup"
+                  aria-label="Exit sign lighting operable"
+                ></div>
+              </li>
+              <li class="mc-card" data-fp250-item="emergency_lighting_operable">
+                <div class="mc-note-body-sm">All emergency lighting operable?</div>
+                <div
+                  class="mc-inline-row mc-gap-top-sm"
+                  role="radiogroup"
+                  aria-label="Emergency lighting operable"
+                ></div>
+              </li>
+              <li class="mc-card" data-fp250-item="extinguishers_working">
+                <div class="mc-note-body-sm">Fire extinguishers in working order?</div>
+                <div
+                  class="mc-inline-row mc-gap-top-sm"
+                  role="radiogroup"
+                  aria-label="Fire extinguishers working"
+                ></div>
+                <div class="mc-field mc-field-tight mc-gap-top-sm">
+                  <label for="fp250-extinguisher-last">Last extinguisher inspection date</label>
+                  <input id="fp250-extinguisher-last" type="date" class="mc-input-like" />
+                </div>
+              </li>
+              <li class="mc-card" data-fp250-item="exterior_clear">
+                <div class="mc-note-body-sm">Exterior stairways and means of egress free of snow and ice?</div>
+                <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Exterior egress clear"></div>
+              </li>
+              <li class="mc-card" data-fp250-item="cert_inspection_posted">
+                <div class="mc-note-body-sm">Certificate of Inspection posted?</div>
+                <div
+                  class="mc-inline-row mc-gap-top-sm"
+                  role="radiogroup"
+                  aria-label="Certificate of Inspection posted"
+                ></div>
+              </li>
+              <li class="mc-card" data-fp250-item="sprinkler_inspection_year">
+                <div class="mc-note-body-sm">Sprinkler system inspected within the last year?</div>
+                <div
+                  class="mc-inline-row mc-gap-top-sm"
+                  role="radiogroup"
+                  aria-label="Sprinkler inspected this year"
+                ></div>
+                <div class="mc-field mc-field-tight mc-gap-top-sm">
+                  <label for="fp250-sprinkler-date">Most recent sprinkler inspection/test date</label>
+                  <input id="fp250-sprinkler-date" type="date" class="mc-input-like" />
+                </div>
+              </li>
+              <li class="mc-card" data-fp250-item="fire_alarm_inspection_year">
+                <div class="mc-note-body-sm">Fire alarm system inspected and tested within the last year?</div>
+                <div
+                  class="mc-inline-row mc-gap-top-sm"
+                  role="radiogroup"
+                  aria-label="Fire alarm inspected this year"
+                ></div>
+                <div class="mc-field mc-field-tight mc-gap-top-sm">
+                  <label for="fp250-fire-alarm-date">Most recent fire alarm inspection/test date</label>
+                  <input id="fp250-fire-alarm-date" type="date" class="mc-input-like" />
+                </div>
+              </li>
+              <li class="mc-card" data-fp250-item="exhaust_cleaned">
+                <div class="mc-note-body-sm">Commercial cooking exhaust system cleaned at the required frequency?</div>
+                <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Cooking exhaust cleaned"></div>
+                <div class="mc-field mc-field-tight mc-gap-top-sm">
+                  <label for="fp250-exhaust-date">Date of last cleaning</label>
+                  <input id="fp250-exhaust-date" type="date" class="mc-input-like" />
+                </div>
+              </li>
+              <li class="mc-card" data-fp250-item="suppression_six_months">
+                <div class="mc-note-body-sm">
+                  Commercial cooking fire suppression system inspected in the last six months?
+                </div>
+                <div
+                  class="mc-inline-row mc-gap-top-sm"
+                  role="radiogroup"
+                  aria-label="Cooking suppression inspected"
+                ></div>
+                <div class="mc-field mc-field-tight mc-gap-top-sm">
+                  <label for="fp250-suppression-date">Date of last inspection</label>
+                  <input id="fp250-suppression-date" type="date" class="mc-input-like" />
+                </div>
+              </li>
+            </ul>
+
+            <h4 class="mc-section-title">Responsibility &amp; capacity</h4>
+            <div class="mc-field mc-field-tight">
+              <label for="fp250-exit-announcer"
+                >Person responsible for Exit announcement (527 CMR 1.00 §20.1.5.8.3)</label
+              >
+              <input id="fp250-exit-announcer" type="text" class="mc-input-like" placeholder="Full name" />
+            </div>
+            <div class="mc-field mc-field-tight">
+              <label for="fp250-occupant-load">Person responsible for occupant-load limit</label>
+              <input id="fp250-occupant-load" type="text" class="mc-input-like" placeholder="Full name" />
+            </div>
+            <div class="mc-field mc-field-tight">
+              <label for="fp250-max-capacity">Maximum capacity</label>
+              <input id="fp250-max-capacity" type="number" min="0" class="mc-input-like" placeholder="e.g. 240" />
+            </div>
+            <div class="mc-field mc-field-tight">
+              <label for="fp250-cap-expiration">Capacity certificate expiration date</label>
+              <input id="fp250-cap-expiration" type="date" class="mc-input-like" />
+            </div>
+
+            <h4 class="mc-section-title">Crowd manager (assignee)</h4>
+            <div class="mc-field mc-field-tight">
+              <label for="fp250-manager-name">Crowd manager name</label>
+              <input
+                id="fp250-manager-name"
+                type="text"
+                class="mc-input-like"
+                placeholder="Today’s on-duty crowd manager"
+              />
+            </div>
+            <div class="mc-field mc-field-tight">
+              <label for="fp250-manager-cert">Crowd Manager Certificate #</label>
+              <input
+                id="fp250-manager-cert"
+                type="text"
+                class="mc-input-like"
+                placeholder="MA DFS certificate number"
+              />
+            </div>
+
+            <h4 class="mc-section-title">E-signature</h4>
+            <p class="mc-hint mc-hint-top0">
+              By typing your name and tapping <strong>Sign &amp; save</strong>, you attest that the inspection items
+              above are accurate as of the time-stamped submission. Your typed name and submission time are recorded
+              with this entry.
+            </p>
+            <div class="mc-field mc-field-tight">
+              <label for="fp250-signature">Typed signature (must match crowd manager name)</label>
+              <input id="fp250-signature" type="text" class="mc-input-like" placeholder="Type your full name to sign" />
+            </div>
+            <label class="mc-inline-row mc-gap-top-sm" style="gap: 0.5rem; align-items: flex-start; cursor: pointer">
+              <input id="fp250-attest" type="checkbox" class="mc-check-input" />
+              <span class="mc-note-body-sm"
+                >I attest the answers above are true and complete to the best of my knowledge.</span
+              >
+            </label>
+            <button type="button" class="mc-btn mc-btn-primary mc-gap-top-sm" id="btn-fp250-submit">
+              Sign &amp; save FP-250
+            </button>
+            <p id="fp250-status" class="mc-status-app" aria-live="polite"></p>
+          </div>
+        </details>
+
+        <h3 class="mc-section-title">Recent checks</h3>
+        <div id="checks-project-list"></div>
+        <h3 class="mc-section-title">Log a station check</h3>
+        <div class="mc-field">
+          <label for="check-station">Station or area</label>
+          <input id="check-station" type="text" placeholder="e.g. Grill, expo, bar" />
+        </div>
+        <div class="mc-field">
+          <label for="check-notes">What you checked</label>
+          <textarea
+            id="check-notes"
+            class="mc-textarea mc-textarea-sm"
+            placeholder="Temps OK, mise set, sanitizer in range…"
+          ></textarea>
+        </div>
+        <button type="button" class="mc-btn mc-btn-primary" id="btn-save-quick-check">Save check</button>
+      </div>
+
+      <div id="panel-section-sops" class="mc-section" hidden>
+        <p class="mc-hint mc-hint-top0">
+          Guides from your team (opening, standards, recipes). If nothing shows, ask a manager to publish them.
+        </p>
+        <div id="sops-body"></div>
+      </div>
+
+      <div id="panel-section-bar" class="mc-section" hidden>
+        <p class="mc-hint mc-hint-top0">
+          Published by your manager for this location. Your notes save to your account.
+        </p>
+
+        <details class="mc-details" id="bar-quick-add" hidden>
+          <summary>Quick add a drink (admin)</summary>
+          <div class="mc-details-body">
+            <p class="mc-hint mc-hint-top0">
+              Saves as <strong>in progress</strong> on the web dashboard for review and publish.
+            </p>
+            <div class="mc-field mc-field-tight">
+              <label for="bar-draft-title">Drink name</label>
+              <input id="bar-draft-title" type="text" class="mc-input-like" placeholder="e.g. Vic's Mai Tai" />
+            </div>
+            <div class="mc-field mc-field-tight">
+              <label for="bar-draft-build">Build (one ingredient per line — e.g. "Lime juice — 0.75 oz")</label>
+              <textarea
+                id="bar-draft-build"
+                class="mc-textarea mc-textarea-md"
+                placeholder="Lime juice — 0.75 oz&#10;Orgeat — 0.5 oz&#10;MT batch — 2.75 oz"
+              ></textarea>
+            </div>
+            <div class="mc-field mc-field-tight">
+              <label for="bar-draft-glass">Glass / mug</label>
+              <input id="bar-draft-glass" type="text" class="mc-input-like" placeholder="e.g. MT glass" />
+            </div>
+            <div class="mc-field mc-field-tight">
+              <label for="bar-draft-method">Method</label>
+              <input id="bar-draft-method" type="text" class="mc-input-like" placeholder="Pebble, blend, top pebble…" />
+            </div>
+            <div class="mc-field mc-field-tight">
+              <label for="bar-draft-garnish">Garnish</label>
+              <input id="bar-draft-garnish" type="text" class="mc-input-like" placeholder="Lime wheel, mint, swizzle" />
+            </div>
+            <div class="mc-field mc-field-tight">
+              <label for="bar-draft-allergies">Allergies</label>
+              <input id="bar-draft-allergies" type="text" class="mc-input-like" placeholder="Almond, grapefruit…" />
+            </div>
+            <button type="button" class="mc-btn mc-btn-primary mc-gap-top-sm" id="btn-bar-draft-save">
+              Save as in progress
+            </button>
+            <p id="bar-draft-status" class="mc-status-app" aria-live="polite"></p>
+          </div>
+        </details>
+
+        <h3 class="mc-section-title">Drink builds &amp; specs</h3>
+        <div id="bar-drinks-body"></div>
+        <h3 class="mc-section-title">Liquors &amp; bar stock</h3>
+        <div id="bar-liquor-body"></div>
+        <h3 class="mc-section-title">Bar checklists</h3>
+        <p class="mc-hint mc-hint-top0">
+          <strong>Done</strong> saves for today on this device. <strong>Need</strong> adds the line to your
+          <strong>Prep</strong> list (opening / midday / closing) or <strong>Stock</strong> list (station stock) when
+          you are signed in — open the <strong>Lists</strong> tab to see it.
+        </p>
+        <div id="bar-checklists-body"></div>
+        <h3 class="mc-section-title">Bar notes</h3>
+        <div class="mc-field">
+          <label for="bar-note-topic">About</label>
+          <select id="bar-note-topic" class="mc-select">
+            <option value="drink">A drink / cocktail</option>
+            <option value="stock">Liquor &amp; stock</option>
+            <option value="general">General bar</option>
+          </select>
+        </div>
+        <div class="mc-field" id="bar-note-drink-wrap">
+          <label for="bar-note-drink">Drink name (optional)</label>
+          <input id="bar-note-drink" type="text" placeholder="e.g. House old fashioned" />
+        </div>
+        <div class="mc-field">
+          <label for="bar-note-title">Title (optional)</label>
+          <input id="bar-note-title" type="text" placeholder="Short label" />
+        </div>
+        <div class="mc-field">
+          <label for="bar-note-body">Note</label>
+          <textarea
+            id="bar-note-body"
+            class="mc-textarea mc-textarea-md"
+            placeholder="86’d bourbon, substitute, garnish change…"
+          ></textarea>
+        </div>
+        <button type="button" class="mc-btn mc-btn-primary" id="btn-save-bar-note">Save bar note</button>
+        <h3 class="mc-section-title">Recent bar notes</h3>
+        <ul class="mc-list" id="bar-notes-list"></ul>
+      </div>
+
+      <div id="panel-section-team" class="mc-section" hidden>
+        <p class="mc-hint mc-hint-top0">
+          Same thread managers see under <strong>Daily restaurant notes</strong> on the dashboard. Pick the calendar
+          date to match theirs (defaults to today).
+        </p>
+        <div class="mc-field">
+          <label for="team-board-date">Log date</label>
+          <input id="team-board-date" type="date" class="mc-input-like" />
+        </div>
+        <h3 class="mc-section-title mc-section-title-top0">Thread</h3>
+        <div id="team-board-feed"></div>
+        <h3 class="mc-section-title">Add a note</h3>
+        <div class="mc-field">
+          <label for="team-board-kind">Type</label>
+          <select id="team-board-kind" class="mc-select">
+            <option value="shift">Shift update</option>
+            <option value="inv_low">Low stock</option>
+            <option value="inv_out">Out of stock</option>
+          </select>
+        </div>
+        <div class="mc-field">
+          <label for="team-board-body">Message</label>
+          <textarea
+            id="team-board-body"
+            class="mc-textarea mc-textarea-lg"
+            placeholder="Handoff, 86, counts, anything management should know…"
+          ></textarea>
+        </div>
+        <button type="button" class="mc-btn mc-btn-primary" id="btn-team-board-post">Post to team log</button>
+      </div>
+
+      <div id="panel-section-temps" class="mc-section" hidden>
+        <div class="mc-tabs" role="tablist">
+          <button type="button" id="tab-fridge" role="tab" aria-selected="true">Refrigerators</button>
+          <button type="button" id="tab-san" role="tab" aria-selected="false">Sanitizer</button>
+        </div>
+        <div id="panel-fridge">
+          <div class="mc-unit-toggle">
+            <input type="checkbox" id="unit-fahrenheit" checked />
+            <label for="unit-fahrenheit">Enter temperature in °F (default for US kitchens)</label>
+          </div>
+          <div class="mc-toolbar">
+            <button type="button" class="mc-btn mc-btn-primary" id="btn-add-fridge">+ Add fridge / cooler</button>
+          </div>
+          <ul class="mc-list" id="fridge-list"></ul>
+        </div>
+        <div id="panel-san" hidden>
+          <div class="mc-toolbar">
+            <button type="button" class="mc-btn mc-btn-primary" id="btn-add-san">+ Add sanitizer station</button>
+          </div>
+          <ul class="mc-list" id="san-list"></ul>
+        </div>
+      </div>
+
+      <p id="status-line-app" class="mc-status-app"></p>
+      <button type="button" class="mc-btn mc-btn-ghost mc-gap-top-sm" id="btn-signout">Sign out</button>
     </div>
 
-    <div id="panel-section-sops" class="mc-section" hidden>
-      <p class="mc-hint mc-hint-top0">Guides from your team (opening, standards, recipes). If nothing shows, ask a manager to publish them.</p>
-      <div id="sops-body"></div>
-    </div>
+    <footer class="mc-foot">
+      <span class="mc-foot__brand">Iterum Shift</span>
+      <a href="/dashboard.html">Manager / office app</a>
+      ·
+      <a href="/">Iterum</a>
+    </footer>
 
-    <div id="panel-section-bar" class="mc-section" hidden>
-      <p class="mc-hint mc-hint-top0">Published by your manager for this location. Your notes save to your account.</p>
-
-      <details class="mc-details" id="bar-quick-add" hidden>
-        <summary>Quick add a drink (admin)</summary>
-        <div class="mc-details-body">
-          <p class="mc-hint mc-hint-top0">Saves as <strong>in progress</strong> on the web dashboard for review and publish.</p>
-          <div class="mc-field mc-field-tight">
-            <label for="bar-draft-title">Drink name</label>
-            <input id="bar-draft-title" type="text" class="mc-input-like" placeholder="e.g. Vic's Mai Tai" />
-          </div>
-          <div class="mc-field mc-field-tight">
-            <label for="bar-draft-build">Build (one ingredient per line — e.g. "Lime juice — 0.75 oz")</label>
-            <textarea id="bar-draft-build" class="mc-textarea mc-textarea-md" placeholder="Lime juice — 0.75 oz&#10;Orgeat — 0.5 oz&#10;MT batch — 2.75 oz"></textarea>
-          </div>
-          <div class="mc-field mc-field-tight">
-            <label for="bar-draft-glass">Glass / mug</label>
-            <input id="bar-draft-glass" type="text" class="mc-input-like" placeholder="e.g. MT glass" />
-          </div>
-          <div class="mc-field mc-field-tight">
-            <label for="bar-draft-method">Method</label>
-            <input id="bar-draft-method" type="text" class="mc-input-like" placeholder="Pebble, blend, top pebble…" />
-          </div>
-          <div class="mc-field mc-field-tight">
-            <label for="bar-draft-garnish">Garnish</label>
-            <input id="bar-draft-garnish" type="text" class="mc-input-like" placeholder="Lime wheel, mint, swizzle" />
-          </div>
-          <div class="mc-field mc-field-tight">
-            <label for="bar-draft-allergies">Allergies</label>
-            <input id="bar-draft-allergies" type="text" class="mc-input-like" placeholder="Almond, grapefruit…" />
-          </div>
-          <button type="button" class="mc-btn mc-btn-primary mc-gap-top-sm" id="btn-bar-draft-save">Save as in progress</button>
-          <p id="bar-draft-status" class="mc-status-app" aria-live="polite"></p>
-        </div>
-      </details>
-
-      <h3 class="mc-section-title">Drink builds &amp; specs</h3>
-      <div id="bar-drinks-body"></div>
-      <h3 class="mc-section-title">Liquors &amp; bar stock</h3>
-      <div id="bar-liquor-body"></div>
-      <h3 class="mc-section-title">Bar checklists</h3>
-      <p class="mc-hint mc-hint-top0">Check off as you go — your progress saves for today on this device.</p>
-      <div id="bar-checklists-body"></div>
-      <h3 class="mc-section-title">Bar notes</h3>
-      <div class="mc-field">
-        <label for="bar-note-topic">About</label>
-        <select id="bar-note-topic" class="mc-select">
-          <option value="drink">A drink / cocktail</option>
-          <option value="stock">Liquor &amp; stock</option>
-          <option value="general">General bar</option>
-        </select>
-      </div>
-      <div class="mc-field" id="bar-note-drink-wrap">
-        <label for="bar-note-drink">Drink name (optional)</label>
-        <input id="bar-note-drink" type="text" placeholder="e.g. House old fashioned" />
-      </div>
-      <div class="mc-field">
-        <label for="bar-note-title">Title (optional)</label>
-        <input id="bar-note-title" type="text" placeholder="Short label" />
-      </div>
-      <div class="mc-field">
-        <label for="bar-note-body">Note</label>
-        <textarea id="bar-note-body" class="mc-textarea mc-textarea-md" placeholder="86’d bourbon, substitute, garnish change…"></textarea>
-      </div>
-      <button type="button" class="mc-btn mc-btn-primary" id="btn-save-bar-note">Save bar note</button>
-      <h3 class="mc-section-title">Recent bar notes</h3>
-      <ul class="mc-list" id="bar-notes-list"></ul>
-    </div>
-
-    <div id="panel-section-team" class="mc-section" hidden>
-      <p class="mc-hint mc-hint-top0">
-        Same thread managers see under <strong>Daily restaurant notes</strong> on the dashboard. Pick the calendar date to match theirs (defaults to today).
-      </p>
-      <div class="mc-field">
-        <label for="team-board-date">Log date</label>
-        <input id="team-board-date" type="date" class="mc-input-like" />
-      </div>
-      <h3 class="mc-section-title mc-section-title-top0">Thread</h3>
-      <div id="team-board-feed"></div>
-      <h3 class="mc-section-title">Add a note</h3>
-      <div class="mc-field">
-        <label for="team-board-kind">Type</label>
-        <select id="team-board-kind" class="mc-select">
-          <option value="shift">Shift update</option>
-          <option value="inv_low">Low stock</option>
-          <option value="inv_out">Out of stock</option>
-        </select>
-      </div>
-      <div class="mc-field">
-        <label for="team-board-body">Message</label>
-        <textarea id="team-board-body" class="mc-textarea mc-textarea-lg" placeholder="Handoff, 86, counts, anything management should know…"></textarea>
-      </div>
-      <button type="button" class="mc-btn mc-btn-primary" id="btn-team-board-post">Post to team log</button>
-    </div>
-
-    <div id="panel-section-temps" class="mc-section" hidden>
-      <div class="mc-tabs" role="tablist">
-        <button type="button" id="tab-fridge" role="tab" aria-selected="true">Refrigerators</button>
-        <button type="button" id="tab-san" role="tab" aria-selected="false">Sanitizer</button>
-      </div>
-      <div id="panel-fridge">
-        <div class="mc-unit-toggle">
-          <input type="checkbox" id="unit-fahrenheit" checked />
-          <label for="unit-fahrenheit">Enter temperature in °F (default for US kitchens)</label>
-        </div>
-        <div class="mc-toolbar">
-          <button type="button" class="mc-btn mc-btn-primary" id="btn-add-fridge">+ Add fridge / cooler</button>
-        </div>
-        <ul class="mc-list" id="fridge-list"></ul>
-      </div>
-      <div id="panel-san" hidden>
-        <div class="mc-toolbar">
-          <button type="button" class="mc-btn mc-btn-primary" id="btn-add-san">+ Add sanitizer station</button>
-        </div>
-        <ul class="mc-list" id="san-list"></ul>
-      </div>
-    </div>
-
-    <p id="status-line-app" class="mc-status-app"></p>
-    <button type="button" class="mc-btn mc-btn-ghost mc-gap-top-sm" id="btn-signout">Sign out</button>
-  </div>
-
-  <footer class="mc-foot">
-    <span class="mc-foot__brand">Iterum Shift</span>
-    <a href="/dashboard.html">Manager / office app</a>
-    ·
-    <a href="/">Iterum</a>
-  </footer>
-
-  <script src="assets/js/user-role-setup.js"></script>
-  <script src="assets/js/wusong-drink-seed.js"></script>
-  <script src="assets/js/bar-drink-drafts.js"></script>
-  <script src="assets/js/bar-checklists-seed.js"></script>
-  <script src="assets/js/bar-checklist-store.js"></script>
-  <script type="module">
-    import { initMobileCompliance } from './assets/js/mobile-compliance.js';
-    document.addEventListener('DOMContentLoaded', () => {
-      initMobileCompliance();
-    });
-  </script>
-</body>
+    <script src="assets/js/user-role-setup.js"></script>
+    <script src="assets/js/wusong-drink-seed.js"></script>
+    <script src="assets/js/bar-drink-drafts.js"></script>
+    <script src="assets/js/bar-checklists-seed.js"></script>
+    <script src="assets/js/bar-checklist-store.js"></script>
+    <script type="module">
+      import { initMobileCompliance } from './assets/js/mobile-compliance.js';
+      document.addEventListener('DOMContentLoaded', () => {
+        initMobileCompliance();
+      });
+    </script>
+  </body>
 </html>

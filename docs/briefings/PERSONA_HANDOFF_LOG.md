@@ -9,28 +9,28 @@
 
 ### Summary
 
-- Bartenders now get four sample-able lists rendered on the phone **Bar** tab: **Opening**, **Midday stock / check**, **Closing**, and a reference **Station stock list** (no checkboxes).
-- Managers edit and publish from a new **Bar checklists** card on `/dashboard.html` (admin/manager only). One **Save & publish** action; one **Import sample** button replaces the pack with a generic 4-list bar starter.
-- Per-user daily completion lives on the phone (`iterum.bar_checklist_state.{pid}.{uid}.{YYYY-MM-DD}`) — resets at midnight, never written to Firestore (the bar room doesn't need history for individual ticks; just the published lists).
+- Bartenders get four lists on the phone **Bar** tab: **Opening**, **Midday stock / check**, **Closing**, and **Station stock list**. Each line has **Done** (local, per day) and **Need** (also local; when checked while signed in, appends a follow-up line to **Prep** for opening/midday/closing or **Stock** for station stock, then auto-saves those lists to the user’s Firestore notes — same paths the **Lists** tab uses).
+- Managers edit and publish from **Bar checklists** on `/dashboard.html` (admin/manager only). **Save & publish**; **Import sample** replaces the pack with the generic starter.
+- Daily bar checklist UI state is `{ done: {…}, need: {…} }` in `iterum.bar_checklist_state.{pid}.{uid}.{YYYY-MM-DD}` (legacy flat `{ opening: { "0": true } }` still migrates as Done-only). Unchecking **Need** does not remove lines from Prep/Stock (avoid accidental data loss).
 
 ### For CTO / engineering
 
 - New files:
   - `public/assets/js/bar-checklists-seed.js` — `window.ITERUM_BAR_CHECKLISTS_SAMPLE` + `window.iterumBarChecklistNormalize(raw)` (trims, dedupes, and accepts string or array input from textareas).
   - `public/assets/js/bar-checklist-store.js` — `window.iterumBarChecklists` with `loadPack`, `savePack`, `importSample`. Stored at `projects/{pid}/snapshots/bar_checklist_pack` — same rules surface as bar drinks; **no new Firestore rules**.
-- Touch points: `public/mobile-compliance.html` (new section + script tags), `public/assets/js/mobile-line-employee.js` (renderer, daily state in localStorage, checkbox listener, wiring on tab + project change), `public/dashboard.html` (admin card + inline JS module).
+- Touch points: `public/mobile-compliance.html` (Bar checklists hint copy + script tags), `public/assets/js/mobile-line-employee.js` (`migrateBarChecklistState`, `appendBarNeedFollowUp` → `loadPrepStock` + `savePrepStock`, bar row UI), `public/dashboard.html` (admin card + inline JS module), `public/assets/css/mobile-shift-brand.css` (`.mc-bar-check-*` row layout).
 - Renderer is defensive: shows distinct empty states for "pick your location" vs "no published lists yet", and degrades gracefully if `iterumBarChecklists` isn't loaded.
 - `npm run format:check` clean; `ReadLints` clean. `npx cap sync android` succeeded; iOS bundle synced manually.
 
 ### For COO / QA
 
-- New section **§2.6 Bar checklists** in [`docs/QA_FEATURE_TEST_WORKFLOW.md`](../QA_FEATURE_TEST_WORKFLOW.md) covers: admin-only card visibility, import flow, edit + publish round-trip, mobile render with daily-state ticks, day rollover, empty-state copy.
+- Section **§2.6 Bar checklists** in [`docs/QA_FEATURE_TEST_WORKFLOW.md`](../QA_FEATURE_TEST_WORKFLOW.md) covers: Done/Need on all four lists, Prep vs Stock routing, dedupe, signed-out rollback of Need, header `X/Y done · Z need`, day rollover, empty-state copy.
 - Sample copy is intentionally **generic-bar** (citrus juices, syrups, soda guns, glassware pars) — not a Wusong drop-in. Managers will customize per location. If we want a Wusong-specific seed later, follow the same pattern as `wusong-drink-seed.js`.
 
 ### For CEO / product
 
 - Closes the obvious gap from yesterday: drinks shipped, but bartenders had no shift rituals. Now they do, with the same one-click "Import sample" affordance that already won over kitchen workflows.
-- Demo flow: admin opens dashboard → **Bar checklists** → **Import sample** → tweak one item → **Save & publish** → bartender opens phone Bar tab → sees the four lists → ticks through opening, header counter goes 3/12 → 4/12.
+- Demo flow: admin opens dashboard → **Bar checklists** → **Import sample** → tweak one item → **Save & publish** → bartender opens phone Bar tab → checks **Done** on a line and **Need** on another → Lists tab shows the `(Bar · …)` follow-up on Prep or Stock.
 - Follow-up tickets worth considering: (1) per-bartender sign-off on opening/closing (mirror the FP-250 e-signature pattern), (2) midday photo upload of the well, (3) station stock list ↔ purchasing tie-in so "below par" rows generate a buy list automatically.
 
 ---
