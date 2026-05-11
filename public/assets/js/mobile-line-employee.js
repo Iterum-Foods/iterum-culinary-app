@@ -1186,6 +1186,166 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     return `<div class="mc-card mc-note-body">${escapeHtml(String(raw))}</div>`;
   }
 
+  const BAR_CHECKLIST_LABELS = {
+    opening: 'Opening',
+    midday: 'Midday stock / check',
+    closing: 'Closing',
+    station_stock: 'Station stock list'
+  };
+
+  function todayDateStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  function barChecklistStateKey(projectId, uid) {
+    return `iterum.bar_checklist_state.${projectId}.${uid || 'anon'}.${todayDateStr()}`;
+  }
+
+  function loadBarChecklistState() {
+    if (!teamProjectSelected()) return {};
+    const uid = getAuth()?.currentUser?.uid || '';
+    try {
+      const raw = localStorage.getItem(barChecklistStateKey(pid(), uid));
+      return raw ? JSON.parse(raw) || {} : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function saveBarChecklistState(state) {
+    if (!teamProjectSelected()) return;
+    const uid = getAuth()?.currentUser?.uid || '';
+    try {
+      localStorage.setItem(
+        barChecklistStateKey(pid(), uid),
+        JSON.stringify(state || {})
+      );
+    } catch (e) {
+      console.warn('bar checklist state write failed', e);
+    }
+  }
+
+  function renderBarChecklists(pack) {
+    const body = document.getElementById('bar-checklists-body');
+    if (!body) return;
+    if (!teamProjectSelected()) {
+      body.innerHTML =
+        '<p class="mc-empty">Pick your <strong>location</strong> above for bar checklists.</p>';
+      return;
+    }
+    const sections = ['opening', 'midday', 'closing', 'station_stock'];
+    const hasAny = sections.some(
+      k => Array.isArray(pack?.[k]) && pack[k].length
+    );
+    if (!hasAny) {
+      body.innerHTML =
+        '<p class="mc-empty">No bar checklists yet. Ask a manager to publish them from the dashboard.</p>';
+      return;
+    }
+    const state = loadBarChecklistState();
+    body.innerHTML = sections
+      .map(kind => {
+        const items = Array.isArray(pack?.[kind]) ? pack[kind] : [];
+        if (!items.length) return '';
+        const isStock = kind === 'station_stock';
+        const sectionState = state[kind] || {};
+        const rows = items
+          .map((text, idx) => {
+            const itemKey = String(idx);
+            const done = !!sectionState[itemKey];
+            if (isStock) {
+              return `<li class="mc-card"><div class="mc-note-body-sm">${escapeHtml(text)}</div></li>`;
+            }
+            return `<li class="mc-card mc-card-split">
+              <label class="mc-check-row">
+                <input type="checkbox" data-bar-check-kind="${kind}" data-bar-check-index="${itemKey}" ${done ? 'checked' : ''} class="mc-check-input" />
+                <span class="${done ? 'mc-check-text done' : 'mc-check-text'}">${escapeHtml(text)}</span>
+              </label>
+            </li>`;
+          })
+          .join('');
+        const completed = isStock
+          ? ''
+          : (() => {
+              const total = items.length;
+              const checked = items.reduce(
+                (n, _, i) => (sectionState[String(i)] ? n + 1 : n),
+                0
+              );
+              return `<span class="mc-hint" style="margin-left:0.5rem;">${checked}/${total} done</span>`;
+            })();
+        return `
+          <div class="mc-stack-gap" data-bar-checklist-kind="${kind}">
+            <h4 class="mc-section-title mc-section-title-top0" style="display:flex;align-items:center;gap:0.4rem;">
+              ${escapeHtml(BAR_CHECKLIST_LABELS[kind] || kind)}${completed}
+            </h4>
+            <ul class="mc-list">${rows}</ul>
+          </div>
+        `;
+      })
+      .join('');
+  }
+
+  async function loadBarChecklists() {
+    const db = getDb();
+    if (!db || !window.iterumBarChecklists) {
+      renderBarChecklists(null);
+      return;
+    }
+    if (!teamProjectSelected()) {
+      renderBarChecklists(null);
+      return;
+    }
+    try {
+      const pack = await window.iterumBarChecklists.loadPack(db, pid());
+      renderBarChecklists(pack);
+    } catch (e) {
+      console.warn('bar checklists load failed', e);
+      const body = document.getElementById('bar-checklists-body');
+      if (body)
+        body.innerHTML =
+          '<p class="mc-empty">Could not load bar checklists.</p>';
+    }
+  }
+
+  function bindBarChecklistInteractions() {
+    const body = document.getElementById('bar-checklists-body');
+    if (!body || body.dataset.bound === '1') return;
+    body.dataset.bound = '1';
+    body.addEventListener('change', e => {
+      const cb = e.target;
+      if (!(cb instanceof HTMLInputElement)) return;
+      if (cb.type !== 'checkbox') return;
+      const kind = cb.getAttribute('data-bar-check-kind');
+      const idx = cb.getAttribute('data-bar-check-index');
+      if (!kind || idx == null) return;
+      const state = loadBarChecklistState();
+      if (!state[kind]) state[kind] = {};
+      if (cb.checked) state[kind][idx] = true;
+      else delete state[kind][idx];
+      saveBarChecklistState(state);
+      const row = cb.closest('.mc-check-row');
+      const span = row ? row.querySelector('.mc-check-text') : null;
+      if (span) {
+        span.className = cb.checked ? 'mc-check-text done' : 'mc-check-text';
+      }
+      const head = cb
+        .closest('[data-bar-checklist-kind]')
+        ?.querySelector('h4 .mc-hint');
+      if (head) {
+        const wrap = cb.closest('[data-bar-checklist-kind]');
+        const total = wrap
+          ? wrap.querySelectorAll('input[type="checkbox"]').length
+          : 0;
+        const checked = wrap
+          ? wrap.querySelectorAll('input[type="checkbox"]:checked').length
+          : 0;
+        head.textContent = `${checked}/${total} done`;
+      }
+    });
+  }
+
   function canEditBarDrafts() {
     if (typeof window === 'undefined') return false;
     if (typeof window.iterumCanViewManagerNotes === 'function') {
@@ -1639,6 +1799,8 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
         syncBarQuickAddVisibility();
         void loadBarPack();
         void loadBarNotes();
+        void loadBarChecklists();
+        bindBarChecklistInteractions();
       }
     });
   });
@@ -1764,6 +1926,8 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
         syncBarQuickAddVisibility();
         void loadBarPack();
         void loadBarNotes();
+        void loadBarChecklists();
+        bindBarChecklistInteractions();
       }
       if (k === 'team') attachTeamBoardListener();
     });

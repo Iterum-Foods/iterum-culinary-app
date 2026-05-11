@@ -732,6 +732,48 @@
             </div>
           </div>
 
+          <div class="card-style" data-dash-roles="account_admin,operations_gm,chef_leadership,location_manager" data-dash-features="bar">
+            <div class="dash-card-head">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
+                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-list-check"></i></span>
+                Bar checklists
+              </h2>
+            </div>
+            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
+              Opening, midday, closing, and station stock lists for bartenders. Edits publish to the mobile Bar tab on <strong>Save</strong>.
+            </p>
+            <div class="flex flex-wrap gap-2 mb-3">
+              <button type="button" id="bar-checklists-refresh" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
+                <i class="fa-solid fa-rotate mr-1" aria-hidden="true"></i>Refresh
+              </button>
+              <button type="button" id="bar-checklists-import-sample" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" title="Replace the current pack with the sample">
+                <i class="fa-solid fa-file-import mr-1" aria-hidden="true"></i>Import sample
+              </button>
+              <button type="button" id="bar-checklists-save" class="text-xs py-2 px-2.5 rounded-md shadow-sm text-white hover:opacity-90 transition-opacity" style="background: var(--brand-primary-accent);">
+                <i class="fa-solid fa-floppy-disk mr-1" aria-hidden="true"></i>Save &amp; publish
+              </button>
+            </div>
+            <div id="bar-checklists-status" class="text-xs mb-2" style="color: var(--brand-text-muted);" aria-live="polite"></div>
+            <div class="grid gap-3 md:grid-cols-2">
+              <div>
+                <label for="bar-checklist-ta-opening" class="text-xs font-semibold" style="color: var(--brand-text-secondary);">Opening</label>
+                <textarea id="bar-checklist-ta-opening" rows="8" class="w-full rounded-md border px-3 py-2 mt-1 text-sm" style="border-color: var(--brand-border-light);" placeholder="One item per line"></textarea>
+              </div>
+              <div>
+                <label for="bar-checklist-ta-midday" class="text-xs font-semibold" style="color: var(--brand-text-secondary);">Midday stock / check</label>
+                <textarea id="bar-checklist-ta-midday" rows="8" class="w-full rounded-md border px-3 py-2 mt-1 text-sm" style="border-color: var(--brand-border-light);" placeholder="One item per line"></textarea>
+              </div>
+              <div>
+                <label for="bar-checklist-ta-closing" class="text-xs font-semibold" style="color: var(--brand-text-secondary);">Closing</label>
+                <textarea id="bar-checklist-ta-closing" rows="8" class="w-full rounded-md border px-3 py-2 mt-1 text-sm" style="border-color: var(--brand-border-light);" placeholder="One item per line"></textarea>
+              </div>
+              <div>
+                <label for="bar-checklist-ta-station_stock" class="text-xs font-semibold" style="color: var(--brand-text-secondary);">Station stock list</label>
+                <textarea id="bar-checklist-ta-station_stock" rows="8" class="w-full rounded-md border px-3 py-2 mt-1 text-sm" style="border-color: var(--brand-border-light);" placeholder="One item per line (e.g. Lime juice — par 1 quart)"></textarea>
+              </div>
+            </div>
+          </div>
+
           <div class="card-style" data-dash-roles="chef_leadership,operations_gm,purchasing" data-dash-features="compliance,ingredients,vendors">
             <div class="dash-card-head">
               <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
@@ -2017,6 +2059,144 @@
 
       document.addEventListener('DOMContentLoaded', function () { waitForReady(0); });
       document.addEventListener('projectChanged', function () { void refreshDrafts(); });
+    })();
+  </script>
+
+  <!-- Bar checklists (opening / midday / closing / station stock) -->
+  <script src="assets/js/bar-checklists-seed.js"></script>
+  <script src="assets/js/bar-checklist-store.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      var SECTIONS = ['opening', 'midday', 'closing', 'station_stock'];
+
+      function statusEl() { return document.getElementById('bar-checklists-status'); }
+
+      function setStatus(msg, isErr) {
+        var el = statusEl();
+        if (!el) return;
+        el.textContent = msg || '';
+        el.style.color = isErr ? '#b45309' : 'var(--brand-text-muted)';
+      }
+
+      function getActiveProjectId() {
+        try {
+          if (window.projectManager) {
+            var pm = window.projectManager;
+            if (typeof pm.getActiveProject === 'function') {
+              var p = pm.getActiveProject();
+              if (p && p.id) return p.id;
+            }
+            if (pm.currentProjectId) return pm.currentProjectId;
+            if (pm.currentProject && pm.currentProject.id) return pm.currentProject.id;
+          }
+        } catch (e) { /* ignore */ }
+        var stored = localStorage.getItem('iterum_current_project_id');
+        return stored || 'master';
+      }
+
+      function getDb() {
+        return (window.firestoreSync && window.firestoreSync.db) || window.firestoreDB || null;
+      }
+
+      function readTextareasToPack() {
+        var pack = { opening: [], midday: [], closing: [], station_stock: [] };
+        SECTIONS.forEach(function (k) {
+          var ta = document.getElementById('bar-checklist-ta-' + k);
+          var raw = ta ? ta.value : '';
+          pack[k] = typeof window.iterumBarChecklistNormalize === 'function'
+            ? window.iterumBarChecklistNormalize(raw)
+            : String(raw || '').split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean);
+        });
+        return pack;
+      }
+
+      function writePackToTextareas(pack) {
+        SECTIONS.forEach(function (k) {
+          var ta = document.getElementById('bar-checklist-ta-' + k);
+          if (!ta) return;
+          var arr = Array.isArray(pack[k]) ? pack[k] : [];
+          ta.value = arr.join('\n');
+        });
+      }
+
+      async function refreshPack() {
+        var db = getDb();
+        if (!db || !window.iterumBarChecklists) {
+          setStatus('Sign in to load checklists.', false);
+          return;
+        }
+        setStatus('Loading…');
+        try {
+          var pack = await window.iterumBarChecklists.loadPack(db, getActiveProjectId());
+          writePackToTextareas(pack);
+          var totals = SECTIONS.map(function (k) { return (pack[k] || []).length; }).reduce(function (a, b) { return a + b; }, 0);
+          setStatus(totals ? 'Loaded ' + totals + ' items.' : 'No items yet — try Import sample.');
+        } catch (e) {
+          console.error('bar checklist load failed', e);
+          setStatus('Could not load. Check project access.', true);
+        }
+      }
+
+      async function savePack() {
+        var db = getDb();
+        if (!db || !window.iterumBarChecklists) {
+          setStatus('Sign in to save.', true);
+          return;
+        }
+        setStatus('Saving…');
+        try {
+          var pack = readTextareasToPack();
+          var clean = await window.iterumBarChecklists.savePack(db, getActiveProjectId(), pack);
+          writePackToTextareas(clean);
+          var totals = SECTIONS.map(function (k) { return (clean[k] || []).length; }).reduce(function (a, b) { return a + b; }, 0);
+          setStatus('Saved ' + totals + ' items — published to the bar tab.');
+        } catch (e) {
+          console.error('bar checklist save failed', e);
+          setStatus('Could not save. Check project access.', true);
+        }
+      }
+
+      async function importSample() {
+        if (!window.iterumBarChecklists) return;
+        if (!confirm('Replace the current bar checklists with the sample pack? This overwrites everything currently in the four lists.')) return;
+        var db = getDb();
+        if (!db) {
+          setStatus('Sign in to import.', true);
+          return;
+        }
+        setStatus('Importing sample…');
+        try {
+          var clean = await window.iterumBarChecklists.importSample(db, getActiveProjectId());
+          writePackToTextareas(clean);
+          var totals = SECTIONS.map(function (k) { return (clean[k] || []).length; }).reduce(function (a, b) { return a + b; }, 0);
+          setStatus('Imported sample (' + totals + ' items) — published to the bar tab.');
+        } catch (e) {
+          console.error('bar checklist import failed', e);
+          setStatus('Could not import sample.', true);
+        }
+      }
+
+      document.addEventListener('click', function (e) {
+        var t = e.target;
+        if (!(t instanceof HTMLElement)) return;
+        var hit = t.closest('#bar-checklists-refresh, #bar-checklists-import-sample, #bar-checklists-save');
+        if (!hit) return;
+        if (hit.id === 'bar-checklists-refresh') void refreshPack();
+        else if (hit.id === 'bar-checklists-import-sample') void importSample();
+        else if (hit.id === 'bar-checklists-save') void savePack();
+      });
+
+      function waitForReady(retries) {
+        retries = retries || 0;
+        if (getDb()) { void refreshPack(); return; }
+        if (retries > 30) { setStatus('Sign in to load checklists.'); return; }
+        setTimeout(function () { waitForReady(retries + 1); }, 400);
+      }
+
+      document.addEventListener('DOMContentLoaded', function () { waitForReady(0); });
+      document.addEventListener('projectChanged', function () { void refreshPack(); });
     })();
   </script>
 

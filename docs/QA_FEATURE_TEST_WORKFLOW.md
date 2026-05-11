@@ -89,6 +89,23 @@ Two surfaces: phone Bar tab (admin/manager only) for capture; dashboard "Bar dri
 - [ ] Click **Delete** on a remaining draft → confirm prompt → draft disappears
 - [ ] Reload dashboard → drafts persist (Firestore round-trip ok)
 
+### 2.6 Bar checklists (opening / midday / closing / station stock)
+
+Two surfaces: dashboard **Bar checklists** card (admin/manager) publishes; mobile **Bar** tab renders them for bartenders. Pack at `projects/{pid}/snapshots/bar_checklist_pack` with shape `{ opening: [], midday: [], closing: [], station_stock: [] }`. Per-user daily completion stays on the phone under `iterum.bar_checklist_state.{pid}.{uid}.{YYYY-MM-DD}`.
+
+- [ ] Sign in as an admin/manager → open `/dashboard.html` → **Bar checklists** card is visible (line role: hidden)
+- [ ] Card shows four textareas (Opening, Midday stock / check, Closing, Station stock list); empty pack shows status "No items yet — try Import sample."
+- [ ] Click **Import sample** → confirm prompt → status reads "Imported sample (N items) — published to the bar tab." and all four textareas populate
+- [ ] Edit a line in **Opening** (add `Set up POS test transaction`) → click **Save & publish** → status reads "Saved N items — published to the bar tab."
+- [ ] Click **Refresh** → edits round-trip from Firestore
+- [ ] Open the mobile app → **Bar** tab → confirm a **Bar checklists** section appears below Liquors & bar stock, with four subsections (Opening, Midday stock / check, Closing, Station stock list)
+- [ ] Each task-style section shows checkboxes; Station stock list shows plain rows (reference-only, no checkbox)
+- [ ] Tick a couple of opening items → header counter increments (`X/Y done`); reload the Bar tab → ticks persist for the day
+- [ ] Switch the device date forward by one day (or wait until tomorrow) → ticks reset
+- [ ] Confirm an `employee_line` user sees the lists but never a publish UI on the dashboard
+- [ ] With no project selected on mobile → section reads "Pick your location above for bar checklists."
+- [ ] With an empty pack on mobile → section reads "No bar checklists yet. Ask a manager to publish them from the dashboard."
+
 ### 2.4 Crowd Manager (FP-250) daily checklist
 
 Required for nightclub, dancehall, discotheque, or bar per 527 CMR 1.00 §20.1.5.6.4. The mobile app stores per-day entries at `iterum.checks.crowd_manager.{projectId}.{YYYY-MM-DD}` and (when signed in) writes to Firestore `projects/{projectId}/checklists/{entryId}` with `templateId: crowd_manager_fp250`.
