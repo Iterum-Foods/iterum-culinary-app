@@ -5,6 +5,31 @@
 
 ---
 
+## 2026-05-11 — ID quick reference (21+ / 18+) at top of Hub + Bar tabs (shipped)
+
+### Summary
+
+- Phone app: small calm **ID quick reference** card at the top of the **Hub** and **Bar** tabs shows today's date and the "born on or before" cutoffs for **21+** and **18+**. Recomputed on every tab activation, on first load, and on project change — so it stays accurate after midnight.
+- Pure client-side: no Firestore, no auth, no network. Works offline. Card is universally visible (servers, bartenders, hosts, FOH all see it without extra setup).
+
+### For CTO / engineering
+
+- New file: `public/assets/js/id-quick-reference.js` — `window.iterumIdQuickReference` with `computeDates(refDate?)`, `formatDate(d, opts?)`, `render(targetEl)`. `subtractYears` clamps Feb 29 to Feb 28 of the destination year so the displayed 21+ cutoff is never a day too early on leap days.
+- Touch points: `public/mobile-compliance.html` (two `data-id-quickref` containers + script tag), `public/assets/js/mobile-line-employee.js` (`refreshIdQuickReference()` wired into tab-click and project-change handlers, plus a first-render on init), `public/assets/css/mobile-shift-brand.css` (`.mc-id-card`, `.mc-id-card-tag`, `.mc-id-card-tag-21`, etc.).
+- `npm run format:check` clean; `ReadLints` clean. `npx cap sync android` + iOS manual copy synced.
+
+### For COO / QA
+
+- New section **§2.7 ID quick reference** in [`docs/QA_FEATURE_TEST_WORKFLOW.md`](../QA_FEATURE_TEST_WORKFLOW.md): cutoff math, refresh on day rollover, Feb 29 edge case, offline behavior, visibility independent of project selection.
+- No PII captured, no calls home — strictly a derived display.
+
+### For CEO / product
+
+- Closes a workflow gap for any bar program: bartenders and servers can glance at the top of their tab and know the day's cutoff date instead of doing the math each time. Pairs with FP-250 (compliance) and bar drink drafts (cocktail program) as a third small "shift hygiene" tile in the bar/FOH track.
+- Worth considering next: per-state legal-age overrides (some states are 19+/20+ for tobacco); printable "today's ID date" sticker for the bar rail; in-card calculator that takes a typed DOB and answers "21+? Y/N".
+
+---
+
 ## 2026-05-10 — Bar checklists: opening / midday / closing / station stock (shipped)
 
 ### Summary

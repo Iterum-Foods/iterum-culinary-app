@@ -110,6 +110,18 @@ Two surfaces: dashboard **Bar checklists** card (admin/manager) publishes; mobil
 - [ ] With no project selected on mobile → section reads "Pick your location above for bar checklists."
 - [ ] With an empty pack on mobile → section reads "No bar checklists yet. Ask a manager to publish them from the dashboard."
 
+### 2.7 ID quick reference (21+ / 18+) on Hub + Bar tabs
+
+A small calm card at the top of the mobile **Hub** and **Bar** tabs shows today's date plus the "born on or before" cutoffs for **21+** and **18+**, computed from the device's local clock. Pure client-side math; no Firestore involved. Renders on tab activation, on first load, and on project change.
+
+- [ ] Open mobile app → **Hub** tab is selected → confirm an **ID quick reference** card sits above the tile grid with: today's date, a **21+** row (highlighted pill), an **18+** row, and a "Verify against a valid government-issued ID" footer
+- [ ] Confirm the 21+ date equals today minus 21 years (Mon, May 11, 2026 → Sun, May 11, 2005); the 18+ date equals today minus 18 years (→ Fri, May 11, 2008)
+- [ ] Tap **Bar station** tile → Bar tab shows the same ID card at the very top, above the "Published by your manager" hint
+- [ ] Switch the device clock forward by 1 day, reopen the Hub tab → both cutoff dates advance by 1 day
+- [ ] Edge case (real device — optional): set the clock to Feb 29 of a leap year → 21+ shows Feb 28 of (year − 21) when (year − 21) is not a leap year (avoids the off-by-one bug where someone born Mar 1 would be displayed as 21 a day early)
+- [ ] No network: card still renders (computation is local-only)
+- [ ] Card stays visible even when no project is selected (does not depend on team membership)
+
 ### 2.4 Crowd Manager (FP-250) daily checklist
 
 Required for nightclub, dancehall, discotheque, or bar per 527 CMR 1.00 §20.1.5.6.4. The mobile app stores per-day entries at `iterum.checks.crowd_manager.{projectId}.{YYYY-MM-DD}` and (when signed in) writes to Firestore `projects/{projectId}/checklists/{entryId}` with `templateId: crowd_manager_fp250`.

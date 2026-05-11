@@ -1943,11 +1943,23 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     }
   }
 
+  function refreshIdQuickReference() {
+    const api = window.iterumIdQuickReference;
+    if (!api || typeof api.render !== 'function') return;
+    const hubEl = document.getElementById('hub-id-quickref');
+    if (hubEl) api.render(hubEl);
+    const barEl = document.getElementById('bar-id-quickref');
+    if (barEl) api.render(barEl);
+  }
+
+  refreshIdQuickReference();
+
   document.querySelectorAll('[data-hub-tab]').forEach(btn => {
     btn.addEventListener('click', () => {
       const k = btn.getAttribute('data-hub-tab');
       if (!k) return;
       showSection(k);
+      if (k === 'hub' || k === 'bar') refreshIdQuickReference();
       if (k === 'menu') void loadPublishedMenu();
       if (k === 'recipes') void loadPublishedRecipes();
       if (k === 'jobs') void loadJobsPanel();
@@ -2075,6 +2087,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
         '[data-hub-tab][aria-selected="true"]'
       );
       const k = active?.getAttribute('data-hub-tab');
+      if (k === 'hub' || k === 'bar') refreshIdQuickReference();
       if (k === 'menu') void loadPublishedMenu();
       if (k === 'recipes') void loadPublishedRecipes();
       if (k === 'jobs') void loadJobsPanel();
