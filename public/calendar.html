@@ -231,6 +231,17 @@
         </div>
       </div>
 
+      <!-- Crowd Manager (FP-250) -->
+      <div class="day-details-section">
+        <h3>
+          <i class="fa-solid fa-fire-extinguisher" style="color: #b91c1c;"></i>
+          Crowd Manager (FP-250)
+        </h3>
+        <div id="day-fp250" class="space-y-2">
+          <p class="text-sm" style="color: var(--brand-text-muted);">Loading...</p>
+        </div>
+      </div>
+
       <!-- Notes -->
       <div class="day-details-section">
         <h3>
@@ -655,8 +666,59 @@
         this.notes = lists;
       }
 
+      /**
+       * Load Crowd Manager (FP-250) daily checklists saved by the mobile app.
+       * localStorage namespace: iterum.checks.crowd_manager.{projectId}.{YYYY-MM-DD}
+       */
+      loadCrowdManagerEntries() {
+        const entries = [];
+        const projectIds = new Set();
+        if (this.currentProjectId) {
+          projectIds.add(this.currentProjectId);
+        } else {
+          projectIds.add('master');
+          try {
+            const projects = JSON.parse(
+              localStorage.getItem('iterum_projects') || '[]'
+            );
+            projects.forEach(p => {
+              if (p && p.id) projectIds.add(p.id);
+            });
+          } catch (e) {
+            /* ignore */
+          }
+        }
+        const prefix = 'iterum.checks.crowd_manager.';
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (!key || !key.startsWith(prefix)) continue;
+          if (key.includes('.prefill.')) continue;
+          const tail = key.slice(prefix.length);
+          const lastDot = tail.lastIndexOf('.');
+          if (lastDot <= 0) continue;
+          const projectId = tail.slice(0, lastDot);
+          const dateStr = tail.slice(lastDot + 1);
+          if (!projectIds.has(projectId)) continue;
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) continue;
+          let raw = null;
+          try {
+            raw = JSON.parse(localStorage.getItem(key));
+          } catch {
+            raw = null;
+          }
+          if (!raw || typeof raw !== 'object') continue;
+          entries.push({
+            projectId,
+            dateStr,
+            entry: raw
+          });
+        }
+        this.crowdManagerEntries = entries;
+      }
+
       loadLocalData() {
         this.loadDashboardShiftNotes();
+        this.loadCrowdManagerEntries();
 
         // Load recipes from localStorage (project-aware)
         try {
@@ -961,7 +1023,9 @@
         this.updateSanitizerLogs(date);
 
         this.updateInspectionLogs(date);
-        
+
+        this.updateCrowdManager(date);
+
         // Update notes
         this.updateNotes(date);
         
@@ -1067,6 +1131,60 @@
           </div>
         `;
         }).join('');
+      }
+
+      escapeText(s) {
+        if (s == null) return '';
+        return String(s).replace(/[&<>"']/g, c => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        })[c]);
+      }
+
+      updateCrowdManager(date) {
+        const container = document.getElementById('day-fp250');
+        if (!container) return;
+        const entries = (this.crowdManagerEntries || []).filter(e => {
+          const d = new Date(`${e.dateStr}T12:00:00`);
+          return this.isSameDate(d, date);
+        });
+        if (entries.length === 0) {
+          container.innerHTML =
+            '<p class="text-sm" style="color: var(--brand-text-muted);">No FP-250 checklist on this date</p>';
+          return;
+        }
+        container.innerHTML = entries
+          .map(({ entry, projectId }) => {
+            const items = entry.items || {};
+            const noCount = Object.values(items).filter(v => v === 'no').length;
+            const yesCount = Object.values(items).filter(v => v === 'yes').length;
+            const signedAt = entry.signedAt
+              ? new Date(entry.signedAt).toLocaleString()
+              : '';
+            const statusColor = noCount > 0 ? '#b45309' : '#0d9488';
+            const statusText =
+              noCount > 0
+                ? `${noCount} item${noCount === 1 ? '' : 's'} marked No — must be resolved`
+                : 'All inspection items clear';
+            return `
+              <div class="activity-item">
+                <div class="text-xs font-semibold mb-1" style="color: var(--brand-text-secondary);">
+                  Crowd Manager (FP-250) · ${this.escapeText(projectId)}
+                </div>
+                <div class="font-medium">${this.escapeText(entry.managerName || 'Crowd manager')}${entry.managerCert ? ` · Cert #${this.escapeText(entry.managerCert)}` : ''}</div>
+                <div class="text-sm" style="color: ${statusColor};">${statusText} (${yesCount} Yes / ${noCount} No)</div>
+                <div class="text-sm" style="color: var(--brand-text-secondary);">Signed by <strong>${this.escapeText(entry.signature || '—')}</strong></div>
+                ${entry.exitAnnouncer ? `<div class="text-sm">Exit announcement: ${this.escapeText(entry.exitAnnouncer)}</div>` : ''}
+                ${entry.occupantLoad ? `<div class="text-sm">Occupant-load lead: ${this.escapeText(entry.occupantLoad)}</div>` : ''}
+                ${entry.maxCapacity ? `<div class="text-sm">Max capacity: ${this.escapeText(entry.maxCapacity)}${entry.capExpiration ? ` (cert expires ${this.escapeText(entry.capExpiration)})` : ''}</div>` : ''}
+                <div class="activity-item-time">${this.escapeText(signedAt)}</div>
+              </div>
+            `;
+          })
+          .join('');
       }
 
       updateNotes(date) {

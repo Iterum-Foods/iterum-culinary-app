@@ -730,6 +730,284 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     }
   }
 
+  const FP250_ITEM_KEYS = [
+    'crowd_managers_count',
+    'employees_trained',
+    'egress_clear',
+    'exit_doors_operable',
+    'exit_signs_operable',
+    'emergency_lighting_operable',
+    'extinguishers_working',
+    'exterior_clear',
+    'cert_inspection_posted',
+    'sprinkler_inspection_year',
+    'fire_alarm_inspection_year',
+    'exhaust_cleaned',
+    'suppression_six_months'
+  ];
+
+  const FP250_DATE_FIELDS = [
+    'extinguisherLast',
+    'sprinklerDate',
+    'fireAlarmDate',
+    'exhaustDate',
+    'suppressionDate',
+    'capExpiration'
+  ];
+
+  function fp250TodayKey(projectId) {
+    const d = new Date();
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    return `iterum.checks.crowd_manager.${projectId}.${iso}`;
+  }
+
+  function fp250PrefillKey(projectId) {
+    return `iterum.checks.crowd_manager.prefill.${projectId}`;
+  }
+
+  function renderFp250Radios() {
+    const items = document.querySelectorAll('#fp250-items [data-fp250-item]');
+    items.forEach(li => {
+      const key = li.getAttribute('data-fp250-item');
+      const wrap = li.querySelector('[role="radiogroup"]');
+      if (!wrap || wrap.dataset.built === '1') return;
+      wrap.dataset.built = '1';
+      wrap.innerHTML = `
+        <label class="mc-inline-row" style="gap:0.35rem;cursor:pointer;">
+          <input type="radio" name="fp250-q-${key}" value="yes" />
+          <span class="mc-note-body-sm">Yes</span>
+        </label>
+        <label class="mc-inline-row" style="gap:0.35rem;cursor:pointer;margin-left:0.75rem;">
+          <input type="radio" name="fp250-q-${key}" value="no" />
+          <span class="mc-note-body-sm">No</span>
+        </label>
+      `;
+    });
+  }
+
+  function readFp250Form() {
+    const items = {};
+    FP250_ITEM_KEYS.forEach(k => {
+      const sel = document.querySelector(`input[name="fp250-q-${k}"]:checked`);
+      items[k] = sel ? sel.value : null;
+    });
+    return {
+      date: document.getElementById('fp250-date')?.value || '',
+      items,
+      extinguisherLast:
+        document.getElementById('fp250-extinguisher-last')?.value || '',
+      sprinklerDate:
+        document.getElementById('fp250-sprinkler-date')?.value || '',
+      fireAlarmDate:
+        document.getElementById('fp250-fire-alarm-date')?.value || '',
+      exhaustDate: document.getElementById('fp250-exhaust-date')?.value || '',
+      suppressionDate:
+        document.getElementById('fp250-suppression-date')?.value || '',
+      exitAnnouncer:
+        document.getElementById('fp250-exit-announcer')?.value?.trim() || '',
+      occupantLoad:
+        document.getElementById('fp250-occupant-load')?.value?.trim() || '',
+      maxCapacity:
+        document.getElementById('fp250-max-capacity')?.value?.trim() || '',
+      capExpiration:
+        document.getElementById('fp250-cap-expiration')?.value || '',
+      managerName:
+        document.getElementById('fp250-manager-name')?.value?.trim() || '',
+      managerCert:
+        document.getElementById('fp250-manager-cert')?.value?.trim() || '',
+      signature:
+        document.getElementById('fp250-signature')?.value?.trim() || '',
+      attest: !!document.getElementById('fp250-attest')?.checked
+    };
+  }
+
+  function writeFp250Form(payload) {
+    if (!payload || typeof payload !== 'object') return;
+    const dateInp = document.getElementById('fp250-date');
+    if (dateInp && payload.date) dateInp.value = payload.date;
+    if (payload.items && typeof payload.items === 'object') {
+      FP250_ITEM_KEYS.forEach(k => {
+        const v = payload.items[k];
+        if (v === 'yes' || v === 'no') {
+          const radio = document.querySelector(
+            `input[name="fp250-q-${k}"][value="${v}"]`
+          );
+          if (radio) radio.checked = true;
+        }
+      });
+    }
+    const map = {
+      extinguisherLast: 'fp250-extinguisher-last',
+      sprinklerDate: 'fp250-sprinkler-date',
+      fireAlarmDate: 'fp250-fire-alarm-date',
+      exhaustDate: 'fp250-exhaust-date',
+      suppressionDate: 'fp250-suppression-date',
+      exitAnnouncer: 'fp250-exit-announcer',
+      occupantLoad: 'fp250-occupant-load',
+      maxCapacity: 'fp250-max-capacity',
+      capExpiration: 'fp250-cap-expiration',
+      managerName: 'fp250-manager-name',
+      managerCert: 'fp250-manager-cert'
+    };
+    Object.entries(map).forEach(([k, id]) => {
+      const el = document.getElementById(id);
+      if (el && payload[k] != null) el.value = payload[k];
+    });
+  }
+
+  function renderFp250Banner(entry) {
+    const banner = document.getElementById('fp250-today-banner');
+    if (!banner) return;
+    if (!entry) {
+      banner.hidden = true;
+      banner.innerHTML = '';
+      return;
+    }
+    const noCount = Object.values(entry.items || {}).filter(
+      v => v === 'no'
+    ).length;
+    const statusLabel =
+      noCount > 0
+        ? `<span class="mc-hint" style="color:#b45309;">${noCount} item${noCount === 1 ? '' : 's'} marked No — must be resolved.</span>`
+        : '<span class="mc-hint" style="color:#1e3d28;">All items clear.</span>';
+    const ts = entry.signedAt ? new Date(entry.signedAt).toLocaleString() : '';
+    banner.hidden = false;
+    banner.innerHTML = `
+      <strong>FP-250 signed today</strong>
+      <div class="mc-note-body-sm">Crowd manager: ${escapeHtml(entry.managerName || '—')}${entry.managerCert ? ` · Cert #${escapeHtml(entry.managerCert)}` : ''}</div>
+      <div class="mc-hint">Signed by ${escapeHtml(entry.signature || '—')} at ${escapeHtml(ts)}</div>
+      ${statusLabel}
+    `;
+  }
+
+  function loadFp250Today() {
+    if (!teamProjectSelected()) {
+      renderFp250Banner(null);
+      return;
+    }
+    const projectId = pid();
+    renderFp250Radios();
+    const dateInp = document.getElementById('fp250-date');
+    if (dateInp && !dateInp.value) {
+      const d = new Date();
+      dateInp.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+    let entry = null;
+    try {
+      const raw = localStorage.getItem(fp250TodayKey(projectId));
+      if (raw) entry = JSON.parse(raw);
+    } catch {
+      entry = null;
+    }
+    if (entry) {
+      writeFp250Form(entry);
+      renderFp250Banner(entry);
+      return;
+    }
+    try {
+      const prefillRaw = localStorage.getItem(fp250PrefillKey(projectId));
+      if (prefillRaw) {
+        const prefill = JSON.parse(prefillRaw);
+        writeFp250Form({
+          ...prefill,
+          date: dateInp ? dateInp.value : prefill.date,
+          signature: '',
+          attest: false
+        });
+      }
+    } catch {
+      /* ignore prefill failure */
+    }
+    renderFp250Banner(null);
+  }
+
+  async function submitCrowdManager() {
+    const setFp250Status = (msg, isErr) => {
+      const el = document.getElementById('fp250-status');
+      if (el) {
+        el.textContent = msg || '';
+        el.style.color = isErr ? '#b45309' : '#1e3d28';
+      }
+      setStatus(msg, isErr);
+    };
+    if (!teamProjectSelected()) {
+      setFp250Status('Pick a team location first.', true);
+      return;
+    }
+    const payload = readFp250Form();
+    if (!payload.date) {
+      setFp250Status('Pick the date of operation.', true);
+      return;
+    }
+    if (!payload.managerName) {
+      setFp250Status('Enter the crowd manager name.', true);
+      return;
+    }
+    if (!payload.signature) {
+      setFp250Status('Type your name to sign.', true);
+      return;
+    }
+    if (payload.signature.toLowerCase() !== payload.managerName.toLowerCase()) {
+      setFp250Status(
+        'Signature must match the crowd manager name above.',
+        true
+      );
+      return;
+    }
+    if (!payload.attest) {
+      setFp250Status('Tick the attestation box to sign.', true);
+      return;
+    }
+    const projectId = pid();
+    const nowIso = new Date().toISOString();
+    const entry = { ...payload, signedAt: nowIso, projectId };
+    try {
+      localStorage.setItem(fp250TodayKey(projectId), JSON.stringify(entry));
+      const prefill = {};
+      FP250_DATE_FIELDS.forEach(k => {
+        if (entry[k]) prefill[k] = entry[k];
+      });
+      prefill.managerCert = entry.managerCert;
+      prefill.maxCapacity = entry.maxCapacity;
+      prefill.exitAnnouncer = entry.exitAnnouncer;
+      prefill.occupantLoad = entry.occupantLoad;
+      localStorage.setItem(fp250PrefillKey(projectId), JSON.stringify(prefill));
+    } catch (e) {
+      console.warn('FP-250 localStorage write failed', e);
+    }
+    const db = getDb();
+    const uid = getAuth()?.currentUser?.uid;
+    if (db && uid) {
+      const entryId =
+        typeof crypto !== 'undefined' && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `fp250_${Date.now()}`;
+      try {
+        await setDoc(
+          doc(db, 'projects', projectId, 'checklists', entryId),
+          {
+            id: entryId,
+            templateId: 'crowd_manager_fp250',
+            templateName: 'Crowd Manager (FP-250)',
+            projectId,
+            ownerId: uid,
+            data: entry,
+            status: 'completed',
+            timestamp: nowIso,
+            createdAt: nowIso,
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+      } catch (e) {
+        console.warn('FP-250 Firestore write failed', e);
+      }
+    }
+    renderFp250Banner(entry);
+    setFp250Status('FP-250 signed and saved.');
+    await loadStationChecks();
+  }
+
   async function loadStationChecks() {
     const db = getDb();
     const body = document.getElementById('checks-project-list');
@@ -1247,7 +1525,10 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
       if (k === 'jobs') void loadJobsPanel();
       if (k === 'notes') void loadMyNotes();
       if (k === 'lists') void loadPrepStock();
-      if (k === 'checks') void loadStationChecks();
+      if (k === 'checks') {
+        loadFp250Today();
+        void loadStationChecks();
+      }
       if (k === 'sops') void loadSops();
       if (k === 'bar') {
         void loadBarPack();
@@ -1325,6 +1606,12 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
   if (saveCheckBtn)
     saveCheckBtn.addEventListener('click', () => submitQuickCheck());
 
+  const fp250Btn = document.getElementById('btn-fp250-submit');
+  if (fp250Btn)
+    fp250Btn.addEventListener('click', () => {
+      void submitCrowdManager();
+    });
+
   const saveBarNoteBtn = document.getElementById('btn-save-bar-note');
   if (saveBarNoteBtn)
     saveBarNoteBtn.addEventListener('click', () => saveBarNoteFromForm());
@@ -1355,7 +1642,10 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
       if (k === 'jobs') void loadJobsPanel();
       if (k === 'notes') void loadMyNotes();
       if (k === 'lists') void loadPrepStock();
-      if (k === 'checks') void loadStationChecks();
+      if (k === 'checks') {
+        loadFp250Today();
+        void loadStationChecks();
+      }
       if (k === 'sops') void loadSops();
       if (k === 'bar') {
         void loadBarPack();

@@ -5,6 +5,46 @@
 
 ---
 
+## 2026-05-10 — Crowd Manager (FP-250) daily checklist on phone + calendar (shipped)
+
+**Reference:** Massachusetts Department of Fire Services form **FP-250** "Crowd Manager Fire and Building Safety Checklist" (Rev. 12/24); required per **527 CMR 1.00 §20.1.5.6.4** for nightclub, dancehall, discotheque, or bar.
+
+### Summary
+
+- Added a full digital FP-250 form to the mobile app's **Checks** tab (`mobile-compliance.html` / `mobile-line-employee.js`), kept inside a `<details>` block so it doesn't crowd the station-check form.
+- All 13 yes/no inspection items + dated inspection fields (extinguisher, sprinkler, fire alarm, exhaust, suppression).
+- Two named-responsibility fields (exit announcement; occupant-load limit), max capacity + certificate expiration, crowd manager name + DFS certificate number.
+- **E-signature** = typed full name (must match crowd manager name) + attestation checkbox + automatic submission timestamp recorded in the saved entry.
+- Per-day persistence: `localStorage` key `iterum.checks.crowd_manager.{projectId}.{YYYY-MM-DD}` + (when signed in) Firestore `projects/{projectId}/checklists/{entryId}` with `templateId: crowd_manager_fp250`.
+- A "FP-250 signed today" banner renders above the form once submitted, with signer, certificate #, signed-at, and a Yes/No status summary.
+- **Calendar (`calendar.html`)** day-details now includes a **Crowd Manager (FP-250)** section showing the same entry per day with signer + timestamp + Yes/No counts.
+- "Static" answers (cert #, capacity, last-inspection dates, responsible persons) prefill the next day's form from a `prefill` cache so daily completion is fast.
+
+### For CTO / engineering
+
+- Touch points:
+  - `public/mobile-compliance.html` — form HTML inside `panel-section-checks`.
+  - `public/assets/js/mobile-line-employee.js` — `FP250_ITEM_KEYS`, `renderFp250Radios`, `readFp250Form`, `writeFp250Form`, `renderFp250Banner`, `loadFp250Today`, `submitCrowdManager`; tab handlers (`hub-tab` click + project-picker change) now also fire `loadFp250Today()` when entering Checks.
+  - `public/calendar.html` — new `loadCrowdManagerEntries()` (localStorage scan), `updateCrowdManager(date)` renderer, `escapeText()` helper; new day-details section.
+- Reused the existing `projects/{pid}/checklists/{entryId}` Firestore path — **no rules change required**. Failures during Firestore write fall back to localStorage-only with a console warning.
+- No new global stylesheets (Phase A guard). All UI uses existing `.mc-*` classes from `mobile-shift-brand.css`.
+- `npm run format:check` clean; no lint regressions (ReadLints clean on touched files).
+- Synced to Android (`android/app/src/main/assets/public/...`) and iOS (`ios/App/App/public/...`) web bundles.
+
+### For COO / QA
+
+- New section **§2.4 Crowd Manager (FP-250) daily checklist** in [`docs/QA_FEATURE_TEST_WORKFLOW.md`](../QA_FEATURE_TEST_WORKFLOW.md) covers happy path, validation guardrails (signature mismatch / missing attestation / missing signature), prefill behavior, and the calendar surfacing.
+- No DB rules / auth changes — pilot venues using their existing Iterum Firestore project will see the feature on next sync.
+- For MA pilots specifically: print FP-250 export is out of scope for v1; surface this in the pilot kickoff if a venue demands a paper artifact pre-shift.
+
+### For CEO / product
+
+- This is the first **regulator-named compliance artifact** Iterum captures end-to-end on a phone — strong wedge for MA nightclubs/bars, and clean evidence for sales conversations with multi-unit groups whose insurers ask for nightly attestations.
+- Demo flow: phone → Checks → expand FP-250 → fill → sign → web `calendar.html` → today → entry visible with timestamp + signer.
+- Follow-up tickets to consider: (1) signed PDF export of a day's FP-250, (2) manager-side "assign tomorrow's crowd manager" on dashboard, (3) DFS-form-specific signed-name canvas if a pilot insurer requires drawn signatures.
+
+---
+
 ## 2026-05-09 — T1: Vendor + ingredients Phase D polish (shipped)
 
 **Roadmap ref:** [`docs/UI_AND_WORKFLOW_ROADMAP.md`](../UI_AND_WORKFLOW_ROADMAP.md) Phase D items D1, D2, D5, plus C3 cross-link reinforcement.

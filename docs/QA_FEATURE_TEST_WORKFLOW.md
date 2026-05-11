@@ -73,6 +73,23 @@ Expected:
 - Valid entries save successfully
 - Invalid entry shows: numeric input guidance message
 
+### 2.4 Crowd Manager (FP-250) daily checklist
+
+Required for nightclub, dancehall, discotheque, or bar per 527 CMR 1.00 §20.1.5.6.4. The mobile app stores per-day entries at `iterum.checks.crowd_manager.{projectId}.{YYYY-MM-DD}` and (when signed in) writes to Firestore `projects/{projectId}/checklists/{entryId}` with `templateId: crowd_manager_fp250`.
+
+- [ ] Open mobile app → **Checks** tab → expand **Crowd Manager (FP-250) — daily fire & building safety**
+- [ ] Confirm the date field defaults to today
+- [ ] Mark a mix of Yes/No on inspection items; fill dated inspection fields (extinguisher, sprinkler, fire alarm, exhaust, suppression)
+- [ ] Enter responsible persons (exit announcement, occupant load), max capacity + certificate expiration
+- [ ] Enter **Crowd manager name** and **Certificate #**
+- [ ] Submit without signature → must be blocked ("Type your name to sign.")
+- [ ] Submit with signature that does not match the crowd manager name → must be blocked
+- [ ] Submit without the attestation checkbox → must be blocked
+- [ ] Submit with matching signature + attestation → status shows **FP-250 signed and saved.** and the "FP-250 signed today" banner renders above the form with the signer, certificate, signed-at timestamp, and a "No items" or "N items marked No" summary
+- [ ] Refresh the page and reopen Checks → static fields (cert #, capacity, last-inspection dates, responsible persons) prefill from `prefill` cache; signature + attestation are blank
+- [ ] Open `/calendar.html` → select today → **Crowd Manager (FP-250)** section shows the same entry with manager name, signer, status (Yes/No counts), and signed-at timestamp
+- [ ] Pick a date with no FP-250 entry → calendar section reads `No FP-250 checklist on this date`
+
 ## 3) Checklist + Corrective Action Workflow (`/dashboard.html`)
 
 ### 3.1 Opening checklist happy path

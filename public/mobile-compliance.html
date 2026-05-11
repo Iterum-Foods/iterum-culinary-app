@@ -239,7 +239,139 @@
     </div>
 
     <div id="panel-section-checks" class="mc-section" hidden>
-      <h3 class="mc-section-title mc-section-title-top0">Recent checks</h3>
+      <div id="fp250-today-banner" class="mc-card mc-stack-gap" hidden></div>
+
+      <details class="mc-details" id="fp250-block">
+        <summary>Crowd Manager (FP-250) — daily fire &amp; building safety</summary>
+        <div class="mc-details-body">
+          <p class="mc-hint mc-hint-top0">
+            Required for nightclub, dancehall, discotheque, or bar per <strong>527 CMR 1.00 §20.1.5.6.4</strong>. Complete on each day of operation prior to opening to patrons. Any <em>No</em> answer must be resolved before opening.
+          </p>
+          <div class="mc-field">
+            <label for="fp250-date">Date</label>
+            <input id="fp250-date" type="date" class="mc-input-like" />
+          </div>
+
+          <h4 class="mc-section-title mc-section-title-top0">Inspection items</h4>
+          <ul class="mc-list" id="fp250-items">
+            <li class="mc-card" data-fp250-item="crowd_managers_count">
+              <div class="mc-note-body-sm">Crowd managers appropriate for occupancy on the Certificate of Occupancy? (1 per 100–249 occupants; 1 per 250 thereafter.) Certificates of Successful Completion kept on site.</div>
+              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Crowd managers appropriate"></div>
+            </li>
+            <li class="mc-card" data-fp250-item="employees_trained">
+              <div class="mc-note-body-sm">Employees trained to direct occupants to an exit in an emergency and the other duties in the emergency plan?</div>
+              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Employees trained"></div>
+            </li>
+            <li class="mc-card" data-fp250-item="egress_clear">
+              <div class="mc-note-body-sm">All egress paths maintained clear, unlocked, accessible?</div>
+              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Egress paths clear"></div>
+            </li>
+            <li class="mc-card" data-fp250-item="exit_doors_operable">
+              <div class="mc-note-body-sm">All exit doors operable?</div>
+              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Exit doors operable"></div>
+            </li>
+            <li class="mc-card" data-fp250-item="exit_signs_operable">
+              <div class="mc-note-body-sm">All exit sign lighting operable?</div>
+              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Exit sign lighting operable"></div>
+            </li>
+            <li class="mc-card" data-fp250-item="emergency_lighting_operable">
+              <div class="mc-note-body-sm">All emergency lighting operable?</div>
+              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Emergency lighting operable"></div>
+            </li>
+            <li class="mc-card" data-fp250-item="extinguishers_working">
+              <div class="mc-note-body-sm">Fire extinguishers in working order?</div>
+              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Fire extinguishers working"></div>
+              <div class="mc-field mc-field-tight mc-gap-top-sm">
+                <label for="fp250-extinguisher-last">Last extinguisher inspection date</label>
+                <input id="fp250-extinguisher-last" type="date" class="mc-input-like" />
+              </div>
+            </li>
+            <li class="mc-card" data-fp250-item="exterior_clear">
+              <div class="mc-note-body-sm">Exterior stairways and means of egress free of snow and ice?</div>
+              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Exterior egress clear"></div>
+            </li>
+            <li class="mc-card" data-fp250-item="cert_inspection_posted">
+              <div class="mc-note-body-sm">Certificate of Inspection posted?</div>
+              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Certificate of Inspection posted"></div>
+            </li>
+            <li class="mc-card" data-fp250-item="sprinkler_inspection_year">
+              <div class="mc-note-body-sm">Sprinkler system inspected within the last year?</div>
+              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Sprinkler inspected this year"></div>
+              <div class="mc-field mc-field-tight mc-gap-top-sm">
+                <label for="fp250-sprinkler-date">Most recent sprinkler inspection/test date</label>
+                <input id="fp250-sprinkler-date" type="date" class="mc-input-like" />
+              </div>
+            </li>
+            <li class="mc-card" data-fp250-item="fire_alarm_inspection_year">
+              <div class="mc-note-body-sm">Fire alarm system inspected and tested within the last year?</div>
+              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Fire alarm inspected this year"></div>
+              <div class="mc-field mc-field-tight mc-gap-top-sm">
+                <label for="fp250-fire-alarm-date">Most recent fire alarm inspection/test date</label>
+                <input id="fp250-fire-alarm-date" type="date" class="mc-input-like" />
+              </div>
+            </li>
+            <li class="mc-card" data-fp250-item="exhaust_cleaned">
+              <div class="mc-note-body-sm">Commercial cooking exhaust system cleaned at the required frequency?</div>
+              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Cooking exhaust cleaned"></div>
+              <div class="mc-field mc-field-tight mc-gap-top-sm">
+                <label for="fp250-exhaust-date">Date of last cleaning</label>
+                <input id="fp250-exhaust-date" type="date" class="mc-input-like" />
+              </div>
+            </li>
+            <li class="mc-card" data-fp250-item="suppression_six_months">
+              <div class="mc-note-body-sm">Commercial cooking fire suppression system inspected in the last six months?</div>
+              <div class="mc-inline-row mc-gap-top-sm" role="radiogroup" aria-label="Cooking suppression inspected"></div>
+              <div class="mc-field mc-field-tight mc-gap-top-sm">
+                <label for="fp250-suppression-date">Date of last inspection</label>
+                <input id="fp250-suppression-date" type="date" class="mc-input-like" />
+              </div>
+            </li>
+          </ul>
+
+          <h4 class="mc-section-title">Responsibility &amp; capacity</h4>
+          <div class="mc-field mc-field-tight">
+            <label for="fp250-exit-announcer">Person responsible for Exit announcement (527 CMR 1.00 §20.1.5.8.3)</label>
+            <input id="fp250-exit-announcer" type="text" class="mc-input-like" placeholder="Full name" />
+          </div>
+          <div class="mc-field mc-field-tight">
+            <label for="fp250-occupant-load">Person responsible for occupant-load limit</label>
+            <input id="fp250-occupant-load" type="text" class="mc-input-like" placeholder="Full name" />
+          </div>
+          <div class="mc-field mc-field-tight">
+            <label for="fp250-max-capacity">Maximum capacity</label>
+            <input id="fp250-max-capacity" type="number" min="0" class="mc-input-like" placeholder="e.g. 240" />
+          </div>
+          <div class="mc-field mc-field-tight">
+            <label for="fp250-cap-expiration">Capacity certificate expiration date</label>
+            <input id="fp250-cap-expiration" type="date" class="mc-input-like" />
+          </div>
+
+          <h4 class="mc-section-title">Crowd manager (assignee)</h4>
+          <div class="mc-field mc-field-tight">
+            <label for="fp250-manager-name">Crowd manager name</label>
+            <input id="fp250-manager-name" type="text" class="mc-input-like" placeholder="Today’s on-duty crowd manager" />
+          </div>
+          <div class="mc-field mc-field-tight">
+            <label for="fp250-manager-cert">Crowd Manager Certificate #</label>
+            <input id="fp250-manager-cert" type="text" class="mc-input-like" placeholder="MA DFS certificate number" />
+          </div>
+
+          <h4 class="mc-section-title">E-signature</h4>
+          <p class="mc-hint mc-hint-top0">By typing your name and tapping <strong>Sign &amp; save</strong>, you attest that the inspection items above are accurate as of the time-stamped submission. Your typed name and submission time are recorded with this entry.</p>
+          <div class="mc-field mc-field-tight">
+            <label for="fp250-signature">Typed signature (must match crowd manager name)</label>
+            <input id="fp250-signature" type="text" class="mc-input-like" placeholder="Type your full name to sign" />
+          </div>
+          <label class="mc-inline-row mc-gap-top-sm" style="gap:0.5rem;align-items:flex-start;cursor:pointer;">
+            <input id="fp250-attest" type="checkbox" class="mc-check-input" />
+            <span class="mc-note-body-sm">I attest the answers above are true and complete to the best of my knowledge.</span>
+          </label>
+          <button type="button" class="mc-btn mc-btn-primary mc-gap-top-sm" id="btn-fp250-submit">Sign &amp; save FP-250</button>
+          <p id="fp250-status" class="mc-status-app" aria-live="polite"></p>
+        </div>
+      </details>
+
+      <h3 class="mc-section-title">Recent checks</h3>
       <div id="checks-project-list"></div>
       <h3 class="mc-section-title">Log a station check</h3>
       <div class="mc-field">
