@@ -726,8 +726,8 @@
   flex-wrap: nowrap;
   align-items: center;
   gap: 6px;
-  margin: 0 -0.85rem 0.7rem;
-  padding: 0.4rem 0.85rem;
+  margin: 0 -1rem 0.7rem;
+  padding: 0.4rem 1rem;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
@@ -736,14 +736,9 @@
   position: sticky;
   top: 0;
   z-index: 6;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.96) 70%,
-    rgba(255, 255, 255, 0.55) 100%
-  );
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: var(--mc-card, #ffffff);
   border-bottom: 1px solid var(--mc-border);
+  box-shadow: 0 4px 10px -8px rgba(20, 48, 32, 0.18);
 }
 
 .mc-hub-nav::-webkit-scrollbar {
