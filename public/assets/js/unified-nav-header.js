@@ -1190,3 +1190,21 @@ window.signOut = function () {
 };
 
 console.log('✅ Unified Nav Header script loaded');
+
+// Auto-load the mobile quick-nav pill bar so every page that uses unified-nav-header
+// gets the phone-friendly top nav for free. The script self-gates by viewport
+// (≤ 720 px) and is a no-op on desktop.
+(function ensureIterumMobileQuickNav() {
+  try {
+    if (typeof document === 'undefined') return;
+    if (window.__iterumMobileQuickNavMounted) return;
+    if (document.getElementById('iterum-mqn-script')) return;
+    var s = document.createElement('script');
+    s.id = 'iterum-mqn-script';
+    s.src = 'assets/js/iterum-mobile-quicknav.js';
+    s.defer = true;
+    document.head.appendChild(s);
+  } catch (e) {
+    /* ignore */
+  }
+})();
