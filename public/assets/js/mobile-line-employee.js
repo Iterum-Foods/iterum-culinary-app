@@ -108,11 +108,28 @@ export function attachLineEmployeeHub(api) {
       const el = document.getElementById(`panel-section-${s}`);
       if (el) el.hidden = s !== key;
     });
+    let activeNavBtn = null;
     document.querySelectorAll('[data-hub-tab]').forEach(btn => {
       const k = btn.getAttribute('data-hub-tab');
       const on = k === key;
       btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      if (on && btn.closest('.mc-hub-nav')) activeNavBtn = btn;
     });
+    if (activeNavBtn) {
+      try {
+        activeNavBtn.scrollIntoView({
+          inline: 'center',
+          block: 'nearest',
+          behavior: 'smooth'
+        });
+      } catch (e) {
+        try {
+          activeNavBtn.scrollIntoView();
+        } catch (_) {
+          /* ignore */
+        }
+      }
+    }
     if (key !== 'team') {
       if (typeof teamBoardUnsub === 'function') {
         try {
