@@ -1,7 +1,7 @@
 # Canonical CSS stack (Phase A)
 
-**Last updated:** 29 March 2026  
-**Related:** [UI_AND_WORKFLOW_ROADMAP.md](./UI_AND_WORKFLOW_ROADMAP.md)
+**Last updated:** 12 May 2026  
+**Related:** [UI_AND_WORKFLOW_ROADMAP.md](./UI_AND_WORKFLOW_ROADMAP.md) · [WEB_APP_DESIGN_CHANGE_WORKFLOW.md](./WEB_APP_DESIGN_CHANGE_WORKFLOW.md) (how to apply stack changes across every page)
 
 ## Golden-path pages (single stack)
 

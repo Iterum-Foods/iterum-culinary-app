@@ -10,6 +10,7 @@ Use this checklist to run a reliable release validation across mobile shift, ope
 - [ ] Confirm test user account(s) are available:
   - line role (`employee_line`)
   - manager/admin role (`location_manager` or `account_admin`)
+- [ ] For **cross-page web UI or token changes**, follow [WEB_APP_DESIGN_CHANGE_WORKFLOW.md](./WEB_APP_DESIGN_CHANGE_WORKFLOW.md) (inventory → tier → spot-checks) in addition to this file.
 
 ## 1) Automated Validation (must run first)
 

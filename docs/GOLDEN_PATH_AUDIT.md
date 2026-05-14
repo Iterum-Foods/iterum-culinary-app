@@ -1,8 +1,9 @@
 # Golden path audit — Setup · Vendors · Ingredients · Recipes
 
 **Purpose:** Map the **exact files** behind the core customer journey and a **phased task list**.  
+For **design or token changes that must hit every web page**, use [WEB_APP_DESIGN_CHANGE_WORKFLOW.md](./WEB_APP_DESIGN_CHANGE_WORKFLOW.md) after this map.  
 **Slice 1 shipped:** setup copy + links; vendor **workspace price override** UI on `vendor-management.html` (writes `users/{uid}/vendor_prices/*` via `firestore-sync.js`).  
-**Last updated:** 29 March 2026
+**Last updated:** 12 May 2026
 
 ---
 

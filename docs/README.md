@@ -12,6 +12,7 @@ Primary navigation for strategy, delivery, and technical references.
 
 - `USER_WORKFLOW_GUIDE.md` — **new restaurant**, **new user at existing restaurant**, and **task-based** paths (menu, team, mobile, specs).
 - `UI_AND_WORKFLOW_ROADMAP.md` — **phased** design and UI plan (workflow-first, professional polish, role surfaces).
+- `WEB_APP_DESIGN_CHANGE_WORKFLOW.md` — **repeatable runbook** to roll design/token/nav changes across **all** web pages (inventory, tiers, shared files, QA).
 - `CSS_CANONICAL_STACK.md` — **golden-path** stylesheet stack (`iterum-canonical-app.css`) and token checklist.
 - `MENU_IMPORT_WORKFLOW.md` — spreadsheet menu import (detailed).
 - `MENU_IMPORT_STAFF_QUICK_CARD.md` — one-page menu import checklist.

@@ -2,9 +2,9 @@
 
 **Purpose:** A single **ordered progression** for design and UI work so the product feels **coherent**, **role-aware**, and **aligned to real restaurant workflows** (not a collection of screens).  
 **Audience:** Design, product, and engineering planning sprints.  
-**Last updated:** 29 March 2026
+**Last updated:** 12 May 2026
 
-**Use with:** [USER_WORKFLOW_GUIDE.md](./USER_WORKFLOW_GUIDE.md) (who does what), [GOLDEN_PATH_AUDIT.md](./GOLDEN_PATH_AUDIT.md) (core file map), [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md), [QA_FEATURE_TEST_WORKFLOW.md](./QA_FEATURE_TEST_WORKFLOW.md).
+**Use with:** [USER_WORKFLOW_GUIDE.md](./USER_WORKFLOW_GUIDE.md) (who does what), [GOLDEN_PATH_AUDIT.md](./GOLDEN_PATH_AUDIT.md) (core file map), [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md), [QA_FEATURE_TEST_WORKFLOW.md](./QA_FEATURE_TEST_WORKFLOW.md), [WEB_APP_DESIGN_CHANGE_WORKFLOW.md](./WEB_APP_DESIGN_CHANGE_WORKFLOW.md) (how to roll design changes across all web pages).
 
 ---
 
@@ -135,7 +135,7 @@ Priority order (suggested):
 |---------|----------|
 | **Weekly** | Pick 1–2 items from the current phase; ship behind feature flags only if needed. |
 | **Per release** | Update [QA_FEATURE_TEST_WORKFLOW.md](./QA_FEATURE_TEST_WORKFLOW.md) with any new default paths. |
-| **Monthly** | Re-read Phase A stack — prevent stylesheet creep. |
+| **Monthly** | Re-read Phase A stack — prevent stylesheet creep. For any **visible** design rollout, follow [WEB_APP_DESIGN_CHANGE_WORKFLOW.md](./WEB_APP_DESIGN_CHANGE_WORKFLOW.md) (inventory → tiers → spot-checks → CI). |
 
 **Suggested owner split:** Design + PM = Phases A–B narrative and tokens; Eng = implementation order and regression; Ops/Pilot = Phase D acceptance on real venues.
 
@@ -151,6 +151,7 @@ Priority order (suggested):
 | 2026-05-10 | **Crowd Manager (FP-250) checklist:** new daily compliance form in mobile Checks tab with typed e-signature + attestation + timestamp; persisted to `localStorage` per project per day and to Firestore `projects/{pid}/checklists/` (templateId `crowd_manager_fp250`); calendar day-details surfaces signed entries with Yes/No status. Mirrors MA DFS form FP-250 (527 CMR 1.00 §20.1.5.6.4). See [briefings/PERSONA_HANDOFF_LOG.md](./briefings/PERSONA_HANDOFF_LOG.md). |
 | 2026-05-10 | **Bar drink drafts (phone capture → web review):** admin-only Quick-add drink form on mobile Bar tab saves to `projects/{pid}/snapshots/bar_drink_drafts` as `status: 'in_progress'`; new dashboard card lists drafts with Publish (pushes to `bar_line_pack.drinks[]`) / Delete / Refresh; one-click **Import Wusong sample** seeds 11 cocktails (transcribed from PDF). No new Firestore rules. See [briefings/PERSONA_HANDOFF_LOG.md](./briefings/PERSONA_HANDOFF_LOG.md). |
 | 2026-05-10 | **Bar checklists (opening / midday / closing / station stock):** admin dashboard card publishes `bar_checklist_pack`; mobile Bar tab lists all four with **Done** + **Need** per line; **Need** (signed in) appends `(Bar · …)` lines to user Prep (opening/midday/closing) or Stock (station stock) via existing Lists-tab Firestore notes. Daily UI state in `localStorage` (`done` / `need` maps). **Import sample** seeds generic-bar starter. See [briefings/PERSONA_HANDOFF_LOG.md](./briefings/PERSONA_HANDOFF_LOG.md). |
+| 2026-05-12 | **Web design change workflow:** new doc [WEB_APP_DESIGN_CHANGE_WORKFLOW.md](./WEB_APP_DESIGN_CHANGE_WORKFLOW.md) — page inventory (`rg`), tiers (unified nav + mobile quicknav, workflow-polish, canonical, standalone, mobile shift), implementation order, coverage audit, CI, and definition of done. Roadmap §5 monthly cadence now references it. |
 | 2026-05-11 | **ID quick reference (21+ / 18+) on phone Hub + Bar:** calm card at the top of Hub and Bar tabs shows today plus "born on or before" cutoffs for 21+ and 18+; computed locally on each tab activation; leap-day-safe (Feb 29 clamps to Feb 28 of the destination year). Pure client-side, no Firestore. See [briefings/PERSONA_HANDOFF_LOG.md](./briefings/PERSONA_HANDOFF_LOG.md). |
 
 When golden path or nav structure changes, update **§3 Phase B** and [USER_WORKFLOW_GUIDE.md](./USER_WORKFLOW_GUIDE.md) together.
