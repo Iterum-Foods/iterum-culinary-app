@@ -22,7 +22,9 @@
 
   function normalizePack(raw) {
     var p = emptyPack();
-    if (!raw || typeof raw !== 'object') return p;
+    if (!raw || typeof raw !== 'object') {
+      return p;
+    }
     SECTIONS.forEach(function (k) {
       var v = raw[k];
       p[k] = Array.isArray(v)
@@ -68,7 +70,9 @@
       global.ITERUM_BAR_CHECKLISTS_SAMPLE
         ? global.ITERUM_BAR_CHECKLISTS_SAMPLE
         : null;
-    if (!sample) throw new Error('Bar checklist sample not loaded.');
+    if (!sample) {
+      throw new Error('Bar checklist sample not loaded.');
+    }
     return await savePack(db, pid, sample);
   }
 

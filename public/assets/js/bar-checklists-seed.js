@@ -76,15 +76,19 @@
   function normalizeChecklistItems(raw) {
     var lines = Array.isArray(raw)
       ? raw
-      : String(raw == null ? '' : raw).split(/\r?\n/);
+      : String(raw === null || raw === undefined ? '' : raw).split(/\r?\n/);
     var out = [];
     var seen = Object.create(null);
     for (var i = 0; i < lines.length; i++) {
       var t = String(lines[i] || '')
         .replace(/^[-•\s]+/, '')
         .trim();
-      if (!t) continue;
-      if (seen[t]) continue;
+      if (!t) {
+        continue;
+      }
+      if (seen[t]) {
+        continue;
+      }
       seen[t] = true;
       out.push(t);
     }

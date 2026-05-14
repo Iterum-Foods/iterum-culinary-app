@@ -103,12 +103,22 @@
     opts = opts || {};
     var existing = await loadDrafts(db, pid);
     var d = Object.assign({}, draft);
-    if (!d.id) d.id = newId();
-    if (!d.status) d.status = 'in_progress';
-    if (!d.source) d.source = opts.source || '';
-    if (!d.createdAt) d.createdAt = new Date().toISOString();
+    if (!d.id) {
+      d.id = newId();
+    }
+    if (!d.status) {
+      d.status = 'in_progress';
+    }
+    if (!d.source) {
+      d.source = opts.source || '';
+    }
+    if (!d.createdAt) {
+      d.createdAt = new Date().toISOString();
+    }
     d.updatedAt = new Date().toISOString();
-    if (opts.createdBy && !d.createdBy) d.createdBy = opts.createdBy;
+    if (opts.createdBy && !d.createdBy) {
+      d.createdBy = opts.createdBy;
+    }
     var i = existing.findIndex(function (x) {
       return x && x.id === d.id;
     });
