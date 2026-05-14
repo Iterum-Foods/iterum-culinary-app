@@ -132,9 +132,9 @@
 }
 
 .menu-category-items {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 /* ==================== Menu Item Cards ==================== */
@@ -458,6 +458,121 @@
 
   .menu-item-price {
     margin-left: 0;
+  }
+}
+
+/* ==================== Main menu list (menu-items-grid) ==================== */
+#menu-items-grid .iterum-menu-item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+#menu-items-grid .iterum-menu-item-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px 20px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  margin: 0;
+}
+
+#menu-items-grid .iterum-menu-item-row:last-child {
+  border-bottom: none;
+}
+
+#menu-items-grid .iterum-menu-item-row:hover {
+  background: #f8fafc;
+}
+
+#menu-items-grid .iterum-menu-item-row-main {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+#menu-items-grid .iterum-menu-item-row-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+  margin-bottom: 4px;
+}
+
+#menu-items-grid .iterum-menu-item-row-title strong {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+#menu-items-grid .iterum-menu-item-row-cat {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+#menu-items-grid .iterum-menu-item-row-desc {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+#menu-items-grid .iterum-menu-list-allergen {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: #92400e;
+  background: #fffbeb;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+#menu-items-grid .iterum-menu-item-row-metrics {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  min-width: 120px;
+}
+
+#menu-items-grid .iterum-menu-list-price {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #15803d;
+}
+
+#menu-items-grid .iterum-menu-list-stat {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+#menu-items-grid .iterum-menu-list-stat small {
+  font-weight: 500;
+  color: #94a3b8;
+  font-size: 0.72rem;
+}
+
+#menu-items-grid .iterum-menu-item-row-actions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  #menu-items-grid .iterum-menu-item-row-metrics,
+  #menu-items-grid .iterum-menu-item-row-actions {
+    flex: 1 1 100%;
   }
 }
 

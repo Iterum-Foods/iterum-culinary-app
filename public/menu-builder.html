@@ -769,14 +769,18 @@
             background: #f1f5f9 !important;
         }
         
-        /* Input text color fixes */
+        /* Input text must stay dark on light fields (was #F5F1EB — invisible on #f1f5f9) */
         input[type="text"],
         input[type="number"],
         input[type="email"],
         input[type="url"],
+        input[type="search"],
+        input[type="password"],
         textarea,
         select {
-            color: var(--text-primary, #F5F1EB) !important;
+            color: var(--brand-text-primary, #0f172a) !important;
+            -webkit-text-fill-color: var(--brand-text-primary, #0f172a) !important;
+            caret-color: var(--brand-text-primary, #0f172a);
         }
         
         /* Ensure all text in the menu builder is readable */
@@ -2837,88 +2841,89 @@
             }
             
             console.log(`📋 Displaying ${menuItems.length} menu items for menu: ${menu.name}`);
-            
-            grid.innerHTML = menuItems.map((item, itemIndex) => `
-                <div class="card card-hover" style="margin-bottom: 15px;">
-                    <div class="card-header-gradient">
-                        <div class="card-title">${item.name}</div>
-                        <div class="card-subtitle">${item.category || 'Uncategorized'}</div>
-                    </div>
-                    <div style="padding: 15px;">
-                        <p style="color: #64748b; font-style: italic; margin-bottom: 10px;">${item.description || 'No description'}</p>
-                        <div class="stats-row">
-                            <div class="stat-item-centered">
-                                <div class="stat-value text-success">$${item.price?.toFixed(2) || '0.00'}</div>
-                                <div class="stat-label">Price</div>
-                            </div>
-                            ${(() => {
-                                // Phase 3: Calculate Food Cost % if recipe is linked
-                                let foodCostDisplay = '';
-                                let recipeCost = null;
-                                
-                                if (item.recipeId && window.foodCostingWorkflow) {
-                                    const costData = window.foodCostingWorkflow.getRecipeCostFromRecipeBuilder(item.recipeId);
-                                    if (costData && item.price) {
-                                        recipeCost = parseFloat(costData.costPerYieldUnit || costData.costPerServing || 0);
-                                        const foodCostPercent = window.foodCostingWorkflow.calculateFoodCostPercentage(recipeCost, item.price);
-                                        const targetFoodCost = item.targetFoodCost || 30; // Default 30%
-                                        const comparison = window.foodCostingWorkflow.compareFoodCostToTarget(foodCostPercent, targetFoodCost);
-                                        
-                                        foodCostDisplay = `
-                                            <div class="stat-item-centered">
-                                                <div class="stat-value" style="color: ${comparison.status === 'good' ? '#6B8E6F' : comparison.status === 'high' ? '#C97676' : '#5B9BAD'};">
-                                                    ${foodCostPercent.toFixed(1)}%
-                                                </div>
-                                                <div class="stat-label">Food Cost</div>
-                                                <small style="font-size: 0.7rem; color: #8A9299;">Target: ${targetFoodCost}%</small>
-                                            </div>
-                                        `;
-                                    }
-                                }
-                                
-                                return `
-                                    ${recipeCost ? `
-                                        <div class="stat-item-centered">
-                                            <div class="stat-value">$${recipeCost.toFixed(2)}</div>
-                                            <div class="stat-label">Recipe Cost</div>
-                                        </div>
-                                    ` : item.cost ? `
-                                        <div class="stat-item-centered">
-                                            <div class="stat-value">$${item.cost.toFixed(2)}</div>
-                                            <div class="stat-label">Cost</div>
-                                        </div>
-                                    ` : ''}
-                                    ${foodCostDisplay}
-                                    ${item.ingredients ? `
-                                        <div class="stat-item-centered">
-                                            <div class="stat-value">${Array.isArray(item.ingredients) ? item.ingredients.length : 0}</div>
-                                            <div class="stat-label">Ingredients</div>
-                                        </div>
-                                    ` : ''}
-                                `;
-                            })()}
-                        </div>
-                        ${item.allergens && item.allergens.length > 0 ? `
-                            <div style="margin-top: 10px; padding: 10px; background: #fef3c7; border-radius: 6px;">
-                                <strong style="color: #92400e;">⚠️ Allergens:</strong> ${item.allergens.join(', ')}
-                            </div>
-                        ` : ''}
-                        
-                        <!-- Action Buttons -->
-                        <div style="margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap;">
-                            <button onclick="viewMenuItem('${menu.id}', ${itemIndex})" class="btn btn-primary" style="flex: 1; min-width: 100px;">
-                                👁️ View
-                            </button>
-                            <button onclick="editMenuItem('${menu.id}', ${itemIndex})" class="btn btn-secondary" style="flex: 1; min-width: 100px;">
-                                ✏️ Edit
-                            </button>
-                            <button onclick="duplicateMenuItem('${menu.id}', ${itemIndex})" class="btn btn-secondary" style="flex: 1; min-width: 100px;">
-                                📋 Duplicate
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+
+            function escapeMenuHtml(s) {
+                if (s == null) return '';
+                return String(s)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/"/g, '&quot;');
+            }
+
+            function buildCostCells(item) {
+                let foodCostDisplay = '';
+                let recipeCost = null;
+                if (item.recipeId && window.foodCostingWorkflow) {
+                    const costData = window.foodCostingWorkflow.getRecipeCostFromRecipeBuilder(
+                        item.recipeId
+                    );
+                    if (costData && item.price) {
+                        recipeCost = parseFloat(
+                            costData.costPerYieldUnit || costData.costPerServing || 0
+                        );
+                        const foodCostPercent =
+                            window.foodCostingWorkflow.calculateFoodCostPercentage(
+                                recipeCost,
+                                item.price
+                            );
+                        const targetFoodCost = item.targetFoodCost || 30;
+                        const comparison =
+                            window.foodCostingWorkflow.compareFoodCostToTarget(
+                                foodCostPercent,
+                                targetFoodCost
+                            );
+                        foodCostDisplay = `<span class="iterum-menu-list-stat iterum-menu-list-stat--fc" style="color:${comparison.status === 'good' ? '#166534' : comparison.status === 'high' ? '#b91c1c' : '#0369a1'}">${foodCostPercent.toFixed(1)}% <small>fc</small></span>`;
+                    }
+                }
+                const rc =
+                    recipeCost != null
+                        ? `<span class="iterum-menu-list-stat">$${recipeCost.toFixed(2)} <small>recipe</small></span>`
+                        : item.cost
+                          ? `<span class="iterum-menu-list-stat">$${parseFloat(item.cost).toFixed(2)} <small>cost</small></span>`
+                          : '';
+                const ing =
+                    item.ingredients && Array.isArray(item.ingredients)
+                        ? `<span class="iterum-menu-list-stat">${item.ingredients.length} <small>ing</small></span>`
+                        : '';
+                return `${rc}${foodCostDisplay}${ing}`;
+            }
+
+            const midJs = JSON.stringify(menu.id);
+            grid.innerHTML = `
+                <ul class="iterum-menu-item-list" role="list" aria-label="Menu items">
+                    ${menuItems
+                        .map((item, itemIndex) => {
+                            const nm = escapeMenuHtml(item.name);
+                            const cat = escapeMenuHtml(item.category || 'Uncategorized');
+                            const desc = escapeMenuHtml(
+                                (item.description || 'No description').slice(0, 160)
+                            );
+                            const allerg =
+                                item.allergens && item.allergens.length
+                                    ? `<span class="iterum-menu-list-allergen">⚠ ${escapeMenuHtml(item.allergens.join(', '))}</span>`
+                                    : '';
+                            return `<li class="iterum-menu-item-row">
+                                <div class="iterum-menu-item-row-main">
+                                    <div class="iterum-menu-item-row-title">
+                                        <strong>${nm}</strong>
+                                        <span class="iterum-menu-item-row-cat">${cat}</span>
+                                    </div>
+                                    <p class="iterum-menu-item-row-desc">${desc}</p>
+                                    ${allerg}
+                                </div>
+                                <div class="iterum-menu-item-row-metrics">
+                                    <span class="iterum-menu-list-price">$${item.price != null ? Number(item.price).toFixed(2) : '0.00'}</span>
+                                    ${buildCostCells(item)}
+                                </div>
+                                <div class="iterum-menu-item-row-actions">
+                                    <button type="button" onclick="viewMenuItem(${midJs}, ${itemIndex})" class="btn btn-secondary btn-sm">View</button>
+                                    <button type="button" onclick="editMenuItem(${midJs}, ${itemIndex})" class="btn btn-secondary btn-sm">Edit</button>
+                                    <button type="button" onclick="duplicateMenuItem(${midJs}, ${itemIndex})" class="btn btn-secondary btn-sm">Duplicate</button>
+                                </div>
+                            </li>`;
+                        })
+                        .join('')}
+                </ul>`;
         }
         
         // Update menu stats
@@ -3833,10 +3838,10 @@
                     
                     <div class="modal-body">
                         <div class="dish-selection-tabs">
-                            <button class="tab-btn active" onclick="switchDishTab('existing')">
+                            <button type="button" class="tab-btn active" data-dish-tab="existing" onclick="switchDishTab('existing', this)">
                                 📚 Select from Recipe Library
                             </button>
-                            <button class="tab-btn" onclick="switchDishTab('new')">
+                            <button type="button" class="tab-btn" data-dish-tab="new" onclick="switchDishTab('new', this)">
                                 ➕ Quick add dish
                             </button>
                         </div>
@@ -3928,17 +3933,25 @@
             addTabStyles();
         }
 
-        function switchDishTab(tabName) {
-            // Update tab buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            document.getElementById(tabName === 'existing' ? 'existing-recipes-tab' : 'new-dish-tab').classList.add('active');
-            
-            // Update add button text
+        function switchDishTab(tabName, btnEl) {
+            const modal = document.getElementById('dish-selection-modal');
+            if (!modal) return;
+            modal.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn =
+                btnEl ||
+                modal.querySelector(`.tab-btn[data-dish-tab="${tabName}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            modal.querySelectorAll('.tab-content').forEach(content =>
+                content.classList.remove('active')
+            );
+            const panel = document.getElementById(
+                tabName === 'existing' ? 'existing-recipes-tab' : 'new-dish-tab'
+            );
+            if (panel) panel.classList.add('active');
+
             const addBtn = document.getElementById('add-dish-btn');
+            if (!addBtn) return;
             if (tabName === 'existing') {
                 addBtn.textContent = 'Select Recipe';
                 addBtn.onclick = selectExistingRecipe;
