@@ -89,6 +89,35 @@ class MenuRecipeIntegration {
         beverage: menuItem.beveragePairing || null
       };
     }
+
+    baseStub.recipe_completion_required = true;
+
+    if (menuItem.copiedFromRecipeId) {
+      baseStub.copiedFromRecipeId = menuItem.copiedFromRecipeId;
+      const srcList = window.universalRecipeManager?.getAllRecipes?.() || [];
+      const src = srcList.find(
+        r => String(r.id) === String(menuItem.copiedFromRecipeId)
+      );
+      if (src) {
+        const clone = v => {
+          try {
+            return JSON.parse(JSON.stringify(v));
+          } catch {
+            return v;
+          }
+        };
+        if (Array.isArray(src.ingredients) && src.ingredients.length) {
+          baseStub.ingredients = clone(src.ingredients);
+        }
+        if (Array.isArray(src.instructions) && src.instructions.length) {
+          baseStub.instructions = clone(src.instructions);
+        }
+        const srcTitle = src.title || src.name || 'recipe';
+        const note = `\n\n— Copied from “${srcTitle}”. Review and finish this draft.`;
+        baseStub.description = (baseStub.description || '') + note;
+      }
+    }
+
     return baseStub;
   }
   init() {

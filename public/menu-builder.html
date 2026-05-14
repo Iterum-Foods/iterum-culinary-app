@@ -1199,6 +1199,34 @@
         🚑 Loading Stuck? Click Here
     </div>
 
+    <!-- Create menu (smooth flow — no double prompt) -->
+    <div id="create-menu-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3>➕ New menu</h3>
+                <span class="modal-close" onclick="closeModal('create-menu-modal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="create-menu-name" class="form-label">Menu name *</label>
+                    <input type="text" id="create-menu-name" class="form-input" required placeholder="e.g. Spring tasting 2026">
+                </div>
+                <div class="form-group">
+                    <label for="create-menu-desc" class="form-label">Description (optional)</label>
+                    <textarea id="create-menu-desc" class="form-textarea" rows="2" placeholder="Short note for your team"></textarea>
+                </div>
+                <label class="checkbox-item" style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+                    <input type="checkbox" id="create-menu-then-add-dish" checked>
+                    <span>Open “add dish” right after create</span>
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('create-menu-modal')">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="submitCreateMenuFromModal()">Create menu</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Uniform Centered Header -->
     <!-- Header injected by unified-nav-header.js -->
 
@@ -1216,7 +1244,7 @@
                 <div class="menu-hero-meta">
                     <div class="project-chip" id="menu-project-chip">Project: Master Project</div>
                     <div class="hero-actions">
-                        <button class="btn btn-primary" onclick="createNewMenu()">➕ New Menu</button>
+                        <button class="btn btn-primary" onclick="openCreateMenuModal()">➕ New Menu</button>
                         <button class="btn btn-secondary" onclick="showImportModal()">📁 Import Menu</button>
                         <button class="btn btn-ghost" onclick="document.getElementById('menu-cards-grid')?.scrollIntoView({ behavior: 'smooth' });">
                             📂 View Library
@@ -1251,7 +1279,7 @@
             </div>
             <div style="padding: 20px;">
                 <div class="button-group mb-6">
-                    <button class="btn btn-primary" onclick="createNewMenu()">
+                    <button class="btn btn-primary" onclick="openCreateMenuModal()">
                         ➕ Create New Menu
                     </button>
                     <button class="btn" onclick="refreshMenuList()">
@@ -1269,7 +1297,7 @@
                     <div style="font-size: 3rem; margin-bottom: 15px;">🍽️</div>
                     <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 10px;">No Menus Yet</h3>
                     <p style="color: #64748b; margin-bottom: 20px;">Create your first menu to get started</p>
-                    <button class="btn btn-primary" onclick="createNewMenu()">
+                    <button class="btn btn-primary" onclick="openCreateMenuModal()">
                         ➕ Create First Menu
                     </button>
                 </div>
@@ -1639,6 +1667,26 @@
                     </div>
                     <form id="add-menu-item-form">
                         <div class="modal-body">
+                            <div class="form-group" id="add-item-mode-row">
+                                <label class="form-label">How are you adding this dish?</label>
+                                <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center;">
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                                        <input type="radio" name="addItemMode" id="add-mode-new" value="new" checked onchange="typeof syncAddMenuItemModeUI==='function'&&syncAddMenuItemModeUI()">
+                                        New line — recipe draft auto-created
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                                        <input type="radio" name="addItemMode" id="add-mode-link" value="link" onchange="typeof syncAddMenuItemModeUI==='function'&&syncAddMenuItemModeUI()">
+                                        Link existing recipe
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                                        <input type="radio" name="addItemMode" id="add-mode-copy" value="copy" onchange="typeof syncAddMenuItemModeUI==='function'&&syncAddMenuItemModeUI()">
+                                        Copy recipe → new draft
+                                    </label>
+                                </div>
+                                <input type="hidden" id="item-copy-source-id" name="copySourceId" value="">
+                                <small class="form-help" style="display: block; margin-top: 8px;">New and Copy always create a recipe card flagged to finish in Recipe Developer. Link reuses an existing recipe for costing.</small>
+                            </div>
+
                             <div class="form-group">
                                 <label for="item-name" class="form-label">Dish Name *</label>
                                 <input type="text" id="item-name" name="name" class="form-input" required placeholder="e.g., Grilled Salmon with Lemon Butter">
@@ -1671,37 +1719,39 @@
                                 </div>
                             </div>
                             
-                            <!-- RECIPE REQUIRED SECTION -->
-                            <div class="form-group" style="padding: 16px; background: #fef3c7; border: 2px solid #fbbf24; border-radius: 8px; margin-top: 16px;">
-                                <label class="form-label" style="color: #78350f !important; font-weight: 700; margin-bottom: 12px; font-size: 1rem;">
-                                    📋 Recipe (Optional - Auto-created if not linked)
-                                </label>
-                                <small class="form-help" style="display: block; margin-bottom: 12px; color: #78350f !important; font-weight: 600; opacity: 1;">
-                                    Link to an existing recipe, or leave empty to automatically create a new recipe draft for this dish.
-                                </small>
-                                
-                                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                            <div id="add-item-copy-panel" class="form-group" style="display: none; padding: 14px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 10px;">
+                                <label for="item-copy-recipe-select" class="form-label">Recipe to copy from *</label>
+                                <select id="item-copy-recipe-select" class="form-select" onchange="document.getElementById('item-copy-source-id').value = this.value || ''">
+                                    <option value="">— Select a recipe —</option>
+                                </select>
+                                <small class="form-help">Creates a <strong>new</strong> recipe draft (copies ingredients &amp; steps when available). Finish in Recipe Developer.</small>
+                            </div>
+                            
+                            <div id="add-item-recipe-panel" class="form-group" style="display: none; padding: 16px; background: #fef3c7; border: 2px solid #fbbf24; border-radius: 8px; margin-top: 8px;">
+                                <label class="form-label" style="color: #78350f !important; font-weight: 700; margin-bottom: 8px;">📋 Link to existing recipe</label>
+                                <small class="form-help" style="display: block; margin-bottom: 12px; color: #78350f;">Reuses the recipe for costing — no new draft.</small>
+                                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                                     <div class="form-group" style="margin-bottom: 0;">
-                                        <label for="item-recipe-link" class="form-label">Select Existing Recipe (Optional)</label>
+                                        <label for="item-recipe-link" class="form-label">Recipe *</label>
                                         <select id="item-recipe-link" name="recipeId" class="form-select">
-                                            <option value="">-- Leave empty to auto-create recipe --</option>
-                                            <!-- Recipes will be populated dynamically -->
+                                            <option value="">— Select —</option>
                                         </select>
                                     </div>
                                     <div class="form-group" style="margin-bottom: 0;">
-                                        <label for="item-target-food-cost" class="form-label">Target Food Cost % (Phase 3)</label>
+                                        <label for="item-target-food-cost" class="form-label">Target Food Cost %</label>
                                         <input type="number" id="item-target-food-cost" name="targetFoodCost" class="form-input" step="0.1" min="0" max="100" placeholder="30" value="30">
-                                        <small class="form-help">Industry standard: 25-35%</small>
                                     </div>
                                 </div>
-                                
-                                <div class="form-group" style="margin-bottom: 0;">
-                                    <label class="checkbox-item" style="padding: 12px; background: #f0fdf4; border: 2px solid #86efac; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
-                                        <input type="checkbox" id="item-create-recipe" name="createRecipe" onchange="toggleRecipeOption()">
-                                        <span style="font-weight: 600; color: #166534;">✨ Force Create New Recipe (Uncheck to use existing recipe)</span>
+                                <div class="form-group" style="margin-bottom: 0; margin-top: 10px;">
+                                    <label class="checkbox-item" style="padding: 10px; background: #fff; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                                        <input type="checkbox" id="item-create-recipe" name="forceNewRecipe">
+                                        <span style="font-weight: 600; color: #166534;">Create a new draft instead of linking (ignores selection above)</span>
                                     </label>
-                                    <small class="form-help">If checked, a new recipe will always be created. If unchecked and no recipe is selected, a recipe will still be auto-created.</small>
                                 </div>
+                            </div>
+
+                            <div id="add-item-new-hint" class="form-group" style="padding: 12px 14px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;">
+                                <small class="form-help" style="margin: 0; color: #475569;">A recipe draft is created automatically and marked <strong>needs development</strong> so you can finish it in Recipe Developer.</small>
                             </div>
 
                             <div class="form-group">
@@ -2328,6 +2378,7 @@
             
             // Store reference to currently selected menu
             currentSelectedMenu = { ...menu, index: index };
+            window.currentSelectedMenu = currentSelectedMenu;
             
             console.log(`✏️ Editing menu: ${menu.name} (${menu.items?.length || 0} items)`);
             
@@ -2425,12 +2476,224 @@
             }, 100);
         }
         
+        function escapeHtmlCh(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function populateRecipeDropdownsForMenuBuilder() {
+            const recipes =
+                (window.universalRecipeManager &&
+                    window.universalRecipeManager.getAllRecipes &&
+                    window.universalRecipeManager.getAllRecipes()) ||
+                [];
+            ['item-recipe-link', 'item-copy-recipe-select', 'edit-item-recipe-link'].forEach(selectId => {
+                const el = document.getElementById(selectId);
+                if (!el) return;
+                const isCopy = selectId === 'item-copy-recipe-select';
+                let html = isCopy
+                    ? '<option value="">— Select a recipe —</option>'
+                    : '<option value="">— Select —</option>';
+                recipes.forEach(r => {
+                    const id = r.id != null ? String(r.id) : '';
+                    const label = escapeHtmlCh(r.title || r.name || 'Recipe');
+                    html += `<option value="${escapeHtmlCh(id)}">${label}</option>`;
+                });
+                el.innerHTML = html;
+            });
+        }
+        window.populateRecipeDropdownsForMenuBuilder = populateRecipeDropdownsForMenuBuilder;
+
+        function syncAddMenuItemModeUI() {
+            const mode =
+                document.querySelector('input[name="addItemMode"]:checked')?.value ||
+                'new';
+            const copyPanel = document.getElementById('add-item-copy-panel');
+            const linkPanel = document.getElementById('add-item-recipe-panel');
+            const hint = document.getElementById('add-item-new-hint');
+            const copyHidden = document.getElementById('item-copy-source-id');
+            if (copyPanel) copyPanel.style.display = mode === 'copy' ? 'block' : 'none';
+            if (linkPanel) linkPanel.style.display = mode === 'link' ? 'block' : 'none';
+            if (hint) hint.style.display = mode === 'new' ? 'block' : 'none';
+            if (mode !== 'copy' && copyHidden) copyHidden.value = '';
+            const crs = document.getElementById('item-copy-recipe-select');
+            if (mode !== 'copy' && crs) crs.value = '';
+            const rs = document.getElementById('item-recipe-link');
+            if (mode !== 'link' && rs) rs.value = '';
+        }
+        window.syncAddMenuItemModeUI = syncAddMenuItemModeUI;
+
+        let __browseSelectedRecipeIds = new Set();
+
+        function showBrowseExistingItemsModal() {
+            if (!currentSelectedMenu && !window.enhancedMenuManager?.currentMenu) {
+                alert('Select a menu first (click a menu card), or create a new menu.');
+                return;
+            }
+            __browseSelectedRecipeIds = new Set();
+            const modal = document.getElementById('browse-existing-items-modal');
+            if (!modal) return;
+            filterBrowseItems();
+            modal.style.display = 'flex';
+        }
+
+        function filterBrowseItems() {
+            const recipes =
+                (window.universalRecipeManager &&
+                    window.universalRecipeManager.getAllRecipes &&
+                    window.universalRecipeManager.getAllRecipes()) ||
+                [];
+            const q = (document.getElementById('browse-search-input')?.value || '').toLowerCase();
+            const cat = (document.getElementById('browse-category-filter')?.value || '').toLowerCase();
+            const filtered = recipes.filter(r => {
+                const title = (r.title || r.name || '').toLowerCase();
+                const c = (r.category || r.cuisine || '').toLowerCase();
+                const okQ = !q || title.includes(q) || c.includes(q);
+                const okC = !cat || c === cat;
+                return okQ && okC;
+            });
+            const grid = document.getElementById('browse-items-grid');
+            const empty = document.getElementById('browse-empty-state');
+            if (!grid) return;
+            if (!filtered.length) {
+                grid.innerHTML = '';
+                if (empty) empty.style.display = 'block';
+                const cnt = document.getElementById('selected-count');
+                if (cnt) cnt.textContent = '0';
+                return;
+            }
+            if (empty) empty.style.display = 'none';
+            grid.innerHTML = filtered
+                .map(r => {
+                    const id = String(r.id);
+                    const sel = __browseSelectedRecipeIds.has(id);
+                    return `<div class="recipe-card-selectable" style="border:2px solid ${sel ? '#5b9bad' : '#e5e7eb'};border-radius:10px;padding:14px;cursor:pointer;" onclick="toggleBrowseRecipeSelection('${escapeHtmlCh(id)}')">
+                        <div style="font-weight:700;">${escapeHtmlCh(r.title || r.name)}</div>
+                        <div style="font-size:13px;color:#64748b;">${escapeHtmlCh(r.category || r.cuisine || '')}</div>
+                    </div>`;
+                })
+                .join('');
+            const cnt = document.getElementById('selected-count');
+            if (cnt) cnt.textContent = String(__browseSelectedRecipeIds.size);
+        }
+
+        function toggleBrowseRecipeSelection(id) {
+            if (__browseSelectedRecipeIds.has(id)) __browseSelectedRecipeIds.delete(id);
+            else __browseSelectedRecipeIds.add(id);
+            filterBrowseItems();
+        }
+
+        async function addSelectedItemsToMenu() {
+            if (!__browseSelectedRecipeIds.size) {
+                alert('Select one or more recipes.');
+                return;
+            }
+            const recipes =
+                (window.universalRecipeManager &&
+                    window.universalRecipeManager.getAllRecipes &&
+                    window.universalRecipeManager.getAllRecipes()) ||
+                [];
+            for (const id of __browseSelectedRecipeIds) {
+                const r = recipes.find(x => String(x.id) === String(id));
+                if (!r || !window.enhancedMenuManager?.addMenuItem) continue;
+                if (currentSelectedMenu && window.enhancedMenuManager) {
+                    window.enhancedMenuManager.currentMenu = currentSelectedMenu;
+                    window.enhancedMenuManager.menuItems = currentSelectedMenu.items || [];
+                }
+                await window.enhancedMenuManager.addMenuItem(
+                    {
+                        name: r.title || r.name,
+                        description: r.description || '',
+                        category: r.category || r.cuisine || 'Main Courses',
+                        price: 0,
+                        targetFoodCost: 30,
+                        recipeId: r.id,
+                        allergens: [],
+                        dietaryInfo: []
+                    },
+                    false
+                );
+            }
+            __browseSelectedRecipeIds.clear();
+            closeModal('browse-existing-items-modal');
+            if (window.enhancedMenuManager?.showToast) {
+                window.enhancedMenuManager.showToast('Linked recipes from your library.', 'success');
+            }
+        }
+
+        function openCreateMenuModal() {
+            const m = document.getElementById('create-menu-modal');
+            if (!m) return;
+            const n = document.getElementById('create-menu-name');
+            const d = document.getElementById('create-menu-desc');
+            if (n) n.value = '';
+            if (d) d.value = '';
+            const cb = document.getElementById('create-menu-then-add-dish');
+            if (cb) cb.checked = true;
+            m.style.display = 'flex';
+            setTimeout(() => n && n.focus(), 50);
+        }
+
+        function submitCreateMenuFromModal() {
+            const name = document.getElementById('create-menu-name')?.value.trim();
+            if (!name) {
+                alert('Enter a menu name.');
+                return;
+            }
+            const description = document.getElementById('create-menu-desc')?.value.trim() || '';
+            const thenAdd = document.getElementById('create-menu-then-add-dish')?.checked;
+            closeModal('create-menu-modal');
+            createNewMenuWithOptions(name, description, thenAdd);
+        }
+
+        function createNewMenuWithOptions(menuName, menuDescription, openAddDish) {
+            const newMenu = {
+                id: 'menu_' + Date.now(),
+                name: menuName,
+                description: menuDescription || '',
+                items: [],
+                categories: [],
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                userId: window.authManager?.currentUser?.userId,
+                userEmail: window.authManager?.currentUser?.email
+            };
+            const user = window.authManager?.currentUser;
+            if (!user) {
+                alert('Sign in to create a menu.');
+                return;
+            }
+            const userId = user.userId || user.id;
+            const menuKey = `menus_${userId}`;
+            let menus = JSON.parse(localStorage.getItem(menuKey) || '[]');
+            menus.push(newMenu);
+            localStorage.setItem(menuKey, JSON.stringify(menus));
+            populateMenuSelector();
+            const newIndex = menus.length - 1;
+            const selector = document.getElementById('menu-selector');
+            if (selector) selector.value = String(newIndex);
+            selectMenuToEdit(newIndex);
+            if (window.enhancedMenuManager?.showToast) {
+                window.enhancedMenuManager.showToast(`Menu “${menuName}” created.`, 'success');
+            }
+            if (openAddDish) {
+                setTimeout(() => {
+                    if (typeof window.showAddItemModal === 'function') window.showAddItemModal();
+                }, 350);
+            }
+        }
+
         // Track currently selected menu
         let currentSelectedMenu = null;
         
         // Clear menu selection
         function clearMenuSelection() {
             currentSelectedMenu = null;
+            window.currentSelectedMenu = null;
             
             const editingDiv = document.getElementById('current-menu-editing');
             if (editingDiv) {
@@ -2505,6 +2768,20 @@
             const menu = menus[parseInt(selectedIndex)];
             
             if (!menu) return;
+            
+            currentSelectedMenu = { ...menu, index: parseInt(selectedIndex, 10) };
+            window.currentSelectedMenu = currentSelectedMenu;
+            
+            if (!menu.items) menu.items = [];
+            if (window.enhancedMenuManager) {
+                window.enhancedMenuManager.currentMenu = menu;
+                window.enhancedMenuManager.menuItems = menu.items || [];
+                const projectId = window.enhancedMenuManager.getCurrentProjectId();
+                localStorage.setItem(
+                    `menu_data_${projectId}`,
+                    JSON.stringify({ menu, items: menu.items || [] })
+                );
+            }
             
             console.log(`📖 Loading menu: ${menu.name}`);
             
@@ -2650,44 +2927,9 @@
             // This would integrate with the existing stats display
         }
         
-        // Create new menu
+        // Legacy entry: open modal instead of prompts
         function createNewMenu() {
-            const menuName = prompt('Enter menu name:', '89 Charles Fall Food Menu');
-            if (!menuName) return;
-            
-            const menuDescription = prompt('Enter menu description (optional):', 'Seasonal fall menu');
-            
-            const newMenu = {
-                id: 'menu_' + Date.now(),
-                name: menuName,
-                description: menuDescription || '',
-                items: [],
-                categories: [],
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                userId: window.authManager?.currentUser?.userId,
-                userEmail: window.authManager?.currentUser?.email
-            };
-            
-            // Save to user's menus
-            const user = window.authManager?.currentUser;
-            const userId = user.userId || user.id;
-            const menuKey = `menus_${userId}`;
-            let menus = JSON.parse(localStorage.getItem(menuKey) || '[]');
-            menus.push(newMenu);
-            localStorage.setItem(menuKey, JSON.stringify(menus));
-            
-            console.log(`✅ Created new menu: ${menuName}`);
-            
-            // Refresh selector
-            populateMenuSelector();
-            
-            // Select the new menu
-            const selector = document.getElementById('menu-selector');
-            selector.value = menus.length - 1;
-            loadSelectedMenu();
-            
-            alert(`✅ Menu "${menuName}" created!`);
+            openCreateMenuModal();
         }
         
         // Format date helper
@@ -3797,60 +4039,73 @@
             selectedRecipe = availableRecipes.find(r => r.id == recipeId);
         }
 
-        function selectExistingRecipe() {
+        async function selectExistingRecipe() {
             if (!selectedRecipe) {
                 alert('Please select a recipe first');
                 return;
             }
-            
-            // Create menu item from selected recipe
+            if (!window.currentSelectedMenu && !window.enhancedMenuManager?.currentMenu) {
+                alert('Select a menu from the cards above first (or create one with New Menu).');
+                return;
+            }
+            if (!window.enhancedMenuManager?.addMenuItem) {
+                alert('Menu builder is still loading. Try again in a moment.');
+                return;
+            }
             const menuItem = {
                 name: selectedRecipe.name || selectedRecipe.title,
-                description: selectedRecipe.description,
-                price: null,
+                description: selectedRecipe.description || '',
+                price: parseFloat(selectedRecipe.price) || 0,
                 recipeId: selectedRecipe.id,
-                prepTime: selectedRecipe.prepTime || selectedRecipe.prep_time,
-                servings: selectedRecipe.servings,
-                difficulty: selectedRecipe.difficulty,
+                targetFoodCost: 30,
                 category:
                     selectedRecipe.category ||
                     selectedRecipe.cuisine ||
-                    'Main Courses'
+                    'Main Courses',
+                allergens: [],
+                dietaryInfo: []
             };
-            
-            // Add to current category or create default category
-            const currentCategory = menuManager.ensureDefaultCategory();
-            menuManager.addItem(currentCategory.id, menuItem);
-            
+            if (window.currentSelectedMenu && window.enhancedMenuManager) {
+                window.enhancedMenuManager.currentMenu = window.currentSelectedMenu;
+                window.enhancedMenuManager.menuItems = window.currentSelectedMenu.items || [];
+            }
+            await window.enhancedMenuManager.addMenuItem(menuItem, false);
             closeModal('dish-selection-modal');
             selectedRecipe = null;
         }
 
-        function addNewDish() {
-            const form = document.getElementById('new-dish-form');
-            const formData = new FormData(form);
-            
+        async function addNewDish() {
             const dishName = document.getElementById('dish-name').value.trim();
             if (!dishName) {
                 alert('Please enter a dish name');
                 return;
             }
-            
+            if (!window.currentSelectedMenu && !window.enhancedMenuManager?.currentMenu) {
+                alert('Select a menu from the cards above first (or create one with New Menu).');
+                return;
+            }
+            if (!window.enhancedMenuManager?.addMenuItem) {
+                alert('Menu builder is still loading. Try again in a moment.');
+                return;
+            }
             const menuItem = {
                 name: dishName,
                 description: document.getElementById('dish-description').value.trim(),
-                price: parseFloat(document.getElementById('dish-price').value) || null,
-                targetFoodCost: parseFloat(document.getElementById('dish-target-food-cost')?.value) || 30, // Phase 3
-                recipeId: document.getElementById('dish-recipe-link')?.value || null, // Phase 3
-                prepTime: parseInt(document.getElementById('dish-prep-time').value) || null,
-                servings: parseInt(document.getElementById('dish-servings').value) || null,
-                category: document.getElementById('dish-category').value
+                price: parseFloat(document.getElementById('dish-price').value) || 0,
+                targetFoodCost:
+                    parseFloat(document.getElementById('dish-target-food-cost')?.value) || 30,
+                recipeId: document.getElementById('dish-recipe-link')?.value || null,
+                prepTime: parseInt(document.getElementById('dish-prep-time').value, 10) || null,
+                servings: parseInt(document.getElementById('dish-servings').value, 10) || null,
+                category: document.getElementById('dish-category').value,
+                allergens: [],
+                dietaryInfo: []
             };
-            
-            // Add to menu
-            const currentCategory = menuManager.ensureDefaultCategory();
-            menuManager.addItem(currentCategory.id, menuItem);
-            
+            if (window.currentSelectedMenu && window.enhancedMenuManager) {
+                window.enhancedMenuManager.currentMenu = window.currentSelectedMenu;
+                window.enhancedMenuManager.menuItems = window.currentSelectedMenu.items || [];
+            }
+            await window.enhancedMenuManager.addMenuItem(menuItem, true);
             closeModal('dish-selection-modal');
         }
 

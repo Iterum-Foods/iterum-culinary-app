@@ -29,7 +29,6 @@ class EnhancedMenuManager {
     await this.loadMenu();
     // Use setTimeout to ensure all elements are rendered
     setTimeout(() => {
-      this.setupEventListeners();
       this.setupFormHandlers();
     }, 100);
   }
@@ -68,40 +67,53 @@ class EnhancedMenuManager {
     const form = event.target;
     const formData = new FormData(form);
 
-    // Get form values
-    const createRecipe =
+    const mode = (formData.get('addItemMode') || 'new').toString();
+    const recipeId = (
+      document.getElementById('item-recipe-link')?.value || ''
+    ).trim();
+    const copySourceId = (
+      document.getElementById('item-copy-source-id')?.value || ''
+    ).trim();
+    const forceNewRecipe =
       document.getElementById('item-create-recipe')?.checked || false;
-    const recipeId = document.getElementById('item-recipe-link')?.value || '';
 
-    // AUTO-CREATE RECIPE: If no recipe is selected, automatically create one
-    // The checkbox is optional - if no recipe is linked, we create one automatically
-    const shouldCreateRecipe = createRecipe || !recipeId;
+    if (mode === 'link' && !recipeId && !forceNewRecipe) {
+      alert('Choose a recipe to link, or check “Create a new draft instead”.');
+      return;
+    }
+    if (mode === 'copy' && !copySourceId && !forceNewRecipe) {
+      alert('Pick the recipe you want to copy from, or check “Create a new draft instead”.');
+      return;
+    }
 
     try {
-      // Prepare item data
       const itemData = {
         name: formData.get('name'),
         description: formData.get('description') || '',
         category: formData.get('category') || 'Main Courses',
         price: parseFloat(formData.get('price')) || 0,
         targetFoodCost: parseFloat(formData.get('targetFoodCost')) || 30,
-        recipeId: shouldCreateRecipe ? null : recipeId, // Will be created if shouldCreateRecipe is true
+        recipeId:
+          mode === 'link' && !forceNewRecipe ? recipeId : null,
+        copiedFromRecipeId:
+          mode === 'copy' && !forceNewRecipe ? copySourceId : null,
         allergens: formData.get('allergens')
           ? formData
               .get('allergens')
               .split(',')
               .map(a => a.trim())
+              .filter(Boolean)
           : [],
         dietaryInfo: formData.get('dietaryInfo')
           ? formData
               .get('dietaryInfo')
               .split(',')
               .map(d => d.trim())
+              .filter(Boolean)
           : []
       };
 
-      // Add menu item (will automatically create recipe if no recipe is linked)
-      await this.addMenuItem(itemData, shouldCreateRecipe);
+      await this.addMenuItem(itemData, true);
 
       // Close modal
       const modal = document.getElementById('add-menu-item-modal');
@@ -451,6 +463,7 @@ class EnhancedMenuManager {
         price: parseFloat(itemData.price) || 0,
         targetFoodCost: parseFloat(itemData.targetFoodCost) || 30, // Phase 3: Default 30%
         recipeId: itemData.recipeId || null, // Phase 3: Link to recipe for automatic costing
+        copiedFromRecipeId: itemData.copiedFromRecipeId || null,
         allergens: itemData.allergens || [],
         dietaryInfo: itemData.dietaryInfo || [],
         projectedCovers: itemData.projectedCovers || 0,
@@ -524,7 +537,7 @@ class EnhancedMenuManager {
       if (!skipToast) {
         if (menuItem.recipeLinkStatus === 'auto-created') {
           this.showToast(
-            `✅ Menu item added! Recipe draft automatically created.`,
+            `✅ Dish added. Recipe draft created — open Recipe Developer to finish it.`,
             'success'
           );
         } else if (menuItem.recipeId) {
@@ -947,7 +960,9 @@ class EnhancedMenuManager {
       }
 
       // Populate recipe select if not already done
-      if (typeof populateRecipeSelects === 'function') {
+      if (typeof window.populateRecipeDropdownsForMenuBuilder === 'function') {
+        window.populateRecipeDropdownsForMenuBuilder();
+      } else if (typeof populateRecipeSelects === 'function') {
         populateRecipeSelects();
       }
 
@@ -957,7 +972,12 @@ class EnhancedMenuManager {
       if (createCheckbox && recipeSelect) {
         createCheckbox.checked = false;
         recipeSelect.disabled = false;
-        recipeSelect.required = true;
+        recipeSelect.required = false;
+      }
+      const modeNew = document.getElementById('add-mode-new');
+      if (modeNew) modeNew.checked = true;
+      if (typeof window.syncAddMenuItemModeUI === 'function') {
+        window.syncAddMenuItemModeUI();
       }
 
       modal.style.display = 'flex';
@@ -987,7 +1007,9 @@ class EnhancedMenuManager {
     const recipeSelect = document.getElementById('edit-item-recipe-link');
     if (recipeSelect) {
       // Populate recipes if needed
-      if (typeof populateRecipeSelects === 'function') {
+      if (typeof window.populateRecipeDropdownsForMenuBuilder === 'function') {
+        window.populateRecipeDropdownsForMenuBuilder();
+      } else if (typeof populateRecipeSelects === 'function') {
         populateRecipeSelects();
       }
       recipeSelect.value = item.recipeId || '';
@@ -1128,245 +1150,6 @@ Chocolate Cake, Rich chocolate cake with ganache, 6.99
     URL.revokeObjectURL(url);
 
     this.showToast('✅ Template downloaded!', 'success');
-  }
-
-  /**
-   * Setup event listeners
-   */
-  setupEventListeners() {
-    // Add item form
-    const addForm = document.getElementById('add-menu-item-form');
-    if (addForm && !addForm.hasAttribute('data-handler-attached')) {
-      addForm.setAttribute('data-handler-attached', 'true');
-      addForm.addEventListener('submit', async e => {
-        e.preventDefault();
-        await this.handleAddMenuItemForm(e);
-      });
-      console.log('✅ Add menu item form handler attached');
-    }
-
-    // Edit item form
-    const editForm = document.getElementById('edit-menu-item-form');
-    if (editForm && !editForm.hasAttribute('data-handler-attached')) {
-      editForm.setAttribute('data-handler-attached', 'true');
-      editForm.addEventListener('submit', async e => {
-        e.preventDefault();
-        await this.handleEditMenuItemForm(e);
-      });
-      console.log('✅ Edit menu item form handler attached');
-    }
-  }
-
-  /**
-   * Handle add menu item form submission
-   * REQUIRES: Recipe (either select existing or create new)
-   */
-  async handleAddMenuItemForm(event) {
-    const form = event.target;
-    const formData = new FormData(form);
-
-    // Get recipe requirement
-    const createRecipe =
-      document.getElementById('item-create-recipe')?.checked || false;
-    const recipeId = document.getElementById('item-recipe-link')?.value || '';
-
-    // VALIDATION: Recipe is REQUIRED
-    if (!createRecipe && !recipeId) {
-      alert(
-        '⚠️ Recipe Required: Every menu item must have a recipe.\n\nPlease either:\n1. Select an existing recipe from the dropdown, OR\n2. Check "Create New Recipe Draft Instead" to create a recipe automatically.'
-      );
-      return;
-    }
-
-    try {
-      const itemData = {
-        name: formData.get('name'),
-        description: formData.get('description') || '',
-        category: formData.get('category') || 'Main Courses',
-        price: parseFloat(formData.get('price')) || 0,
-        targetFoodCost: parseFloat(formData.get('targetFoodCost')) || 30,
-        recipeId: createRecipe ? null : recipeId, // Will be created if createRecipe is true
-        allergens: formData.get('allergens')
-          ? formData
-              .get('allergens')
-              .split(',')
-              .map(a => a.trim())
-              .filter(Boolean)
-          : [],
-        dietaryInfo: formData.get('dietaryInfo')
-          ? formData
-              .get('dietaryInfo')
-              .split(',')
-              .map(d => d.trim())
-              .filter(Boolean)
-          : []
-      };
-
-      // Add menu item (will create recipe if createRecipe is true)
-      await this.addMenuItem(itemData, createRecipe);
-
-      // Close modal
-      const modal = document.getElementById('add-menu-item-modal');
-      if (modal) {
-        modal.style.display = 'none';
-      }
-
-      // Reset form
-      form.reset();
-
-      // Update display
-      if (
-        window.currentSelectedMenu &&
-        typeof displayMenuItems === 'function'
-      ) {
-        displayMenuItems({
-          ...window.currentSelectedMenu,
-          items: this.menuItems
-        });
-      }
-    } catch (error) {
-      console.error('❌ Error adding menu item:', error);
-      alert(
-        `Error: ${error.message || 'Failed to add menu item. Please try again.'}`
-      );
-    }
-  }
-
-  /**
-   * Handle edit menu item form submission
-   * REQUIRES: Recipe
-   */
-  async handleEditMenuItemForm(event) {
-    const form = event.target;
-    const formData = new FormData(form);
-    const itemId = window._editingItemId;
-
-    if (!itemId) {
-      alert('Error: Menu item ID not found');
-      return;
-    }
-
-    const recipeId =
-      document.getElementById('edit-item-recipe-link')?.value || '';
-
-    // VALIDATION: Recipe is REQUIRED
-    if (!recipeId) {
-      alert(
-        '⚠️ Recipe Required: Every menu item must have a recipe. Please select a recipe.'
-      );
-      return;
-    }
-
-    try {
-      const item = this.menuItems.find(i => i.id === itemId);
-      if (!item) {
-        throw new Error('Menu item not found');
-      }
-
-      // Update item data
-      item.name = formData.get('name');
-      item.description = formData.get('description') || '';
-      item.category = formData.get('category') || 'Main Courses';
-      item.price = parseFloat(formData.get('price')) || 0;
-      item.targetFoodCost = parseFloat(formData.get('targetFoodCost')) || 30;
-      item.recipeId = recipeId; // REQUIRED
-      item.updatedAt = new Date().toISOString();
-
-      // Update in database
-      if (window.menuItemsDatabase) {
-        try {
-          const dbItem = window.menuItemsDatabase.getMenuItem(itemId);
-          if (dbItem) {
-            dbItem.name = item.name;
-            dbItem.description = item.description;
-            dbItem.category = item.category;
-            dbItem.price = item.price;
-            dbItem.targetFoodCost = item.targetFoodCost;
-            dbItem.recipeId = item.recipeId; // REQUIRED
-
-            // Get recipe name
-            try {
-              const recipes = JSON.parse(
-                localStorage.getItem('recipes') || '[]'
-              );
-              const recipeIdeas = JSON.parse(
-                localStorage.getItem('recipe_ideas') || '[]'
-              );
-              const recipeStubs = JSON.parse(
-                localStorage.getItem('recipe_stubs') || '[]'
-              );
-              const allRecipes = [...recipes, ...recipeIdeas, ...recipeStubs];
-              const recipe = allRecipes.find(
-                r => (r.id || r._id) === item.recipeId
-              );
-              if (recipe) {
-                dbItem.recipeName = recipe.name || recipe.title;
-              }
-            } catch (error) {
-              console.warn('Could not load recipe name:', error);
-            }
-
-            dbItem.updatedAt = item.updatedAt;
-            window.menuItemsDatabase.saveMenuItem(dbItem);
-          } else {
-            // Add to database if not there
-            window.menuItemsDatabase.saveMenuItem({
-              ...item,
-              menuIds: [this.currentMenu?.id].filter(Boolean),
-              userId: this.getCurrentUserId(),
-              projectId: this.getCurrentProjectId()
-            });
-          }
-        } catch (error) {
-          console.error('Error updating menu item in database:', error);
-        }
-      }
-
-      // Save menu
-      await this.saveMenu();
-
-      // Update in user menus list
-      if (window.currentSelectedMenu) {
-        const user = window.authManager?.currentUser;
-        if (user) {
-          const userId = user.userId || user.id;
-          const menuKey = `menus_${userId}`;
-          const menus = JSON.parse(localStorage.getItem(menuKey) || '[]');
-          const menuIndex = menus.findIndex(m => m.id === this.currentMenu?.id);
-          if (menuIndex !== -1) {
-            menus[menuIndex].items = this.menuItems;
-            localStorage.setItem(menuKey, JSON.stringify(menus));
-          }
-        }
-      }
-
-      // Close modal
-      const modal = document.getElementById('edit-menu-item-modal');
-      if (modal) {
-        modal.style.display = 'none';
-      }
-
-      window._editingItemId = null;
-
-      // Refresh display
-      this.renderMenuItems();
-      if (
-        window.currentSelectedMenu &&
-        typeof displayMenuItems === 'function'
-      ) {
-        displayMenuItems({
-          ...window.currentSelectedMenu,
-          items: this.menuItems
-        });
-      }
-
-      this.showToast('✅ Menu item updated!', 'success');
-    } catch (error) {
-      console.error('❌ Error updating menu item:', error);
-      alert(
-        `Error: ${error.message || 'Failed to update menu item. Please try again.'}`
-      );
-    }
   }
 
   /**

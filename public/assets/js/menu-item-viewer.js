@@ -496,7 +496,7 @@ class MenuItemViewer {
     this.showToast('✅ Menu item updated!');
   }
 
-  duplicateMenuItem(menuId, itemIndex) {
+  async duplicateMenuItem(menuId, itemIndex) {
     console.log(`📋 Duplicating menu item: ${menuId}, index: ${itemIndex}`);
 
     const user = window.authManager?.currentUser;
@@ -519,11 +519,52 @@ class MenuItemViewer {
       ...item,
       name: `${item.name} (Copy)`,
       id: `item_${Date.now()}`,
+      recipeId: null,
+      recipeName: undefined,
+      recipeLinkStatus: undefined,
+      copiedFromRecipeId: item.recipeId || null,
       createdAt: new Date().toISOString()
     };
 
     menu.items.push(duplicate);
     localStorage.setItem(menuKey, JSON.stringify(menus));
+
+    if (
+      window.menuRecipeIntegration?.createRecipeStubForMenuItem &&
+      !duplicate.recipeId
+    ) {
+      try {
+        const stub =
+          await window.menuRecipeIntegration.createRecipeStubForMenuItem({
+            id: duplicate.id,
+            name: duplicate.name,
+            description: duplicate.description || '',
+            category: duplicate.category || 'Main Courses',
+            price: duplicate.price,
+            copiedFromRecipeId: item.recipeId || null
+          });
+        if (stub?.id) {
+          duplicate.recipeId = stub.id;
+          duplicate.recipeLinkStatus = 'auto-created';
+          localStorage.setItem(menuKey, JSON.stringify(menus));
+        }
+      } catch (e) {
+        console.warn('Duplicate → recipe stub skipped:', e);
+      }
+    }
+
+    if (
+      window.enhancedMenuManager &&
+      String(window.currentSelectedMenu?.id) === String(menuId)
+    ) {
+      window.enhancedMenuManager.currentMenu = menu;
+      window.enhancedMenuManager.menuItems = menu.items || [];
+      const projectId = window.enhancedMenuManager.getCurrentProjectId();
+      localStorage.setItem(
+        `menu_data_${projectId}`,
+        JSON.stringify({ menu, items: menu.items || [] })
+      );
+    }
 
     // Close modal and refresh
     document
@@ -534,7 +575,7 @@ class MenuItemViewer {
       displayMenuItems(menu);
     }
 
-    this.showToast('✅ Menu item duplicated!');
+    this.showToast('✅ Copy added with a new recipe draft to finish.');
   }
 
   printMenuItem(menuId, itemIndex) {
