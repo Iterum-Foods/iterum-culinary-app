@@ -6,7 +6,7 @@
   'use strict';
 
   var LOCAL_SEED_VERSION = 5;
-  var FIRESTORE_SEED_VERSION = 1;
+  var FIRESTORE_SEED_VERSION = 2;
 
   function normEmail(e) {
     return (e || '').trim().toLowerCase();
@@ -208,6 +208,48 @@
       { merge: true }
     );
 
+    if (typeof window.getIterumDemoFirestoreMenuMirror === 'function') {
+      try {
+        var menuMirror = window.getIterumDemoFirestoreMenuMirror(uid);
+        var fsMenuRef = doc(db, 'projects', projectId, 'menus', 'primary');
+        await setDoc(
+          fsMenuRef,
+          {
+            menu: menuMirror.menu,
+            items: menuMirror.items,
+            links: menuMirror.links || {},
+            itemCount: menuMirror.itemCount || 0,
+            updatedBy: uid,
+            syncedAt: new Date().toISOString(),
+            updatedAt: fs.serverTimestamp()
+          },
+          { merge: true }
+        );
+      } catch (e) {
+        console.warn('[Iterum demo] Menu Firestore mirror failed', e);
+      }
+    }
+
+    if (typeof window.getIterumDemoRecipeLibraryMirror === 'function') {
+      try {
+        var recipesMirror = window.getIterumDemoRecipeLibraryMirror(uid);
+        var snapRef = doc(db, 'users', uid, 'snapshots', 'recipeLibrary');
+        await setDoc(
+          snapRef,
+          {
+            recipes: recipesMirror,
+            count: recipesMirror.length,
+            fullCount: recipesMirror.length,
+            syncedAt: new Date().toISOString(),
+            updatedAt: fs.serverTimestamp()
+          },
+          { merge: true }
+        );
+      } catch (e) {
+        console.warn('[Iterum demo] Recipe snapshot mirror failed', e);
+      }
+    }
+
     localStorage.setItem(doneKey, String(FIRESTORE_SEED_VERSION));
     console.log('[Iterum demo] Firestore compliance sample saved for uid', uid);
   }
@@ -232,7 +274,7 @@
 
   function scheduleDemoWork(user) {
     if (!isDemoUser(user)) return;
-    var uid = user.id || user.userId;
+    var uid = user.id || user.userId || user.uid;
     if (!uid) return;
 
     runLocalSeed(uid);
@@ -280,4 +322,48 @@
       scheduleDemoWork(window.authManager.currentUser);
     }
   }, 2000);
+
+  function tryAttachFirebaseShiftPage() {
+    if (typeof window === 'undefined' || !window.firebaseConfig) return;
+    var started = false;
+    function run() {
+      if (started) return;
+      started = true;
+      Promise.all([
+        import(
+          'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js'
+        ),
+        import(
+          'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js'
+        )
+      ])
+        .then(function (mods) {
+          var appMod = mods[0];
+          var authMod = mods[1];
+          var app = appMod.getApps().length
+            ? appMod.getApp()
+            : appMod.initializeApp(window.firebaseConfig);
+          var auth = authMod.getAuth(app);
+          authMod.onAuthStateChanged(auth, function (u) {
+            if (!u || !u.email) return;
+            scheduleDemoWork({
+              id: u.uid,
+              userId: u.uid,
+              uid: u.uid,
+              email: u.email
+            });
+          });
+        })
+        .catch(function (e) {
+          console.warn('[Iterum demo] Firebase shift attach failed', e);
+        });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run);
+    } else {
+      setTimeout(run, 0);
+    }
+  }
+
+  tryAttachFirebaseShiftPage();
 })();

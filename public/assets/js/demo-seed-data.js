@@ -1649,6 +1649,43 @@
     };
   };
 
+  /**
+   * Same paths as office Firestore sync: projects/{projectId}/menus/primary (Shift hub).
+   * @param {string} [uid]
+   */
+  global.getIterumDemoFirestoreMenuMirror = function (uid) {
+    uid = uid || sessionUserId() || 'guest';
+    var builder = demoMenuBuilderData(uid);
+    return {
+      projectId: DEMO_PROJECT_ID,
+      menu: builder.menuDataPayload.menu,
+      items: builder.menuDataPayload.items,
+      links: menuRecipeLinkMap(builder.menuDataPayload.items, uid),
+      itemCount: builder.menuDataPayload.items.length
+    };
+  };
+
+  /**
+   * users/{uid}/snapshots/recipeLibrary — lean objects for mobile list + Firestore limits.
+   * @param {string} [uid]
+   */
+  global.getIterumDemoRecipeLibraryMirror = function (uid) {
+    uid = uid || sessionUserId() || 'guest';
+    return demoRecipes(uid).map(function (r) {
+      var o = {
+        id: r.id,
+        name: r.name || r.title,
+        title: r.title || r.name,
+        description: r.description || '',
+        servings: r.servings
+      };
+      if (r.yield != null && r.yield !== '') {
+        o.yield = r.yield;
+      }
+      return o;
+    });
+  };
+
   global.ITERUM_DEMO_PROJECT_ID = DEMO_PROJECT_ID;
   global.ITERUM_DEMO_EMAILS = ['demo@iterumfoods.com'];
 })(typeof window !== 'undefined' ? window : this);

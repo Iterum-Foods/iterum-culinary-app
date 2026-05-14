@@ -159,6 +159,69 @@ export function attachLineEmployeeHub(api) {
     return v !== '' && v !== 'mobile-default';
   }
 
+  /**
+   * When Firestore has no published menu, use the same keys as the web app
+   * (menu_data_{projectId} or menus_{uid}).
+   */
+  function tryLocalPublishedMenu(uid, projectId) {
+    if (!uid || !projectId) return null;
+    try {
+      const raw = localStorage.getItem(`menu_data_${projectId}`);
+      if (raw) {
+        const data = JSON.parse(raw);
+        const items = Array.isArray(data.items) ? data.items : [];
+        if (items.length) {
+          const menuName =
+            (data.menu && data.menu.name) || data.name || 'Published menu';
+          return { menuName, items };
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+    try {
+      const raw = localStorage.getItem(`menus_${uid}`);
+      if (!raw) return null;
+      const menus = JSON.parse(raw);
+      if (!Array.isArray(menus)) return null;
+      const match = menus.find(
+        m =>
+          m &&
+          (m.projectId === projectId ||
+            m.project === projectId ||
+            (m.menuData && m.menuData.projectId === projectId))
+      );
+      if (!match || !Array.isArray(match.items) || !match.items.length) {
+        return null;
+      }
+      return {
+        menuName: match.name || 'Published menu',
+        items: match.items
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  function readLocalRecipesMerged() {
+    try {
+      const legacy = JSON.parse(localStorage.getItem('recipes') || '[]');
+      const lib = JSON.parse(localStorage.getItem('recipe_library') || '[]');
+      const byId = {};
+      for (const r of Array.isArray(legacy) ? legacy : []) {
+        if (r && r.id) byId[r.id] = r;
+      }
+      for (const r of Array.isArray(lib) ? lib : []) {
+        if (r && r.id) {
+          byId[r.id] = Object.assign({}, byId[r.id] || {}, r);
+        }
+      }
+      return Object.values(byId);
+    } catch {
+      return [];
+    }
+  }
+
   function timestampToMs(value) {
     if (!value) {
       return 0;
@@ -328,6 +391,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
   async function loadPublishedMenu() {
     const db = getDb();
     const body = document.getElementById('menu-published-body');
+    const uid = getAuth()?.currentUser?.uid;
     if (!db || !body) return;
     if (!teamProjectSelected()) {
       body.innerHTML =
@@ -335,6 +399,24 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
       return;
     }
     body.innerHTML = '<p class="mc-hint">Loading menu…</p>';
+    function renderMenuRows(menuName, items, hintHtml) {
+      if (!items.length) {
+        body.innerHTML = `<p><strong>${escapeHtml(menuName)}</strong></p><p class="mc-empty">No items in this snapshot.</p>`;
+        return;
+      }
+      const rows = items
+        .map(it => {
+          const name = it.name || it.title || it.itemName || it.label || 'Item';
+          const price = it.price != null ? String(it.price) : '';
+          const cat = it.category || it.section || '';
+          return `<li class="mc-card"><strong>${escapeHtml(name)}</strong>${cat ? `<div class="mc-hint">${escapeHtml(cat)}</div>` : ''}${price ? `<div class="mc-hint">${escapeHtml(price)}</div>` : ''}</li>`;
+        })
+        .join('');
+      const hint = hintHtml
+        ? `<p class="mc-hint">${hintHtml}</p>`
+        : '';
+      body.innerHTML = `${hint}<p class="mc-panel-title">${escapeHtml(menuName)}</p><ul class="mc-list">${rows}</ul>`;
+    }
     try {
       const projectRef = doc(db, 'projects', pid());
       let menuSnap = await getDoc(
@@ -348,28 +430,27 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
           menuSnap = list.docs[0];
         }
       }
-      if (!menuSnap.exists()) {
-        body.innerHTML =
-          '<p class="mc-empty">No menu here yet. Ask a manager to publish it from the office app.</p>';
+      if (menuSnap.exists()) {
+        const data = menuSnap.data();
+        const items = Array.isArray(data.items) ? data.items : [];
+        const menuName =
+          (data.menu && data.menu.name) || data.name || 'Published menu';
+        renderMenuRows(menuName, items, '');
         return;
       }
-      const data = menuSnap.data();
-      const items = Array.isArray(data.items) ? data.items : [];
-      const menuName =
-        (data.menu && data.menu.name) || data.name || 'Published menu';
-      if (!items.length) {
-        body.innerHTML = `<p><strong>${escapeHtml(menuName)}</strong></p><p class="mc-empty">No items in this snapshot.</p>`;
+      const localMenu = uid ? tryLocalPublishedMenu(uid, pid()) : null;
+      if (localMenu) {
+        renderMenuRows(
+          localMenu.menuName,
+          localMenu.items,
+          escapeHtml(
+            'Showing menu from this device (same data as the office web app on this browser).'
+          )
+        );
         return;
       }
-      const rows = items
-        .map(it => {
-          const name = it.name || it.title || it.itemName || it.label || 'Item';
-          const price = it.price != null ? String(it.price) : '';
-          const cat = it.category || it.section || '';
-          return `<li class="mc-card"><strong>${escapeHtml(name)}</strong>${cat ? `<div class="mc-hint">${escapeHtml(cat)}</div>` : ''}${price ? `<div class="mc-hint">${escapeHtml(price)}</div>` : ''}</li>`;
-        })
-        .join('');
-      body.innerHTML = `<p class="mc-panel-title">${escapeHtml(menuName)}</p><ul class="mc-list">${rows}</ul>`;
+      body.innerHTML =
+        '<p class="mc-empty">No menu here yet. Ask a manager to publish it from the office app.</p>';
     } catch (e) {
       console.error(e);
       body.innerHTML =
@@ -388,24 +469,14 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
       return;
     }
     body.innerHTML = '<p class="mc-hint">Loading recipes…</p>';
-    try {
-      const userSnap = await getDoc(
-        doc(db, 'users', uid, 'snapshots', 'recipeLibrary')
-      );
-      if (!userSnap.exists()) {
-        body.innerHTML =
-          '<p class="mc-empty">No recipes found yet. Publish or sync recipes from the web app first.</p>';
-        return;
-      }
-      const recipes = Array.isArray(userSnap.data()?.recipes)
-        ? userSnap.data().recipes
-        : [];
+    function renderRecipeList(recipes, hintHtml) {
       if (!recipes.length) {
         body.innerHTML =
           '<p class="mc-empty">Recipe list is empty for this account.</p>';
         return;
       }
-      body.innerHTML = `<ul class="mc-list">${recipes
+      const hint = hintHtml ? `<p class="mc-hint">${hintHtml}</p>` : '';
+      body.innerHTML = `${hint}<ul class="mc-list">${recipes
         .slice(0, 80)
         .map(recipe => {
           const name =
@@ -423,6 +494,37 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
           </li>`;
         })
         .join('')}</ul>`;
+    }
+    try {
+      const userSnap = await getDoc(
+        doc(db, 'users', uid, 'snapshots', 'recipeLibrary')
+      );
+      if (userSnap.exists()) {
+        const recipes = Array.isArray(userSnap.data()?.recipes)
+          ? userSnap.data().recipes
+          : [];
+        if (recipes.length) {
+          renderRecipeList(recipes, '');
+          return;
+        }
+      }
+      const localRec = readLocalRecipesMerged();
+      if (localRec.length) {
+        renderRecipeList(
+          localRec,
+          escapeHtml(
+            'Showing recipes from this device (same library as the office web app on this browser).'
+          )
+        );
+        return;
+      }
+      if (!userSnap.exists()) {
+        body.innerHTML =
+          '<p class="mc-empty">No recipes found yet. Publish or sync recipes from the web app first.</p>';
+        return;
+      }
+      body.innerHTML =
+        '<p class="mc-empty">Recipe list is empty for this account.</p>';
     } catch (e) {
       console.error(e);
       body.innerHTML = '<p class="mc-empty">Could not load recipes.</p>';
