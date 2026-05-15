@@ -5,8 +5,8 @@
 (function () {
   'use strict';
 
-  var LOCAL_SEED_VERSION = 5;
-  var FIRESTORE_SEED_VERSION = 2;
+  var LOCAL_SEED_VERSION = 6;
+  var FIRESTORE_SEED_VERSION = 3;
 
   function normEmail(e) {
     return (e || '').trim().toLowerCase();

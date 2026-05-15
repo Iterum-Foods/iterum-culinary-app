@@ -385,36 +385,31 @@
         id: 'demo_recipe_seaweed_oyster',
         title: 'Chilled oysters — seaweed mignonette',
         name: 'Chilled oysters — seaweed mignonette',
-        description: 'Bar bite — brine forward, kelp vinegar.',
+        description: 'Shuck to order · kelp–shallot mignonette.',
         category: 'appetizer',
         cuisine: 'Nordic',
         servings: 12,
-        prepTime: 20,
+        prepTime: 15,
         cookTime: 0,
         difficulty: 'easy',
         projectId: DEMO_PROJECT_ID,
         project: DEMO_PROJECT_ID,
         userId: uid,
         status: 'published',
-        tags: ['shellfish', 'bar', 'demo'],
+        tags: ['shellfish', 'bar', 'demo', 'bar_pass'],
         ingredients: [
+          { name: 'Oysters', amount: '24', unit: 'pc', notes: 'shucked' },
           {
-            name: 'Oysters',
-            amount: '24',
-            unit: 'pc',
-            notes: 'shucked to order'
-          },
-          { name: 'Kelp vinegar', amount: '100', unit: 'ml', notes: '' },
-          { name: 'Shallot brunoise', amount: '40', unit: 'g', notes: '' }
+            name: 'Mignonette',
+            amount: '1',
+            unit: 'batch',
+            notes: 'kelp vinegar + shallot + white pepper'
+          }
         ],
         instructions: [
           {
             step: 1,
-            instruction: 'Shuck; check liquor; nest on crushed ice.'
-          },
-          {
-            step: 2,
-            instruction: 'Mignonette: kelp vinegar + shallot + white pepper.'
+            instruction: 'Ice + mignonette cup; shuck; check liquor.'
           }
         ],
         createdAt: now,
@@ -424,28 +419,32 @@
         id: 'demo_recipe_koji_rye',
         title: 'Koji rye loaf',
         name: 'Koji rye loaf',
-        description: 'Demo bread program — long ferment, malt notes.',
+        description: 'Pastry batch — slice cold for pass.',
         category: 'bakery',
         cuisine: 'Nordic',
         servings: 2,
-        prepTime: 30,
+        prepTime: 20,
         cookTime: 45,
-        difficulty: 'hard',
+        difficulty: 'medium',
         projectId: DEMO_PROJECT_ID,
         project: DEMO_PROJECT_ID,
         userId: uid,
         status: 'published',
-        tags: ['bread', 'fermentation', 'demo'],
+        tags: ['bread', 'fermentation', 'demo', 'bar_pass'],
         ingredients: [
-          { name: 'Rye flour', amount: '400', unit: 'g', notes: '' },
-          { name: 'Koji syrup', amount: '40', unit: 'ml', notes: '' },
-          { name: 'Salt', amount: '10', unit: 'g', notes: '' },
-          { name: 'Water', amount: '280', unit: 'ml', notes: 'ice-cold mix' }
+          {
+            name: 'Rye dough (bulk)',
+            amount: '1',
+            unit: 'batch',
+            notes: 'rye + koji syrup + salt + water — baked off AM'
+          },
+          { name: 'Cultured butter', amount: '1', unit: 'quart', notes: 'whipped' }
         ],
         instructions: [
-          { step: 1, instruction: 'Autolyse 20 min; add salt + koji syrup.' },
-          { step: 2, instruction: 'Bulk 3 h with folds; shape batard.' },
-          { step: 3, instruction: 'Bake 230°C steam-off 40 min.' }
+          {
+            step: 1,
+            instruction: 'Pull from pastry; 6 mm slices; butter ramekin on tray.'
+          }
         ],
         createdAt: now,
         updatedAt: now
@@ -454,31 +453,32 @@
         id: 'demo_recipe_maitake_skewer',
         title: 'Charred maitake — smoked cream',
         name: 'Charred maitake — smoked cream',
-        description: 'Vegan bar skewer; hot pass or pass-around.',
+        description: 'Grill skewer · dip smoked cream (vegan).',
         category: 'appetizer',
         cuisine: 'Nordic',
         servings: 16,
-        prepTime: 15,
-        cookTime: 12,
-        difficulty: 'medium',
+        prepTime: 12,
+        cookTime: 10,
+        difficulty: 'easy',
         projectId: DEMO_PROJECT_ID,
         project: DEMO_PROJECT_ID,
         userId: uid,
         status: 'published',
-        tags: ['vegetarian', 'bar', 'demo'],
+        tags: ['vegetarian', 'bar', 'demo', 'bar_pass'],
         ingredients: [
-          { name: 'Maitake clusters', amount: '800', unit: 'g', notes: '' },
           {
-            name: 'Smoked cashew cream',
-            amount: '200',
-            unit: 'ml',
-            notes: ''
+            name: 'Maitake + oil + salt',
+            amount: '1',
+            unit: 'mis',
+            notes: 'skewer 80 g clusters'
           },
-          { name: 'Grape seed oil', amount: '30', unit: 'ml', notes: '' }
+          { name: 'Smoked cashew cream', amount: '200', unit: 'ml', notes: 'hot' }
         ],
         instructions: [
-          { step: 1, instruction: 'Toss maitake in oil; salt; skewer.' },
-          { step: 2, instruction: 'Char on grill; nap smoked cream.' }
+          {
+            step: 1,
+            instruction: 'Char skewers; ramekin of cream on pick-up tray.'
+          }
         ],
         createdAt: now,
         updatedAt: now
@@ -487,27 +487,30 @@
         id: 'demo_recipe_yuzu_spritzer',
         title: 'Yuzu–honey spritzer (NA)',
         name: 'Yuzu–honey spritzer (NA)',
-        description: 'Zero-proof bar anchor with bubble.',
+        description: 'Build in glass: yuzu + honey 1:1 + soda.',
         category: 'beverage',
         cuisine: 'Fusion',
         servings: 1,
-        prepTime: 5,
+        prepTime: 2,
         cookTime: 0,
         difficulty: 'easy',
         projectId: DEMO_PROJECT_ID,
         project: DEMO_PROJECT_ID,
         userId: uid,
         status: 'published',
-        tags: ['na-bev', 'bar', 'demo'],
+        tags: ['na-bev', 'bar', 'demo', 'bar_pass'],
         ingredients: [
-          { name: 'Yuzu juice', amount: '20', unit: 'ml', notes: '' },
-          { name: 'Honey syrup', amount: '15', unit: 'ml', notes: '1:1' },
-          { name: 'Soda', amount: '120', unit: 'ml', notes: '' }
+          {
+            name: 'Yuzu 20 ml + honey syrup 15 ml + soda 120 ml',
+            amount: '1',
+            unit: 'serve',
+            notes: 'wine glass, ice'
+          }
         ],
         instructions: [
           {
             step: 1,
-            instruction: 'Build in wine glass over ice; stir gently.'
+            instruction: 'Pour yuzu + syrup; top soda; one gentle stir.'
           }
         ],
         createdAt: now,
@@ -517,34 +520,31 @@
         id: 'demo_recipe_cloudberry_shrub',
         title: 'Cloudberry shrub cordial',
         name: 'Cloudberry shrub cordial',
-        description: 'Shot or lengthen — vinegar balance for bar.',
+        description: 'Batch cordial — 20 ml shot or lengthen with soda.',
         category: 'beverage',
         cuisine: 'Nordic',
         servings: 12,
-        prepTime: 15,
-        cookTime: 10,
+        prepTime: 10,
+        cookTime: 8,
         difficulty: 'easy',
         projectId: DEMO_PROJECT_ID,
         project: DEMO_PROJECT_ID,
         userId: uid,
         status: 'published',
-        tags: ['na-bev', 'bar', 'demo'],
+        tags: ['na-bev', 'bar', 'demo', 'bar_pass'],
         ingredients: [
           {
-            name: 'Cloudberry preserves',
-            amount: '200',
-            unit: 'g',
-            notes: ''
-          },
-          { name: 'Champagne vinegar', amount: '80', unit: 'ml', notes: '' },
-          { name: 'Sugar', amount: '60', unit: 'g', notes: '' }
+            name: 'Cordial base',
+            amount: '1',
+            unit: 'batch',
+            notes: 'cloudberry + sugar simmer, cool, strain, add vinegar'
+          }
         ],
         instructions: [
           {
             step: 1,
-            instruction: 'Simmer preserves with sugar; cool; add vinegar.'
-          },
-          { step: 2, instruction: 'Strain; bottle; dose 20 ml per serve.' }
+            instruction: 'Bottle dated; service: 20 ml neat or + soda.'
+          }
         ],
         createdAt: now,
         updatedAt: now

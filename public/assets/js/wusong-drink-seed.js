@@ -177,28 +177,40 @@
   ];
 
   /**
-   * Render a structured drink as a single-string `spec` (matches the existing
-   * bar_line_pack reader on mobile, which falls back to spec/body/recipe/build).
+   * Compact pass-sheet text for bar_line_pack / Shift (short lines, no heavy bullets).
    * @param {DrinkSpec} d
    * @returns {string}
    */
   function specToText(d) {
-    var lines = [];
+    var parts = [];
     if (Array.isArray(d.build) && d.build.length) {
-      lines.push('Build:');
-      d.build.forEach(function (b) {
-        var amt = b.amount || '';
-        var unit = b.unit || '';
-        lines.push(
-          '  • ' + b.ingredient + ': ' + amt + (unit ? ' ' + unit : '')
-        );
-      });
+      var buildLine = d.build
+        .map(function (b) {
+          var amt = String(b.amount || '').trim();
+          var unit = (b.unit || '').trim();
+          var u = unit ? ' ' + unit : '';
+          return (b.ingredient || '').trim() + ' ' + amt + u;
+        })
+        .join(' · ');
+      parts.push(buildLine);
     }
-    if (d.glass) lines.push('Glass: ' + d.glass);
-    if (d.method) lines.push('Method: ' + d.method);
-    if (d.garnish) lines.push('Garnish: ' + d.garnish);
-    if (d.allergies) lines.push('Allergies: ' + d.allergies);
-    return lines.join('\n');
+    var gm = [];
+    if (d.glass) {
+      gm.push(d.glass);
+    }
+    if (d.method) {
+      gm.push(d.method);
+    }
+    if (gm.length) {
+      parts.push(gm.join(' — '));
+    }
+    if (d.garnish) {
+      parts.push('Garnish: ' + d.garnish);
+    }
+    if (d.allergies) {
+      parts.push('Allergies: ' + d.allergies);
+    }
+    return parts.join('\n');
   }
 
   global.ITERUM_WUSONG_DRINKS = WUSONG_DRINKS;
