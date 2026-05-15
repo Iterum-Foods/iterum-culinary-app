@@ -3,7 +3,7 @@
  * Syncs user data between localStorage and Firebase Firestore
  */
 
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
 import {
   getFirestore,
   doc,
@@ -19,7 +19,7 @@ import {
   limit,
   onSnapshot,
   serverTimestamp
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
 class FirestoreSync {
   constructor() {
@@ -37,21 +37,35 @@ class FirestoreSync {
     return String(source).replace(/[^a-zA-Z0-9_-]/g, '_');
   }
 
+  /**
+   * Firestore `users/{userId}/...` rules require `userId === request.auth.uid` for many paths.
+   * Do not derive userId from email slug — that causes permission errors while signed in.
+   */
+  looksLikeFirebaseUid(value) {
+    const s = String(value || '').trim();
+    if (!s || s.includes('@')) {
+      return false;
+    }
+    return /^[a-zA-Z0-9_-]{10,128}$/.test(s);
+  }
+
   resolveUserId(explicitUserId) {
     if (explicitUserId) {
-      return this.normalizeId(explicitUserId);
+      const t = String(explicitUserId).trim();
+      return t ? this.normalizeId(t) : 'local-testing';
     }
 
     const firebaseUid = window.firebaseAuth?.auth?.currentUser?.uid;
     if (firebaseUid) {
-      return firebaseUid;
+      return String(firebaseUid);
     }
 
     const authUser = window.authManager?.currentUser;
     if (authUser) {
-      const id = authUser.userId || authUser.id || authUser.uid;
-      if (id) {
-        return this.normalizeId(id);
+      for (const c of [authUser.uid, authUser.userId, authUser.id]) {
+        if (c && this.looksLikeFirebaseUid(c)) {
+          return this.normalizeId(String(c).trim());
+        }
       }
     }
 
@@ -59,11 +73,11 @@ class FirestoreSync {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        if (parsed?.id || parsed?.userId) {
-          return this.normalizeId(parsed.id || parsed.userId);
-        }
-        if (parsed?.email) {
-          return this.normalizeId(parsed.email);
+        for (const key of ['uid', 'userId', 'id']) {
+          const v = parsed?.[key];
+          if (v && this.looksLikeFirebaseUid(v)) {
+            return this.normalizeId(String(v).trim());
+          }
         }
       } catch (error) {
         console.warn(
@@ -232,7 +246,7 @@ class FirestoreSync {
       } catch (e) {
         // App might already be initialized
         const { getApp } = await import(
-          'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js'
+          'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js'
         );
         app = getApp();
       }
