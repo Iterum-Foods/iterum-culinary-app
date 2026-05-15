@@ -507,6 +507,8 @@
                     ...groupExtras
                 });
 
+                loadProjects();
+
                 alert(`✅ Project "${projectName}" created!\n\nOpening project...`);
                 openProject(project.id);
             }
@@ -674,6 +676,8 @@
                 ...groupExtras
             });
 
+            loadProjects();
+
             // Close modal
             document.querySelector('.modal-overlay').remove();
 
@@ -764,6 +768,12 @@
             const groupBadge = project.restaurantGroupName
                 ? `<div style="margin-top:10px;font-size:12px;font-weight:600;color:#2c3e46;">📍 Group: ${escapeHtml(project.restaurantGroupName)}</div>`
                 : '';
+            const underMaster =
+                project.parentProjectId === 'master' &&
+                project.id !== 'master' &&
+                project.type !== 'master'
+                    ? `<div style="margin-top:6px;font-size:11px;color:#64748b;">Linked under <strong>Master Project</strong> workspace</div>`
+                    : '';
 
             return `
                 <div class="project-card" style="border-left-color: ${borderColor};">
@@ -774,6 +784,7 @@
                         </div>
                         <div class="project-desc">${escapeHtml(project.description || 'No description')}</div>
                         ${groupBadge}
+                        ${underMaster}
                     </div>
                     
                     <div class="project-stats">

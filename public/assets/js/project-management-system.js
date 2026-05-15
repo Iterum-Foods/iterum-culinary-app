@@ -19,44 +19,11 @@ class ProjectManagementSystem {
   /**
    * Initialize master project
    */
-  initializeMasterProject() {
-    console.log('🏗️ Initializing master project...');
-
-    // Create master project if it doesn't exist
-    const masterProject = {
-      id: this.masterProjectId,
-      name: 'Master Project',
-      description: 'Default project for all culinary data',
-      type: 'master',
-      createdAt: new Date().toISOString(),
-      isDefault: true
-    };
-
-    // Ensure master project exists in storage
-    this.ensureMasterProject(masterProject);
-  }
-
   /**
-   * Ensure master project exists in storage
+   * @deprecated Master is ensured inside loadProjects(); kept for any legacy callers.
    */
-  ensureMasterProject(masterProject) {
-    try {
-      const stored = localStorage.getItem(this.storageKey);
-      let projects = stored ? JSON.parse(stored) : [];
-
-      // Check if master project exists
-      const masterExists = projects.some(p => p.id === this.masterProjectId);
-
-      if (!masterExists) {
-        projects.push(masterProject);
-        localStorage.setItem(this.storageKey, JSON.stringify(projects));
-        console.log('✅ Master project created');
-      } else {
-        console.log('✅ Master project already exists');
-      }
-    } catch (error) {
-      console.error('❌ Error ensuring master project:', error);
-    }
+  initializeMasterProject() {
+    this.ensureMasterProject();
   }
 
   /**
@@ -97,10 +64,7 @@ class ProjectManagementSystem {
         }
       }
 
-      // Initialize with master project only
-      this.initializeMasterProject();
-
-      // Load projects from storage
+      // Load projects from storage (also ensures master via ensureMasterProject)
       this.loadProjects();
 
       // Load current project (don't force master - use saved selection)
@@ -149,10 +113,21 @@ class ProjectManagementSystem {
   }
 
   /**
+   * Keep user id aligned with auth + session (avoids saving under `guest` before auth hydrates).
+   */
+  syncUserIdFromEnvironment() {
+    const uid = this.getCurrentUserId();
+    if (uid) {
+      this.currentUserId = uid;
+    }
+  }
+
+  /**
    * Load all projects from local storage
    */
   loadProjects() {
     try {
+      this.syncUserIdFromEnvironment();
       console.log('🔍 Loading projects for user:', this.currentUserId);
       const userStorageKey = this.getUserStorageKey(this.storageKey);
       const stored = localStorage.getItem(userStorageKey);
@@ -227,6 +202,7 @@ class ProjectManagementSystem {
    */
   saveProjects() {
     try {
+      this.syncUserIdFromEnvironment();
       const userStorageKey = this.getUserStorageKey(this.storageKey);
       localStorage.setItem(userStorageKey, JSON.stringify(this.projects));
 
@@ -245,6 +221,14 @@ class ProjectManagementSystem {
         this.currentUserId
       );
       console.log(`📦 Saved ${this.projects.length} projects`);
+
+      if (
+        window.unifiedProjectSelector &&
+        typeof window.unifiedProjectSelector.loadProjects === 'function'
+      ) {
+        window.unifiedProjectSelector.currentUserId = this.currentUserId;
+        window.unifiedProjectSelector.loadProjects();
+      }
     } catch (error) {
       console.error('❌ Error saving projects:', error);
     }
@@ -349,6 +333,7 @@ class ProjectManagementSystem {
    * Set current project
    */
   setCurrentProject(projectId) {
+    this.syncUserIdFromEnvironment();
     const previousProject = this.currentProject;
     let project = this.projects.find(p => p.id === projectId);
     if (!project) {
@@ -421,6 +406,8 @@ class ProjectManagementSystem {
   createProject(projectData, options = {}) {
     const setAsCurrent = options.setAsCurrent !== false;
 
+    this.syncUserIdFromEnvironment();
+
     const newProject = {
       id: this.generateProjectId(),
       name: projectData.name || 'New Project',
@@ -435,6 +422,17 @@ class ProjectManagementSystem {
       userId: this.currentUserId, // Ensure user ID is set
       ...projectData
     };
+
+    const isMasterRow =
+      newProject.id === this.masterProjectId ||
+      newProject.type === 'master' ||
+      newProject.isMaster;
+    if (!isMasterRow) {
+      newProject.parentProjectId =
+        projectData.parentProjectId || this.masterProjectId;
+      newProject.workspaceRootId =
+        projectData.workspaceRootId || this.masterProjectId;
+    }
 
     // Add to projects array
     this.projects.push(newProject);
@@ -1676,7 +1674,8 @@ class ProjectManagementSystem {
   getCurrentUserId() {
     // Try to get from authManager first
     if (window.authManager && window.authManager.currentUser) {
-      return window.authManager.currentUser.userId;
+      const u = window.authManager.currentUser;
+      return u.userId || u.id || u.uid || null;
     }
 
     // Fallback to stored value
@@ -1702,6 +1701,7 @@ class ProjectManagementSystem {
    * Handle user change events
    */
   handleUserChange(user) {
+    this.syncUserIdFromEnvironment();
     const uid = user?.userId || user?.id;
     if (user && uid) {
       this.currentUserId = uid;
