@@ -49,6 +49,17 @@ let myProjectRows = [];
 /** Avoid duplicate visibility/pageshow handlers if init runs more than once. */
 let workspaceResumeListenersBound = false;
 
+/** @type {(() => void)[]} */
+let readingsLogUnsubs = [];
+
+/** @type {import('firebase/firestore').QueryDocumentSnapshot[] | null} */
+let cachedTempReadingDocs = null;
+
+/** @type {import('firebase/firestore').QueryDocumentSnapshot[] | null} */
+let cachedSanReadingDocs = null;
+
+let haccpReminderIntervalId = null;
+
 const PROJECTS_STORE_PREFIX = 'iterum_projects_user_';
 
 function projectsStorageKey(uid) {
@@ -318,23 +329,446 @@ function setStatus(msg, isErr) {
   });
 }
 
-function isoDayKey(value = new Date()) {
+/** Local calendar YYYY-MM-DD (kitchen “day” for logs and archive). */
+function localDayKeyFromDate(value = new Date()) {
   const d = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(d.getTime())) {
     return '';
   }
-  return d.toISOString().slice(0, 10);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
 function parseEntryDay(entry) {
+  if (
+    entry?.dateKey &&
+    typeof entry.dateKey === 'string' &&
+    /^\d{4}-\d{2}-\d{2}$/.test(entry.dateKey)
+  ) {
+    return entry.dateKey;
+  }
   const raw = entry?.timestamp || entry?.createdAt || entry?.updatedAt || null;
   if (!raw) {
     return '';
   }
   if (raw?.toDate) {
-    return isoDayKey(raw.toDate());
+    return localDayKeyFromDate(raw.toDate());
   }
-  return isoDayKey(raw);
+  return localDayKeyFromDate(raw);
+}
+
+/**
+ * @param {import('firebase/firestore').Timestamp | Date | null | undefined} ts
+ */
+function formatReadingDateTime(ts) {
+  if (!ts) {
+    return '—';
+  }
+  try {
+    const d = ts?.toDate ? ts.toDate() : new Date(ts);
+    if (Number.isNaN(d.getTime())) {
+      return '—';
+    }
+    return d.toLocaleString(undefined, {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit'
+    });
+  } catch {
+    return '—';
+  }
+}
+
+function complianceReadingMatchesProject(data, projectId) {
+  if (!projectId || projectId === 'mobile-default' || projectId === 'master') {
+    return true;
+  }
+  return data.projectId === projectId || !data.projectId;
+}
+
+function stopReadingsLogListeners() {
+  while (readingsLogUnsubs.length) {
+    const u = readingsLogUnsubs.pop();
+    try {
+      u();
+    } catch (e) {
+      console.warn('stopReadingsLogListeners', e);
+    }
+  }
+  cachedTempReadingDocs = null;
+  cachedSanReadingDocs = null;
+}
+
+function rerenderComplianceLogLists() {
+  if (cachedTempReadingDocs) {
+    renderTemperatureLogList(cachedTempReadingDocs);
+  } else {
+    renderTemperatureLogList([]);
+  }
+  if (cachedSanReadingDocs) {
+    renderSanitizerLogList(cachedSanReadingDocs);
+  } else {
+    renderSanitizerLogList([]);
+  }
+}
+
+/**
+ * @param {import('firebase/firestore').QueryDocumentSnapshot[]} docs
+ */
+function renderTemperatureLogList(docs) {
+  const todayWrap = document.getElementById('temp-log-today');
+  const archiveWrap = document.getElementById('temp-log-archive');
+  if (!todayWrap || !archiveWrap) {
+    return;
+  }
+  const projectId = getProjectId();
+  const todayKey = localDayKeyFromDate(new Date());
+  const rows = [];
+  docs.forEach(d => {
+    const data = d.data() || {};
+    if (!complianceReadingMatchesProject(data, projectId)) {
+      return;
+    }
+    rows.push({ id: d.id, data });
+  });
+  const todayRows = rows.filter(
+    r => parseEntryDay(r.data) === todayKey
+  );
+  /** @type {Map<string, typeof rows>} */
+  const byDay = new Map();
+  for (const r of rows) {
+    const k = parseEntryDay(r.data);
+    if (!k || k === todayKey) {
+      continue;
+    }
+    if (!byDay.has(k)) {
+      byDay.set(k, []);
+    }
+    byDay.get(k).push(r);
+  }
+  const archiveKeys = [...byDay.keys()].sort((a, b) => (a < b ? 1 : -1));
+
+  const useF = $('unit-fahrenheit').checked;
+  const fmtTemp = tempC => {
+    const c = Number(tempC);
+    if (!Number.isFinite(c)) {
+      return '—';
+    }
+    if (useF) {
+      const f = (c * 9) / 5 + 32;
+      return String(Math.round(f * 10) / 10);
+    }
+    return String(Math.round(c * 10) / 10);
+  };
+
+  const lineHtml = list =>
+    list
+      .map(r => {
+        const t = r.data.timestamp;
+        const when = formatReadingDateTime(t);
+        const unit = escapeHtml(r.data.unitName || r.data.unitId || '—');
+        const suffix = useF ? '°F' : '°C';
+        const val = fmtTemp(r.data.tempC ?? r.data.temperature);
+        return `<li class="mc-log-line"><span class="mc-log-when">${escapeHtml(when)}</span><span class="mc-log-body"><strong>${unit}</strong> · ${escapeHtml(String(val))}${suffix}</span></li>`;
+      })
+      .join('');
+
+  todayWrap.innerHTML = todayRows.length
+    ? `<ul class="mc-list mc-log-list">${lineHtml(
+        [...todayRows].sort((a, b) => {
+          const ta = a.data.timestamp?.toMillis?.() || 0;
+          const tb = b.data.timestamp?.toMillis?.() || 0;
+          return tb - ta;
+        })
+      )}</ul>`
+    : '<p class="mc-hint mc-hint-top0">No temperatures logged yet today. Entries reset each calendar day; older days appear in Archive.</p>';
+
+  let archiveHtml = '';
+  for (const day of archiveKeys) {
+    const list = byDay.get(day) || [];
+    list.sort((a, b) => {
+      const ta = a.data.timestamp?.toMillis?.() || 0;
+      const tb = b.data.timestamp?.toMillis?.() || 0;
+      return tb - ta;
+    });
+    archiveHtml += `<details class="mc-archive-day"><summary class="mc-archive-summary">${escapeHtml(day)} · ${list.length} log${list.length === 1 ? '' : 's'}</summary><ul class="mc-list mc-log-list">${lineHtml(list)}</ul></details>`;
+  }
+  archiveWrap.innerHTML = archiveHtml
+    ? archiveHtml
+    : '<p class="mc-hint mc-hint-top0">No archived days yet.</p>';
+}
+
+/**
+ * @param {import('firebase/firestore').QueryDocumentSnapshot[]} docs
+ */
+function renderSanitizerLogList(docs) {
+  const todayWrap = document.getElementById('san-log-today');
+  const archiveWrap = document.getElementById('san-log-archive');
+  if (!todayWrap || !archiveWrap) {
+    return;
+  }
+  const projectId = getProjectId();
+  const todayKey = localDayKeyFromDate(new Date());
+  const rows = [];
+  docs.forEach(d => {
+    const data = d.data() || {};
+    if (!complianceReadingMatchesProject(data, projectId)) {
+      return;
+    }
+    rows.push({ id: d.id, data });
+  });
+  const todayRows = rows.filter(
+    r => parseEntryDay(r.data) === todayKey
+  );
+  /** @type {Map<string, typeof rows>} */
+  const byDay = new Map();
+  for (const r of rows) {
+    const k = parseEntryDay(r.data);
+    if (!k || k === todayKey) {
+      continue;
+    }
+    if (!byDay.has(k)) {
+      byDay.set(k, []);
+    }
+    byDay.get(k).push(r);
+  }
+  const archiveKeys = [...byDay.keys()].sort((a, b) => (a < b ? 1 : -1));
+
+  const lineHtml = list =>
+    list
+      .map(r => {
+        const t = r.data.timestamp;
+        const when = formatReadingDateTime(t);
+        const loc = escapeHtml(r.data.locationName || r.data.locationId || '—');
+        const ppm = r.data.ppm;
+        const pass =
+          r.data.passed === true
+            ? '<span class="mc-pass">pass</span>'
+            : r.data.passed === false
+              ? '<span class="mc-fail">check</span>'
+              : '';
+        return `<li class="mc-log-line"><span class="mc-log-when">${escapeHtml(when)}</span><span class="mc-log-body"><strong>${loc}</strong> · ${escapeHtml(String(ppm ?? '—'))} ppm ${pass}</span></li>`;
+      })
+      .join('');
+
+  todayWrap.innerHTML = todayRows.length
+    ? `<ul class="mc-list mc-log-list">${lineHtml(
+        [...todayRows].sort((a, b) => {
+          const ta = a.data.timestamp?.toMillis?.() || 0;
+          const tb = b.data.timestamp?.toMillis?.() || 0;
+          return tb - ta;
+        })
+      )}</ul>`
+    : '<p class="mc-hint mc-hint-top0">No sanitizer checks yet today. Older days stay in Archive.</p>';
+
+  let archiveHtml = '';
+  for (const day of archiveKeys) {
+    const list = byDay.get(day) || [];
+    list.sort((a, b) => {
+      const ta = a.data.timestamp?.toMillis?.() || 0;
+      const tb = b.data.timestamp?.toMillis?.() || 0;
+      return tb - ta;
+    });
+    archiveHtml += `<details class="mc-archive-day"><summary class="mc-archive-summary">${escapeHtml(day)} · ${list.length} check${list.length === 1 ? '' : 's'}</summary><ul class="mc-list mc-log-list">${lineHtml(list)}</ul></details>`;
+  }
+  archiveWrap.innerHTML = archiveHtml
+    ? archiveHtml
+    : '<p class="mc-hint mc-hint-top0">No archived days yet.</p>';
+}
+
+function startReadingsLogListeners(uid) {
+  stopReadingsLogListeners();
+  if (!db || !uid) {
+    rerenderComplianceLogLists();
+    return;
+  }
+  const tempQ = query(
+    collection(db, 'users', uid, 'temperature_readings'),
+    orderBy('timestamp', 'desc'),
+    limit(200)
+  );
+  const sanQ = query(
+    collection(db, 'users', uid, 'sanitizer_readings'),
+    orderBy('timestamp', 'desc'),
+    limit(200)
+  );
+  readingsLogUnsubs.push(
+    onSnapshot(
+      tempQ,
+      snap => {
+        cachedTempReadingDocs = snap.docs.slice();
+        renderTemperatureLogList(snap.docs);
+      },
+      err => {
+        console.error('temperature_readings listener', err);
+      }
+    )
+  );
+  readingsLogUnsubs.push(
+    onSnapshot(
+      sanQ,
+      snap => {
+        cachedSanReadingDocs = snap.docs.slice();
+        renderSanitizerLogList(snap.docs);
+      },
+      err => {
+        console.error('sanitizer_readings listener', err);
+      }
+    )
+  );
+}
+
+const HACCP_REMIND_FLAG = 'iterum_haccp_remind_enabled';
+
+function readReminderConfig() {
+  try {
+    const raw = localStorage.getItem('iterum_haccp_remind_windows');
+    if (raw) {
+      const j = JSON.parse(raw);
+      const am = j?.am || {};
+      const pm = j?.pm || {};
+      return {
+        amStartHour: Number(am.h) || 10,
+        amStartMin: Number(am.m) || 0,
+        amEndHour: Number(am.endH) || 12,
+        amEndMin: Number(am.endM) || 0,
+        pmStartHour: Number(pm.h) || 15,
+        pmStartMin: Number(pm.m) || 0,
+        pmEndHour: Number(pm.endH) || 17,
+        pmEndMin: Number(pm.endM) || 30
+      };
+    }
+  } catch {
+    /* default */
+  }
+  return {
+    amStartHour: 10,
+    amStartMin: 0,
+    amEndHour: 12,
+    amEndMin: 0,
+    pmStartHour: 15,
+    pmStartMin: 0,
+    pmEndHour: 17,
+    pmEndMin: 30
+  };
+}
+
+function minutesNow(d = new Date()) {
+  return d.getHours() * 60 + d.getMinutes();
+}
+
+function minutesFrom(h, m) {
+  return h * 60 + m;
+}
+
+function tryFireHaccpReminders() {
+  if (localStorage.getItem(HACCP_REMIND_FLAG) !== '1') {
+    return;
+  }
+  if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+    return;
+  }
+  if (!('Notification' in window) || Notification.permission !== 'granted') {
+    return;
+  }
+  const cfg = readReminderConfig();
+  const now = new Date();
+  const today = localDayKeyFromDate(now);
+  const mn = minutesNow(now);
+  const amA = minutesFrom(cfg.amStartHour, cfg.amStartMin);
+  const amB = minutesFrom(cfg.amEndHour, cfg.amEndMin);
+  const pmA = minutesFrom(cfg.pmStartHour, cfg.pmStartMin);
+  const pmB = minutesFrom(cfg.pmEndHour, cfg.pmEndMin);
+
+  const keyAm = `iterum_haccp_fired_am_${today}`;
+  const keyPm = `iterum_haccp_fired_pm_${today}`;
+
+  if (mn >= amA && mn < amB && localStorage.getItem(keyAm) !== '1') {
+    localStorage.setItem(keyAm, '1');
+    try {
+      new Notification('Iterum Shift — morning checks', {
+        body: 'Log refrigerator temperatures and sanitizer PPM for your workspace.',
+        tag: `haccp-am-${today}`
+      });
+    } catch (e) {
+      console.warn('Notification', e);
+    }
+  }
+  if (mn >= pmA && mn < pmB && localStorage.getItem(keyPm) !== '1') {
+    localStorage.setItem(keyPm, '1');
+    try {
+      new Notification('Iterum Shift — afternoon checks', {
+        body: 'Second round: confirm temps and sanitizer on the Temps tab.',
+        tag: `haccp-pm-${today}`
+      });
+    } catch (e) {
+      console.warn('Notification', e);
+    }
+  }
+}
+
+function startHaccpReminderScheduler() {
+  if (haccpReminderIntervalId) {
+    clearInterval(haccpReminderIntervalId);
+  }
+  haccpReminderIntervalId = setInterval(() => tryFireHaccpReminders(), 60000);
+  tryFireHaccpReminders();
+}
+
+function wireHaccpReminderControls() {
+  const btn = document.getElementById('btn-haccp-notify');
+  const hint = document.getElementById('haccp-reminder-hint');
+  if (!btn || btn.dataset.bound === '1') {
+    return;
+  }
+  btn.dataset.bound = '1';
+
+  const syncHint = () => {
+    const on = localStorage.getItem(HACCP_REMIND_FLAG) === '1';
+    const cfg = readReminderConfig();
+    const perm =
+      typeof Notification !== 'undefined' ? Notification.permission : 'denied';
+    if (hint) {
+      hint.textContent = on && perm === 'granted'
+        ? `Reminders on: morning ${cfg.amStartHour}:${String(cfg.amStartMin).padStart(2, '0')}–${cfg.amEndHour}:${String(cfg.amEndMin).padStart(2, '0')}, afternoon ${cfg.pmStartHour}:${String(cfg.pmStartMin).padStart(2, '0')}–${cfg.pmEndHour}:${String(cfg.pmEndMin).padStart(2, '0')} (device local time). Logs show today below; past days move to Archive.`
+        : 'Tap the button to allow notifications. We ping once per window (late morning + afternoon) to log temps and sanitizer on this device.';
+    }
+    btn.textContent =
+      on && perm === 'granted' ? 'Reminders on (tap to turn off)' : 'Enable twice-daily reminders';
+  };
+
+  btn.addEventListener('click', async () => {
+    const on = localStorage.getItem(HACCP_REMIND_FLAG) === '1';
+    if (on) {
+      localStorage.removeItem(HACCP_REMIND_FLAG);
+      syncHint();
+      setStatus('HACCP reminders off for this device.');
+      return;
+    }
+    if (!('Notification' in window)) {
+      setStatus('Notifications are not supported in this browser.', true);
+      return;
+    }
+    let perm = Notification.permission;
+    if (perm === 'default') {
+      perm = await Notification.requestPermission();
+    }
+    if (perm !== 'granted') {
+      setStatus('Allow notifications in the browser or OS settings to use reminders.', true);
+      syncHint();
+      return;
+    }
+    localStorage.setItem(HACCP_REMIND_FLAG, '1');
+    syncHint();
+    tryFireHaccpReminders();
+    setStatus('Twice-daily reminders enabled. Keep this app installed or tab available around shift times.');
+  });
+
+  syncHint();
 }
 
 function currentRoleForProject(projectId) {
@@ -512,7 +946,7 @@ async function refreshTodayPanel(uid) {
     return;
   }
 
-  const today = isoDayKey();
+  const today = localDayKeyFromDate(new Date());
   const model = {
     role: currentRoleForProject(projectId),
     summary: 'Loading today’s priorities…',
@@ -565,7 +999,7 @@ async function refreshTodayPanel(uid) {
       if (parseEntryDay(data) !== today) {
         return;
       }
-      if (data.projectId === projectId || !data.projectId) {
+      if (complianceReadingMatchesProject(data, projectId)) {
         tempCount += 1;
       }
     });
@@ -680,6 +1114,7 @@ function renderSanList(locs) {
 
 function startListeners(uid) {
   if (!db) return;
+  startReadingsLogListeners(uid);
   onSnapshot(
     query(collection(db, 'users', uid, REF_UNITS)),
     snap => {
@@ -718,6 +1153,7 @@ async function recordTemp(unitId, unitName) {
   if (raw == null || raw === '' || Number.isNaN(Number(raw))) return;
   const n = parseFloat(raw);
   const tempC = useF ? fToC(n) : n;
+  const dateKey = localDayKeyFromDate(new Date());
   try {
     await addDoc(collection(db, 'users', uid, 'temperature_readings'), {
       unitId,
@@ -725,6 +1161,7 @@ async function recordTemp(unitId, unitName) {
       tempC,
       temperature: tempC,
       projectId: getProjectId(),
+      dateKey,
       timestamp: serverTimestamp()
     });
     await updateDoc(doc(db, 'users', uid, REF_UNITS, unitId), {
@@ -758,6 +1195,7 @@ async function recordSan(locationId, locationName) {
     return;
   }
   const passed = ppm >= 100 && ppm <= 200;
+  const dateKey = localDayKeyFromDate(new Date());
   try {
     await addDoc(collection(db, 'users', uid, 'sanitizer_readings'), {
       locationId,
@@ -765,6 +1203,7 @@ async function recordSan(locationId, locationName) {
       ppm,
       passed,
       projectId: getProjectId(),
+      dateKey,
       timestamp: serverTimestamp()
     });
     await updateDoc(doc(db, 'users', uid, SAN_LOCS, locationId), {
@@ -1086,6 +1525,7 @@ async function refreshProjectPicker(uid) {
     }
     setWorkspaceReadyGlobally(uid);
     void refreshTodayPanel(uid);
+    rerenderComplianceLogLists();
   };
 
   updateWorkspaceFirstRunVisibility(uid);
@@ -1213,6 +1653,14 @@ function wireAuth() {
   $('btn-add-san').addEventListener('click', () => addSanStation());
 
   window.addEventListener('lineShowTemps', () => switchTab('fridge'));
+
+  const fToggle = document.getElementById('unit-fahrenheit');
+  if (fToggle && !fToggle.dataset.boundLogRerender) {
+    fToggle.dataset.boundLogRerender = '1';
+    fToggle.addEventListener('change', () => rerenderComplianceLogLists());
+  }
+
+  wireHaccpReminderControls();
 }
 
 export function initMobileCompliance() {
@@ -1286,6 +1734,7 @@ export function initMobileCompliance() {
         });
     } else {
       profileEnsuredThisSession = false;
+      stopReadingsLogListeners();
       showPanel('auth');
       $('user-chip').textContent = '';
       myProjectRows = [];
@@ -1300,5 +1749,12 @@ export function initMobileCompliance() {
     getProjectId,
     setStatus,
     escapeHtml
+  });
+
+  startHaccpReminderScheduler();
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      tryFireHaccpReminders();
+    }
   });
 }

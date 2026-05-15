@@ -686,6 +686,14 @@
       </div>
 
       <div id="panel-section-temps" class="mc-section" hidden>
+        <div class="mc-card mc-stack-gap" id="haccp-reminder-card">
+          <p class="mc-hint mc-hint-top0">
+            <strong>Twice-daily reminders</strong> — optional device notifications for a morning and afternoon
+            temp &amp; sanitizer round (this device, local time).
+          </p>
+          <button type="button" class="mc-btn mc-btn-ghost" id="btn-haccp-notify">Enable twice-daily reminders</button>
+          <p id="haccp-reminder-hint" class="mc-hint mc-hint-top0"></p>
+        </div>
         <div class="mc-tabs" role="tablist">
           <button type="button" id="tab-fridge" role="tab" aria-selected="true">Refrigerators</button>
           <button type="button" id="tab-san" role="tab" aria-selected="false">Sanitizer</button>
@@ -699,12 +707,25 @@
             <button type="button" class="mc-btn mc-btn-primary" id="btn-add-fridge">+ Add fridge / cooler</button>
           </div>
           <ul class="mc-list" id="fridge-list"></ul>
+          <h3 class="mc-section-title">Today’s temperature log</h3>
+          <p class="mc-hint mc-hint-top0">
+            Every reading shows date and time. When the calendar day changes, new entries start a fresh log;
+            prior days appear under Archive.
+          </p>
+          <div id="temp-log-today"></div>
+          <h3 class="mc-section-title">Archive</h3>
+          <div id="temp-log-archive"></div>
         </div>
         <div id="panel-san" hidden>
           <div class="mc-toolbar">
             <button type="button" class="mc-btn mc-btn-primary" id="btn-add-san">+ Add sanitizer station</button>
           </div>
           <ul class="mc-list" id="san-list"></ul>
+          <h3 class="mc-section-title">Today’s sanitizer log</h3>
+          <p class="mc-hint mc-hint-top0">Dated checks; past calendar days are grouped in Archive.</p>
+          <div id="san-log-today"></div>
+          <h3 class="mc-section-title">Archive</h3>
+          <div id="san-log-archive"></div>
         </div>
       </div>
 
