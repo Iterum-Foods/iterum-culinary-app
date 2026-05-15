@@ -694,6 +694,15 @@
           <button type="button" class="mc-btn mc-btn-ghost" id="btn-haccp-notify">Enable twice-daily reminders</button>
           <p id="haccp-reminder-hint" class="mc-hint mc-hint-top0"></p>
         </div>
+        <div class="mc-card mc-stack-gap">
+          <p class="mc-hint mc-hint-top0">
+            <strong>Monthly archive</strong> — full calendar with past days. Tap a date to see temperatures, sanitizer
+            checks, team log notes, and checklist activity for that day.
+          </p>
+          <button type="button" class="mc-btn mc-btn-primary mc-btn-full" id="btn-open-compliance-calendar">
+            Open compliance calendar
+          </button>
+        </div>
         <div class="mc-tabs" role="tablist">
           <button type="button" id="tab-fridge" role="tab" aria-selected="true">Refrigerators</button>
           <button type="button" id="tab-san" role="tab" aria-selected="false">Sanitizer</button>
@@ -709,12 +718,9 @@
           <ul class="mc-list" id="fridge-list"></ul>
           <h3 class="mc-section-title">Today’s temperature log</h3>
           <p class="mc-hint mc-hint-top0">
-            Every reading shows date and time. When the calendar day changes, new entries start a fresh log;
-            prior days appear under Archive.
+            Every reading shows date and time. Older days are in <strong>Open compliance calendar</strong> above.
           </p>
           <div id="temp-log-today"></div>
-          <h3 class="mc-section-title">Archive</h3>
-          <div id="temp-log-archive"></div>
         </div>
         <div id="panel-san" hidden>
           <div class="mc-toolbar">
@@ -722,15 +728,56 @@
           </div>
           <ul class="mc-list" id="san-list"></ul>
           <h3 class="mc-section-title">Today’s sanitizer log</h3>
-          <p class="mc-hint mc-hint-top0">Dated checks; past calendar days are grouped in Archive.</p>
+          <p class="mc-hint mc-hint-top0">Dated checks. Past days are in the compliance calendar.</p>
           <div id="san-log-today"></div>
-          <h3 class="mc-section-title">Archive</h3>
-          <div id="san-log-archive"></div>
         </div>
       </div>
 
       <p id="status-line-app" class="mc-status-app"></p>
       <button type="button" class="mc-btn mc-btn-ghost mc-gap-top-sm" id="btn-signout">Sign out</button>
+    </div>
+
+    <div
+      id="compliance-archive-modal"
+      class="mc-archive-modal"
+      hidden
+      aria-hidden="true"
+    >
+      <div class="mc-archive-modal__backdrop" id="compliance-archive-backdrop" tabindex="-1"></div>
+      <div
+        class="mc-archive-modal__panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="compliance-archive-title"
+      >
+        <div class="mc-archive-modal__head">
+          <h2 id="compliance-archive-title" class="mc-archive-modal__title">Compliance calendar</h2>
+          <button type="button" class="mc-btn mc-btn-ghost" id="btn-close-compliance-calendar">Close</button>
+        </div>
+        <p id="compliance-archive-status" class="mc-hint mc-hint-top0">
+          Pick a workspace to load history. Calendar uses your device’s local time zone.
+        </p>
+        <div class="mc-cal-nav">
+          <button type="button" class="mc-btn mc-btn-ghost" id="btn-cal-prev" aria-label="Previous month">
+            ← Prev
+          </button>
+          <span id="cal-month-label" class="mc-cal-nav-label"></span>
+          <button type="button" class="mc-btn mc-btn-ghost" id="btn-cal-next" aria-label="Next month">
+            Next →
+          </button>
+        </div>
+        <div class="mc-cal-weekdays" aria-hidden="true">
+          <span>Sun</span>
+          <span>Mon</span>
+          <span>Tue</span>
+          <span>Wed</span>
+          <span>Thu</span>
+          <span>Fri</span>
+          <span>Sat</span>
+        </div>
+        <div id="cal-grid" class="mc-cal-grid"></div>
+        <div id="cal-day-detail" class="mc-cal-day-detail"></div>
+      </div>
     </div>
 
     <footer class="mc-foot">

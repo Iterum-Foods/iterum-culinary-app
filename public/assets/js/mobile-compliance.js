@@ -34,6 +34,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  Timestamp,
   updateDoc,
   where
 } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
@@ -59,6 +60,18 @@ let cachedTempReadingDocs = null;
 let cachedSanReadingDocs = null;
 
 let haccpReminderIntervalId = null;
+
+/** @type {{ year: number, monthIndex: number }} Month in local time (monthIndex 0–11). */
+let complianceCalendarCursor = {
+  year: new Date().getFullYear(),
+  monthIndex: new Date().getMonth()
+};
+
+/** @type {string | null} */
+let complianceCalendarSelectedDay = null;
+
+/** @type {Map<string, { temps: Record<string, unknown>[], sans: Record<string, unknown>[], posts: Record<string, unknown>[], checks: Record<string, unknown>[] }> | null} */
+let complianceArchiveByDay = null;
 
 const PROJECTS_STORE_PREFIX = 'iterum_projects_user_';
 
@@ -421,8 +434,7 @@ function rerenderComplianceLogLists() {
  */
 function renderTemperatureLogList(docs) {
   const todayWrap = document.getElementById('temp-log-today');
-  const archiveWrap = document.getElementById('temp-log-archive');
-  if (!todayWrap || !archiveWrap) {
+  if (!todayWrap) {
     return;
   }
   const projectId = getProjectId();
@@ -438,19 +450,6 @@ function renderTemperatureLogList(docs) {
   const todayRows = rows.filter(
     r => parseEntryDay(r.data) === todayKey
   );
-  /** @type {Map<string, typeof rows>} */
-  const byDay = new Map();
-  for (const r of rows) {
-    const k = parseEntryDay(r.data);
-    if (!k || k === todayKey) {
-      continue;
-    }
-    if (!byDay.has(k)) {
-      byDay.set(k, []);
-    }
-    byDay.get(k).push(r);
-  }
-  const archiveKeys = [...byDay.keys()].sort((a, b) => (a < b ? 1 : -1));
 
   const useF = $('unit-fahrenheit').checked;
   const fmtTemp = tempC => {
@@ -485,21 +484,7 @@ function renderTemperatureLogList(docs) {
           return tb - ta;
         })
       )}</ul>`
-    : '<p class="mc-hint mc-hint-top0">No temperatures logged yet today. Entries reset each calendar day; older days appear in Archive.</p>';
-
-  let archiveHtml = '';
-  for (const day of archiveKeys) {
-    const list = byDay.get(day) || [];
-    list.sort((a, b) => {
-      const ta = a.data.timestamp?.toMillis?.() || 0;
-      const tb = b.data.timestamp?.toMillis?.() || 0;
-      return tb - ta;
-    });
-    archiveHtml += `<details class="mc-archive-day"><summary class="mc-archive-summary">${escapeHtml(day)} · ${list.length} log${list.length === 1 ? '' : 's'}</summary><ul class="mc-list mc-log-list">${lineHtml(list)}</ul></details>`;
-  }
-  archiveWrap.innerHTML = archiveHtml
-    ? archiveHtml
-    : '<p class="mc-hint mc-hint-top0">No archived days yet.</p>';
+    : '<p class="mc-hint mc-hint-top0">No temperatures logged yet today. Open <strong>Compliance calendar</strong> for past days.</p>';
 }
 
 /**
@@ -507,8 +492,7 @@ function renderTemperatureLogList(docs) {
  */
 function renderSanitizerLogList(docs) {
   const todayWrap = document.getElementById('san-log-today');
-  const archiveWrap = document.getElementById('san-log-archive');
-  if (!todayWrap || !archiveWrap) {
+  if (!todayWrap) {
     return;
   }
   const projectId = getProjectId();
@@ -524,19 +508,6 @@ function renderSanitizerLogList(docs) {
   const todayRows = rows.filter(
     r => parseEntryDay(r.data) === todayKey
   );
-  /** @type {Map<string, typeof rows>} */
-  const byDay = new Map();
-  for (const r of rows) {
-    const k = parseEntryDay(r.data);
-    if (!k || k === todayKey) {
-      continue;
-    }
-    if (!byDay.has(k)) {
-      byDay.set(k, []);
-    }
-    byDay.get(k).push(r);
-  }
-  const archiveKeys = [...byDay.keys()].sort((a, b) => (a < b ? 1 : -1));
 
   const lineHtml = list =>
     list
@@ -563,21 +534,638 @@ function renderSanitizerLogList(docs) {
           return tb - ta;
         })
       )}</ul>`
-    : '<p class="mc-hint mc-hint-top0">No sanitizer checks yet today. Older days stay in Archive.</p>';
+    : '<p class="mc-hint mc-hint-top0">No sanitizer checks yet today. Past days are in the compliance calendar.</p>';
+}
 
-  let archiveHtml = '';
-  for (const day of archiveKeys) {
-    const list = byDay.get(day) || [];
-    list.sort((a, b) => {
-      const ta = a.data.timestamp?.toMillis?.() || 0;
-      const tb = b.data.timestamp?.toMillis?.() || 0;
+function monthKeyBounds(year, monthIndex) {
+  const start = new Date(year, monthIndex, 1);
+  const end = new Date(year, monthIndex + 1, 0, 23, 59, 59, 999);
+  return {
+    monthStartKey: localDayKeyFromDate(start),
+    monthEndKey: localDayKeyFromDate(end),
+    daysInMonth: new Date(year, monthIndex + 1, 0).getDate()
+  };
+}
+
+function readingMs(data) {
+  const t = data?.timestamp;
+  if (t?.toMillis) {
+    return t.toMillis();
+  }
+  return 0;
+}
+
+/**
+ * @param {string} uid
+ * @param {'temperature_readings'|'sanitizer_readings'} subcoll
+ * @param {string} monthStartKey
+ * @param {string} monthEndKey
+ * @param {string} projectId
+ */
+async function fetchUserReadingsForMonth(
+  uid,
+  subcoll,
+  monthStartKey,
+  monthEndKey,
+  projectId
+) {
+  const byId = new Map();
+  const ingest = snap => {
+    snap.forEach(d => {
+      const data = d.data() || {};
+      if (!complianceReadingMatchesProject(data, projectId)) {
+        return;
+      }
+      byId.set(d.id, { id: d.id, ...data });
+    });
+  };
+  if (db) {
+    try {
+      const q1 = query(
+        collection(db, 'users', uid, subcoll),
+        where('dateKey', '>=', monthStartKey),
+        where('dateKey', '<=', monthEndKey),
+        limit(500)
+      );
+      ingest(await getDocs(q1));
+    } catch (e) {
+      console.warn('fetchUserReadingsForMonth dateKey', subcoll, e);
+    }
+    try {
+      const start = new Date(`${monthStartKey}T00:00:00`);
+      const end = new Date(`${monthEndKey}T23:59:59.999`);
+      const q2 = query(
+        collection(db, 'users', uid, subcoll),
+        where('timestamp', '>=', Timestamp.fromDate(start)),
+        where('timestamp', '<=', Timestamp.fromDate(end)),
+        limit(500)
+      );
+      ingest(await getDocs(q2));
+    } catch (e) {
+      console.warn('fetchUserReadingsForMonth timestamp', subcoll, e);
+    }
+  }
+  return [...byId.values()];
+}
+
+/**
+ * @param {string} projectId
+ * @param {string} monthStartKey
+ * @param {string} monthEndKey
+ */
+async function fetchShiftPostsForMonth(
+  projectId,
+  monthStartKey,
+  monthEndKey
+) {
+  const out = [];
+  if (!db || !projectId || projectId === 'mobile-default') {
+    return out;
+  }
+  try {
+    const q = query(
+      collection(db, 'projects', projectId, 'shift_day_posts'),
+      where('dateKey', '>=', monthStartKey),
+      where('dateKey', '<=', monthEndKey),
+      limit(500)
+    );
+    const snap = await getDocs(q);
+    snap.forEach(d => out.push({ id: d.id, ...d.data() }));
+  } catch (e) {
+    console.warn('fetchShiftPostsForMonth', e);
+  }
+  return out;
+}
+
+/**
+ * @param {string} projectId
+ * @param {string} monthStartKey
+ * @param {string} monthEndKey
+ */
+async function fetchChecklistsForMonth(
+  projectId,
+  monthStartKey,
+  monthEndKey
+) {
+  const out = [];
+  if (!db || !projectId || projectId === 'mobile-default') {
+    return out;
+  }
+  try {
+    let snap;
+    try {
+      snap = await getDocs(
+        query(
+          collection(db, 'projects', projectId, 'checklists'),
+          orderBy('timestamp', 'desc'),
+          limit(400)
+        )
+      );
+    } catch {
+      snap = await getDocs(
+        query(collection(db, 'projects', projectId, 'checklists'), limit(400))
+      );
+    }
+    snap.forEach(d => {
+      const data = d.data() || {};
+      if (!complianceReadingMatchesProject(data, projectId)) {
+        return;
+      }
+      const day = parseEntryDay(data);
+      if (day && day >= monthStartKey && day <= monthEndKey) {
+        out.push({ id: d.id, ...data });
+      }
+    });
+  } catch (e) {
+    console.warn('fetchChecklistsForMonth', e);
+  }
+  return out;
+}
+
+function buildComplianceArchiveByDay(temps, sans, posts, checks) {
+  /** @type {Map<string, { temps: Record<string, unknown>[], sans: Record<string, unknown>[], posts: Record<string, unknown>[], checks: Record<string, unknown>[] }>} */
+  const byDay = new Map();
+  const touch = dayKey => {
+    if (!byDay.has(dayKey)) {
+      byDay.set(dayKey, {
+        temps: [],
+        sans: [],
+        posts: [],
+        checks: []
+      });
+    }
+    return byDay.get(dayKey);
+  };
+  for (const row of temps) {
+    const k = parseEntryDay(row);
+    if (k) {
+      touch(k).temps.push(row);
+    }
+  }
+  for (const row of sans) {
+    const k = parseEntryDay(row);
+    if (k) {
+      touch(k).sans.push(row);
+    }
+  }
+  for (const row of posts) {
+    const k =
+      typeof row.dateKey === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(row.dateKey)
+        ? row.dateKey
+        : parseEntryDay(row);
+    if (k) {
+      touch(k).posts.push(row);
+    }
+  }
+  for (const row of checks) {
+    const k = parseEntryDay(row);
+    if (k) {
+      touch(k).checks.push(row);
+    }
+  }
+  for (const [, bundle] of byDay) {
+    bundle.temps.sort((a, b) => readingMs(b) - readingMs(a));
+    bundle.sans.sort((a, b) => readingMs(b) - readingMs(a));
+    bundle.posts.sort((a, b) => {
+      const ta = a.createdAt?.toMillis?.() || 0;
+      const tb = b.createdAt?.toMillis?.() || 0;
       return tb - ta;
     });
-    archiveHtml += `<details class="mc-archive-day"><summary class="mc-archive-summary">${escapeHtml(day)} · ${list.length} check${list.length === 1 ? '' : 's'}</summary><ul class="mc-list mc-log-list">${lineHtml(list)}</ul></details>`;
+    bundle.checks.sort((a, b) => {
+      const sa = String(a.timestamp || a.createdAt || '');
+      const sb = String(b.timestamp || b.createdAt || '');
+      return sb.localeCompare(sa);
+    });
   }
-  archiveWrap.innerHTML = archiveHtml
-    ? archiveHtml
-    : '<p class="mc-hint mc-hint-top0">No archived days yet.</p>';
+  return byDay;
+}
+
+function setComplianceArchiveModalOpen(open) {
+  const modal = document.getElementById('compliance-archive-modal');
+  if (!modal) {
+    return;
+  }
+  modal.hidden = !open;
+  modal.setAttribute('aria-hidden', open ? 'false' : 'true');
+  if (open) {
+    document.getElementById('btn-close-compliance-calendar')?.focus();
+  }
+}
+
+function renderComplianceCalendarGrid(year, monthIndex, byDay) {
+  const grid = document.getElementById('cal-grid');
+  const label = document.getElementById('cal-month-label');
+  if (!grid || !label) {
+    return;
+  }
+  const monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ];
+  label.textContent = `${monthNames[monthIndex]} ${year}`;
+
+  const firstDow = new Date(year, monthIndex, 1).getDay();
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const prevMonthDays = new Date(year, monthIndex, 0).getDate();
+  const todayK = localDayKeyFromDate(new Date());
+  const cells = [];
+
+  for (let i = 0; i < firstDow; i += 1) {
+    const d = prevMonthDays - firstDow + i + 1;
+    cells.push({ type: 'muted', day: d, key: null });
+  }
+  for (let d = 1; d <= daysInMonth; d += 1) {
+    const key = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    cells.push({ type: 'day', day: d, key });
+  }
+  while (cells.length % 7 !== 0) {
+    cells.push({ type: 'muted', day: null, key: null });
+  }
+
+  grid.innerHTML = '';
+  for (const c of cells) {
+    if (c.type === 'muted') {
+      const placeholder = document.createElement('div');
+      placeholder.className = 'mc-cal-day mc-cal-day--muted';
+      placeholder.setAttribute('aria-hidden', 'true');
+      placeholder.innerHTML = c.day != null
+        ? `<span class="mc-cal-day-num">${c.day}</span>`
+        : '';
+      grid.appendChild(placeholder);
+      continue;
+    }
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mc-cal-day';
+    const bundle = c.key ? byDay?.get(c.key) : null;
+    const busy =
+      bundle &&
+      (bundle.temps.length > 0 ||
+        bundle.sans.length > 0 ||
+        bundle.posts.length > 0 ||
+        bundle.checks.length > 0);
+    if (busy) {
+      btn.classList.add('mc-cal-day--busy');
+    }
+    if (c.key === todayK) {
+      btn.classList.add('mc-cal-day--today');
+    }
+    if (c.key && c.key === complianceCalendarSelectedDay) {
+      btn.classList.add('mc-cal-day--selected');
+    }
+    btn.dataset.dayKey = c.key || '';
+    btn.innerHTML = `<span class="mc-cal-day-num">${c.day}</span>`;
+    btn.addEventListener('click', () => {
+      if (!c.key) {
+        return;
+      }
+      complianceCalendarSelectedDay = c.key;
+      renderComplianceCalendarGrid(year, monthIndex, byDay);
+      const b =
+        byDay?.get(c.key) || {
+          temps: [],
+          sans: [],
+          posts: [],
+          checks: []
+        };
+      renderComplianceCalendarDayDetail(c.key, b);
+    });
+    grid.appendChild(btn);
+  }
+}
+
+function summarizeChecklistEntry(data) {
+  const raw = data?.data;
+  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+    const st = raw.station != null ? String(raw.station) : '';
+    const n = raw.notes != null ? String(raw.notes) : '';
+    const bits = [st, n].filter(Boolean);
+    if (bits.length) {
+      return bits.join(' — ');
+    }
+  }
+  if (raw != null && typeof raw !== 'object') {
+    return String(raw).slice(0, 180);
+  }
+  return '';
+}
+
+function renderComplianceCalendarDayDetail(dayKey, bundle) {
+  const el = document.getElementById('cal-day-detail');
+  if (!el) {
+    return;
+  }
+  if (!dayKey) {
+    el.innerHTML =
+      '<p class="mc-hint">Select a date on the calendar to see details.</p>';
+    return;
+  }
+  const b = bundle || {
+    temps: [],
+    sans: [],
+    posts: [],
+    checks: []
+  };
+  if (
+    !b.temps.length &&
+    !b.sans.length &&
+    !b.posts.length &&
+    !b.checks.length
+  ) {
+    el.innerHTML = `<h3 class="mc-section-title mc-section-title-top0">${escapeHtml(dayKey)}</h3><p class="mc-hint">No temperatures, sanitizer checks, team notes, or checklist entries for this day.</p>`;
+    return;
+  }
+  const useF = document.getElementById('unit-fahrenheit')?.checked !== false;
+  const fmtTemp = tempC => {
+    const c = Number(tempC);
+    if (!Number.isFinite(c)) {
+      return '—';
+    }
+    if (useF) {
+      const f = (c * 9) / 5 + 32;
+      return String(Math.round(f * 10) / 10);
+    }
+    return String(Math.round(c * 10) / 10);
+  };
+  const suffix = useF ? '°F' : '°C';
+
+  const tempSection =
+    b.temps.length === 0
+      ? ''
+      : `<div class="mc-cal-detail-section"><h4>Temperatures</h4><ul class="mc-cal-detail-list">${b.temps
+          .map(row => {
+            const when = formatReadingDateTime(row.timestamp);
+            const unit = escapeHtml(
+              String(row.unitName || row.unitId || '—')
+            );
+            const val = fmtTemp(row.tempC ?? row.temperature);
+            return `<li><span class="mc-log-when">${escapeHtml(when)}</span> — <strong>${unit}</strong> ${escapeHtml(String(val))}${suffix}</li>`;
+          })
+          .join('')}</ul></div>`;
+
+  const sanSection =
+    b.sans.length === 0
+      ? ''
+      : `<div class="mc-cal-detail-section"><h4>Sanitizer</h4><ul class="mc-cal-detail-list">${b.sans
+          .map(row => {
+            const when = formatReadingDateTime(row.timestamp);
+            const loc = escapeHtml(
+              String(row.locationName || row.locationId || '—')
+            );
+            const pass =
+              row.passed === true
+                ? 'pass'
+                : row.passed === false
+                  ? 'review'
+                  : '';
+            return `<li><span class="mc-log-when">${escapeHtml(when)}</span> — <strong>${loc}</strong> ${escapeHtml(String(row.ppm ?? '—'))} ppm${pass ? ` · ${escapeHtml(pass)}` : ''}</li>`;
+          })
+          .join('')}</ul></div>`;
+
+  const postSection =
+    b.posts.length === 0
+      ? ''
+      : `<div class="mc-cal-detail-section"><h4>Team log</h4><ul class="mc-cal-detail-list">${b.posts
+          .map(row => {
+            const author = escapeHtml(String(row.authorName || 'Team'));
+            const kind = escapeHtml(String(row.category || row.priority || ''));
+            const body = escapeHtml(
+              String(row.body || '')
+                .trim()
+                .slice(0, 800)
+            );
+            return `<li><strong>${author}</strong>${kind ? ` · ${kind}` : ''}<div class="mc-hint mc-note-inline">${body}</div></li>`;
+          })
+          .join('')}</ul></div>`;
+
+  const checkSection =
+    b.checks.length === 0
+      ? ''
+      : `<div class="mc-cal-detail-section"><h4>Checks &amp; changes</h4><ul class="mc-cal-detail-list">${b.checks
+          .map(row => {
+            const title = escapeHtml(
+              String(row.templateName || row.templateId || 'Check')
+            );
+            const when = escapeHtml(
+              String(row.timestamp || row.createdAt || '—')
+            );
+            const detail = summarizeChecklistEntry(row);
+            const detailHtml = detail
+              ? `<div class="mc-hint mc-note-inline">${escapeHtml(detail)}</div>`
+              : '';
+            return `<li><strong>${title}</strong><div class="mc-hint">${when}</div>${detailHtml}</li>`;
+          })
+          .join('')}</ul></div>`;
+
+  el.innerHTML = `<h3 class="mc-section-title mc-section-title-top0">${escapeHtml(dayKey)}</h3>${tempSection}${sanSection}${postSection}${checkSection}`;
+}
+
+async function loadComplianceArchiveMonthIntoModal() {
+  const statusEl = document.getElementById('compliance-archive-status');
+  const uid = auth?.currentUser?.uid;
+  const projectId = getProjectId();
+  const { year, monthIndex } = complianceCalendarCursor;
+
+  if (!uid) {
+    if (statusEl) {
+      statusEl.textContent = 'Sign in to load the compliance calendar.';
+    }
+    complianceArchiveByDay = new Map();
+    complianceCalendarSelectedDay = null;
+    renderComplianceCalendarGrid(year, monthIndex, complianceArchiveByDay);
+    const det = document.getElementById('cal-day-detail');
+    if (det) {
+      det.innerHTML =
+        '<p class="mc-hint">Sign in, then reopen the calendar.</p>';
+    }
+    return;
+  }
+  if (!projectId || projectId === 'mobile-default') {
+    if (statusEl) {
+      statusEl.textContent =
+        'Pick a workspace to load team notes, checks, and logs on the calendar.';
+    }
+    complianceArchiveByDay = new Map();
+    complianceCalendarSelectedDay = null;
+    renderComplianceCalendarGrid(year, monthIndex, complianceArchiveByDay);
+    const det = document.getElementById('cal-day-detail');
+    if (det) {
+      det.innerHTML =
+        '<p class="mc-hint">Choose your location above, then reload the calendar.</p>';
+    }
+    return;
+  }
+
+  if (statusEl) {
+    statusEl.textContent = 'Loading this month…';
+  }
+  const bounds = monthKeyBounds(year, monthIndex);
+  try {
+    const [temps, sans, posts, checks] = await Promise.all([
+      fetchUserReadingsForMonth(
+        uid,
+        'temperature_readings',
+        bounds.monthStartKey,
+        bounds.monthEndKey,
+        projectId
+      ),
+      fetchUserReadingsForMonth(
+        uid,
+        'sanitizer_readings',
+        bounds.monthStartKey,
+        bounds.monthEndKey,
+        projectId
+      ),
+      fetchShiftPostsForMonth(
+        projectId,
+        bounds.monthStartKey,
+        bounds.monthEndKey
+      ),
+      fetchChecklistsForMonth(
+        projectId,
+        bounds.monthStartKey,
+        bounds.monthEndKey
+      )
+    ]);
+    complianceArchiveByDay = buildComplianceArchiveByDay(
+      temps,
+      sans,
+      posts,
+      checks
+    );
+
+    const todayK = localDayKeyFromDate(new Date());
+    let selectKey = null;
+    if (todayK >= bounds.monthStartKey && todayK <= bounds.monthEndKey) {
+      selectKey = todayK;
+    } else {
+      for (let d = bounds.daysInMonth; d >= 1; d -= 1) {
+        const k = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const b = complianceArchiveByDay.get(k);
+        if (
+          b &&
+          (b.temps.length > 0 ||
+            b.sans.length > 0 ||
+            b.posts.length > 0 ||
+            b.checks.length > 0)
+        ) {
+          selectKey = k;
+          break;
+        }
+      }
+    }
+    complianceCalendarSelectedDay = selectKey;
+    renderComplianceCalendarGrid(
+      year,
+      monthIndex,
+      complianceArchiveByDay
+    );
+    if (selectKey) {
+      renderComplianceCalendarDayDetail(
+        selectKey,
+        complianceArchiveByDay.get(selectKey)
+      );
+    } else {
+      complianceCalendarSelectedDay = null;
+      const det = document.getElementById('cal-day-detail');
+      if (det) {
+        det.innerHTML =
+          '<p class="mc-hint">No temperatures, sanitizer checks, team log posts, or checklist entries for this month in this workspace.</p>';
+      }
+    }
+    if (statusEl) {
+      statusEl.textContent = `${bounds.monthStartKey} — ${bounds.monthEndKey} · Tap a date (dot = activity).`;
+    }
+  } catch (e) {
+    console.error('loadComplianceArchiveMonthIntoModal', e);
+    if (statusEl) {
+      statusEl.textContent =
+        'Could not load this month. Check connection or Firestore indexes (console may show a link).';
+    }
+    complianceArchiveByDay = new Map();
+    complianceCalendarSelectedDay = null;
+    renderComplianceCalendarGrid(year, monthIndex, complianceArchiveByDay);
+    const det = document.getElementById('cal-day-detail');
+    if (det) {
+      det.innerHTML = '<p class="mc-hint">Try again or pick another month.</p>';
+    }
+  }
+}
+
+function wireComplianceArchiveCalendar() {
+  const openBtn = document.getElementById('btn-open-compliance-calendar');
+  const closeBtn = document.getElementById('btn-close-compliance-calendar');
+  const backdrop = document.getElementById('compliance-archive-backdrop');
+  const prevBtn = document.getElementById('btn-cal-prev');
+  const nextBtn = document.getElementById('btn-cal-next');
+
+  if (openBtn && !openBtn.dataset.bound) {
+    openBtn.dataset.bound = '1';
+    openBtn.addEventListener('click', () => {
+      const now = new Date();
+      complianceCalendarCursor = {
+        year: now.getFullYear(),
+        monthIndex: now.getMonth()
+      };
+      setComplianceArchiveModalOpen(true);
+      void loadComplianceArchiveMonthIntoModal();
+    });
+  }
+  const closeModal = () => {
+    setComplianceArchiveModalOpen(false);
+  };
+  if (closeBtn && !closeBtn.dataset.bound) {
+    closeBtn.dataset.bound = '1';
+    closeBtn.addEventListener('click', closeModal);
+  }
+  if (backdrop && !backdrop.dataset.bound) {
+    backdrop.dataset.bound = '1';
+    backdrop.addEventListener('click', closeModal);
+  }
+  if (prevBtn && !prevBtn.dataset.bound) {
+    prevBtn.dataset.bound = '1';
+    prevBtn.addEventListener('click', () => {
+      complianceCalendarCursor.monthIndex -= 1;
+      if (complianceCalendarCursor.monthIndex < 0) {
+        complianceCalendarCursor.monthIndex = 11;
+        complianceCalendarCursor.year -= 1;
+      }
+      void loadComplianceArchiveMonthIntoModal();
+    });
+  }
+  if (nextBtn && !nextBtn.dataset.bound) {
+    nextBtn.dataset.bound = '1';
+    nextBtn.addEventListener('click', () => {
+      complianceCalendarCursor.monthIndex += 1;
+      if (complianceCalendarCursor.monthIndex > 11) {
+        complianceCalendarCursor.monthIndex = 0;
+        complianceCalendarCursor.year += 1;
+      }
+      void loadComplianceArchiveMonthIntoModal();
+    });
+  }
+  if (!document.documentElement.dataset.complianceCalEsc) {
+    document.documentElement.dataset.complianceCalEsc = '1';
+    document.addEventListener('keydown', ev => {
+      if (ev.key !== 'Escape') {
+        return;
+      }
+      const modal = document.getElementById('compliance-archive-modal');
+      if (modal && !modal.hidden) {
+        closeModal();
+      }
+    });
+  }
 }
 
 function startReadingsLogListeners(uid) {
@@ -1012,7 +1600,7 @@ async function refreshTodayPanel(uid) {
     const dayPostsSnap = await getDocs(
       query(
         collection(db, 'projects', projectId, 'shift_day_posts'),
-        where('postDate', '==', today),
+        where('dateKey', '==', today),
         limit(40)
       )
     );
@@ -1526,6 +2114,10 @@ async function refreshProjectPicker(uid) {
     setWorkspaceReadyGlobally(uid);
     void refreshTodayPanel(uid);
     rerenderComplianceLogLists();
+    const modal = document.getElementById('compliance-archive-modal');
+    if (modal && !modal.hidden) {
+      void loadComplianceArchiveMonthIntoModal();
+    }
   };
 
   updateWorkspaceFirstRunVisibility(uid);
@@ -1661,6 +2253,7 @@ function wireAuth() {
   }
 
   wireHaccpReminderControls();
+  wireComplianceArchiveCalendar();
 }
 
 export function initMobileCompliance() {
@@ -1735,6 +2328,7 @@ export function initMobileCompliance() {
     } else {
       profileEnsuredThisSession = false;
       stopReadingsLogListeners();
+      setComplianceArchiveModalOpen(false);
       showPanel('auth');
       $('user-chip').textContent = '';
       myProjectRows = [];
