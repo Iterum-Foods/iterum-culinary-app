@@ -191,8 +191,12 @@ class FirestoreSync {
     if (!this.initialized || !projectId) {
       return null;
     }
-    const authUid =
-      opts.firebaseUid || window.authManager?.currentUser?.uid || null;
+    const rawUid =
+      opts.firebaseUid ?? window.authManager?.currentUser?.uid ?? null;
+    if (rawUid === null || rawUid === undefined) {
+      return null;
+    }
+    const authUid = String(rawUid).trim();
     if (!authUid) {
       return null;
     }

@@ -46,6 +46,9 @@ const SAN_LOCS = 'sanitizer_locations';
 /** @type {{ id: string, role?: string }[]} */
 let myProjectRows = [];
 
+/** Avoid duplicate visibility/pageshow handlers if init runs more than once. */
+let workspaceResumeListenersBound = false;
+
 const PROJECTS_STORE_PREFIX = 'iterum_projects_user_';
 
 function projectsStorageKey(uid) {
@@ -1223,6 +1226,28 @@ export function initMobileCompliance() {
     : initializeApp(window.firebaseConfig);
   db = getFirestore(app);
   auth = getAuth(app);
+
+  if (!workspaceResumeListenersBound) {
+    workspaceResumeListenersBound = true;
+    const refreshTeamWorkspacesOnResume = () => {
+      if (document.visibilityState !== 'visible') {
+        return;
+      }
+      const uid = auth.currentUser?.uid;
+      if (!uid) {
+        return;
+      }
+      void refreshProjectPicker(uid).then(() => {
+        ensureSiteIdIfNoTeamProjects();
+      });
+    };
+    document.addEventListener('visibilitychange', refreshTeamWorkspacesOnResume);
+    window.addEventListener('pageshow', ev => {
+      if (ev.persisted) {
+        refreshTeamWorkspacesOnResume();
+      }
+    });
+  }
 
   let profileEnsuredThisSession = false;
 

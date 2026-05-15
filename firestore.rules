@@ -339,7 +339,15 @@ service cloud.firestore {
 
       // Company / workspace membership (uid = Firebase Auth uid)
       match /members/{memberId} {
-        allow read: if canAccessProjectDoc(projectId);
+        // Own member row: allow read when doc id and authUid match (supports collectionGroup
+        // listing even if canAccessProjectDoc would circularly depend on this doc).
+        allow read: if canAccessProjectDoc(projectId)
+          || (
+            isAuthenticated()
+            && memberId == request.auth.uid
+            && resource.data.keys().hasAny(['authUid'])
+            && resource.data.authUid == request.auth.uid
+          );
 
         // memberId must equal the invited user's Firebase Auth uid; authUid in data must match (for collectionGroup queries)
         allow create: if isValidSize()
