@@ -330,12 +330,8 @@
       if (started) return;
       started = true;
       Promise.all([
-        import(
-          'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js'
-        ),
-        import(
-          'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js'
-        )
+        import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js'),
+        import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js')
       ])
         .then(function (mods) {
           var appMod = mods[0];

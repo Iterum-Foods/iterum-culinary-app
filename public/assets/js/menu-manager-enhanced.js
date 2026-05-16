@@ -82,7 +82,9 @@ class EnhancedMenuManager {
       return;
     }
     if (mode === 'copy' && !copySourceId && !forceNewRecipe) {
-      alert('Pick the recipe you want to copy from, or check “Create a new draft instead”.');
+      alert(
+        'Pick the recipe you want to copy from, or check “Create a new draft instead”.'
+      );
       return;
     }
 
@@ -93,8 +95,7 @@ class EnhancedMenuManager {
         category: formData.get('category') || 'Main Courses',
         price: parseFloat(formData.get('price')) || 0,
         targetFoodCost: parseFloat(formData.get('targetFoodCost')) || 30,
-        recipeId:
-          mode === 'link' && !forceNewRecipe ? recipeId : null,
+        recipeId: mode === 'link' && !forceNewRecipe ? recipeId : null,
         copiedFromRecipeId:
           mode === 'copy' && !forceNewRecipe ? copySourceId : null,
         allergens: formData.get('allergens')

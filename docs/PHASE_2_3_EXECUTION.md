@@ -1,6 +1,7 @@
 # Phase 2 & 3 execution guide
 
 **Purpose:** Operational checklist to **finish store-ready mobile (Phase 2)** and **first-wave go-to-market (Phase 3)**. Parent tracker: [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md).  
+**Prerequisite:** [FUNCTIONAL_READINESS_GATE.md](./FUNCTIONAL_READINESS_GATE.md) — confirm core flows on production before treating store submission as the priority.  
 **Last updated:** 2026-05-09
 
 **Quick links**

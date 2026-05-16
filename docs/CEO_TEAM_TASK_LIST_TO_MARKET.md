@@ -4,7 +4,7 @@
 **For:** CTO, COO, Engineering, Product/Marketing, Ops  
 **Purpose:** One delegable list from **today** through **first market motion** (pilot + store presence).  
 **Living trackers:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [PILOT_APP_COMPLETION_MASTER.md](./PILOT_APP_COMPLETION_MASTER.md) (what “done” means) · [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) (engineering backlog) · [APP_COMPLETION_PLAN.md](./APP_COMPLETION_PLAN.md) · [HOW_WE_SHIP.md](./HOW_WE_SHIP.md)  
-**Last updated:** 9 May 2026  
+**Last updated:** 11 May 2026  
 
 ---
 
@@ -44,6 +44,8 @@
 ## Phase 2 — Phone app (store-ready)
 
 **Execution checklist:** [PHASE_2_3_EXECUTION.md](./PHASE_2_3_EXECUTION.md) § Phase 2 (AAB, TestFlight, assets, data safety, versions).
+
+**Prerequisite:** complete [FUNCTIONAL_READINESS_GATE.md](./FUNCTIONAL_READINESS_GATE.md) so real users can run core flows on production before you optimize for store review.
 
 | Done | Task | Owner | Done when |
 |------|------|-------|-----------|

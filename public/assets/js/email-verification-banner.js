@@ -143,7 +143,7 @@
         banner.style.borderColor = '#10b981';
 
         setTimeout(() => {
-          dismissVerificationBanner();
+          window.dismissVerificationBanner?.();
         }, 3000);
       }
     } catch (error) {

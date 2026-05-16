@@ -523,12 +523,12 @@ class EnhancedMenuImport {
         window.enhancedMenuManager.renderMenuItems();
       }
 
-      // Update display
+      // Update display (menu builder may expose this globally)
       if (
         window.currentSelectedMenu &&
-        typeof displayMenuItems === 'function'
+        typeof window.displayMenuItems === 'function'
       ) {
-        displayMenuItems(currentMenu);
+        window.displayMenuItems(currentMenu);
       }
 
       this.closeModal();

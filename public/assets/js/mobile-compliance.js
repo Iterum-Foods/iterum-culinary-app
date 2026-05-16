@@ -447,9 +447,7 @@ function renderTemperatureLogList(docs) {
     }
     rows.push({ id: d.id, data });
   });
-  const todayRows = rows.filter(
-    r => parseEntryDay(r.data) === todayKey
-  );
+  const todayRows = rows.filter(r => parseEntryDay(r.data) === todayKey);
 
   const useF = $('unit-fahrenheit').checked;
   const fmtTemp = tempC => {
@@ -505,9 +503,7 @@ function renderSanitizerLogList(docs) {
     }
     rows.push({ id: d.id, data });
   });
-  const todayRows = rows.filter(
-    r => parseEntryDay(r.data) === todayKey
-  );
+  const todayRows = rows.filter(r => parseEntryDay(r.data) === todayKey);
 
   const lineHtml = list =>
     list
@@ -613,11 +609,7 @@ async function fetchUserReadingsForMonth(
  * @param {string} monthStartKey
  * @param {string} monthEndKey
  */
-async function fetchShiftPostsForMonth(
-  projectId,
-  monthStartKey,
-  monthEndKey
-) {
+async function fetchShiftPostsForMonth(projectId, monthStartKey, monthEndKey) {
   const out = [];
   if (!db || !projectId || projectId === 'mobile-default') {
     return out;
@@ -642,11 +634,7 @@ async function fetchShiftPostsForMonth(
  * @param {string} monthStartKey
  * @param {string} monthEndKey
  */
-async function fetchChecklistsForMonth(
-  projectId,
-  monthStartKey,
-  monthEndKey
-) {
+async function fetchChecklistsForMonth(projectId, monthStartKey, monthEndKey) {
   const out = [];
   if (!db || !projectId || projectId === 'mobile-default') {
     return out;
@@ -798,9 +786,8 @@ function renderComplianceCalendarGrid(year, monthIndex, byDay) {
       const placeholder = document.createElement('div');
       placeholder.className = 'mc-cal-day mc-cal-day--muted';
       placeholder.setAttribute('aria-hidden', 'true');
-      placeholder.innerHTML = c.day != null
-        ? `<span class="mc-cal-day-num">${c.day}</span>`
-        : '';
+      placeholder.innerHTML =
+        c.day != null ? `<span class="mc-cal-day-num">${c.day}</span>` : '';
       grid.appendChild(placeholder);
       continue;
     }
@@ -831,13 +818,12 @@ function renderComplianceCalendarGrid(year, monthIndex, byDay) {
       }
       complianceCalendarSelectedDay = c.key;
       renderComplianceCalendarGrid(year, monthIndex, byDay);
-      const b =
-        byDay?.get(c.key) || {
-          temps: [],
-          sans: [],
-          posts: [],
-          checks: []
-        };
+      const b = byDay?.get(c.key) || {
+        temps: [],
+        sans: [],
+        posts: [],
+        checks: []
+      };
       renderComplianceCalendarDayDetail(c.key, b);
     });
     grid.appendChild(btn);
@@ -905,9 +891,7 @@ function renderComplianceCalendarDayDetail(dayKey, bundle) {
       : `<div class="mc-cal-detail-section"><h4>Temperatures</h4><ul class="mc-cal-detail-list">${b.temps
           .map(row => {
             const when = formatReadingDateTime(row.timestamp);
-            const unit = escapeHtml(
-              String(row.unitName || row.unitId || '—')
-            );
+            const unit = escapeHtml(String(row.unitName || row.unitId || '—'));
             const val = fmtTemp(row.tempC ?? row.temperature);
             return `<li><span class="mc-log-when">${escapeHtml(when)}</span> — <strong>${unit}</strong> ${escapeHtml(String(val))}${suffix}</li>`;
           })
@@ -1065,11 +1049,7 @@ async function loadComplianceArchiveMonthIntoModal() {
       }
     }
     complianceCalendarSelectedDay = selectKey;
-    renderComplianceCalendarGrid(
-      year,
-      monthIndex,
-      complianceArchiveByDay
-    );
+    renderComplianceCalendarGrid(year, monthIndex, complianceArchiveByDay);
     if (selectKey) {
       renderComplianceCalendarDayDetail(
         selectKey,
@@ -1257,7 +1237,10 @@ function tryFireHaccpReminders() {
   if (localStorage.getItem(HACCP_REMIND_FLAG) !== '1') {
     return;
   }
-  if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+  if (
+    typeof document !== 'undefined' &&
+    document.visibilityState !== 'visible'
+  ) {
     return;
   }
   if (!('Notification' in window) || Notification.permission !== 'granted') {
@@ -1321,12 +1304,15 @@ function wireHaccpReminderControls() {
     const perm =
       typeof Notification !== 'undefined' ? Notification.permission : 'denied';
     if (hint) {
-      hint.textContent = on && perm === 'granted'
-        ? `Reminders on: morning ${cfg.amStartHour}:${String(cfg.amStartMin).padStart(2, '0')}–${cfg.amEndHour}:${String(cfg.amEndMin).padStart(2, '0')}, afternoon ${cfg.pmStartHour}:${String(cfg.pmStartMin).padStart(2, '0')}–${cfg.pmEndHour}:${String(cfg.pmEndMin).padStart(2, '0')} (device local time). Logs show today below; past days move to Archive.`
-        : 'Tap the button to allow notifications. We ping once per window (late morning + afternoon) to log temps and sanitizer on this device.';
+      hint.textContent =
+        on && perm === 'granted'
+          ? `Reminders on: morning ${cfg.amStartHour}:${String(cfg.amStartMin).padStart(2, '0')}–${cfg.amEndHour}:${String(cfg.amEndMin).padStart(2, '0')}, afternoon ${cfg.pmStartHour}:${String(cfg.pmStartMin).padStart(2, '0')}–${cfg.pmEndHour}:${String(cfg.pmEndMin).padStart(2, '0')} (device local time). Logs show today below; past days move to Archive.`
+          : 'Tap the button to allow notifications. We ping once per window (late morning + afternoon) to log temps and sanitizer on this device.';
     }
     btn.textContent =
-      on && perm === 'granted' ? 'Reminders on (tap to turn off)' : 'Enable twice-daily reminders';
+      on && perm === 'granted'
+        ? 'Reminders on (tap to turn off)'
+        : 'Enable twice-daily reminders';
   };
 
   btn.addEventListener('click', async () => {
@@ -1346,14 +1332,19 @@ function wireHaccpReminderControls() {
       perm = await Notification.requestPermission();
     }
     if (perm !== 'granted') {
-      setStatus('Allow notifications in the browser or OS settings to use reminders.', true);
+      setStatus(
+        'Allow notifications in the browser or OS settings to use reminders.',
+        true
+      );
       syncHint();
       return;
     }
     localStorage.setItem(HACCP_REMIND_FLAG, '1');
     syncHint();
     tryFireHaccpReminders();
-    setStatus('Twice-daily reminders enabled. Keep this app installed or tab available around shift times.');
+    setStatus(
+      'Twice-daily reminders enabled. Keep this app installed or tab available around shift times.'
+    );
   });
 
   syncHint();
@@ -2282,7 +2273,10 @@ export function initMobileCompliance() {
         ensureSiteIdIfNoTeamProjects();
       });
     };
-    document.addEventListener('visibilitychange', refreshTeamWorkspacesOnResume);
+    document.addEventListener(
+      'visibilitychange',
+      refreshTeamWorkspacesOnResume
+    );
     window.addEventListener('pageshow', ev => {
       if (ev.persisted) {
         refreshTeamWorkspacesOnResume();

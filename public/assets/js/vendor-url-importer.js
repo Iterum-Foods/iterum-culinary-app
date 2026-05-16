@@ -470,9 +470,12 @@ class VendorURLImporter {
     this.showToast('✅ Vendor added successfully!', 'success');
     this.closeModal();
 
-    // Refresh vendor list if function exists
-    if (typeof loadVendors === 'function') {
-      loadVendors();
+    // Refresh vendor list via vendorManager when present (no global loadVendors)
+    if (
+      window.vendorManager &&
+      typeof window.vendorManager.loadVendors === 'function'
+    ) {
+      void window.vendorManager.loadVendors();
     }
 
     // Dispatch event for other components

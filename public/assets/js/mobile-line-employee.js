@@ -412,9 +412,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
           return `<li class="mc-card"><strong>${escapeHtml(name)}</strong>${cat ? `<div class="mc-hint">${escapeHtml(cat)}</div>` : ''}${price ? `<div class="mc-hint">${escapeHtml(price)}</div>` : ''}</li>`;
         })
         .join('');
-      const hint = hintHtml
-        ? `<p class="mc-hint">${hintHtml}</p>`
-        : '';
+      const hint = hintHtml ? `<p class="mc-hint">${hintHtml}</p>` : '';
       body.innerHTML = `${hint}<p class="mc-panel-title">${escapeHtml(menuName)}</p><ul class="mc-list">${rows}</ul>`;
     }
     try {

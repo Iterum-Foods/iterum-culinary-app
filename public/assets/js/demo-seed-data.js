@@ -438,12 +438,18 @@
             unit: 'batch',
             notes: 'rye + koji syrup + salt + water — baked off AM'
           },
-          { name: 'Cultured butter', amount: '1', unit: 'quart', notes: 'whipped' }
+          {
+            name: 'Cultured butter',
+            amount: '1',
+            unit: 'quart',
+            notes: 'whipped'
+          }
         ],
         instructions: [
           {
             step: 1,
-            instruction: 'Pull from pastry; 6 mm slices; butter ramekin on tray.'
+            instruction:
+              'Pull from pastry; 6 mm slices; butter ramekin on tray.'
           }
         ],
         createdAt: now,
@@ -472,7 +478,12 @@
             unit: 'mis',
             notes: 'skewer 80 g clusters'
           },
-          { name: 'Smoked cashew cream', amount: '200', unit: 'ml', notes: 'hot' }
+          {
+            name: 'Smoked cashew cream',
+            amount: '200',
+            unit: 'ml',
+            notes: 'hot'
+          }
         ],
         instructions: [
           {
