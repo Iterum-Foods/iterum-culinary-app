@@ -536,8 +536,8 @@ class PhotoManager {
               console.log('Photos uploaded for step:', photos);
               modal.remove();
               // Refresh the recipe view
-              if (typeof refreshRecipeView === 'function') {
-                refreshRecipeView();
+              if (typeof window.refreshRecipeView === 'function') {
+                window.refreshRecipeView();
               }
             }
           })}
