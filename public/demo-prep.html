@@ -55,7 +55,7 @@
       <h1 class="text-2xl sm:text-3xl font-semibold text-ink tracking-tight">Load demo showcase data</h1>
       <p class="text-slate mt-2 text-base leading-relaxed">
         Merges sample projects, two menus (lunch + bar), recipes (published + WIP), recipe ideas, ingredients, inventory, vendors, menu–recipe links, equipment for HACCP, and sanitizer / temperature / dishwasher logs into this browser.
-        The account demo@iterumfoods.com automatically receives the same local merge plus a one-time Firestore sample (dashboard sanitizer and fridge logs) when they sign in on pages that load the app shell (home, sign-in, dashboard). Create that user in Firebase Authentication (email/password) if it does not exist yet. Other accounts can use this page manually.
+        Optional URL opt-in for any account: add <code class="bg-slate-100 px-1 rounded">?demo=1</code> (or <code class="bg-slate-100 px-1 rounded">?iterum_demo=1</code>) when opening the app so demo auto-merge can run after sign-in, or set <code class="bg-slate-100 px-1 rounded">localStorage.iterum_demo_seed</code> to <code class="bg-slate-100 px-1 rounded">1</code>. The demo email still qualifies without extra flags. Create the demo user in Firebase Authentication if it does not exist yet.
       </p>
     </div>
 
@@ -82,7 +82,10 @@
       var btn = document.getElementById('btn-demo-seed');
       btn.addEventListener('click', function () {
         btn.disabled = true;
-        var r = typeof applyIterumDemoSeed === 'function' ? applyIterumDemoSeed({}) : { ok: false, error: 'missing_seed' };
+        var r =
+          typeof applyIterumDemoSeed === 'function'
+            ? applyIterumDemoSeed({ force: true })
+            : { ok: false, error: 'missing_seed' };
         if (r.ok) {
           var s = r.summary || {};
           statusEl.textContent =

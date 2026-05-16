@@ -302,9 +302,9 @@
             // Wait for authentication system to be ready
             await new Promise(resolve => setTimeout(resolve, 500));
             
-            // Ensure unified auth system is initialized and user state is maintained
-            if (window.unifiedAuth) {
-                console.log('🔐 Unified auth system found, checking user state...');
+            // Auth: prefer AuthManager (head); unified shell optional
+            if (window.authManager) {
+                console.log('🔐 Auth manager found, checking user state...');
                 
                 // Check if there's a current user session
                 const currentUser = localStorage.getItem('current_user');
@@ -318,9 +318,6 @@
                         // Update the header display with current user
                         updateHeaderUserDisplay(user);
                         
-                        // Ensure unified auth system has the current user
-                        window.unifiedAuth.currentUser = user;
-                        
                     } catch (error) {
                         console.warn('⚠️ Error parsing current user:', error);
                     }
@@ -328,7 +325,7 @@
                     console.log('⚠️ No active user session found');
                 }
             } else {
-                console.warn('⚠️ Unified auth system not available');
+                console.warn('⚠️ Auth manager not available');
             }
             
             // Initialize header user synchronization
@@ -1126,35 +1123,6 @@
             }
         });
     </script>
-
-    <!-- Initialize Unified Authentication System -->
-    <script>
-      // Initialize authentication system when DOM is ready
-      document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 DOM loaded, initializing authentication system...');
-        
-        // Wait a moment for all scripts to load
-        setTimeout(() => {
-          if (typeof UnifiedAuthSystem !== 'undefined') {
-            console.log('✅ UnifiedAuthSystem class found, creating instance...');
-            window.unifiedAuthSystem = new UnifiedAuthSystem();
-            window.unifiedAuth = window.unifiedAuthSystem; // Alias for onclick handlers
-            console.log('✅ Authentication system initialized');
-          } else {
-            console.error('❌ UnifiedAuthSystem class not found');
-          }
-          
-          // Initialize page protection if available
-          if (typeof PageProtection !== 'undefined') {
-            console.log('✅ PageProtection class found, creating instance...');
-            window.pageProtection = new PageProtection();
-            console.log('✅ Page protection system initialized');
-          } else {
-            console.warn('⚠️ PageProtection class not found');
-          }
-        }, 100);
-      });
-    </script>
     
     <!-- Load Firebase Modules -->
     <script type="module" src="assets/js/firebase-auth.js"></script>
@@ -1173,12 +1141,6 @@
     
     <!-- Central Data Loader -->
     <script src="assets/js/central-data-loader.js"></script>
-    
-    <!-- State Persistence Manager - Ensures user and project persist across pages -->
-    <script src="assets/js/state-persistence-manager.js"></script>
-    
-    <!-- Universal Recipe Manager - Ensures all recipes go to library -->
-    <script src="assets/js/universal-recipe-manager.js"></script>
     
     <!-- Secure Storage Manager - Fast & Secure IndexedDB storage -->
     <script src="assets/js/secure-storage-manager.js"></script>

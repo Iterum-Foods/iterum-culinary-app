@@ -463,8 +463,11 @@ class UnifiedProjectSelector {
 
     const path = `${window.location.pathname} ${window.location.href}`;
 
-    if (/recipe-library/i.test(path) && typeof loadRecipes === 'function') {
-      setTimeout(() => loadRecipes(), 100);
+    if (
+      /recipe-library/i.test(path) &&
+      typeof window.loadRecipes === 'function'
+    ) {
+      setTimeout(() => window.loadRecipes(), 100);
     }
 
     if (/menu-builder/i.test(path) && window.loadMenuData) {
@@ -475,8 +478,11 @@ class UnifiedProjectSelector {
       setTimeout(() => window.vendorManager.loadVendors(), 100);
     }
 
-    if (/ingredients/i.test(path) && typeof displayIngredients === 'function') {
-      setTimeout(() => displayIngredients(), 100);
+    if (
+      /ingredients/i.test(path) &&
+      typeof window.displayIngredients === 'function'
+    ) {
+      setTimeout(() => window.displayIngredients(), 100);
     }
 
     if (
@@ -484,8 +490,8 @@ class UnifiedProjectSelector {
         `${window.location.pathname} ${window.location.href}`
       )
     ) {
-      if (typeof updateDashboardStats === 'function') {
-        setTimeout(() => updateDashboardStats(), 100);
+      if (typeof window.updateDashboardStats === 'function') {
+        setTimeout(() => window.updateDashboardStats(), 100);
       }
     }
   }

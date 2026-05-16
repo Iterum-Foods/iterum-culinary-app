@@ -366,8 +366,8 @@ class RecipeViewer {
     alert('✅ Recipe duplicated successfully!');
 
     // Reload recipes if on library page
-    if (typeof loadRecipes === 'function') {
-      loadRecipes();
+    if (typeof window.loadRecipes === 'function') {
+      window.loadRecipes();
     }
   }
 

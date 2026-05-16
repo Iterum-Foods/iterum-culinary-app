@@ -99,7 +99,6 @@ class IngredientSelectorIntegrated {
     const hiddenPrice = document.getElementById(`${id}-best-price`);
     const info = document.getElementById(`${id}-info`);
 
-    let selectedIngredient = null;
     let filteredIngredients = [];
 
     // Search input handler
@@ -226,8 +225,6 @@ class IngredientSelectorIntegrated {
     showPrice,
     onSelect
   ) {
-    selectedIngredient = ingredient;
-
     // Update hidden fields
     hiddenId.value = ingredient.id;
     hiddenName.value = ingredient.name;

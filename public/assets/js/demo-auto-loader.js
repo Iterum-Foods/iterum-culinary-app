@@ -1,5 +1,5 @@
 /**
- * Auto-merge demo data for configured demo accounts (ITERUM_DEMO_EMAILS).
+ * Auto-merge demo data when opted in (ITERUM_DEMO_EMAILS, ?demo=1, or localStorage iterum_demo_seed).
  * Runs on session_saved / session_loaded; catches up if AuthManager was already ready.
  */
 (function () {
@@ -7,22 +7,6 @@
 
   var LOCAL_SEED_VERSION = 6;
   var FIRESTORE_SEED_VERSION = 3;
-
-  function normEmail(e) {
-    return (e || '').trim().toLowerCase();
-  }
-
-  function demoEmailList() {
-    var list = (typeof window !== 'undefined' && window.ITERUM_DEMO_EMAILS) || [
-      'demo@iterumfoods.com'
-    ];
-    return list.map(normEmail);
-  }
-
-  function isDemoUser(user) {
-    if (!user || !user.email) return false;
-    return demoEmailList().indexOf(normEmail(user.email)) !== -1;
-  }
 
   function localVersionKey(uid) {
     return 'iterum_demo_local_seed_applied_v_' + (uid || 'na');
@@ -254,6 +238,26 @@
     console.log('[Iterum demo] Firestore compliance sample saved for uid', uid);
   }
 
+  function userMayReceiveDemoSeed(user) {
+    if (!user) {
+      return false;
+    }
+    if (typeof window.iterumDemoSeedOptIn === 'function') {
+      return window.iterumDemoSeedOptIn(user);
+    }
+    if (!user.email) {
+      return false;
+    }
+    var rawList =
+      window.ITERUM_DEMO_EMAILS && window.ITERUM_DEMO_EMAILS.length
+        ? window.ITERUM_DEMO_EMAILS
+        : ['demo@iterumfoods.com'];
+    var list = rawList.map(function (e) {
+      return (e || '').trim().toLowerCase();
+    });
+    return list.indexOf((user.email || '').trim().toLowerCase()) !== -1;
+  }
+
   function runLocalSeed(uid) {
     var key = localVersionKey(uid);
     if (parseInt(localStorage.getItem(key) || '0', 10) >= LOCAL_SEED_VERSION) {
@@ -273,9 +277,16 @@
   }
 
   function scheduleDemoWork(user) {
-    if (!isDemoUser(user)) return;
+    if (!user) {
+      return;
+    }
+    if (!userMayReceiveDemoSeed(user)) {
+      return;
+    }
     var uid = user.id || user.userId || user.uid;
-    if (!uid) return;
+    if (!uid) {
+      return;
+    }
 
     runLocalSeed(uid);
 
@@ -290,7 +301,9 @@
 
     var scheduleTimer = null;
     var debounced = function (user) {
-      if (!isDemoUser(user)) return;
+      if (!userMayReceiveDemoSeed(user)) {
+        return;
+      }
       clearTimeout(scheduleTimer);
       scheduleTimer = setTimeout(function () {
         scheduleDemoWork(user);
@@ -300,7 +313,7 @@
     am.on('session_saved', debounced);
     am.on('session_loaded', debounced);
 
-    if (am.currentUser && isDemoUser(am.currentUser)) {
+    if (am.currentUser) {
       debounced(am.currentUser);
     }
     return true;

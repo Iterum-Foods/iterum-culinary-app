@@ -250,8 +250,8 @@ class VendorIngredientConnector {
 
     // Refresh page data
     setTimeout(() => {
-      if (typeof displayIngredients === 'function') {
-        displayIngredients();
+      if (typeof window.displayIngredients === 'function') {
+        window.displayIngredients();
       }
     }, 500);
   }

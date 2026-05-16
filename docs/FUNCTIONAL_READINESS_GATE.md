@@ -2,7 +2,7 @@
 
 **Purpose:** Ship only **Phase 2 (Play / App Store)** and heavy **Lane A GTM** after this gate is green. Product should be **reliably usable** for real pilots on web + mobile shell first.
 
-**Last updated:** 2026-05-11
+**Last updated:** 2026-05-09
 
 ---
 
@@ -15,8 +15,9 @@ Lane A = store submission + broad listing/comms ([PHASE_2_3_EXECUTION.md](./PHAS
 1. **Automated smoke is green** — `npm run test:chromium` (and full `npm test` if WebKit/mobile projects are installed in CI).
 2. **Lint/format do not block your merge policy** — `npm run lint` (no errors); `npm run format:check` passes on touched paths (or team agrees to a formatting PR).
 3. **Human QA pass** — [QA_FEATURE_TEST_WORKFLOW.md](./QA_FEATURE_TEST_WORKFLOW.md) on **production** URL ([HOW_WE_SHIP.md](./HOW_WE_SHIP.md)), not only localhost: auth, workspace switch, menu path, shift log, checklist, teammate add ([PHASE_1_TEAMMATE_FLOW_CHECKLIST.md](./PHASE_1_TEAMMATE_FLOW_CHECKLIST.md)).
-4. **Workspace trust** — No known **wrong-`projectId`** writes on high-traffic surfaces; track remaining work in [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) **E2** (audit note + fixes).
-5. **Pilot bar** — [PILOT_ACCEPTANCE_CRITERIA_WEB.md](./PILOT_ACCEPTANCE_CRITERIA_WEB.md) explicitly reviewed; gaps are **documented**, not hidden.
+4. **Demo / sample data** — Automatic demo merge runs only when opted in: listed demo emails, URL `?demo=1` / `?iterum_demo=1`, or `localStorage.iterum_demo_seed=1`. See [demo-prep.html](../public/demo-prep.html) (manual install uses `force: true`).
+5. **Workspace trust** — No known **wrong-`projectId`** writes on high-traffic surfaces; track remaining work in [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) **E2** (audit note + fixes).
+6. **Pilot bar** — [PILOT_ACCEPTANCE_CRITERIA_WEB.md](./PILOT_ACCEPTANCE_CRITERIA_WEB.md) explicitly reviewed; gaps are **documented**, not hidden.
 
 ---
 
@@ -44,3 +45,4 @@ Lane A = store submission + broad listing/comms ([PHASE_2_3_EXECUTION.md](./PHAS
 | Date | Change |
 |------|--------|
 | 2026-05-11 | Initial gate doc — functionality before Lane A / store. |
+| 2026-05-09 | Documented demo-sample opt-in (`?demo=1`, `iterum_demo_seed`, demo emails). |

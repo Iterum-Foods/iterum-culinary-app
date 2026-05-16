@@ -8,6 +8,67 @@
   var DASH_PREFIX = 'iterum.dashboard.simplified';
   var DEMO_PROJECT_ID = 'demo_bistro_nord';
 
+  function captureDemoQueryParam() {
+    try {
+      var q = new URLSearchParams(global.location.search || '');
+      if (q.get('demo') === '1' || q.get('iterum_demo') === '1') {
+        global.sessionStorage.setItem('iterum_demo_seed', '1');
+      }
+    } catch (e) {
+      void e;
+    }
+  }
+  captureDemoQueryParam();
+
+  function demoEmailListNormalized() {
+    var list = global.ITERUM_DEMO_EMAILS;
+    if (!list || !list.length) {
+      list = ['demo@iterumfoods.com'];
+    }
+    return list.map(function (e) {
+      return (e || '').trim().toLowerCase();
+    });
+  }
+
+  function isDemoListedEmail(email) {
+    var norm = (email || '').trim().toLowerCase();
+    if (!norm) {
+      return false;
+    }
+    return demoEmailListNormalized().indexOf(norm) !== -1;
+  }
+
+  /**
+   * Demo seeds run only when opted in: URL ?demo=1 | ?iterum_demo=1 (session),
+   * localStorage iterum_demo_seed=1, or email in ITERUM_DEMO_EMAILS.
+   */
+  global.iterumDemoSeedOptIn = function (userLike) {
+    try {
+      if (global.sessionStorage.getItem('iterum_demo_seed') === '1') {
+        return true;
+      }
+      if (global.localStorage.getItem('iterum_demo_seed') === '1') {
+        return true;
+      }
+    } catch (e) {
+      void e;
+    }
+    var email = '';
+    if (userLike && userLike.email) {
+      email = userLike.email;
+    } else {
+      try {
+        var cu = JSON.parse(
+          global.localStorage.getItem('current_user') || '{}'
+        );
+        email = cu.email || '';
+      } catch (e2) {
+        void e2;
+      }
+    }
+    return isDemoListedEmail(email);
+  };
+
   function sessionUserId() {
     try {
       var raw = global.localStorage.getItem('current_user');
@@ -1398,6 +1459,20 @@
    */
   global.applyIterumDemoSeed = function (options) {
     options = options || {};
+    if (!options.force) {
+      var uLike = {};
+      try {
+        uLike = JSON.parse(global.localStorage.getItem('current_user') || '{}');
+      } catch (e0) {
+        void e0;
+      }
+      if (
+        typeof global.iterumDemoSeedOptIn === 'function' &&
+        !global.iterumDemoSeedOptIn(uLike)
+      ) {
+        return { ok: false, error: 'demo_opt_in_required' };
+      }
+    }
     var uid = sessionUserId();
     if (!uid && !options.forceGuest) {
       return { ok: false, error: 'not_signed_in' };

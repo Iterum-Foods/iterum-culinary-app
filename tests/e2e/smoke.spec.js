@@ -69,6 +69,20 @@ test.describe('Smoke', () => {
     );
   });
 
+  test('recipe library page loads', async ({ page }) => {
+    const res = await page.goto('/recipe-library.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(page.locator('h1')).toContainText(/Recipe Library/i);
+  });
+
+  test('ingredients page loads', async ({ page }) => {
+    const res = await page.goto('/ingredients.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(page.locator('h1')).toContainText(
+      /Master ingredient library/i
+    );
+  });
+
   test('spec library page loads', async ({ page }) => {
     const res = await page.goto('/spec-library.html');
     expect(res?.ok()).toBeTruthy();

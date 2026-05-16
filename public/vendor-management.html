@@ -471,14 +471,7 @@
         </section>
     </main>
 
-    <!-- Scripts -->
-    <!-- Load Firebase Configuration -->
-    <script src="assets/js/firebase-config.js"></script>
-    
-    <!-- Load Firebase Authentication -->
-    <script type="module" src="assets/js/firebase-auth.js"></script>
-    <script type="module" src="assets/js/firebase-auth-ui.js"></script>
-    
+    <!-- Scripts — firebase-config + auth in <head>; firebase modules deferred at end -->
     <!-- Load Unified Authentication System -->
     <script src="assets/js/unified_auth_system.js"></script>
     
@@ -674,6 +667,7 @@
     
     <!-- Load Auth System at End -->
     <script type="module" defer src="assets/js/firebase-auth.js"></script>
+    <script type="module" defer src="assets/js/firebase-auth-ui.js"></script>
     <script type="module" defer src="assets/js/firestore-sync.js"></script>
     <script defer src="assets/js/vendor-price-overrides-panel.js"></script>
     <script defer src="assets/js/header-user-display.js"></script>
