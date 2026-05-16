@@ -450,8 +450,8 @@ https://example.com/product-2"></textarea>
       } catch (e) {
         void e;
       }
-      if (typeof loadEquipment === 'function') {
-        loadEquipment();
+      if (typeof window.loadEquipment === 'function') {
+        window.loadEquipment();
       } else {
         window.refreshEquipmentView?.();
       }

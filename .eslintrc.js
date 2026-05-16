@@ -38,6 +38,11 @@ module.exports = {
     'userSystem': 'readonly',
     'projectManager': 'readonly',
     'iterumApp': 'readonly',
-    'IterumErrorTracker': 'readonly'
+    'IterumErrorTracker': 'readonly',
+    // CDN scripts (menu-builder, equipment, inventory, bulk import)
+    'XLSX': 'readonly',
+    'pdfjsLib': 'readonly',
+    'mammoth': 'readonly',
+    'Chart': 'readonly'
   }
 };

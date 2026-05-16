@@ -38,14 +38,14 @@ class RecipeFileScanner {
    */
   async scanLocalFiles() {
     if (!('showDirectoryPicker' in window)) {
-      showWarning(
+      window.showWarning?.(
         'File System Access API not supported in this browser. Try Chrome or Edge.'
       );
       return [];
     }
 
     try {
-      showInfo('Select a folder to scan for recipes...');
+      window.showInfo?.('Select a folder to scan for recipes...');
 
       // Request directory access
       const dirHandle = await window.showDirectoryPicker({
@@ -53,12 +53,12 @@ class RecipeFileScanner {
         startIn: 'documents'
       });
 
-      const loaderId = showLoading('Scanning folder for recipe files...');
+      const loaderId = window.showLoading?.('Scanning folder for recipe files...');
 
       const files = [];
       await this.scanDirectory(dirHandle, files);
 
-      hideLoading(loaderId);
+      window.hideLoading?.(loaderId);
 
       // Filter for potential recipe files
       const recipeFiles = files.filter(file =>
@@ -67,14 +67,14 @@ class RecipeFileScanner {
 
       this.foundFiles = recipeFiles;
 
-      showSuccess(`Found ${recipeFiles.length} potential recipe files!`);
+      window.showSuccess?.(`Found ${recipeFiles.length} potential recipe files!`);
       return recipeFiles;
     } catch (error) {
       if (error.name === 'AbortError') {
-        showInfo('Folder selection cancelled');
+        window.showInfo?.('Folder selection cancelled');
       } else {
         console.error('Error scanning files:', error);
-        showError('Failed to scan folder: ' + error.message);
+        window.showError?.('Failed to scan folder: ' + error.message);
       }
       return [];
     }
@@ -125,7 +125,7 @@ class RecipeFileScanner {
    * Connect to Google Drive
    */
   async connectGoogleDrive() {
-    showInfo('Opening Google Drive authentication...');
+    window.showInfo?.('Opening Google Drive authentication...');
 
     // Google Drive API configuration
     const CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID'; // User would need to set this up
@@ -152,11 +152,11 @@ class RecipeFileScanner {
       await window.gapi.auth2.getAuthInstance().signIn();
 
       this.googleDriveEnabled = true;
-      showSuccess('Connected to Google Drive!');
+      window.showSuccess?.('Connected to Google Drive!');
       return true;
     } catch (error) {
       console.error('Google Drive connection error:', error);
-      showError(
+      window.showError?.(
         'Failed to connect to Google Drive. Please check your credentials.'
       );
       return false;
@@ -201,7 +201,7 @@ class RecipeFileScanner {
       }
     }
 
-    const loaderId = showLoading('Searching Google Drive for recipes...');
+    const loaderId = window.showLoading?.('Searching Google Drive for recipes...');
 
     try {
       const files = [];
@@ -231,7 +231,7 @@ class RecipeFileScanner {
         );
       }
 
-      hideLoading(loaderId);
+      window.hideLoading?.(loaderId);
 
       // Remove duplicates
       const uniqueFiles = Array.from(
@@ -240,12 +240,12 @@ class RecipeFileScanner {
 
       this.foundFiles = [...this.foundFiles, ...uniqueFiles];
 
-      showSuccess(`Found ${uniqueFiles.length} recipe files in Google Drive!`);
+      window.showSuccess?.(`Found ${uniqueFiles.length} recipe files in Google Drive!`);
       return uniqueFiles;
     } catch (error) {
-      hideLoading(loaderId);
+      window.hideLoading?.(loaderId);
       console.error('Google Drive search error:', error);
-      showError('Failed to search Google Drive: ' + error.message);
+      window.showError?.('Failed to search Google Drive: ' + error.message);
       return [];
     }
   }
@@ -264,12 +264,12 @@ class RecipeFileScanner {
       } else if (['.jpg', '.jpeg', '.png'].includes(ext)) {
         return await this.parseImageFile(file);
       } else {
-        showWarning(`${ext} files require manual import`);
+        window.showWarning?.(`${ext} files require manual import`);
         return null;
       }
     } catch (error) {
       console.error('Parse error:', error);
-      showError(`Failed to parse ${file.name}`);
+      window.showError?.(`Failed to parse ${file.name}`);
       return null;
     }
   }
@@ -286,7 +286,7 @@ class RecipeFileScanner {
    * Parse PDF file (requires PDF.js library)
    */
   async parsePDFFile(fileInfo) {
-    showWarning(
+    window.showWarning?.(
       'PDF parsing requires PDF.js library. Opening file for manual review...'
     );
 
@@ -303,7 +303,7 @@ class RecipeFileScanner {
    * Parse image file (requires OCR)
    */
   async parseImageFile(fileInfo) {
-    showWarning(
+    window.showWarning?.(
       'Image recipe extraction requires OCR. Please use manual import.'
     );
 
@@ -495,11 +495,11 @@ class RecipeFileScanner {
   async importFile(index) {
     const file = this.foundFiles[index];
     if (!file) {
-      showError('File not found');
+      window.showError?.('File not found');
       return;
     }
 
-    const loaderId = showLoading(`Importing ${file.name}...`);
+    const loaderId = window.showLoading?.(`Importing ${file.name}...`);
 
     try {
       const recipeData = await this.parseRecipeFile(file);
@@ -517,8 +517,8 @@ class RecipeFileScanner {
 
           window.universalRecipeManager.addRecipe(recipe);
 
-          hideLoading(loaderId);
-          showSuccess(`Recipe "${recipeData.name}" imported successfully!`);
+          window.hideLoading?.(loaderId);
+          window.showSuccess?.(`Recipe "${recipeData.name}" imported successfully!`);
 
           // Ask if user wants to edit it
           setTimeout(() => {
@@ -527,16 +527,16 @@ class RecipeFileScanner {
             }
           }, 500);
         } else {
-          hideLoading(loaderId);
-          showError('Recipe manager not available');
+          window.hideLoading?.(loaderId);
+          window.showError?.('Recipe manager not available');
         }
       } else {
-        hideLoading(loaderId);
+        window.hideLoading?.(loaderId);
       }
     } catch (error) {
-      hideLoading(loaderId);
+      window.hideLoading?.(loaderId);
       console.error('Import error:', error);
-      showError('Failed to import recipe');
+      window.showError?.('Failed to import recipe');
     }
   }
 }

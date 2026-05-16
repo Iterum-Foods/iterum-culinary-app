@@ -128,9 +128,9 @@ class EnhancedMenuManager {
       // Update display
       if (
         window.currentSelectedMenu &&
-        typeof displayMenuItems === 'function'
+        typeof window.displayMenuItems === 'function'
       ) {
-        displayMenuItems({
+        window.displayMenuItems({
           ...window.currentSelectedMenu,
           items: this.menuItems
         });
@@ -259,9 +259,9 @@ class EnhancedMenuManager {
       this.renderMenuItems();
       if (
         window.currentSelectedMenu &&
-        typeof displayMenuItems === 'function'
+        typeof window.displayMenuItems === 'function'
       ) {
-        displayMenuItems({
+        window.displayMenuItems({
           ...window.currentSelectedMenu,
           items: this.menuItems
         });
@@ -581,8 +581,8 @@ class EnhancedMenuManager {
         this.renderMenuItems();
 
         // Also update the displayMenuItems view if it exists
-        if (typeof displayMenuItems === 'function' && this.currentMenu) {
-          displayMenuItems(this.currentMenu);
+        if (typeof window.displayMenuItems === 'function' && this.currentMenu) {
+          window.displayMenuItems(this.currentMenu);
         }
       }
 
@@ -963,8 +963,8 @@ class EnhancedMenuManager {
       // Populate recipe select if not already done
       if (typeof window.populateRecipeDropdownsForMenuBuilder === 'function') {
         window.populateRecipeDropdownsForMenuBuilder();
-      } else if (typeof populateRecipeSelects === 'function') {
-        populateRecipeSelects();
+      } else if (typeof window.populateRecipeSelects === 'function') {
+        window.populateRecipeSelects();
       }
 
       // Reset recipe option toggle
@@ -1010,8 +1010,8 @@ class EnhancedMenuManager {
       // Populate recipes if needed
       if (typeof window.populateRecipeDropdownsForMenuBuilder === 'function') {
         window.populateRecipeDropdownsForMenuBuilder();
-      } else if (typeof populateRecipeSelects === 'function') {
-        populateRecipeSelects();
+      } else if (typeof window.populateRecipeSelects === 'function') {
+        window.populateRecipeSelects();
       }
       recipeSelect.value = item.recipeId || '';
       recipeSelect.required = true;

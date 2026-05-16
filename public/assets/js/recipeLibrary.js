@@ -5,6 +5,21 @@
 if (typeof window.RecipeLibrary !== 'undefined') {
   console.log('RecipeLibrary already loaded, skipping initialization');
 } else {
+  function iterumResolveAuthorUserId() {
+    if (typeof window.getCurrentUserId === 'function') {
+      return window.getCurrentUserId();
+    }
+    if (window.userDataManager?.getCurrentUserId) {
+      return window.userDataManager.getCurrentUserId();
+    }
+    try {
+      const user = JSON.parse(localStorage.getItem('current_user') || '{}');
+      return user?.id || user?.userId || null;
+    } catch {
+      return null;
+    }
+  }
+
   class RecipeLibrary {
     constructor() {
       this.recipes = [];
@@ -897,8 +912,8 @@ if (typeof window.RecipeLibrary !== 'undefined') {
     showNotification(message, type = 'info') {
       console.log(`${type.toUpperCase()}: ${message}`);
 
-      if (typeof showNotification === 'function') {
-        showNotification(message, type);
+      if (typeof window.showNotification === 'function') {
+        window.showNotification(message, type);
       } else {
         alert(message);
       }
@@ -1071,7 +1086,7 @@ if (typeof window.RecipeLibrary !== 'undefined') {
                 i => (typeof i === 'string' ? { instruction: i } : i)
               ),
               status: 'pending',
-              author_id: getCurrentUserId() // Add author_id
+              author_id: iterumResolveAuthorUserId()
             };
             const res = await fetch('/api/recipes/', {
               method: 'POST',
@@ -1091,8 +1106,8 @@ if (typeof window.RecipeLibrary !== 'undefined') {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 status: 'approved',
-                author_id: getCurrentUserId()
-              }) // Add author_id
+                author_id: iterumResolveAuthorUserId()
+              })
             });
             if (res.ok) {
               this.loadPendingReviews();
@@ -1120,8 +1135,8 @@ if (typeof window.RecipeLibrary !== 'undefined') {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 status: 'rejected',
-                author_id: getCurrentUserId()
-              }) // Add author_id
+                author_id: iterumResolveAuthorUserId()
+              })
             });
             if (res.ok) {
               this.loadPendingReviews();

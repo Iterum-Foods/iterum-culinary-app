@@ -225,8 +225,8 @@ class ErrorHandler {
       }
 
       // Reinitialize profile manager if needed
-      if (typeof initializeLoginSystem === 'function') {
-        initializeLoginSystem();
+      if (typeof window.initializeLoginSystem === 'function') {
+        window.initializeLoginSystem();
       }
     }, 1000);
   }

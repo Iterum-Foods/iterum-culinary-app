@@ -20,7 +20,7 @@ class RecipePhotoManager {
     for (const file of files) {
       // Validate file
       if (!this.validateFile(file)) {
-        showWarning(`Skipped ${file.name}: Invalid file type or size`);
+        window.showWarning?.(`Skipped ${file.name}: Invalid file type or size`);
         continue;
       }
 
@@ -54,14 +54,16 @@ class RecipePhotoManager {
         }
       } catch (error) {
         console.error('Error processing photo:', error);
-        showError(`Failed to upload ${file.name}`);
+        window.showError?.(`Failed to upload ${file.name}`);
       }
     }
 
     if (photos.length > 0) {
       // Save photos to recipe
       await this.savePhotosToRecipe(recipeId, photos);
-      showSuccess(`${photos.length} photo(s) uploaded successfully!`);
+      window.showSuccess?.(
+        `${photos.length} photo(s) uploaded successfully!`
+      );
     }
 
     return photos;
@@ -72,12 +74,12 @@ class RecipePhotoManager {
    */
   validateFile(file) {
     if (!this.allowedTypes.includes(file.type)) {
-      showWarning(`${file.name}: Only JPEG, PNG, and WebP images are allowed`);
+      window.showWarning?.(`${file.name}: Only JPEG, PNG, and WebP images are allowed`);
       return false;
     }
 
     if (file.size > this.maxFileSize) {
-      showWarning(`${file.name}: File too large (max 5MB)`);
+      window.showWarning?.(`${file.name}: File too large (max 5MB)`);
       return false;
     }
 
@@ -245,7 +247,7 @@ class RecipePhotoManager {
       }
     }
 
-    showSuccess('Photo deleted');
+    window.showSuccess?.('Photo deleted');
 
     // Trigger event
     window.dispatchEvent(
@@ -371,9 +373,9 @@ class RecipePhotoManager {
     input.addEventListener('change', async e => {
       const files = Array.from(e.target.files);
       if (files.length > 0) {
-        const loaderId = showLoading(`Uploading ${files.length} photo(s)...`);
+        const loaderId = window.showLoading?.(`Uploading ${files.length} photo(s)...`);
         await this.uploadPhotos(recipeId, files);
-        hideLoading(loaderId);
+        window.hideLoading?.(loaderId);
 
         // Refresh gallery
         this.refreshGallery(recipeId, containerId);

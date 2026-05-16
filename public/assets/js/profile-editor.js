@@ -294,7 +294,7 @@
     // Close on outside click
     modal.addEventListener('click', e => {
       if (e.target === modal) {
-        closeProfileEditModal();
+        window.closeProfileEditModal?.();
       }
     });
   };

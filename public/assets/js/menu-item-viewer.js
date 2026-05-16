@@ -488,8 +488,8 @@ class MenuItemViewer {
       .forEach(el => el.remove());
 
     // Refresh display
-    if (typeof displayMenuItems === 'function') {
-      displayMenuItems(menu);
+    if (typeof window.displayMenuItems === 'function') {
+      window.displayMenuItems(menu);
     }
 
     // Show success
@@ -571,8 +571,8 @@ class MenuItemViewer {
       .querySelectorAll('div[style*="position: fixed"]')
       .forEach(el => el.remove());
 
-    if (typeof displayMenuItems === 'function') {
-      displayMenuItems(menu);
+    if (typeof window.displayMenuItems === 'function') {
+      window.displayMenuItems(menu);
     }
 
     this.showToast('✅ Copy added with a new recipe draft to finish.');

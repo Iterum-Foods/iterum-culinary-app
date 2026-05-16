@@ -517,8 +517,8 @@ class RecipeScaler {
     console.log(`${type.toUpperCase()}: ${message}`);
 
     // You could integrate with your existing notification system
-    if (typeof showNotification === 'function') {
-      showNotification(message, type);
+    if (typeof window.showNotification === 'function') {
+      window.showNotification(message, type);
     } else {
       alert(message);
     }

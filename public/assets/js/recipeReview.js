@@ -695,7 +695,7 @@ class RecipeReviewManager {
               typeof i === 'string' ? { instruction: i } : i
             ),
             status: 'pending',
-            author_id: getCurrentUserId() // Add author_id
+            author_id: this.getCurrentUserId()
             // Add more fields as needed
           };
           const res = await fetch('/api/recipes/', {
@@ -885,8 +885,8 @@ class RecipeReviewManager {
   showNotification(message, type = 'info') {
     console.log(`${type.toUpperCase()}: ${message}`);
 
-    if (typeof showNotification === 'function') {
-      showNotification(message, type);
+    if (typeof window.showNotification === 'function') {
+      window.showNotification(message, type);
     } else {
       alert(message);
     }
@@ -1195,8 +1195,8 @@ class RecipeReviewManager {
           },
           body: JSON.stringify({
             ...updatedRecipe,
-            author_id: getCurrentUserId()
-          }) // Add author_id
+            author_id: this.getCurrentUserId()
+          })
         }
       );
 

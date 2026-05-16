@@ -504,8 +504,8 @@ document
           }
         }
         // Add to inventory list (replace with your add logic)
-        imported.forEach(item => addInventoryItem(item));
-        showNotification(
+        imported.forEach(item => window.addInventoryItem?.(item));
+        window.showNotification?.(
           'Imported ' + imported.length + ' inventory items from PDF.'
         );
         previewDiv.classList.add('hidden');
