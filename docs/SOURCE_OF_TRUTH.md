@@ -2,7 +2,7 @@
 
 **Purpose:** One place that states **canonical storage** for recipes, menus, vendors, and checklists until product and sync fully converge.  
 **Companion:** [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md) (paths, keys, rules).  
-**Last updated:** 2026-03-29    
+**Last updated:** 2026-05-11  
 
 ---
 
@@ -44,5 +44,6 @@
 
 | Date | Change |
 |------|--------|
+| 2026-05-11 | Removed unused legacy bundles: `equipmentManager.js` (superseded by `equipment-manager.js`), `enhanced_default_equipment.js` (unreferenced). |
 | 2026-04-25 | Added Week 1 canonical operations contract pack references (checklist, logs, corrective actions, specs). |
 | 2026-03-29 | Initial v1 table + exceptions + employee_line note. |

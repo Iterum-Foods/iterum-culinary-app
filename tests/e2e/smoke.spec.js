@@ -6,7 +6,8 @@ test.describe('Smoke', () => {
     { name: 'landing / index', path: '/', title: /Iterum/i },
     { name: 'dashboard HTML', path: '/dashboard.html' },
     { name: 'menu builder', path: '/menu-builder.html' },
-    { name: 'project hub', path: '/project-hub.html' }
+    { name: 'project hub', path: '/project-hub.html' },
+    { name: 'equipment management', path: '/equipment-management.html' }
   ];
 
   basicPages.forEach(({ name, path, title }) => {
@@ -21,6 +22,9 @@ test.describe('Smoke', () => {
         await expect(page.locator('body')).toContainText(
           /Operations exceptions/i
         );
+      }
+      if (path === '/equipment-management.html') {
+        await expect(page).toHaveTitle(/Equipment/i);
       }
     });
   });
