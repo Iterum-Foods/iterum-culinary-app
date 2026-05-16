@@ -1161,7 +1161,9 @@
             localStorage.setItem(key, JSON.stringify(equipmentList));
             localStorage.setItem('equipment_list', JSON.stringify(equipmentList)); // Compatibility
             
-            alert(`✅ Equipment "${equipment.name}" added successfully!`);
+            window.showSuccess?.(
+              `Equipment "${equipment.name}" added successfully!`
+            ) ?? alert(`✅ Equipment "${equipment.name}" added successfully!`);
             closeAddEquipmentModal();
             loadEquipment();
           });
@@ -1278,6 +1280,9 @@
     
     <!-- WebstaurantStore Integration -->
     <script src="assets/js/webstaurant-integration.js"></script>
+    <!-- UI polish: toasts and loading overlays (CSV/Excel import) -->
+    <script src="assets/js/toast-notifications.js"></script>
+    <script src="assets/js/loading-states.js"></script>
     <!-- Excel parser (SheetJS) for Excel imports -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script defer src="assets/js/import-service.js"></script>
@@ -1999,13 +2004,15 @@
         if (!modal) return;
         const checkboxes = modal.querySelectorAll('.catalog-item-checkbox:checked');
         if (!checkboxes.length) {
-          alert('Select at least one item to import.');
+          window.showWarning?.('Select at least one item to import.') ??
+            alert('Select at least one item to import.');
           return;
         }
 
         const packBundle = await fetchEquipmentCatalogPack(packId);
         if (!packBundle) {
-          alert('Failed to load catalog data.');
+          window.showError?.('Failed to load catalog data.') ??
+            alert('Failed to load catalog data.');
           return;
         }
 
@@ -2022,9 +2029,15 @@
         closeModal('equipment-catalog-modal');
         if (imported.length) {
           loadEquipment();
-          alert(`✅ Imported ${imported.length} catalog item(s) into inventory.`);
+          window.showSuccess?.(
+            `Imported ${imported.length} catalog item(s) into inventory.`
+          ) ??
+            alert(`✅ Imported ${imported.length} catalog item(s) into inventory.`);
         } else {
-          alert('No new items were imported (duplicates may have been skipped).');
+          window.showWarning?.(
+            'No new items were imported (duplicates may have been skipped).'
+          ) ??
+            alert('No new items were imported (duplicates may have been skipped).');
         }
       }
 
@@ -2367,7 +2380,10 @@
             localStorage.setItem(key, JSON.stringify(equipmentList));
             localStorage.setItem('equipment_list', JSON.stringify(equipmentList));
             
-            alert(`✅ Equipment "${equipmentList[index].name}" updated successfully!`);
+            window.showSuccess?.(
+              `Equipment "${equipmentList[index].name}" updated successfully!`
+            ) ??
+              alert(`✅ Equipment "${equipmentList[index].name}" updated successfully!`);
             document.getElementById('edit-equipment-modal').classList.add('hidden');
             loadEquipment();
           });

@@ -1,3 +1,28 @@
+function iterumImportNotify(message, type) {
+  const resolved =
+    type ||
+    (/^✅/.test(String(message))
+      ? 'success'
+      : /not available|unable|failed|empty|no rows|no csv/i.test(
+            String(message)
+          )
+        ? 'error'
+        : 'warning');
+  const fn =
+    resolved === 'success'
+      ? window.showSuccess
+      : resolved === 'error'
+        ? window.showError
+        : resolved === 'warning'
+          ? window.showWarning
+          : window.showInfo;
+  if (typeof fn === 'function') {
+    fn(message);
+    return;
+  }
+  alert(message);
+}
+
 class ImportService {
   constructor() {
     this.modal = null;
@@ -55,7 +80,9 @@ class ImportService {
 
   openIngredientURLImport() {
     if (!window.fetchIngredientMetadata) {
-      alert('Bulk URL import is only available on the ingredient page.');
+      iterumImportNotify(
+        'Bulk URL import is only available on the ingredient page.'
+      );
       return;
     }
 
@@ -116,7 +143,7 @@ https://example.com/product-2"></textarea>
     const progressEl = document.getElementById('bulk-import-progress');
     const raw = textarea.value.trim();
     if (!raw) {
-      alert('Please paste at least one URL.');
+      iterumImportNotify('Please paste at least one URL.');
       return;
     }
 
@@ -129,7 +156,7 @@ https://example.com/product-2"></textarea>
       )
     );
     if (!urls.length) {
-      alert('Please paste valid URLs.');
+      iterumImportNotify('Please paste valid URLs.');
       return;
     }
 
@@ -157,7 +184,7 @@ https://example.com/product-2"></textarea>
     }
 
     this.closeModal();
-    alert(
+    iterumImportNotify(
       `Bulk URL import finished. Added ${successCount} ingredient(s). ${failureCount ? failureCount + ' failed/skipped.' : ''}`
     );
     window.refreshIngredientsView?.();
@@ -255,7 +282,9 @@ https://example.com/product-2"></textarea>
       // Excel path
       if (lower.endsWith('.xlsx') || lower.endsWith('.xls')) {
         if (typeof XLSX === 'undefined') {
-          alert('Excel parser not loaded. Please include xlsx.full.min.js.');
+          iterumImportNotify(
+            'Excel parser not loaded. Please include xlsx.full.min.js.'
+          );
           return;
         }
         const reader = new FileReader();
@@ -267,7 +296,7 @@ https://example.com/product-2"></textarea>
             const sheet = workbook.Sheets[sheetName];
             const raw = XLSX.utils.sheet_to_json(sheet, { header: 1 });
             if (!raw || !raw.length) {
-              alert('No rows found in Excel sheet.');
+              iterumImportNotify('No rows found in Excel sheet.');
               return;
             }
             const headers = (raw[0] || []).map(h => String(h || '').trim());
@@ -293,7 +322,7 @@ https://example.com/product-2"></textarea>
             this.handleParsedTable(parsed, config);
           } catch (err) {
             console.error('Excel parse error:', err);
-            alert(
+            iterumImportNotify(
               'Unable to parse Excel file. Try saving as CSV and re-importing.'
             );
           }
@@ -308,7 +337,9 @@ https://example.com/product-2"></textarea>
             this.handleCSVText(text, config);
           } catch (error) {
             console.error('CSV read error:', error);
-            alert('Unable to read that file. Please try another CSV.');
+            iterumImportNotify(
+              'Unable to read that file. Please try another CSV.'
+            );
           }
         };
         reader.readAsText(file);
@@ -318,12 +349,12 @@ https://example.com/product-2"></textarea>
 
   handleCSVText(text, config) {
     if (!text) {
-      alert('Empty file.');
+      iterumImportNotify('Empty file.');
       return;
     }
     const parsed = this.parseCSV(text);
     if (!parsed || !parsed.rows.length) {
-      alert('No rows found in file.');
+      iterumImportNotify('No rows found in file.');
       return;
     }
     this.handleParsedTable(parsed, config);
@@ -331,7 +362,7 @@ https://example.com/product-2"></textarea>
 
   handleParsedTable(parsed, config) {
     if (!parsed || !parsed.headers || !parsed.rows) {
-      alert('Unable to read table data.');
+      iterumImportNotify('Unable to read table data.');
       return;
     }
 
@@ -416,7 +447,7 @@ https://example.com/product-2"></textarea>
 
   async executeCSVImport() {
     if (!this.csvData) {
-      alert('No CSV data loaded.');
+      iterumImportNotify('No CSV data loaded.');
       return;
     }
 
@@ -438,7 +469,7 @@ https://example.com/product-2"></textarea>
     }
 
     this.closeModal();
-    alert(
+    iterumImportNotify(
       `✅ Imported ${imported} ${this.currentType === 'equipment' ? 'equipment items' : 'ingredients'} from file.`
     );
 
@@ -462,7 +493,7 @@ https://example.com/product-2"></textarea>
 
   importEquipmentRows(rows) {
     if (!window.equipmentManager) {
-      alert('Equipment manager is not available on this page.');
+      iterumImportNotify('Equipment manager is not available on this page.');
       return 0;
     }
 
