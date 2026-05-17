@@ -2,7 +2,7 @@
 
 **Purpose:** Prove **end-to-end** team access on **production (Vercel)** without Firebase Console for the happy path (admin already has owner/`account_admin`).  
 **Prod base URL:** `https://iterum-culinary-app.vercel.app` (adjust if your primary URL differs).  
-**Related:** [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md) · [project-hub team panel](../public/project-hub.html) · [mobile-compliance.html](../public/mobile-compliance.html) · **M1 COO bundle:** [M1_COO_PROD_VERIFICATION.md](./M1_COO_PROD_VERIFICATION.md) · [WEB_APP_DESIGN_CHANGE_WORKFLOW.md](./WEB_APP_DESIGN_CHANGE_WORKFLOW.md) (if UI chrome changed during the flow)
+**Related:** [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISSIONS.md) · [RESTAURANT_FOH_BOH_READINESS.md](./RESTAURANT_FOH_BOH_READINESS.md) (full floor/kitchen rollout after this flow) · [project-hub team panel](../public/project-hub.html) · [mobile-compliance.html](../public/mobile-compliance.html) · **M1 COO bundle:** [M1_COO_PROD_VERIFICATION.md](./M1_COO_PROD_VERIFICATION.md) · [WEB_APP_DESIGN_CHANGE_WORKFLOW.md](./WEB_APP_DESIGN_CHANGE_WORKFLOW.md) (if UI chrome changed during the flow)
 
 ---
 

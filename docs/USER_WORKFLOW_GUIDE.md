@@ -18,6 +18,7 @@
 | You were **added** to a project (employee or new manager) | [C — Joining an existing workspace](#c-joining-an-existing-workspace-new-user-existing-restaurant) |
 | You have a **specific job** (menu, vendors, shift, team) | [D — Workflows by task](#d-workflows-by-task) |
 | You are validating a build | [QA_FEATURE_TEST_WORKFLOW.md](./QA_FEATURE_TEST_WORKFLOW.md) |
+| You are rolling out **FOH + BOH** staff on phones and web | [RESTAURANT_FOH_BOH_READINESS.md](./RESTAURANT_FOH_BOH_READINESS.md) |
 
 ---
 

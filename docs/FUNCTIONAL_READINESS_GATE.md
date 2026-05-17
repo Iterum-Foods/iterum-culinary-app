@@ -27,9 +27,10 @@ Lane A = store submission + broad listing/comms ([PHASE_2_3_EXECUTION.md](./PHAS
 |-------|--------|----------------|
 | 1 | **Stability & smoke** | `npm run test:chromium`, extend tests as you fix bugs |
 | 2 | **E2 multi-workspace** | Audit writers → fix; update [SOURCE_OF_TRUTH.md](./SOURCE_OF_TRUTH.md) if patterns change |
-| 3 | **E3 costing / vendors** (ICP) | Close remaining slices in [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) for *your* pilot promise |
-| 4 | **E5 authenticated E2E** (optional but high) | One Playwright path with test credentials (secrets in CI) |
-| 5 | **Lane A** | [PHASE_2_3_EXECUTION.md](./PHASE_2_3_EXECUTION.md) — AAB, TestFlight, listings |
+| 3 | **FOH / BOH shift-ready** | [RESTAURANT_FOH_BOH_READINESS.md](./RESTAURANT_FOH_BOH_READINESS.md) phases 0–2 + [QA_FEATURE_TEST_WORKFLOW.md](./QA_FEATURE_TEST_WORKFLOW.md) for three role types |
+| 4 | **E3 costing / vendors** (ICP) | Close remaining slices in [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) for *your* pilot promise |
+| 5 | **E5 authenticated E2E** (optional but high) | One Playwright path with test credentials (secrets in CI) |
+| 6 | **Lane A** | [PHASE_2_3_EXECUTION.md](./PHASE_2_3_EXECUTION.md) — AAB, TestFlight, listings |
 
 ---
 
