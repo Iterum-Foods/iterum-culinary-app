@@ -253,16 +253,45 @@ class VendorURLImporter {
   }
 
   /**
+   * Load vendor page HTML. Prefer same-origin `/api/vendor-fetch` (Vercel) so we are not blocked
+   * by browser CORS or QUIC issues when calling flaky public proxies from the client.
+   * Falls back to api.allorigins.win for local static servers without `/api`.
+   */
+  async fetchHtmlForVendorPage(url) {
+    const proxyPath = `/api/vendor-fetch?url=${encodeURIComponent(url)}`;
+    try {
+      const r = await fetch(proxyPath, { credentials: 'same-origin' });
+      const data = await r.json().catch(() => ({}));
+      if (r.ok && data.success && typeof data.html === 'string') {
+        return data.html;
+      }
+      throw new Error(data.error || `Proxy HTTP ${r.status}`);
+    } catch (e) {
+      console.warn(
+        'Vendor import: /api/vendor-fetch unavailable (local dev or deploy config):',
+        e?.message || e
+      );
+    }
+
+    const corsProxy = 'https://api.allorigins.win/get?url=';
+    const proxyUrl = corsProxy + encodeURIComponent(url);
+    const response = await fetch(proxyUrl);
+    if (!response.ok) {
+      throw new Error(`CORS proxy HTTP ${response.status}`);
+    }
+    const data = await response.json();
+    const html = data.contents;
+    if (typeof html !== 'string' || !html.length) {
+      throw new Error('Empty page from CORS proxy');
+    }
+    return html;
+  }
+
+  /**
    * Fetch vendor information from URL
    */
   async fetchVendorInfo(url) {
-    // Use CORS proxy for fetching external websites
-    const corsProxy = 'https://api.allorigins.win/get?url=';
-    const proxyUrl = corsProxy + encodeURIComponent(url);
-
-    const response = await fetch(proxyUrl);
-    const data = await response.json();
-    const html = data.contents;
+    const html = await this.fetchHtmlForVendorPage(url);
 
     // Parse HTML
     const parser = new DOMParser();
