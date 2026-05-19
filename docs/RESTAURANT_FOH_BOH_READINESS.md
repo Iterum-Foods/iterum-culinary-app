@@ -56,9 +56,9 @@ Role mapping and dashboard flags: [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISS
 
 **Engineering backlog (BOH):**
 
-- [ ] **E2** — Audit menu/recipe/checklist writers for correct `projectId` on save ([P1_EPIC_BREAKDOWN](./P1_EPIC_BREAKDOWN.md) E2a).
-- [ ] **Rules** — Tighten member writes so line cannot edit menu masters (planned in [ROLES_AND_PERMISSIONS](./ROLES_AND_PERMISSIONS.md); today members may write broadly).
-- [ ] **Offline queue** — Document “online required” for pilots until offline log ships.
+- [x] **E2** — Audit menu/recipe/checklist writers — [E2_PROJECTID_AUDIT.md](./E2_PROJECTID_AUDIT.md).
+- [x] **Rules** — Field-staff roles read-only on `menus` / `recipes` / `snapshots` (`isFieldStaffRole` in `firestore.rules`).
+- [x] **Offline queue** — [OFFLINE_PILOT_NOTE.md](./OFFLINE_PILOT_NOTE.md) (online required for pilots).
 
 ---
 
@@ -77,8 +77,8 @@ Role mapping and dashboard flags: [ROLES_AND_PERMISSIONS.md](./ROLES_AND_PERMISS
 **Engineering backlog (FOH):**
 
 - [x] Load `menu-foh-manager.js` on kitchen management (FOH briefing was falling back without script).
-- [ ] Expose **read-only menu snapshot** on mobile **Menu** tab for FOH when menu published to project snapshots (confirm data path in [SOURCE_OF_TRUTH.md](./SOURCE_OF_TRUTH.md)).
-- [ ] Staff one-pager: “FOH first shift” (link from project-hub invite helper).
+- [x] **Read-only menu** on mobile **Menu** tab (`mobile-line-employee.js` → `projects/{id}/menus`; smoke test).
+- [x] Staff one-pager: [FOH_FIRST_SHIFT_QUICK_CARD.md](./FOH_FIRST_SHIFT_QUICK_CARD.md) (linked from project-hub invite).
 
 ---
 
@@ -97,9 +97,9 @@ Needed so FOH/BOH see **correct** menus, specs, and checklists.
 
 **Engineering backlog (managers):**
 
-- [ ] **E3c** — Operator UI for vendor **price overrides** (not console-only).
-- [ ] **E3d** — Costing tests: menu lines pull overrides after `projectChanged`.
-- [ ] **E5** — One authenticated Playwright path (sign-in → dashboard or mobile workspace select).
+- [x] **E3c** — `vendor-price-overrides-panel.js` on vendor-management.
+- [x] **E3d** — `cost-calculator.js` refetch on `projectChanged` (manual QA for line costing).
+- [x] **E5** — `tests/e2e/auth-workspace.spec.js` (runs when `E2E_TEST_EMAIL` + `E2E_TEST_PASSWORD` set).
 
 ---
 
@@ -118,6 +118,8 @@ Collect evidence for [PILOT_ACCEPTANCE_CRITERIA_WEB.md](./PILOT_ACCEPTANCE_CRITE
 ---
 
 ## Suggested sprint order (next 3 engineering slices)
+
+**Detailed checklists:** [SPRINT_PLAN_FOH_BOH_S1_S3.md](./SPRINT_PLAN_FOH_BOH_S1_S3.md) · verify: `npm run verify:sprints`
 
 | Sprint | Focus | Outcome |
 |--------|--------|---------|

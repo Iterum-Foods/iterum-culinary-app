@@ -50,6 +50,23 @@ test.describe('Smoke', () => {
     await expect(page.locator('[data-hub-tab="jobs"]')).toHaveCount(2);
   });
 
+  test('mobile menu panel markup is present', async ({ page }) => {
+    await page.goto('/mobile-compliance.html');
+    await expect(page.locator('#panel-section-menu')).toHaveCount(1);
+    await expect(page.locator('#menu-published-body')).toHaveCount(1);
+  });
+
+  test('FOH first shift quick card loads', async ({ page }) => {
+    const res = await page.goto('/foh-first-shift.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(
+      /FOH|first shift/i
+    );
+    await expect(
+      page.getByRole('link', { name: 'Open shift app' })
+    ).toBeVisible();
+  });
+
   test('dashboard checklist deep link opens opening checklist modal', async ({
     page
   }) => {
@@ -67,6 +84,9 @@ test.describe('Smoke', () => {
     await expect(page.locator('body')).toContainText(
       /workspace price overrides/i
     );
+    await expect(
+      page.locator('#vendor-price-overrides-panel-root')
+    ).toHaveCount(1);
   });
 
   test('recipe library page loads', async ({ page }) => {

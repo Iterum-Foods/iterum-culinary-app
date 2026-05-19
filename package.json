@@ -11,6 +11,7 @@
     "test": "playwright test",
     "test:chromium": "playwright test --project=chromium",
     "test:smoke:prod": "playwright test -c playwright.prod.config.js --project=chromium",
+    "verify:sprints": "npm run lint && npm run format:check && npm run test:chromium",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "lint": "eslint \"public/assets/js/**/*.js\" --max-warnings 10000",

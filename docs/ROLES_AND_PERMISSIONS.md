@@ -111,7 +111,7 @@ Stored only on `projects/{projectId}/members/{uid}.role` (not in `iterum_operato
 |----------------|----------------------|--------|
 | `account_admin` | `chef_leadership` | Full operator-style board; can manage **members** (with owner). |
 | `location_manager` | `operations_gm` | Ops / shift focus. |
-| `employee_line` | `employee_line` | Compliance + tasks + notes; no idea pad / R&D / purchasing tile. **Firestore:** read `projects/.../menus`, `recipes`, `snapshots`; **write** only `checklists` (not menus/recipes/snapshots). |
+| `employee_line`, `kitchen_staff`, `front_of_house`, `support_staff`, `prep_cook`, `line_cook`, `bartender`, `server`, `host`, `runner`, etc. | `employee_line` (UI) | Compliance + tasks + notes; no idea pad / R&D / purchasing tile. **Firestore:** read `projects/.../menus`, `recipes`, `snapshots`; **no write** to menu/recipe/snapshot masters (`isFieldStaffRole` in `firestore.rules`). |
 
 ---
 

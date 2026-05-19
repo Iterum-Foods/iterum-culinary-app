@@ -18,7 +18,8 @@
 
 1. Open `{base}/mobile-compliance.html` → sign in.  
 2. Use **Copy my user ID** (`#my-firebase-uid`).  
-3. Send the UID to the admin over a **private** channel (not a public ticket).
+3. Send the UID to the admin over a **private** channel (not a public ticket).  
+4. Optional staff guide: `{base}/foh-first-shift.html` or [FOH_FIRST_SHIFT_QUICK_CARD.md](./FOH_FIRST_SHIFT_QUICK_CARD.md).
 
 ---
 

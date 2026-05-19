@@ -130,10 +130,37 @@ service cloud.firestore {
         || r == 'front_of_house'
         || r == 'kitchen_staff'
         || r == 'support_staff'
+        || r == 'prep_cook'
+        || r == 'line_cook'
+        || r == 'expeditor'
+        || r == 'dishwasher'
+        || r == 'bakery_pastry'
+        || r == 'bartender'
+        || r == 'bar_manager'
+        || r == 'host'
+        || r == 'server'
+        || r == 'runner'
         || r == 'chef_leadership'
         || r == 'operations_gm'
         || r == 'purchasing'
         || r == 'consultant_rd';
+    }
+
+    // Shift / floor staff: read menus & SOPs; no writes to menu/recipe/snapshot masters
+    function isFieldStaffRole(r) {
+      return r == 'employee_line'
+        || r == 'front_of_house'
+        || r == 'kitchen_staff'
+        || r == 'support_staff'
+        || r == 'prep_cook'
+        || r == 'line_cook'
+        || r == 'expeditor'
+        || r == 'dishwasher'
+        || r == 'bakery_pastry'
+        || r == 'host'
+        || r == 'server'
+        || r == 'runner'
+        || r == 'bartender';
     }
 
     // Owner OR invited member (company / workspace access)
@@ -141,14 +168,9 @@ service cloud.firestore {
       return isProjectOwnerOnly(projectId) || isProjectMember(projectId);
     }
 
-    // Field / shift staff (any position): read menus & SOPs; no writes to menu/recipe/snapshot masters
     function isFieldStaffMember(projectId) {
-      return isProjectMember(projectId) && (
-        projectMemberRole(projectId) == 'employee_line'
-        || projectMemberRole(projectId) == 'front_of_house'
-        || projectMemberRole(projectId) == 'kitchen_staff'
-        || projectMemberRole(projectId) == 'support_staff'
-      );
+      return isProjectMember(projectId)
+        && isFieldStaffRole(projectMemberRole(projectId));
     }
 
     function canWriteProjectMenusRecipesSnapshots(projectId) {

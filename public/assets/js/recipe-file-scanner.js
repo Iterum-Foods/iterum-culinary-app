@@ -53,7 +53,9 @@ class RecipeFileScanner {
         startIn: 'documents'
       });
 
-      const loaderId = window.showLoading?.('Scanning folder for recipe files...');
+      const loaderId = window.showLoading?.(
+        'Scanning folder for recipe files...'
+      );
 
       const files = [];
       await this.scanDirectory(dirHandle, files);
@@ -67,7 +69,9 @@ class RecipeFileScanner {
 
       this.foundFiles = recipeFiles;
 
-      window.showSuccess?.(`Found ${recipeFiles.length} potential recipe files!`);
+      window.showSuccess?.(
+        `Found ${recipeFiles.length} potential recipe files!`
+      );
       return recipeFiles;
     } catch (error) {
       if (error.name === 'AbortError') {
@@ -201,7 +205,9 @@ class RecipeFileScanner {
       }
     }
 
-    const loaderId = window.showLoading?.('Searching Google Drive for recipes...');
+    const loaderId = window.showLoading?.(
+      'Searching Google Drive for recipes...'
+    );
 
     try {
       const files = [];
@@ -240,7 +246,9 @@ class RecipeFileScanner {
 
       this.foundFiles = [...this.foundFiles, ...uniqueFiles];
 
-      window.showSuccess?.(`Found ${uniqueFiles.length} recipe files in Google Drive!`);
+      window.showSuccess?.(
+        `Found ${uniqueFiles.length} recipe files in Google Drive!`
+      );
       return uniqueFiles;
     } catch (error) {
       window.hideLoading?.(loaderId);
@@ -518,7 +526,9 @@ class RecipeFileScanner {
           window.universalRecipeManager.addRecipe(recipe);
 
           window.hideLoading?.(loaderId);
-          window.showSuccess?.(`Recipe "${recipeData.name}" imported successfully!`);
+          window.showSuccess?.(
+            `Recipe "${recipeData.name}" imported successfully!`
+          );
 
           // Ask if user wants to edit it
           setTimeout(() => {

@@ -54,15 +54,18 @@ function buildInviteText() {
   const mobileUrl = origin
     ? `${origin}/mobile-compliance.html`
     : 'mobile-compliance.html';
+  const quickCard = origin
+    ? `${origin}/foh-first-shift.html`
+    : '/foh-first-shift.html';
   return (
     `You are invited to join ${projectName} in Iterum.\n\n` +
     `Steps:\n` +
-    `1) Open the mobile app (or ${mobileUrl}).\n` +
-    `2) Sign in / create your account.\n` +
-    `3) In the app, tap Copy ID (Firebase UID).\n` +
-    `4) Send that UID back to me.\n\n` +
+    `1) Open the shift app: ${mobileUrl}\n` +
+    `2) Sign in / create your account (same email you gave us).\n` +
+    `3) Tap Copy my user ID and send it back to me.\n` +
+    `4) After I add you, reopen the app and pick this workspace.\n\n` +
     `Reply format: UID: <paste your full Firebase UID>\n\n` +
-    `Once I add your UID to the project, reopen the app and choose the workspace.`
+    `First-shift tips (FOH/bar/kitchen): ${quickCard}`
   );
 }
 

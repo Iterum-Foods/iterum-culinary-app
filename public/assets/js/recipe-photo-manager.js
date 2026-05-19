@@ -61,9 +61,7 @@ class RecipePhotoManager {
     if (photos.length > 0) {
       // Save photos to recipe
       await this.savePhotosToRecipe(recipeId, photos);
-      window.showSuccess?.(
-        `${photos.length} photo(s) uploaded successfully!`
-      );
+      window.showSuccess?.(`${photos.length} photo(s) uploaded successfully!`);
     }
 
     return photos;
@@ -74,7 +72,9 @@ class RecipePhotoManager {
    */
   validateFile(file) {
     if (!this.allowedTypes.includes(file.type)) {
-      window.showWarning?.(`${file.name}: Only JPEG, PNG, and WebP images are allowed`);
+      window.showWarning?.(
+        `${file.name}: Only JPEG, PNG, and WebP images are allowed`
+      );
       return false;
     }
 
@@ -373,7 +373,9 @@ class RecipePhotoManager {
     input.addEventListener('change', async e => {
       const files = Array.from(e.target.files);
       if (files.length > 0) {
-        const loaderId = window.showLoading?.(`Uploading ${files.length} photo(s)...`);
+        const loaderId = window.showLoading?.(
+          `Uploading ${files.length} photo(s)...`
+        );
         await this.uploadPhotos(recipeId, files);
         window.hideLoading?.(loaderId);
 
