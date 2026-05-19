@@ -4,20 +4,22 @@
  */
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+@import url('./taste-craft-revamp-tokens.css');
 
 :root {
-  --mc-bg: #f3f6f4;
-  --mc-bg-accent: linear-gradient(165deg, #f6faf7 0%, #eef4f0 45%, #e8f0ec 100%);
-  --mc-card: #ffffff;
-  --mc-text: #142018;
-  --mc-muted: #5a6b62;
-  --mc-accent: #3d6b47;
-  --mc-accent-mid: #4d7c57;
-  --mc-accent2: #1e3d28;
-  --mc-accent-soft: rgba(61, 107, 71, 0.12);
-  --mc-accent-glow: rgba(61, 107, 71, 0.18);
-  --mc-border: rgba(30, 61, 40, 0.12);
-  --mc-border-strong: rgba(30, 61, 40, 0.2);
+  --mc-bg: hsl(var(--tc-background));
+  --mc-bg-accent: var(--tc-gradient-hero);
+  --mc-card: hsl(var(--tc-card));
+  --mc-text: hsl(var(--tc-foreground));
+  --mc-muted: hsl(var(--tc-muted-foreground));
+  --mc-accent: hsl(var(--tc-accent));
+  --mc-accent-mid: hsl(var(--tc-primary-glow));
+  --mc-accent2: hsl(var(--tc-primary));
+  --mc-accent-soft: hsl(var(--tc-accent-soft));
+  --mc-border: hsl(var(--tc-border) / 0.85);
+  --mc-shadow: var(--tc-shadow-card);
+  --mc-accent-glow: var(--tc-shadow-glow);
+  --mc-border-strong: hsl(var(--tc-border));
   --mc-safe-top: env(safe-area-inset-top, 0);
   --mc-safe-bottom: env(safe-area-inset-bottom, 0);
   --mc-radius: 16px;

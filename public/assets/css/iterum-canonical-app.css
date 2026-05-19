@@ -4,6 +4,8 @@
  * Order: tokens → layout utilities → components → shell → polish.
  */
 @import url('./iterum-brand-kit.css');
+@import url('./taste-craft-revamp-tokens.css');
+@import url('./taste-craft-revamp-ui.css');
 @import url('./modal-high-contrast.css');
 @import url('./tailwind-output.css');
 @import url('./iterum-design-system.css');

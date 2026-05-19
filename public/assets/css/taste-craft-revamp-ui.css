@@ -1,0 +1,305 @@
+/**
+ * Static HTML components aligned with taste-craft-revamp (PageHeader, Card, StatusPill, buttons).
+ * Use class prefixes tc-* on golden-path pages.
+ */
+
+/* Page hero (Index / HACCP / RecipeDeveloper header band) */
+.tc-page-hero {
+  background: var(--tc-gradient-hero);
+  border-bottom: 1px solid hsl(var(--tc-border));
+}
+
+.tc-page-hero__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 2rem 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .tc-page-hero__inner {
+    padding: 2rem 2.5rem;
+  }
+}
+
+.tc-page-hero__title {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 600;
+  color: hsl(var(--tc-foreground));
+}
+
+.tc-page-hero__desc {
+  margin: 0.5rem 0 0;
+  max-width: 42rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: hsl(var(--tc-muted-foreground));
+}
+
+.tc-page-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Cards — matches shadcn Card + shadow-card */
+.tc-card,
+.card-style.tc-revamp-card,
+.tc-revamp-body .card-style {
+  background: hsl(var(--tc-card));
+  color: hsl(var(--tc-card-foreground));
+  border: 1px solid hsl(var(--tc-border) / 0.65);
+  border-radius: var(--tc-radius);
+  box-shadow: var(--tc-shadow-card);
+  padding: 1.25rem 1.35rem;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.tc-card:hover,
+.tc-revamp-body .card-style:hover {
+  box-shadow: var(--tc-shadow-elevated);
+}
+
+.tc-card__title {
+  margin: 0 0 0.75rem;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.tc-card__subtitle {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  color: hsl(var(--tc-muted-foreground));
+}
+
+/* Stat grid (dashboard Index) */
+.tc-stat-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 640px) {
+  .tc-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .tc-stat-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.tc-stat-card {
+  padding: 1.25rem;
+}
+
+.tc-stat-card__label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: hsl(var(--tc-muted-foreground));
+}
+
+.tc-stat-card__value {
+  margin-top: 0.5rem;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.875rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.tc-stat-card__delta {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: hsl(var(--tc-muted-foreground));
+}
+
+.tc-stat-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  background: hsl(var(--tc-secondary));
+  color: hsl(var(--tc-secondary-foreground));
+}
+
+.tc-stat-card__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+/* Buttons */
+.tc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  border-radius: calc(var(--tc-radius) - 2px);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.tc-btn-accent {
+  background: var(--tc-gradient-accent);
+  color: hsl(var(--tc-accent-foreground));
+  box-shadow: var(--tc-shadow-glow);
+}
+
+.tc-btn-accent:hover {
+  opacity: 0.92;
+}
+
+.tc-btn-outline {
+  background: hsl(var(--tc-card));
+  color: hsl(var(--tc-foreground));
+  border-color: hsl(var(--tc-border));
+}
+
+.tc-btn-outline:hover {
+  background: hsl(var(--tc-muted));
+}
+
+.tc-btn-ghost {
+  background: transparent;
+  color: hsl(var(--tc-muted-foreground));
+}
+
+.tc-btn-ghost:hover {
+  background: hsl(var(--tc-muted));
+  color: hsl(var(--tc-foreground));
+}
+
+/* Status pill */
+.tc-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+}
+
+.tc-status-pill::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.tc-status-pill--ok,
+.tc-status-pill--passed,
+.tc-status-pill--active {
+  background: hsl(var(--tc-success) / 0.12);
+  color: hsl(var(--tc-success));
+  border-color: hsl(var(--tc-success) / 0.25);
+}
+
+.tc-status-pill--warning,
+.tc-status-pill--low,
+.tc-status-pill--follow-up {
+  background: hsl(var(--tc-warning) / 0.15);
+  color: hsl(38 70% 32%);
+  border-color: hsl(var(--tc-warning) / 0.35);
+}
+
+.tc-status-pill--critical {
+  background: hsl(var(--tc-destructive) / 0.1);
+  color: hsl(var(--tc-destructive));
+  border-color: hsl(var(--tc-destructive) / 0.25);
+}
+
+.tc-status-pill--draft {
+  background: hsl(var(--tc-muted));
+  color: hsl(var(--tc-muted-foreground));
+  border-color: hsl(var(--tc-border));
+}
+
+/* Recipe developer surfaces */
+.tc-revamp-body .recipe-canvas,
+.tc-revamp-body .recipe-ideas-sidebar {
+  background: hsl(var(--tc-card));
+  border: 1px solid hsl(var(--tc-border) / 0.65);
+  border-radius: var(--tc-radius);
+  box-shadow: var(--tc-shadow-card);
+}
+
+.tc-revamp-body .recipe-section {
+  border-color: hsl(var(--tc-border) / 0.65);
+  border-radius: var(--tc-radius);
+  box-shadow: var(--tc-shadow-card);
+}
+
+.tc-revamp-body .recipe-section-title {
+  color: hsl(var(--tc-foreground));
+  font-family: 'Fraunces', Georgia, serif;
+}
+
+.tc-revamp-body .btn-primary {
+  background: var(--tc-gradient-accent);
+  border-color: transparent;
+  color: hsl(var(--tc-accent-foreground));
+}
+
+.tc-revamp-body .btn-primary:hover {
+  opacity: 0.92;
+}
+
+.tc-revamp-body .btn-secondary {
+  background: hsl(var(--tc-secondary));
+  color: hsl(var(--tc-secondary-foreground));
+  border-color: hsl(var(--tc-border));
+}
+
+/* Dashboard header band */
+.tc-revamp-body .dash-page-header.tc-page-hero {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin-bottom: 1.5rem;
+  padding: 0;
+  border: none;
+  background: var(--tc-gradient-hero);
+}
+
+.tc-revamp-body .dash-page-header.tc-page-hero .flex-1 {
+  padding: 1.25rem 0 1.25rem 0;
+}
+
+.tc-revamp-body .main-content-area {
+  background: hsl(var(--tc-background));
+  background-image: none;
+}
+
+/* Unified nav sidebar tint (when present) */
+.tc-revamp-body #unified-sidebar-nav,
+.tc-revamp-body .unified-sidebar {
+  --sidebar-tint: hsl(var(--tc-sidebar-background));
+}

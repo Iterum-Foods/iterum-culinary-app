@@ -5,7 +5,7 @@
 
 ## Golden-path pages (single stack)
 
-These authenticated surfaces should load **`assets/css/iterum-canonical-app.css`** first, then **only** page-specific CSS (e.g. `menu-builder-enhanced.css`, `recipe-developer-enhanced.css`).
+These authenticated surfaces should load **`assets/css/iterum-canonical-app.css`** first (includes **taste-craft-revamp** tokens/UI from [TASTE_CRAFT_REVAMP_INTEGRATION.md](./TASTE_CRAFT_REVAMP_INTEGRATION.md)), then **only** page-specific CSS (e.g. `menu-builder-enhanced.css`, `recipe-developer-enhanced.css`).
 
 | Page | Extra stylesheets (after canonical) |
 |------|-------------------------------------|
@@ -18,7 +18,7 @@ These authenticated surfaces should load **`assets/css/iterum-canonical-app.css`
 | `recipe-developer.html` | `page-ui-improvements.css`, `recipe-developer-enhanced.css`, `recipe-developer-contrast-fix.css` |
 | `menu-builder.html` | `menu-builder-enhanced.css`, `menu-builder-pdf-upload.css` |
 | `project-hub.html` | `unified-cards.css` + `page-layouts.css` already inside canonical — add page-only overrides inline or small `project-hub.css` if needed. |
-| `mobile-compliance.html` | `mobile-shift-brand.css` (PWA shell; not merged into canonical). |
+| `mobile-compliance.html` | `mobile-shift-brand.css` (imports `taste-craft-revamp-tokens.css` for aligned Shift palette). |
 
 ## Legacy / experimental
 
