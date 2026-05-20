@@ -6,7 +6,7 @@
   'use strict';
 
   var DASH_PREFIX = 'iterum.dashboard.simplified';
-  var DEMO_PROJECT_ID = 'demo_bistro_nord';
+  var DEMO_PROJECT_ID = 'sample_project';
 
   function captureDemoQueryParam() {
     try {
@@ -137,15 +137,16 @@
     return [
       {
         id: DEMO_PROJECT_ID,
-        name: 'Bistro Nord — Spring tasting',
+        name: 'Sample Project',
         description:
-          'Showcase venue: seasonal lunch, pastry, and beverage alignment.',
+          'Pre-loaded recipes, menus, vendors, inventory, and HACCP logs for exploring Iterum.',
         type: 'restaurant',
         status: 'active',
         createdAt: now,
-        icon: '◇',
-        color: '#5b7c5f',
-        isDefault: false
+        icon: '📦',
+        color: 'hsl(28 85% 55%)',
+        isDefault: false,
+        isSample: true
       }
     ];
   }
@@ -1524,7 +1525,7 @@
     );
     global.localStorage.setItem(projectsKey, JSON.stringify(existingProjects));
 
-    var demoName = 'Bistro Nord — Spring tasting';
+    var demoName = 'Sample Project';
     setActiveProjectKeys(uid, DEMO_PROJECT_ID, demoName);
 
     var maps = demoDashboardMaps(DEMO_PROJECT_ID, userLabel);

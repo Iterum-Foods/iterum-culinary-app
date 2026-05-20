@@ -11,6 +11,7 @@
     <script type="module" src="assets/js/firebase-auth.js"></script>
     <script type="module" src="assets/js/firestore-sync.js"></script>
     <script type="module" src="assets/js/project-hub-team.js"></script>
+    <script src="assets/js/demo-seed-data.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
@@ -316,6 +317,23 @@
             </div>
         </section>
 
+        <!-- Sample Project data -->
+        <section id="sample-project-panel" style="background: white; border-radius: 16px; padding: 28px; margin-bottom: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+            <h2 class="section-title" style="margin-bottom: 8px;">📦 Sample Project</h2>
+            <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 16px; max-width: 640px;">
+                Install a full demo workspace in this browser: <strong>Sample Project</strong> with recipes (published + in progress),
+                two menus (lunch + bar), ingredients, vendors, inventory, menu–recipe links, and HACCP logs.
+                Safe to run again — matching sample IDs are updated in place.
+            </p>
+            <p id="sample-project-status" style="font-size: 14px; color: #0f766e; min-height: 1.25em; margin-bottom: 12px;" role="status"></p>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+                <button type="button" id="btn-install-sample-project" style="padding: 12px 20px; border-radius: 10px; border: none; background: var(--brand-btn-primary, linear-gradient(135deg, #6b8e6f 0%, #5b9bad 100%)); color: white; font-weight: 700; font-size: 15px; cursor: pointer;">
+                    Install sample data
+                </button>
+                <a href="demo-prep.html" style="font-size: 14px; font-weight: 600; color: #5b9bad;">Advanced demo options →</a>
+            </div>
+        </section>
+
         <!-- Quick Start Templates -->
         <section>
             <div class="section-header">
@@ -323,6 +341,14 @@
             </div>
             
             <div class="templates-grid">
+                <div class="template-card" id="template-sample-project-card">
+                    <div class="template-icon">📦</div>
+                    <div class="template-name">Sample Project</div>
+                    <div class="template-desc">One click: recipes, menus, vendors, inventory, and compliance logs under a dedicated sample workspace</div>
+                    <div class="template-features">✓ Lunch + bar menus • ✓ HACCP demo logs • ✓ Switches active project</div>
+                    <button type="button" class="template-btn" id="btn-template-sample-project">Install sample data</button>
+                </div>
+
                 <div class="template-card" onclick="window.location.href='restaurant-group-onboarding.html'">
                     <div class="template-icon">📍</div>
                     <div class="template-name">Multiple restaurants</div>
@@ -915,6 +941,65 @@
             
             loadProjects();
         }
+
+        function installSampleProjectData() {
+            if (typeof applyIterumDemoSeed !== 'function') {
+                alert('Sample data script not loaded. Refresh the page and try again.');
+                return;
+            }
+            if (
+                !confirm(
+                    'Install sample recipes, menus, vendors, and logs into "Sample Project"?\n\nSafe to run again — existing sample IDs are updated in place.'
+                )
+            ) {
+                return;
+            }
+            var statusEl = document.getElementById('sample-project-status');
+            var r = applyIterumDemoSeed({ force: true });
+            if (!r || !r.ok) {
+                var err = (r && r.error) || 'unknown';
+                if (err === 'not_signed_in') {
+                    alert('Sign in first, then install sample data.');
+                } else {
+                    alert('Could not install sample data: ' + err);
+                }
+                if (statusEl) {
+                    statusEl.textContent = '';
+                }
+                return;
+            }
+            var s = r.summary || {};
+            var projectId = s.projectId || window.ITERUM_DEMO_PROJECT_ID || 'sample_project';
+            if (window.projectManager) {
+                window.projectManager.loadProjects();
+                window.projectManager.setCurrentProject(projectId);
+                loadProjects();
+            }
+            var msg =
+                'Sample Project ready. Recipes: ' +
+                (s.recipes || 0) +
+                ', menu dishes: ' +
+                (s.menuItems || 0) +
+                ', HACCP checks: ' +
+                (s.sanitizerChecks || 0) +
+                ' sanitizer / ' +
+                (s.temperatureLogs || 0) +
+                ' temp. Open Dashboard or Menu builder.';
+            if (statusEl) {
+                statusEl.textContent = msg;
+            }
+            alert('✅ ' + msg);
+        }
+
+        document.getElementById('btn-install-sample-project')?.addEventListener('click', installSampleProjectData);
+        document.getElementById('btn-template-sample-project')?.addEventListener('click', function (e) {
+            e.stopPropagation();
+            installSampleProjectData();
+        });
+        document.getElementById('template-sample-project-card')?.addEventListener('click', function (e) {
+            if (e.target.closest('button')) return;
+            installSampleProjectData();
+        });
 
         // Load on init
         document.addEventListener('DOMContentLoaded', function() {

@@ -102,7 +102,7 @@
     var setDoc = fs.setDoc;
     var Timestamp = fs.Timestamp;
 
-    var projectId = window.ITERUM_DEMO_PROJECT_ID || 'demo_bistro_nord';
+    var projectId = window.ITERUM_DEMO_PROJECT_ID || 'sample_project';
     var now = Date.now();
     var locPrep = 'demo_iterum_loc_prep';
     var locBar = 'demo_iterum_loc_bar';
