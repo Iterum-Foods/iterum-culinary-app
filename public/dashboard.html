@@ -52,28 +52,7 @@
      * ITERUM BRAND KIT - Heritage Warmth (Terracotta & Olive)
      * Notebook-style dashboard with warm earth tones
      */
-    /* UX: Nordic moss + slate — aligned with sign-in + iterum-brand-kit accents */
-    :root {
-      --brand-bg-primary: #ffffff;
-      --brand-bg-secondary: #f0f4f2;
-      --brand-bg-tertiary: #e2ebe6;
-
-      --brand-text-primary: #1a2e35;
-      --brand-text-secondary: #3d5a66;
-      --brand-text-muted: #5a6d75;
-
-      --brand-primary-accent: #6b8e6f;
-      --brand-moss-dark: #5b7c5f;
-      --brand-secondary-accent: #5b9bad;
-
-      --brand-card-bg: #ffffff;
-      --brand-border-light: rgba(26, 46, 53, 0.12);
-      --nav-hover-bg: rgba(107, 142, 111, 0.12);
-
-      --radius-md: 0.5rem;
-      --radius-lg: 0.875rem;
-      --shadow-md: 0 4px 20px rgba(26, 46, 53, 0.08);
-    }
+    /* Tokens: taste-craft-revamp-tokens.css (do not override :root here) */
 
     body {
       font-family: 'Inter', system-ui, sans-serif;
@@ -87,18 +66,12 @@
     }
 
     .card-style {
-      background-color: var(--brand-card-bg);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
-      border: 1px solid var(--brand-border-light);
       padding: 1.25rem 1.35rem;
     }
 
-    /* Calm canvas: subtle vertical rhythm, no heavy “notebook” yellow */
     .main-content-area {
       background-color: var(--brand-bg-secondary);
-      background-image: linear-gradient(to bottom, rgba(107, 142, 111, 0.06) 1px, transparent 1px);
-      background-size: 100% 32px;
+      background-image: none;
       padding-top: 1.25rem;
       padding-right: 0;
       padding-bottom: 3rem;
@@ -399,6 +372,49 @@
         </button>
       </header>
 
+      <div class="tc-stat-grid mb-6" id="dash-top-stat-grid" aria-label="At a glance">
+        <article class="tc-card tc-stat-card">
+          <div class="tc-stat-card__row">
+            <div>
+              <div class="tc-stat-card__label">Open tasks</div>
+              <p class="tc-stat-card__value m-0"><span data-dash-stat="tasks" id="quick-stat-tasks">0</span></p>
+              <p class="tc-stat-card__delta m-0">Due on working date</p>
+            </div>
+            <span class="tc-stat-card__icon" aria-hidden="true"><i class="fa-solid fa-list-check"></i></span>
+          </div>
+        </article>
+        <article class="tc-card tc-stat-card" id="dash-top-stat-ideas" data-dash-roles="chef_leadership,consultant_rd" data-dash-features="recipes">
+          <div class="tc-stat-card__row">
+            <div>
+              <div class="tc-stat-card__label">Ideas queued</div>
+              <p class="tc-stat-card__value m-0"><span data-dash-stat="ideas" id="quick-stat-ideas">0</span></p>
+              <p class="tc-stat-card__delta m-0">Culinary idea pad</p>
+            </div>
+            <span class="tc-stat-card__icon" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></span>
+          </div>
+        </article>
+        <article class="tc-card tc-stat-card">
+          <div class="tc-stat-card__row">
+            <div>
+              <div class="tc-stat-card__label">Days logged</div>
+              <p class="tc-stat-card__value m-0"><span data-dash-stat="notes" id="quick-stat-notes">0</span></p>
+              <p class="tc-stat-card__delta m-0">Daily &amp; manager notes</p>
+            </div>
+            <span class="tc-stat-card__icon" aria-hidden="true"><i class="fa-solid fa-book"></i></span>
+          </div>
+        </article>
+        <article class="tc-card tc-stat-card">
+          <div class="tc-stat-card__row">
+            <div>
+              <div class="tc-stat-card__label">Shift tools</div>
+              <p class="tc-stat-card__value m-0" style="font-size: 1.35rem;">HACCP</p>
+              <p class="tc-stat-card__delta m-0"><a href="mobile-compliance.html" class="tc-link-accent">Open compliance →</a></p>
+            </div>
+            <span class="tc-stat-card__icon tc-stat-card__icon--warning" aria-hidden="true"><i class="fa-solid fa-thermometer-half"></i></span>
+          </div>
+        </article>
+      </div>
+
       <div class="card-style mb-5 lg:col-span-2" data-dash-roles="employee_line">
         <div class="dash-card-head">
           <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
@@ -409,7 +425,7 @@
         <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
           Log temps, sanitizer, prep, and shift notes on the device you carry on the line.
         </p>
-        <a href="mobile-compliance.html" class="inline-flex items-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold text-white shadow-sm hover:opacity-95 transition-opacity" style="background-color: var(--brand-primary-accent);">
+        <a href="mobile-compliance.html" class="tc-btn tc-btn-accent inline-flex items-center gap-2 py-2.5 px-4 text-sm">
           <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
           Open shift tools
         </a>
@@ -849,15 +865,15 @@
             <p class="text-xs mb-3" style="color: var(--brand-text-muted);">Local to this browser until cloud summaries land everywhere.</p>
             <div id="quick-stat-grid" class="dash-stat-grid cols-3">
               <div class="dash-stat-tile">
-                <div class="text-xl font-bold" style="color: var(--brand-primary-accent);" id="quick-stat-tasks">0</div>
+                <div class="text-xl font-bold" style="color: var(--brand-primary-accent);"><span data-dash-stat="tasks">0</span></div>
                 <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Open tasks</div>
               </div>
               <div id="quick-stat-ideas-col" class="dash-stat-tile">
-                <div class="text-xl font-bold" style="color: var(--brand-secondary-accent);" id="quick-stat-ideas">0</div>
+                <div class="text-xl font-bold" style="color: var(--brand-secondary-accent);" ><span data-dash-stat="ideas">0</span></div>
                 <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Ideas queued</div>
               </div>
               <div class="dash-stat-tile">
-                <div class="text-xl font-bold" style="color: var(--brand-primary-accent);" id="quick-stat-notes">0</div>
+                <div class="text-xl font-bold" style="color: var(--brand-primary-accent);" ><span data-dash-stat="notes">0</span></div>
                 <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Days logged</div>
               </div>
             </div>

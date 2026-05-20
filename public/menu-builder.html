@@ -27,11 +27,11 @@
     <!-- Force page visibility -->
     <style>
         /* Force page to be visible */
-        body { 
+        body.menu-builder-page.tc-revamp-body { 
             overflow: auto !important; 
             pointer-events: auto !important;
-            background: var(--brand-bg-gradient) !important;
-            color: var(--brand-text-primary) !important;
+            background: hsl(var(--tc-background)) !important;
+            color: hsl(var(--tc-foreground)) !important;
             font-family: var(--font-family-primary, 'Inter', system-ui, sans-serif);
         }
         
@@ -1197,7 +1197,7 @@
     <script src="assets/js/user-data-manager.js" defer></script>
     <script src="assets/js/cloud-data-sync.js" defer></script>
 </head>
-<body class="menu-builder-page min-h-screen" style="padding-top: 80px;">
+<body class="menu-builder-page tc-revamp-body min-h-screen" style="padding-top: 80px;">
     <!-- Emergency Loading Fix Button -->
     <div id="emergency-loading-fix" class="fixed top-4 right-4 z-50 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg cursor-pointer" onclick="emergencyLoadingFix()" style="display: none;">
         🚑 Loading Stuck? Click Here
@@ -1226,7 +1226,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('create-menu-modal')">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="submitCreateMenuFromModal()">Create menu</button>
+                <button type="button" class="btn btn-primary tc-btn tc-btn-accent" onclick="submitCreateMenuFromModal()">Create menu</button>
             </div>
         </div>
     </div>
@@ -1240,18 +1240,18 @@
             <div class="menu-hero-top">
                 <div>
                     <p class="hero-eyebrow">Iterum Kitchen OS · Menu Ops</p>
-                    <h1>Menu Builder</h1>
-                    <p class="hero-subtitle">
-                        Import full menus, link every dish to a recipe, and keep prep + FOH collateral in sync without leaving this page.
+                    <h1 class="tc-page-hero__title">Menu Builder</h1>
+                    <p class="hero-subtitle tc-page-hero__desc">
+                        Build menus, cost every dish, review margins, and publish to your team — one workflow from draft to service.
                     </p>
                 </div>
                 <div class="menu-hero-meta">
                     <div class="project-chip" id="menu-project-chip">Project: Master Project</div>
                     <div class="hero-actions">
-                        <button class="btn btn-primary" onclick="openCreateMenuModal()">➕ New Menu</button>
-                        <button class="btn btn-secondary" onclick="showImportModal()">📁 Import Menu</button>
-                        <button class="btn btn-ghost" onclick="document.getElementById('menu-cards-grid')?.scrollIntoView({ behavior: 'smooth' });">
-                            📂 View Library
+                        <button type="button" class="btn btn-primary tc-btn tc-btn-accent" onclick="openCreateMenuModal()">New menu</button>
+                        <button type="button" class="btn btn-secondary tc-btn tc-btn-outline" onclick="showImportModal()">Import</button>
+                        <button type="button" class="btn btn-ghost tc-btn tc-btn-ghost" onclick="document.getElementById('menu-cards-grid')?.scrollIntoView({ behavior: 'smooth' });">
+                            View library
                         </button>
                     </div>
                 </div>
@@ -1275,19 +1275,26 @@
             </div>
         </section>
 
+        <nav class="tc-workflow-tabs" aria-label="Menu workflow">
+            <button type="button" class="tc-workflow-tabs__item is-active" data-menu-scroll="menu-cards-grid">Build</button>
+            <button type="button" class="tc-workflow-tabs__item" data-menu-scroll="menu-cost-section">Cost</button>
+            <button type="button" class="tc-workflow-tabs__item" data-menu-scroll="current-menu-editing">Review</button>
+            <button type="button" class="tc-workflow-tabs__item" data-menu-scroll="menu-export-section">Publish</button>
+        </nav>
+
         <!-- My Menus - Clear Display -->
         <div class="card mb-6">
             <div class="card-header-gradient">
-                <h2 class="card-title">📋 Your Menus</h2>
+                <h2 class="card-title">Your menus</h2>
                 <p class="card-subtitle">Select a menu to edit or create a new one</p>
             </div>
             <div style="padding: 20px;">
                 <div class="button-group mb-6">
-                    <button class="btn btn-primary" onclick="openCreateMenuModal()">
-                        ➕ Create New Menu
+                    <button type="button" class="btn btn-primary tc-btn tc-btn-accent" onclick="openCreateMenuModal()">
+                        Create new menu
                     </button>
-                    <button class="btn" onclick="refreshMenuList()">
-                        🔄 Refresh
+                    <button type="button" class="btn btn-secondary tc-btn tc-btn-outline" onclick="refreshMenuList()">
+                        Refresh
                     </button>
                 </div>
                 
@@ -1327,7 +1334,7 @@
         <!-- Menu Builder Container -->
         <div class="menu-builder-container">
             <!-- Menu Statistics Dashboard -->
-            <section class="menu-statistics-section">
+            <section class="menu-statistics-section" id="menu-cost-section">
                 <div class="iterum-card">
                     <div class="iterum-card-header">
                         <h2 class="heading-2">📊 Menu Overview</h2>
@@ -1358,7 +1365,7 @@
             </section>
 
             <!-- Quick Actions -->
-            <section class="menu-quick-actions">
+            <section class="menu-quick-actions" id="menu-export-section">
                 <div class="iterum-card">
                     <div class="iterum-card-header">
                         <h2 class="heading-2">🚀 Quick Actions</h2>
@@ -4409,5 +4416,22 @@
     <script src="assets/js/secure-storage-manager.js"></script>
     
     <script defer src="assets/js/auth_guard.js"></script>
+    <script>
+      (function () {
+        document.querySelectorAll('.tc-workflow-tabs__item[data-menu-scroll]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            document.querySelectorAll('.tc-workflow-tabs__item').forEach(function (t) {
+              t.classList.remove('is-active');
+            });
+            btn.classList.add('is-active');
+            var id = btn.getAttribute('data-menu-scroll');
+            var el = id ? document.getElementById(id) : null;
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        });
+      })();
+    </script>
 </body>
 </html> 

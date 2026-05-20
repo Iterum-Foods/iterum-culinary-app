@@ -171,22 +171,25 @@
         });
       }
     },
+    setDashStat(key, value) {
+      document
+        .querySelectorAll('[data-dash-stat="' + key + '"]')
+        .forEach(el => {
+          el.textContent = value;
+        });
+    },
     updateQuickStats() {
-      if (this.quickStatTasks) {
-        const map = this.getTasksMap();
-        const tasks = map[this.activeDate] || [];
-        const openTasks = tasks.filter(task => !task.done).length;
-        this.quickStatTasks.textContent = openTasks;
-      }
-      if (this.quickStatIdeas) {
-        const ideas = this.getIdeas();
-        const openIdeas = ideas.filter(idea => idea.status !== 'done').length;
-        this.quickStatIdeas.textContent = openIdeas;
-      }
-      if (this.quickStatNotes) {
-        const notesMap = this.getNotesMap();
-        this.quickStatNotes.textContent = this.countDaysWithNotes(notesMap);
-      }
+      const map = this.getTasksMap();
+      const tasks = map[this.activeDate] || [];
+      const openTasks = tasks.filter(task => !task.done).length;
+      this.setDashStat('tasks', openTasks);
+
+      const ideas = this.getIdeas();
+      const openIdeas = ideas.filter(idea => idea.status !== 'done').length;
+      this.setDashStat('ideas', openIdeas);
+
+      const notesMap = this.getNotesMap();
+      this.setDashStat('notes', this.countDaysWithNotes(notesMap));
     },
     syncProjectContext() {
       try {

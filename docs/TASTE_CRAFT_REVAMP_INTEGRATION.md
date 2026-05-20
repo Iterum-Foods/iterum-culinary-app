@@ -16,8 +16,9 @@
 
 **Pages using revamp skin (`tc-revamp-body`):**
 
-- `dashboard.html` — hero header + cards
-- `recipe-developer.html` — canvas / sections / primary buttons (via canonical stack)
+- `dashboard.html` — hero header, top `tc-stat-grid`, cards
+- `menu-builder.html` — hero, workflow tabs (Build / Cost / Review / Publish), taste-craft buttons
+- `recipe-developer.html` — page hero + `recipe-developer-revamp-layout.css` + `recipe-developer-revamp-ui.js` (notebook layout, type picker, right rail)
 - `project-hub.html` — canonical stack
 - `mobile-compliance.html` — Shift shell colors aligned via `mobile-shift-brand.css` import
 

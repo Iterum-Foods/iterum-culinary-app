@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="assets/css/page-ui-improvements.css">
     <link rel="stylesheet" href="assets/css/recipe-developer-enhanced.css">
     <link rel="stylesheet" href="assets/css/recipe-developer-contrast-fix.css">
+    <link rel="stylesheet" href="assets/css/recipe-developer-revamp-layout.css">
     <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
     
     <!-- Enhanced User Management now handled by Firebase Auth -->
@@ -623,44 +624,72 @@
 
     <!-- Main Content -->
     <main class="page-shell">
-        <div class="page-layout">
-            <!-- Progress Indicator -->
-            <div class="recipe-progress">
-                <div class="progress-steps">
-                    <div class="progress-step active" data-step="basics">
-                        <div>Basic Info</div>
-                    </div>
-                    <div class="progress-connector"></div>
-                    <div class="progress-step" data-step="ingredients">
-                        <div>Ingredients</div>
-                    </div>
-                    <div class="progress-connector"></div>
-                    <div class="progress-step" data-step="instructions">
-                        <div>Instructions</div>
-                    </div>
-                    <div class="progress-connector"></div>
-                    <div class="progress-step" data-step="details">
-                        <div>Details</div>
-                    </div>
+        <header class="tc-page-hero tc-rd-page-hero">
+            <div class="tc-page-hero__inner">
+                <div>
+                    <p class="tc-eyebrow">Iterum Kitchen OS · R&amp;D</p>
+                    <h1 class="tc-page-hero__title">Recipe Developer</h1>
+                    <p class="tc-page-hero__desc">
+                        Bar prep, cocktails, kitchen prep, and plated dishes — structured ingredients, method, versions, and costing in one workspace.
+                    </p>
+                </div>
+                <div class="tc-page-hero__actions">
+                    <button type="button" class="btn btn-primary tc-btn tc-btn-accent" onclick="createNewRecipe()">New recipe</button>
+                    <button type="button" class="btn btn-secondary tc-btn tc-btn-outline" onclick="refreshRecipeIdeasOnDeveloperPage()">Refresh ideas</button>
+                    <a href="recipe-library.html" class="btn btn-ghost tc-btn tc-btn-ghost" style="text-decoration: none;">Recipe library</a>
                 </div>
             </div>
-            
-            <!-- Quick Tips -->
-            <div class="quick-tips">
-                <div class="quick-tips-title">💡 Pro Tips</div>
-                <ul>
-                    <li>Use <strong>Ctrl+S</strong> to save your recipe anytime</li>
-                    <li>Your work is auto-saved every 30 seconds</li>
-                    <li>Scale recipes easily with the calculator in the recipe library</li>
-                    <li>Add component recipes to build complex dishes</li>
-                </ul>
+        </header>
+        <div class="page-layout tc-rd-workspace">
+            <div class="tc-rd-sticky-bar">
+                <div class="tc-rd-toolbar">
+                    <div class="tc-rd-toolbar__brand">
+                        <span class="tc-rd-toolbar__icon" aria-hidden="true">📖</span>
+                        <div class="min-w-0">
+                            <div class="tc-rd-toolbar__eyebrow" id="tc-rd-type-label">Kitchen dish · Working draft</div>
+                            <div class="tc-rd-toolbar__title" id="tc-rd-toolbar-title">Untitled recipe</div>
+                        </div>
+                    </div>
+                    <div class="tc-rd-toolbar__actions">
+                        <span class="tc-rd-save-hint" id="tc-rd-save-hint" aria-live="polite">Auto-save every 30s</span>
+                        <span id="recipe-status" class="tc-status-pill tc-status-pill--draft">New recipe</span>
+                        <button type="button" class="btn btn-secondary btn-sm tc-btn tc-btn-outline" onclick="saveRecipe()">Save</button>
+                        <button type="button" class="btn btn-primary btn-sm tc-btn tc-btn-accent" onclick="saveAndContinue()">Save &amp; continue</button>
+                    </div>
+                </div>
+                <div class="tc-rd-type-grid" role="group" aria-label="Recipe type">
+                    <button type="button" class="tc-rd-type-btn" data-recipe-type="bar-prep" data-category="prep-recipe">
+                        <span class="tc-rd-type-btn__glyph" aria-hidden="true">🧪</span>
+                        <span><span class="tc-rd-type-btn__label">Bar prep</span><span class="tc-rd-type-btn__sub">Syrups · infusions</span></span>
+                    </button>
+                    <button type="button" class="tc-rd-type-btn" data-recipe-type="bar" data-category="beverage">
+                        <span class="tc-rd-type-btn__glyph" aria-hidden="true">🍸</span>
+                        <span><span class="tc-rd-type-btn__label">Bar</span><span class="tc-rd-type-btn__sub">Cocktails · builds</span></span>
+                    </button>
+                    <button type="button" class="tc-rd-type-btn" data-recipe-type="kitchen-prep" data-category="prep-recipe">
+                        <span class="tc-rd-type-btn__glyph" aria-hidden="true">🍲</span>
+                        <span><span class="tc-rd-type-btn__label">Kitchen prep</span><span class="tc-rd-type-btn__sub">Stocks · sauces</span></span>
+                    </button>
+                    <button type="button" class="tc-rd-type-btn is-active" data-recipe-type="kitchen-dish" data-category="main-course">
+                        <span class="tc-rd-type-btn__glyph" aria-hidden="true">🍽️</span>
+                        <span><span class="tc-rd-type-btn__label">Kitchen dish</span><span class="tc-rd-type-btn__sub">Plated · service</span></span>
+                    </button>
+                </div>
+                <div class="recipe-progress tc-rd-step-bar">
+                <div class="progress-steps">
+                    <div class="progress-step active" data-step="basics"><div>Basics</div></div>
+                    <div class="progress-connector"></div>
+                    <div class="progress-step" data-step="ingredients"><div>Ingredients</div></div>
+                    <div class="progress-connector"></div>
+                    <div class="progress-step" data-step="instructions"><div>Method</div></div>
+                    <div class="progress-connector"></div>
+                    <div class="progress-step" data-step="details"><div>Details</div></div>
+                </div>
+                </div>
             </div>
-            
-            <!-- Removed legacy page header to avoid duplicate with unified header -->
 
-            <!-- Recipe Development Layout -->
-            <div class="recipe-development-layout">
-                <!-- Recipe Ideas Sidebar -->
+            <div class="recipe-development-layout tc-rd-grid">
+                <aside class="tc-rd-rail">
                 <div class="recipe-ideas-sidebar">
                     <div class="ideas-sidebar-header">
                         <h3>💡 Recipe Ideas & History</h3>
@@ -711,14 +740,22 @@
                         <button class="btn btn-success w-full" onclick="exportAllUserData()">📤 Export All Data</button>
                     </div>
                 </div>
-                
-                <!-- Recipe Canvas -->
-                <div class="recipe-canvas">
+                <div class="tc-card tc-rd-cost-card" id="tc-rd-cost-card" aria-live="polite">
+                    <h3>Live costing</h3>
+                    <dl class="tc-rd-cost-dl">
+                        <div class="tc-rd-cost-row"><dt>Batch cost</dt><dd id="tc-rd-batch-cost">$0.00</dd></div>
+                        <div class="tc-rd-cost-row"><dt>Cost / portion</dt><dd id="tc-rd-cost-portion">$0.00</dd></div>
+                        <div class="tc-rd-cost-row tc-rd-cost-row--accent"><dt>Suggested price (28% FC)</dt><dd id="tc-rd-suggested-price">$0.00</dd></div>
+                    </dl>
+                </div>
+                </aside>
+
+                <article class="recipe-canvas tc-rd-notebook">
                     <!-- Recipe Header with Status -->
-                    <div class="recipe-header">
+                    <div class="recipe-header tc-rd-toolbar-legacy">
                         <div class="recipe-status-display">
                             <span class="status-label">Status:</span>
-                            <span id="recipe-status" class="status-badge new">New Recipe</span>
+                            <span class="status-badge new">New Recipe</span>
                         </div>
                         <div class="recipe-actions">
                             <a href="recipe-canvas.html" class="btn btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
@@ -729,17 +766,13 @@
                         </div>
                     </div>
                     
-                    <!-- Recipe Name Section -->
-                    <div class="recipe-section">
-                        <div class="recipe-section-title">
-                            <span>📝</span>
-                            Recipe Information
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="form-group">
-                                <label for="recipe-name" class="form-label">Recipe Name</label>
-                                <input type="text" id="recipe-name" class="form-input" placeholder="Enter recipe name">
-                            </div>
+                    <header class="tc-rd-cover" data-section="basics">
+                        <div class="tc-rd-cover__badge" id="tc-rd-cover-badge">Kitchen dish · Working draft</div>
+                        <label class="sr-only" for="recipe-name">Recipe title</label>
+                        <input type="text" id="recipe-name" class="tc-rd-title-input" placeholder="Recipe title" autocomplete="off">
+                        <label class="sr-only" for="recipe-subtitle">Subtitle</label>
+                        <input type="text" id="recipe-subtitle" class="tc-rd-subtitle-input" placeholder="A short subtitle or accompaniment line" autocomplete="off">
+                        <div class="tc-rd-meta-strip">
                             <div class="form-group">
                                 <label for="recipe-category" class="form-label">Category</label>
                                 <select id="recipe-category" class="form-select">
@@ -754,21 +787,27 @@
                             </div>
                             <div class="form-group">
                                 <label for="recipe-cuisine" class="form-label">Cuisine</label>
-                                <input type="text" id="recipe-cuisine" class="form-input" placeholder="e.g., Italian, French, Asian">
+                                <input type="text" id="recipe-cuisine" class="form-input" placeholder="e.g. Italian, French">
                             </div>
                             <div class="form-group">
-                                <label for="recipe-servings" class="form-label">Servings</label>
+                                <label for="recipe-servings" class="form-label">Yield / servings</label>
                                 <input type="number" id="recipe-servings" class="form-input" min="1" value="4">
                             </div>
+                            <div class="form-group">
+                                <label for="recipe-story" class="form-label">Chef&apos;s note</label>
+                                <input type="text" id="recipe-story" class="form-input" placeholder="Why this recipe, what to look for…">
+                            </div>
                         </div>
-                    </div>
+                    </header>
+                    <div class="tc-rd-notebook-body">
 
                 <!-- Ingredients Section -->
-                <div class="recipe-section">
+                <div class="recipe-section" data-section="ingredients">
                     <div class="recipe-section-title">
                         <span>🥬</span>
                         Ingredients
                     </div>
+                    <div class="tc-rd-ingredients-head" aria-hidden="true"><span>Qty</span><span>Unit</span><span>Ingredient</span><span>Notes</span><span></span></div>
                     <div id="ingredients-container">
                         <div class="ingredient-row" data-ingredient-index="0">
                             <div id="ingredient-select-0" class="ingredient-select-container"></div>
@@ -784,7 +823,7 @@
                 </div>
 
                 <!-- Instructions Section -->
-                <div class="recipe-section">
+                <div class="recipe-section" data-section="instructions">
                     <div class="recipe-section-title">
                         <span>📋</span>
                         Instructions
@@ -939,6 +978,7 @@
                     </div>
                 </div>
 
+                    </div>
                 <!-- Action Buttons -->
                 <div class="action-buttons">
                     <button class="btn btn-primary" onclick="saveRecipe()">💾 Save Recipe</button>
@@ -946,7 +986,7 @@
                     <button class="btn btn-secondary" onclick="calculateNutrition()">🧮 Calculate Nutrition</button>
                     <button class="btn btn-secondary" onclick="previewRecipe()">👁️ Preview</button>
                 </div>
-            </div>
+            </article>
         </div>
     </div>
 </div>
@@ -4118,6 +4158,7 @@
     
     <!-- Recipe Developer Enhancements - Autosave, validation, UX improvements -->
     <script src="assets/js/recipe-developer-enhancements.js"></script>
+    <script src="assets/js/recipe-developer-revamp-ui.js"></script>
 </body>
 </html>
 

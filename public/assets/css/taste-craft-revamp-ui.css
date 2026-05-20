@@ -303,3 +303,289 @@
 .tc-revamp-body .unified-sidebar {
   --sidebar-tint: hsl(var(--tc-sidebar-background));
 }
+
+/* —— Dashboard —— */
+.tc-revamp-body .dash-page-header.tc-page-hero {
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--tc-radius);
+  margin-left: -0.25rem;
+  margin-right: -0.25rem;
+}
+
+.tc-revamp-body .dash-card-head h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+}
+
+.tc-revamp-body .dash-card-icon {
+  background: hsl(var(--tc-accent-soft)) !important;
+  color: hsl(var(--tc-accent)) !important;
+  border-color: hsl(var(--tc-border) / 0.5) !important;
+}
+
+.tc-revamp-body .card-style {
+  background: hsl(var(--tc-card));
+  border: 1px solid hsl(var(--tc-border) / 0.65);
+  border-radius: var(--tc-radius);
+  box-shadow: var(--tc-shadow-card);
+}
+
+.tc-revamp-body .card-style:hover {
+  box-shadow: var(--tc-shadow-elevated);
+}
+
+.tc-revamp-body .btn-primary,
+.tc-revamp-body a[style*='brand-primary-accent'] {
+  background: var(--tc-gradient-accent) !important;
+  color: hsl(var(--tc-accent-foreground)) !important;
+  border: none !important;
+}
+
+.tc-revamp-body .btn-primary:hover {
+  opacity: 0.92;
+}
+
+.tc-revamp-body #dash-header-primary-cta {
+  color: hsl(var(--tc-accent-foreground)) !important;
+}
+
+.tc-revamp-body .dash-mobile-strip > span {
+  color: hsl(var(--tc-primary)) !important;
+}
+
+.tc-revamp-body .dash-mobile-strip > span {
+  font-family: 'Fraunces', Georgia, serif;
+}
+
+.tc-revamp-body input:focus,
+.tc-revamp-body textarea:focus,
+.tc-revamp-body select:focus {
+  border-color: hsl(var(--tc-ring)) !important;
+  box-shadow: 0 0 0 3px hsl(var(--tc-ring) / 0.15) !important;
+}
+
+.tc-revamp-body .task-item input[type='checkbox'] {
+  accent-color: hsl(var(--tc-accent));
+}
+
+/* —— Menu builder —— */
+.tc-revamp-body.menu-builder-page {
+  background: hsl(var(--tc-background)) !important;
+}
+
+.tc-revamp-body .menu-hero {
+  background: var(--tc-gradient-hero) !important;
+  border: 1px solid hsl(var(--tc-border) / 0.65) !important;
+  border-radius: var(--tc-radius) !important;
+  box-shadow: var(--tc-shadow-card) !important;
+  padding: 2rem 1.75rem !important;
+}
+
+.tc-revamp-body .menu-hero::after {
+  background: radial-gradient(
+      circle at 90% 0%,
+      hsl(var(--tc-accent) / 0.12),
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      hsl(var(--tc-primary) / 0.08),
+      transparent 45%
+    ) !important;
+}
+
+.tc-revamp-body .menu-hero h1 {
+  font-family: 'Fraunces', Georgia, serif !important;
+  font-size: clamp(1.75rem, 4vw, 2.5rem) !important;
+  font-weight: 600 !important;
+  color: hsl(var(--tc-foreground)) !important;
+  letter-spacing: -0.02em;
+}
+
+.tc-revamp-body .hero-eyebrow {
+  color: hsl(var(--tc-muted-foreground)) !important;
+  letter-spacing: 0.14em !important;
+  font-size: 0.6875rem !important;
+}
+
+.tc-revamp-body .hero-subtitle {
+  color: hsl(var(--tc-muted-foreground)) !important;
+  font-size: 1rem !important;
+}
+
+.tc-revamp-body .hero-stat-card {
+  background: hsl(var(--tc-card)) !important;
+  border: 1px solid hsl(var(--tc-border) / 0.65) !important;
+  border-radius: calc(var(--tc-radius) - 2px) !important;
+  box-shadow: var(--tc-shadow-card) !important;
+}
+
+.tc-revamp-body .hero-stat-value {
+  font-family: 'Fraunces', Georgia, serif !important;
+  font-weight: 600 !important;
+  color: hsl(var(--tc-foreground)) !important;
+}
+
+.tc-revamp-body .hero-stat-label {
+  color: hsl(var(--tc-muted-foreground)) !important;
+}
+
+.tc-revamp-body .project-chip {
+  background: hsl(var(--tc-accent-soft)) !important;
+  border-color: hsl(var(--tc-border)) !important;
+  color: hsl(var(--tc-foreground)) !important;
+}
+
+.tc-revamp-body .menu-stepper {
+  background: var(--tc-gradient-primary) !important;
+  box-shadow: var(--tc-shadow-card) !important;
+  border-radius: var(--tc-radius) !important;
+}
+
+.tc-revamp-body .card,
+.tc-revamp-body .menu-section,
+.tc-revamp-body .iterum-card {
+  border: 1px solid hsl(var(--tc-border) / 0.65) !important;
+  border-radius: var(--tc-radius) !important;
+  box-shadow: var(--tc-shadow-card) !important;
+}
+
+.tc-revamp-body .card-header-gradient {
+  background: hsl(var(--tc-muted)) !important;
+  border-bottom: 1px solid hsl(var(--tc-border) / 0.65) !important;
+}
+
+.tc-revamp-body .card-header-gradient .card-title,
+.tc-revamp-body .iterum-card-header h2,
+.tc-revamp-body .iterum-card-header h3 {
+  font-family: 'Fraunces', Georgia, serif;
+  color: hsl(var(--tc-foreground)) !important;
+}
+
+/* —— Recipe developer —— */
+.tc-revamp-body .tc-rd-page-hero {
+  margin-bottom: 1.25rem;
+  border-radius: var(--tc-radius);
+  overflow: hidden;
+}
+
+.tc-revamp-body .tc-eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: hsl(var(--tc-muted-foreground));
+}
+
+.tc-revamp-body .recipe-progress {
+  background: hsl(var(--tc-card));
+  border: 1px solid hsl(var(--tc-border) / 0.65);
+  border-radius: var(--tc-radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--tc-shadow-card);
+}
+
+.tc-revamp-body .progress-step.active {
+  background: hsl(var(--tc-accent-soft));
+  color: hsl(var(--tc-primary));
+  border-color: hsl(var(--tc-accent) / 0.35);
+}
+
+.tc-revamp-body .progress-step.active > div {
+  font-weight: 600;
+}
+
+.tc-revamp-body .quick-tips {
+  background: hsl(var(--tc-muted));
+  border: 1px solid hsl(var(--tc-border) / 0.65);
+  border-radius: var(--tc-radius);
+  color: hsl(var(--tc-muted-foreground));
+}
+
+.tc-revamp-body .quick-tips-title {
+  font-family: 'Fraunces', Georgia, serif;
+  color: hsl(var(--tc-foreground));
+}
+
+.tc-revamp-body .ideas-sidebar-header h3 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.05rem;
+}
+
+@media (min-width: 1024px) {
+  .tc-revamp-body .quick-tips {
+    max-width: 280px;
+    float: right;
+    margin-left: 1rem;
+  }
+}
+
+.tc-link-accent {
+  color: hsl(var(--tc-accent));
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tc-link-accent:hover {
+  text-decoration: underline;
+}
+
+.tc-stat-card__icon--warning {
+  background: hsl(var(--tc-warning) / 0.15);
+  color: hsl(38 70% 32%);
+}
+
+.tc-revamp-body .page-shell {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.25rem 2rem;
+}
+
+.tc-revamp-body .tc-rd-page-hero .tc-page-hero__inner {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.tc-workflow-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0 0 1.5rem;
+  padding: 0.35rem;
+  background: hsl(var(--tc-muted));
+  border: 1px solid hsl(var(--tc-border) / 0.65);
+  border-radius: var(--tc-radius);
+}
+
+.tc-workflow-tabs__item {
+  flex: 1 1 auto;
+  min-width: 5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: center;
+  color: hsl(var(--tc-muted-foreground));
+  background: transparent;
+  border: none;
+  border-radius: calc(var(--tc-radius) - 4px);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.tc-workflow-tabs__item.is-active,
+.tc-workflow-tabs__item:hover {
+  background: hsl(var(--tc-card));
+  color: hsl(var(--tc-foreground));
+  box-shadow: var(--tc-shadow-card);
+}
+
+.tc-revamp-body .hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
