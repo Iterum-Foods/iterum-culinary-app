@@ -1,0 +1,148 @@
+/**
+ * Taste Craft palette enforcement — load last on revamp pages.
+ * Beats iterum-brand-kit body !important, header-universal moss/blue, and nav JS fallbacks.
+ */
+
+.tc-revamp-body {
+  --brand-bg-gradient: var(--tc-gradient-hero);
+  --brand-btn-primary: var(--tc-gradient-accent);
+  --brand-accent-primary: hsl(var(--tc-primary));
+  --brand-accent-secondary: hsl(var(--tc-primary));
+  --brand-accent-forest: hsl(var(--tc-primary));
+  --brand-primary-accent: hsl(var(--tc-accent));
+  --brand-moss-dark: hsl(182 38% 16%);
+}
+
+/* Sidebar — dark teal (taste-craft-revamp) */
+.tc-revamp-body .unified-nav-sidebar {
+  background: hsl(var(--tc-sidebar-background)) !important;
+  background-color: hsl(var(--tc-sidebar-background)) !important;
+  background-image: none !important;
+  border-right: 1px solid hsl(var(--tc-sidebar-border)) !important;
+  box-shadow: 2px 0 16px hsl(180 25% 11% / 0.12) !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .sidebar-header,
+.tc-revamp-body .unified-nav-sidebar .sidebar-footer {
+  border-color: hsl(var(--tc-sidebar-border)) !important;
+  background: transparent !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .sidebar-footer {
+  background: hsl(var(--tc-sidebar-accent) / 0.5) !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .nav-logo,
+.tc-revamp-body .unified-nav-sidebar .nav-logo-text,
+.tc-revamp-body .unified-nav-sidebar .sidebar-toggle-mobile {
+  color: hsl(var(--tc-sidebar-foreground)) !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .nav-section-label {
+  color: hsl(var(--tc-sidebar-foreground) / 0.55) !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .nav-link {
+  color: hsl(var(--tc-sidebar-foreground) / 0.88) !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .nav-link:hover,
+.tc-revamp-body .unified-nav-sidebar .nav-link:focus {
+  background: hsl(var(--tc-sidebar-accent)) !important;
+  color: hsl(var(--tc-sidebar-foreground)) !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .nav-link.active {
+  background: var(--tc-gradient-accent) !important;
+  color: hsl(var(--tc-accent-foreground)) !important;
+  border-color: transparent !important;
+  box-shadow: var(--tc-shadow-glow) !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .nav-link-emphasis {
+  background: hsl(var(--tc-accent) / 0.18) !important;
+  border-color: hsl(var(--tc-accent) / 0.35) !important;
+  color: hsl(var(--tc-accent-soft)) !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .nav-link-emphasis:hover,
+.tc-revamp-body .unified-nav-sidebar .nav-link-emphasis:focus {
+  background: var(--tc-gradient-accent) !important;
+  color: hsl(var(--tc-accent-foreground)) !important;
+  box-shadow: var(--tc-shadow-glow) !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .sidebar-user-avatar {
+  background: var(--tc-gradient-accent) !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .sidebar-user-name {
+  color: hsl(var(--tc-sidebar-foreground)) !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .sidebar-user-email {
+  color: hsl(var(--tc-sidebar-foreground) / 0.65) !important;
+}
+
+/* Legacy header rules (if any page still shows top bar) */
+.tc-revamp-body .unified-nav-header .nav-link.active,
+.tc-revamp-body .unified-nav-header .nav-avatar {
+  background: var(--tc-gradient-accent) !important;
+  box-shadow: var(--tc-shadow-glow) !important;
+}
+
+.tc-revamp-body .unified-nav-header .nav-link:hover,
+.tc-revamp-body .unified-nav-header .nav-link:focus,
+.tc-revamp-body .unified-nav-header .nav-dropdown-item:hover {
+  background: hsl(var(--tc-accent-soft)) !important;
+  color: hsl(var(--tc-foreground)) !important;
+}
+
+/* Cards — no moss hover ring */
+.tc-revamp-body [class*='card']:hover {
+  border-color: hsl(var(--tc-accent) / 0.35) !important;
+}
+
+/* Menu builder inline stepper remnants */
+.tc-revamp-body .menu-stepper {
+  background: var(--tc-gradient-primary) !important;
+  box-shadow: var(--tc-shadow-card) !important;
+}
+
+.tc-revamp-body .stepper-step.active .stepper-number {
+  background: hsl(var(--tc-accent)) !important;
+  border-color: hsl(var(--tc-accent)) !important;
+  box-shadow: 0 0 20px hsl(var(--tc-accent) / 0.35) !important;
+}
+
+.tc-revamp-body .menu-builder-page .import-options .btn-primary,
+.tc-revamp-body .menu-builder-page .btn-create-menu,
+.tc-revamp-body .menu-builder-page [class*='btn-primary'] {
+  background: var(--tc-gradient-accent) !important;
+  box-shadow: var(--tc-shadow-glow) !important;
+}
+
+/* Dashboard page-local classes */
+.tc-revamp-body .dash-card-icon {
+  background: hsl(var(--tc-accent-soft)) !important;
+  color: hsl(var(--tc-accent)) !important;
+}
+
+.tc-revamp-body .dash-hint {
+  background: hsl(var(--tc-muted)) !important;
+  color: hsl(var(--tc-muted-foreground)) !important;
+  border: 1px solid hsl(var(--tc-border) / 0.5);
+}
+
+.tc-revamp-body .btn-secondary:hover {
+  background-color: hsl(var(--tc-primary-glow)) !important;
+}
+
+.tc-revamp-body .stat-card {
+  background: var(--tc-gradient-primary) !important;
+  box-shadow: var(--tc-shadow-card) !important;
+}
+
+.tc-revamp-body .stat-card:hover {
+  box-shadow: var(--tc-shadow-elevated) !important;
+}

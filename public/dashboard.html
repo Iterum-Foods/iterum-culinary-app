@@ -31,6 +31,7 @@
   <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
   <link rel="stylesheet" href="assets/css/taste-craft-revamp-tokens.css">
   <link rel="stylesheet" href="assets/css/taste-craft-revamp-ui.css">
+  <link rel="stylesheet" href="assets/css/taste-craft-revamp-colors.css">
   <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
   <link rel="stylesheet" href="assets/css/header-universal.css">
   <link rel="stylesheet" href="assets/css/iterum-workflow-polish.css">
@@ -142,7 +143,7 @@
     textarea:focus, input:focus {
       outline: none;
       border-color: var(--brand-primary-accent);
-      box-shadow: 0 0 0 3px rgba(107, 142, 111, 0.2);
+      box-shadow: 0 0 0 3px hsl(var(--tc-accent) / 0.22);
     }
 
     button {
@@ -160,16 +161,16 @@
     }
 
     .btn-primary:hover {
-      background-color: var(--brand-moss-dark);
+      background-color: hsl(28 80% 48%);
     }
 
     .btn-secondary {
-      background-color: var(--brand-secondary-accent);
-      color: white;
+      background-color: hsl(var(--tc-primary));
+      color: hsl(var(--tc-primary-foreground));
     }
 
     .btn-secondary:hover {
-      background-color: #4a8a9e;
+      background-color: hsl(var(--tc-primary-glow));
     }
 
     .btn-ghost {
@@ -245,8 +246,8 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      background: rgba(107, 142, 111, 0.12);
-      color: var(--brand-primary-accent);
+      background: hsl(var(--tc-accent-soft));
+      color: hsl(var(--tc-accent));
     }
     .dash-list-well {
       border-radius: var(--radius-md);
@@ -261,7 +262,7 @@
       line-height: 1.45;
       padding: 0.5rem 0.65rem;
       border-radius: var(--radius-md);
-      background: rgba(91, 155, 173, 0.1);
+      background: hsl(var(--tc-muted));
       color: var(--brand-text-secondary);
       margin-bottom: 0.75rem;
     }

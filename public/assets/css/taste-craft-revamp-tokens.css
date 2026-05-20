@@ -64,9 +64,10 @@
   --tc-sidebar-border: 182 25% 20%;
 
   /* Bridge → iterum-brand-kit consumers */
-  --brand-bg-primary: hsl(var(--tc-card));
+  --brand-bg-primary: hsl(var(--tc-background));
   --brand-bg-secondary: hsl(var(--tc-background));
   --brand-bg-tertiary: hsl(var(--tc-accent-soft));
+  --brand-bg-gradient: var(--tc-gradient-hero);
   --brand-card-bg: hsl(var(--tc-card));
   --brand-card-bg-subtle: hsl(var(--tc-muted));
   --brand-border-light: hsl(var(--tc-border));
@@ -76,23 +77,36 @@
   --brand-primary-accent: hsl(var(--tc-accent));
   --brand-secondary-accent: hsl(var(--tc-primary));
   --brand-accent-primary: hsl(var(--tc-primary));
+  --brand-accent-secondary: hsl(var(--tc-primary));
+  --brand-accent-forest: hsl(var(--tc-primary));
+  --brand-moss-dark: hsl(182 38% 16%);
   --brand-success: hsl(var(--tc-success));
   --brand-warning: hsl(var(--tc-warning));
   --brand-error: hsl(var(--tc-destructive));
+  --brand-info: hsl(var(--tc-primary-glow));
   --brand-btn-primary: var(--tc-gradient-accent);
   --brand-btn-accent: var(--tc-gradient-accent);
   --brand-header-bg: hsl(var(--tc-card) / 0.88);
   --brand-header-border: hsl(var(--tc-border));
   --radius-lg: var(--tc-radius);
   --shadow-md: var(--tc-shadow-card);
+
+  /* iterum-unified-colors fallbacks */
+  --iterum-bg-secondary: hsl(var(--tc-background));
+  --iterum-text-primary: hsl(var(--tc-foreground));
+  --iterum-accent-primary: hsl(var(--tc-accent));
+  --iterum-accent-secondary: hsl(var(--tc-primary));
+  --iterum-btn-primary: var(--tc-gradient-accent);
 }
 
 body.tc-revamp-body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: hsl(var(--tc-background));
-  color: hsl(var(--tc-foreground));
+  font-family: 'Inter', system-ui, sans-serif !important;
+  background: hsl(var(--tc-background)) !important;
+  background-image: var(--tc-gradient-hero) !important;
+  color: hsl(var(--tc-foreground)) !important;
   font-feature-settings: 'ss01', 'cv11';
   -webkit-font-smoothing: antialiased;
+  padding-top: 0 !important;
 }
 
 .tc-font-display,

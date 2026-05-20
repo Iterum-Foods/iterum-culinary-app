@@ -551,9 +551,9 @@ class UnifiedNavHeader {
                 top: 0;
                 width: 280px;
                 height: 100vh;
-                background: rgba(255, 255, 255, 0.98);
-                border-right: 1px solid rgba(226, 232, 240, 0.8);
-                box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+                background: hsl(var(--tc-sidebar-background, 182 38% 13%));
+                border-right: 1px solid hsl(var(--tc-sidebar-border, 182 25% 20%));
+                box-shadow: 2px 0 16px hsl(180 25% 11% / 0.12);
                 display: flex;
                 flex-direction: column;
                 z-index: 1000;
@@ -568,7 +568,7 @@ class UnifiedNavHeader {
 
             .sidebar-header {
                 padding: 24px 20px;
-                border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+                border-bottom: 1px solid hsl(var(--tc-sidebar-border, 182 25% 20%));
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
@@ -592,8 +592,8 @@ class UnifiedNavHeader {
 
             .sidebar-footer {
                 padding: 20px;
-                border-top: 1px solid rgba(226, 232, 240, 0.8);
-                background: rgba(248, 250, 252, 0.5);
+                border-top: 1px solid hsl(var(--tc-sidebar-border, 182 25% 20%));
+                background: hsl(var(--tc-sidebar-accent, 182 30% 18%) / 0.5);
             }
 
             .sidebar-user-profile {
@@ -704,7 +704,7 @@ class UnifiedNavHeader {
             }
 
             .nav-link {
-                color: #3E4C54;
+                color: hsl(var(--tc-sidebar-foreground, 40 30% 88%) / 0.88);
                 text-decoration: none;
                 padding: 12px 16px;
                 border-radius: 8px;
@@ -738,31 +738,31 @@ class UnifiedNavHeader {
 
             .nav-link:hover,
             .nav-link:focus {
-                background: rgba(148, 163, 184, 0.1);
-                color: #2C4A52;
+                background: hsl(var(--tc-sidebar-accent, 182 30% 18%));
+                color: hsl(var(--tc-sidebar-foreground, 40 30% 88%));
             }
 
             .nav-link.active {
-                color: #ffffff;
-                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+                color: hsl(var(--tc-accent-foreground, 40 33% 99%));
+                background: var(--brand-btn-primary, var(--tc-gradient-accent, linear-gradient(135deg, hsl(28 85% 55%) 0%, hsl(18 80% 50%) 100%)));
                 border-color: transparent;
-                box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+                box-shadow: var(--tc-shadow-glow, 0 8px 32px hsl(28 85% 55% / 0.18));
                 font-weight: 600;
             }
 
             .nav-link-emphasis {
-                background: rgba(59, 130, 246, 0.12);
-                border-color: rgba(59, 130, 246, 0.28);
-                color: #1e40af;
+                background: hsl(var(--tc-accent, 28 85% 55%) / 0.18);
+                border-color: hsl(var(--tc-accent, 28 85% 55%) / 0.35);
+                color: hsl(var(--tc-sidebar-foreground, 40 30% 88%));
                 font-weight: 600;
             }
 
             .nav-link-emphasis:hover,
             .nav-link-emphasis:focus {
-                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-                color: #ffffff;
+                background: var(--brand-btn-primary, var(--tc-gradient-accent));
+                color: hsl(var(--tc-accent-foreground, 40 33% 99%));
                 border-color: transparent;
-                box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+                box-shadow: var(--tc-shadow-glow, 0 8px 32px hsl(28 85% 55% / 0.18));
             }
 
             .nav-right {
