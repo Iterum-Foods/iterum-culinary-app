@@ -61,6 +61,7 @@
   --tc-sidebar-background: 182 38% 13%;
   --tc-sidebar-foreground: 40 30% 88%;
   --tc-sidebar-accent: 182 30% 18%;
+  --tc-sidebar-accent-foreground: 40 33% 97%;
   --tc-sidebar-border: 182 25% 20%;
 
   /* Bridge → iterum-brand-kit consumers */

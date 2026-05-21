@@ -34,7 +34,7 @@
 
 ## Not ported (yet)
 
-- Full **AppSidebar** React layout (unified nav remains `unified-nav-header.js`).
+- **AppSidebar** React parity is ported to `unified-nav-header.js` + `taste-craft-app-sidebar.css` (collapsible icon rail, Daily Ops / Kitchen groups, footer project card).
 - **RecipeDeveloper.tsx** feature set (version tabs, type picker, inventory command palette) — UI chrome only on `recipe-developer.html`.
 - **Recharts** dashboard charts from revamp `Index.tsx` — dashboard keeps Chart.js.
 - **React Router** shell — each HTML page stays independent.

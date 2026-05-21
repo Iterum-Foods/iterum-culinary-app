@@ -3,6 +3,9 @@
  * Provides consistent navigation across all pages
  */
 
+/** Bump when sidebar HTML or menu structure changes (forces rebuild on cached pages). */
+const ITERUM_NAV_VERSION = '2026-05-19-tc-sidebar';
+
 class UnifiedNavHeader {
   constructor() {
     this.currentPage = this.detectCurrentPage();
@@ -12,6 +15,13 @@ class UnifiedNavHeader {
   detectCurrentPage() {
     const path = (window.location.pathname || '').toLowerCase();
     if (path.includes('index') || path.includes('dashboard')) {
+      const hash = (window.location.hash || '').toLowerCase();
+      if (hash.includes('temp')) {
+        return 'temperature';
+      }
+      if (hash.includes('haccp')) {
+        return 'haccp';
+      }
       return 'dashboard';
     }
     if (path.includes('restaurant-group-onboarding')) {
@@ -42,10 +52,10 @@ class UnifiedNavHeader {
       return 'vendorprice';
     }
     if (path.includes('production-planning')) {
-      return 'production';
+      return 'reports';
     }
     if (path.includes('project-hub')) {
-      return 'projects';
+      return 'team';
     }
     if (path.includes('contact_management')) {
       return 'crm';
@@ -119,6 +129,10 @@ class UnifiedNavHeader {
       'vendorprice',
       'equipment',
       'production',
+      'reports',
+      'team',
+      'haccp',
+      'temperature',
       'import_recipe',
       'import_ing',
       'rgo',
@@ -156,29 +170,99 @@ class UnifiedNavHeader {
     document.head.appendChild(link);
   }
 
-  init() {
-    // Check if sidebar already exists
-    if (document.querySelector('.unified-nav-sidebar')) {
-      console.log('Navigation sidebar already exists');
+  ensureAppShell() {
+    if (this.shouldSkipUnifiedNav()) {
       return;
     }
+    document.body.classList.add('tc-revamp-body', 'iterum-has-sidebar');
+    this.ensureCanonicalStyles();
+    this.ensureCompanionScripts();
+  }
 
+  ensureCanonicalStyles() {
+    if (
+      document.querySelector('link[href*="iterum-canonical-app.css"]')
+    ) {
+      return;
+    }
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'assets/css/iterum-canonical-app.css';
+    document.head.appendChild(link);
+  }
+
+  ensureCompanionScripts() {
+    const load = (src, test) => {
+      if (test()) {
+        return;
+      }
+      if (document.querySelector('script[src="' + src + '"]')) {
+        return;
+      }
+      const s = document.createElement('script');
+      s.src = src;
+      s.defer = true;
+      document.head.appendChild(s);
+    };
+    load('assets/js/project-management-system.js', () => window.projectManager);
+    load('assets/js/unified-project-selector.js', () => window.unifiedProjectSelector);
+  }
+
+  unwrapMainContent() {
+    const wrapper = document.querySelector('.main-content-wrapper');
+    if (!wrapper) {
+      return;
+    }
+    const sidebar = document.querySelector('.unified-nav-sidebar');
+    const children = Array.from(wrapper.children);
+    children.forEach(child => {
+      if (sidebar && child === sidebar) {
+        return;
+      }
+      document.body.appendChild(child);
+    });
+    wrapper.remove();
+  }
+
+  removeStaleSidebar() {
+    const sidebar = document.querySelector('.unified-nav-sidebar');
+    if (!sidebar) {
+      return false;
+    }
+    if (sidebar.getAttribute('data-nav-version') === ITERUM_NAV_VERSION) {
+      return false;
+    }
+    sidebar.remove();
+    this.unwrapMainContent();
+    return true;
+  }
+
+  init() {
     if (this.shouldSkipUnifiedNav()) {
       console.log('Unified nav: skipped (data-no-unified-nav)');
       return;
+    }
+
+    this.ensureAppShell();
+
+    const sidebar = document.querySelector('.unified-nav-sidebar');
+    if (sidebar && sidebar.getAttribute('data-nav-version') === ITERUM_NAV_VERSION) {
+      return;
+    }
+
+    if (sidebar) {
+      this.removeStaleSidebar();
     }
 
     this.injectHeader();
   }
 
   injectHeader() {
-    // Check if sidebar already exists
-    if (document.querySelector('.unified-nav-sidebar')) {
-      console.log('Navigation sidebar already exists');
+    if (this.shouldSkipUnifiedNav()) {
       return;
     }
 
-    if (this.shouldSkipUnifiedNav()) {
+    if (document.querySelector('.unified-nav-sidebar')) {
       return;
     }
 
@@ -186,6 +270,7 @@ class UnifiedNavHeader {
 
     const sidebar = document.createElement('aside');
     sidebar.className = 'unified-nav-sidebar';
+    sidebar.setAttribute('data-nav-version', ITERUM_NAV_VERSION);
     sidebar.innerHTML = this.getSidebarHTML();
 
     // Insert at start of body
@@ -223,6 +308,7 @@ class UnifiedNavHeader {
     // Setup mobile toggle
     this.setupMobileToggle();
     this.setupMobileNavLinkClose();
+    this.setupSidebarCollapse();
 
     this.injectWorkspaceFeaturesScript();
     this.injectRestaurantLocationSidebarScript();
@@ -376,55 +462,86 @@ class UnifiedNavHeader {
     });
   }
 
-  getSidebarHTML() {
-    const p = slug => this.navPageActive(slug);
-    const moreActive = this.moreMenuActiveClass();
-    return `
-            <div class="sidebar-header">
-                <a href="dashboard.html" class="nav-logo">
-                    <span class="nav-logo-icon">🍳</span>
-                    <span class="nav-logo-text">Iterum</span>
-                </a>
-                <button type="button" class="sidebar-toggle-mobile" id="sidebar-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="unified-sidebar-nav">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-            </div>
+  navLink(href, slug, iconClass, label, feature) {
+    const feat = feature ? ` data-iterum-feature="${feature}"` : '';
+    return (
+      '<a href="' +
+      href +
+      '" class="nav-link ' +
+      this.navPageActive(slug) +
+      '"' +
+      feat +
+      ' title="' +
+      label +
+      '">' +
+      '<i class="' +
+      iconClass +
+      ' nav-link-fa" aria-hidden="true"></i>' +
+      '<span class="nav-link-label">' +
+      label +
+      '</span></a>'
+    );
+  }
 
-            <div class="iterum-nav-context-bar" id="iterum-nav-context-bar" aria-label="Project context">
-                <div class="iterum-nav-context-breadcrumb" id="iterum-nav-context-breadcrumb" hidden></div>
-                <div class="iterum-nav-context-row">
-                    <span class="iterum-nav-context-project" id="iterum-nav-context-project">Select project</span>
-                    <span class="iterum-nav-context-role" id="iterum-nav-context-role"></span>
-                </div>
+  formatRoleLabel(roleKey) {
+    const map = {
+      chef_leadership: 'Kitchen lead',
+      location_manager: 'Location manager',
+      account_admin: 'Account admin',
+      operations_gm: 'Operations / GM',
+      employee_line: 'Line crew',
+      kitchen_staff: 'Kitchen staff',
+      front_of_house: 'Front of house',
+      bartender: 'Bartender',
+      server: 'Server',
+      purchasing: 'Purchasing',
+      consultant_rd: 'R&D consultant'
+    };
+    if (!roleKey) {
+      return 'Kitchen lead';
+    }
+    return map[roleKey] || roleKey.replace(/_/g, ' ');
+  }
+
+  getSidebarHTML() {
+    const moreActive = this.moreMenuActiveClass();
+    const p = slug => this.navPageActive(slug);
+    return `
+            <div class="tc-sidebar-header sidebar-header">
+                <a href="dashboard.html" class="tc-sidebar-brand">
+                    <span class="tc-sidebar-brand-icon" aria-hidden="true"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                    <span class="tc-sidebar-brand-text">
+                        <span class="tc-sidebar-brand-title">Iterum</span>
+                        <span class="tc-sidebar-brand-eyebrow">Culinary OS</span>
+                    </span>
+                </a>
+                <button type="button" class="tc-sidebar-collapse-btn" id="sidebar-collapse-btn" aria-label="Collapse sidebar" aria-expanded="true" title="Collapse sidebar">
+                    <i class="fa-solid fa-angles-left" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="sidebar-toggle-mobile" id="sidebar-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="unified-sidebar-nav">
+                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                </button>
             </div>
 
             <nav class="sidebar-nav" id="unified-sidebar-nav" aria-label="Main">
                 <div class="nav-links">
-                    <div class="nav-section-label">Daily ops</div>
-                    <a href="dashboard.html" class="nav-link nav-link-emphasis ${p('dashboard')}"><i class="fa-solid fa-table-columns nav-link-fa" aria-hidden="true"></i>Dashboard</a>
-                    <a href="project-hub.html" class="nav-link ${p('projects')}" data-iterum-feature="projects"><i class="fa-solid fa-diagram-project nav-link-fa" aria-hidden="true"></i>Project hub</a>
-                    <a href="mobile-compliance.html" class="nav-link ${p('shift')}" data-iterum-feature="compliance"><i class="fa-solid fa-clipboard-check nav-link-fa" aria-hidden="true"></i>Shift tools</a>
-                    <a href="calendar.html" class="nav-link ${p('calendar')}" data-iterum-feature="calendar"><i class="fa-solid fa-calendar-days nav-link-fa" aria-hidden="true"></i>Calendar</a>
-                    <a href="kitchen-management.html" class="nav-link ${p('kitchen')}" data-iterum-feature="kitchen"><i class="fa-solid fa-fire-burner nav-link-fa" aria-hidden="true"></i>Kitchen</a>
+                    <div class="nav-section-label">Daily Ops</div>
+                    ${this.navLink('dashboard.html', 'dashboard', 'fa-solid fa-table-columns', 'Dashboard', 'dashboard')}
+                    ${this.navLink('dashboard.html#haccp', 'haccp', 'fa-solid fa-clipboard-check', 'HACCP Log', 'compliance')}
+                    ${this.navLink('dashboard.html#temperature', 'temperature', 'fa-solid fa-temperature-half', 'Temperature', 'compliance')}
+                    ${this.navLink('calendar.html', 'calendar', 'fa-solid fa-calendar-days', 'Calendar', 'calendar')}
 
-                    <div class="nav-section-label">Menu &amp; recipes</div>
-                    <a href="menu-builder.html" class="nav-link ${p('menu')}" data-iterum-feature="menus"><i class="fa-solid fa-utensils nav-link-fa" aria-hidden="true"></i>Menu builder</a>
-                    <a href="recipe-library.html" class="nav-link ${p('recipes')}" data-iterum-feature="recipes"><i class="fa-solid fa-book nav-link-fa" aria-hidden="true"></i>Recipe index</a>
-                    <a href="recipe-developer.html" class="nav-link ${p('developer')}" data-iterum-feature="recipes"><i class="fa-solid fa-flask nav-link-fa" aria-hidden="true"></i>Recipe developer</a>
-                    <a href="recipe-canvas.html" class="nav-link ${p('canvas')}" data-iterum-feature="recipes"><i class="fa-solid fa-pen-ruler nav-link-fa" aria-hidden="true"></i>Recipe canvas</a>
-
-                    <div class="nav-section-label">Purchasing &amp; inventory</div>
-                    <a href="ingredients.html" class="nav-link ${p('ingredients')}" data-iterum-feature="ingredients"><i class="fa-solid fa-carrot nav-link-fa" aria-hidden="true"></i>Ingredients</a>
-                    <a href="inventory.html" class="nav-link ${p('inventory')}" data-iterum-feature="inventory"><i class="fa-solid fa-warehouse nav-link-fa" aria-hidden="true"></i>Inventory</a>
-                    <a href="vendor-management.html" class="nav-link ${p('vendors')}" data-iterum-feature="vendors"><i class="fa-solid fa-truck-field nav-link-fa" aria-hidden="true"></i>Vendors</a>
-
-                    <div class="nav-section-label">Tools</div>
-                    <a href="recipe-photo-studio.html" class="nav-link ${p('photo')}" data-iterum-feature="photo_studio"><i class="fa-solid fa-camera nav-link-fa" aria-hidden="true"></i>Photo studio</a>
-                    <a href="recipe-scaling-tool.html" class="nav-link ${p('scaling')}" data-iterum-feature="scaling"><i class="fa-solid fa-calculator nav-link-fa" aria-hidden="true"></i>Recipe scaling</a>
+                    <div class="nav-section-label">Kitchen</div>
+                    ${this.navLink('recipe-library.html', 'recipes', 'fa-solid fa-book', 'Recipes', 'recipes')}
+                    ${this.navLink('recipe-developer.html', 'developer', 'fa-solid fa-flask', 'Recipe Developer', 'recipes')}
+                    ${this.navLink('menu-builder.html', 'menu', 'fa-solid fa-utensils', 'Menu Builder', 'menus')}
+                    ${this.navLink('inventory.html', 'inventory', 'fa-solid fa-warehouse', 'Inventory', 'inventory')}
+                    ${this.navLink('production-planning.html', 'reports', 'fa-solid fa-chart-line', 'Reports', 'production')}
+                    ${this.navLink('project-hub.html', 'team', 'fa-solid fa-users', 'Team', 'projects')}
 
                     <div class="nav-dropdown">
                         <button type="button" class="nav-link nav-dropdown-btn ${moreActive}" aria-expanded="false" aria-haspopup="true" aria-controls="nav-more-panel" id="nav-more-toggle">
-                            <span class="nav-more-chevron" aria-hidden="true">▸</span> More tools
+                            <i class="fa-solid fa-ellipsis nav-link-fa" aria-hidden="true"></i><span class="nav-link-label nav-more-label">More</span>
                         </button>
                         <div class="nav-dropdown-content" id="nav-more-panel" aria-labelledby="nav-more-toggle">
                             <div class="nav-dropdown-category">Kitchen tools</div>
@@ -437,7 +554,11 @@ class UnifiedNavHeader {
                             <a href="spec-library.html" class="${p('spec_library')}" data-iterum-feature="ingredients"><i class="fa-solid fa-file-lines fa-fw nav-dd-icon" aria-hidden="true"></i>Spec library</a>
                             <a href="vendor-price-comparison.html" class="${p('vendorprice')}" data-iterum-feature="vendors"><i class="fa-solid fa-scale-balanced fa-fw nav-dd-icon" aria-hidden="true"></i>Price compare</a>
                             <a href="equipment-management.html" class="${p('equipment')}" data-iterum-feature="equipment"><i class="fa-solid fa-screwdriver-wrench fa-fw nav-dd-icon" aria-hidden="true"></i>Equipment</a>
-                            <a href="production-planning.html" class="${p('production')}" data-iterum-feature="production"><i class="fa-solid fa-clipboard-list fa-fw nav-dd-icon" aria-hidden="true"></i>Production</a>
+                            <a href="mobile-compliance.html" class="${p('shift')}" data-iterum-feature="compliance"><i class="fa-solid fa-mobile-screen fa-fw nav-dd-icon" aria-hidden="true"></i>Shift tools</a>
+                            <a href="ingredients.html" class="${p('ingredients')}" data-iterum-feature="ingredients"><i class="fa-solid fa-carrot fa-fw nav-dd-icon" aria-hidden="true"></i>Ingredients</a>
+                            <a href="vendor-management.html" class="${p('vendors')}" data-iterum-feature="vendors"><i class="fa-solid fa-truck-field fa-fw nav-dd-icon" aria-hidden="true"></i>Vendors</a>
+                            <a href="recipe-canvas.html" class="${p('canvas')}" data-iterum-feature="recipes"><i class="fa-solid fa-pen-ruler fa-fw nav-dd-icon" aria-hidden="true"></i>Recipe canvas</a>
+                            <a href="kitchen-management.html" class="${p('kitchen')}" data-iterum-feature="kitchen"><i class="fa-solid fa-fire-burner fa-fw nav-dd-icon" aria-hidden="true"></i>Kitchen hub</a>
                             <a href="inventory-variance.html" class="${p('invvar')}" data-iterum-feature="inventory"><i class="fa-solid fa-chart-line fa-fw nav-dd-icon" aria-hidden="true"></i>Inventory variance</a>
                             <hr>
                             <div class="nav-dropdown-category">Import</div>
@@ -457,40 +578,71 @@ class UnifiedNavHeader {
             </nav>
 
             <div class="sidebar-footer">
-                <div id="unified-project-selector" class="sidebar-unified-project-slot" style="width:100%;margin-bottom:12px;position:relative;"></div>
-                <div class="nav-project-chip" id="nav-project-chip">Project: Master Project</div>
+                <div id="unified-project-selector" class="sidebar-unified-project-slot" style="width:100%;position:relative;"></div>
+                <div class="tc-sidebar-footer-card" id="tc-sidebar-footer-card">
+                    <p class="tc-sidebar-footer-project" id="tc-sidebar-footer-project">Master Project</p>
+                    <p class="tc-sidebar-footer-meta">
+                        <span id="tc-sidebar-footer-role">Kitchen lead</span>
+                        <span aria-hidden="true"> · </span>
+                        <span class="tc-sidebar-footer-status" id="tc-sidebar-footer-status">Online</span>
+                    </p>
+                </div>
+                <div class="nav-project-chip" id="nav-project-chip" hidden>Master Project</div>
                 <div class="sidebar-restaurant-scope-wrap" style="display:none;width:100%;margin:10px 0 14px;">
-                    <div style="font-size:10px;text-transform:uppercase;font-weight:600;letter-spacing:0.06em;color:#b45309;opacity:0.9;margin-bottom:6px;">Locations</div>
                     <label for="sidebar-restaurant-location-select" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;">Restaurant location</label>
-                    <select id="sidebar-restaurant-location-select" data-restaurant-location-select aria-label="Restaurant location"
-                        style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(180,83,9,0.35);background:rgba(255,251,235,0.95);color:#451a03;font-size:12px;font-weight:600;cursor:pointer;"></select>
+                    <select id="sidebar-restaurant-location-select" data-restaurant-location-select aria-label="Restaurant location"></select>
                 </div>
-                <!-- User Profile Section -->
-                <div class="sidebar-user-profile">
-                    <div class="flex items-center mb-2">
-                        <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-white text-sm sidebar-user-avatar" id="nav-user-avatar" style="background-color: #4d7c0f;">C</div>
-                        <div class="ml-2.5 flex-1 min-w-0">
-                            <div class="text-sm font-semibold truncate sidebar-user-name" id="nav-user-name" style="color: #78350f;">Chef</div>
-                            <div class="text-xs truncate sidebar-user-email" id="nav-user-email" style="color: #b45309;">Loading...</div>
-                        </div>
-                    </div>
-                    
-                    <!-- User Menu Dropdown (no duplicate links — Projects / group onboarding live under Main + More) -->
-                    <div class="nav-dropdown" style="width: 100%;">
-                        <button type="button" class="nav-user-menu-btn" id="nav-settings-toggle" aria-expanded="false" aria-haspopup="true" aria-controls="nav-settings-panel"
-                            style="width: 100%; text-align: left; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(180, 83, 9, 0.22); background: rgba(255, 251, 235, 0.85); cursor: pointer; font-weight: 600; color: #451a03; font-size: 0.8rem;">
-                            <span aria-hidden="true">⚙️</span> Account
-                        </button>
-                        <div class="nav-dropdown-content nav-user-menu" id="nav-settings-panel" aria-labelledby="nav-settings-toggle">
-                            <a href="user-profile.html">👤 Profile &amp; settings</a>
-                            <a href="setup.html"><i class="fa-solid fa-sliders fa-fw nav-dd-icon" aria-hidden="true"></i>Operator &amp; project setup</a>
-                            <hr>
-                            <a href="#" class="nav-sign-out-link" data-iterum-sign-out="1">🚪 Sign out</a>
-                        </div>
+                <div class="tc-sidebar-account-wrap nav-dropdown">
+                    <button type="button" class="nav-user-menu-btn" id="nav-settings-toggle" aria-expanded="false" aria-haspopup="true" aria-controls="nav-settings-panel">
+                        <i class="fa-solid fa-gear" aria-hidden="true"></i> <span class="nav-link-label">Account</span>
+                    </button>
+                    <div class="nav-dropdown-content nav-user-menu" id="nav-settings-panel" aria-labelledby="nav-settings-toggle">
+                        <a href="user-profile.html"><i class="fa-solid fa-user fa-fw nav-dd-icon" aria-hidden="true"></i>Profile &amp; settings</a>
+                        <a href="setup.html"><i class="fa-solid fa-sliders fa-fw nav-dd-icon" aria-hidden="true"></i>Operator setup</a>
+                        <hr>
+                        <a href="#" class="nav-sign-out-link" data-iterum-sign-out="1"><i class="fa-solid fa-right-from-bracket fa-fw nav-dd-icon" aria-hidden="true"></i>Sign out</a>
                     </div>
                 </div>
+                <span id="nav-user-name" hidden></span>
+                <span id="nav-user-email" hidden></span>
+                <span id="nav-user-avatar" hidden></span>
+                <span id="iterum-nav-context-project" hidden></span>
+                <span id="iterum-nav-context-role" hidden></span>
             </div>
         `;
+  }
+
+  setupSidebarCollapse() {
+    const sidebar = document.querySelector('.unified-nav-sidebar');
+    const btn = document.getElementById('sidebar-collapse-btn');
+    if (!sidebar || !btn) {
+      return;
+    }
+    const apply = collapsed => {
+      sidebar.classList.toggle('is-collapsed', collapsed);
+      document.body.classList.toggle('sidebar-collapsed', collapsed);
+      btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      btn.innerHTML = collapsed
+        ? '<i class="fa-solid fa-angles-right" aria-hidden="true"></i>'
+        : '<i class="fa-solid fa-angles-left" aria-hidden="true"></i>';
+      btn.setAttribute(
+        'aria-label',
+        collapsed ? 'Expand sidebar' : 'Collapse sidebar'
+      );
+    };
+    apply(localStorage.getItem('iterum_sidebar_collapsed') === '1');
+    btn.addEventListener('click', () => {
+      const collapsed = !sidebar.classList.contains('is-collapsed');
+      apply(collapsed);
+      try {
+        localStorage.setItem(
+          'iterum_sidebar_collapsed',
+          collapsed ? '1' : '0'
+        );
+      } catch (e) {
+        void e;
+      }
+    });
   }
 
   setupMobileToggle() {
@@ -542,376 +694,34 @@ class UnifiedNavHeader {
   }
 
   injectStyles() {
+    if (document.getElementById('iterum-unified-nav-layout-style')) {
+      return;
+    }
     const style = document.createElement('style');
+    style.id = 'iterum-unified-nav-layout-style';
     style.textContent = `
-            /* Sidebar Styles */
+            body.iterum-has-sidebar,
+            body.tc-revamp-body:has(.unified-nav-sidebar) {
+                padding-top: 0 !important;
+            }
+            body.iterum-has-sidebar > nav[aria-label="App shortcuts"] {
+                display: none !important;
+            }
             .unified-nav-sidebar {
                 position: fixed;
                 left: 0;
                 top: 0;
-                width: 280px;
                 height: 100vh;
-                background: hsl(var(--tc-sidebar-background, 182 38% 13%));
-                border-right: 1px solid hsl(var(--tc-sidebar-border, 182 25% 20%));
-                box-shadow: 2px 0 16px hsl(180 25% 11% / 0.12);
-                display: flex;
-                flex-direction: column;
                 z-index: 1000;
-                overflow-y: auto;
-                transition: transform 0.3s ease;
             }
-
             .main-content-wrapper {
-                margin-left: 280px;
                 min-height: 100vh;
             }
-
-            .sidebar-header {
-                padding: 24px 20px;
-                border-bottom: 1px solid hsl(var(--tc-sidebar-border, 182 25% 20%));
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
-
-            .sidebar-toggle-mobile {
-                display: none;
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                cursor: pointer;
-                color: #2C4A52;
-                padding: 8px;
-            }
-
-            .sidebar-nav {
-                flex: 1;
-                padding: 16px 0;
-                overflow-y: auto;
-            }
-
-            .sidebar-footer {
-                padding: 20px;
-                border-top: 1px solid hsl(var(--tc-sidebar-border, 182 25% 20%));
-                background: hsl(var(--tc-sidebar-accent, 182 30% 18%) / 0.5);
-            }
-
-            .sidebar-user-profile {
-                margin-top: 16px;
-                padding-top: 16px;
-                border-top: 1px solid rgba(226, 232, 240, 0.8);
-            }
-
-            .sidebar-user-avatar {
-                width: 36px;
-                height: 36px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: bold;
-                color: white;
-                font-size: 0.875rem;
-                flex-shrink: 0;
-            }
-
-            .sidebar-user-name {
-                font-size: 0.875rem;
-                font-weight: 600;
-                color: #78350f;
-                line-height: 1.2;
-            }
-
-            .sidebar-user-email {
-                font-size: 0.75rem;
-                color: #b45309;
-                line-height: 1.2;
-                margin-top: 2px;
-            }
-
-            .nav-user-menu-btn {
-                margin-top: 8px;
-            }
-
-            .nav-user-menu-btn:hover {
-                background: rgba(252, 211, 77, 0.3) !important;
-            }
-
-            /* Mobile Styles */
-            @media (max-width: 768px) {
-                .unified-nav-sidebar {
-                    transform: translateX(-100%);
-                }
-
-                .unified-nav-sidebar.mobile-open {
-                    transform: translateX(0);
-                }
-
-                .main-content-wrapper {
-                    margin-left: 0;
-                }
-
-                .sidebar-toggle-mobile {
-                    display: block;
-                }
-
-                /* Flyout to the right overflows the viewport — open below the toggle */
-                .unified-nav-sidebar .nav-dropdown-content {
-                    left: 0;
-                    right: 0;
-                    top: 100%;
-                    margin-left: 0;
-                    margin-top: 6px;
-                    min-width: unset;
-                }
-            }
-
-            .nav-logo {
-                display: inline-flex;
-                align-items: center;
-                gap: 12px;
-                text-decoration: none;
-                color: #2C4A52;
-                font-weight: 800;
-                font-size: 1.4rem;
-                letter-spacing: -0.02em;
-            }
-
-            .nav-logo-icon {
-                font-size: 1.8rem;
-            }
-
-            .nav-links {
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-                padding: 0 12px;
-            }
-
-            .nav-section-label {
-                font-size: 0.65rem;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.08em;
-                color: #94a3b8;
-                padding: 14px 16px 6px;
-                margin-top: 2px;
-            }
-
-            .nav-section-label:first-child {
-                padding-top: 4px;
-                margin-top: 0;
-            }
-
-            .nav-link {
-                color: hsl(var(--tc-sidebar-foreground, 40 30% 88%) / 0.88);
-                text-decoration: none;
-                padding: 12px 16px;
-                border-radius: 8px;
-                transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                font-weight: 500;
-                font-size: 0.9375rem;
-                background: transparent;
-                border: 1px solid transparent;
-                cursor: pointer;
-                white-space: nowrap;
-            }
-
-            .nav-more-chevron {
-                display: inline-block;
-                transition: transform 0.2s ease;
-                font-size: 0.75rem;
-                opacity: 0.75;
-                margin-right: 2px;
-            }
-
-            .nav-dropdown-btn[aria-expanded="true"] .nav-more-chevron {
-                transform: rotate(90deg);
-            }
-
-            .nav-link span:first-child {
-                font-size: 1.1rem;
-            }
-
-            .nav-link:hover,
-            .nav-link:focus {
-                background: hsl(var(--tc-sidebar-accent, 182 30% 18%));
-                color: hsl(var(--tc-sidebar-foreground, 40 30% 88%));
-            }
-
-            .nav-link.active {
-                color: hsl(var(--tc-accent-foreground, 40 33% 99%));
-                background: var(--brand-btn-primary, var(--tc-gradient-accent, linear-gradient(135deg, hsl(28 85% 55%) 0%, hsl(18 80% 50%) 100%)));
-                border-color: transparent;
-                box-shadow: var(--tc-shadow-glow, 0 8px 32px hsl(28 85% 55% / 0.18));
-                font-weight: 600;
-            }
-
-            .nav-link-emphasis {
-                background: hsl(var(--tc-accent, 28 85% 55%) / 0.18);
-                border-color: hsl(var(--tc-accent, 28 85% 55%) / 0.35);
-                color: hsl(var(--tc-sidebar-foreground, 40 30% 88%));
-                font-weight: 600;
-            }
-
-            .nav-link-emphasis:hover,
-            .nav-link-emphasis:focus {
-                background: var(--brand-btn-primary, var(--tc-gradient-accent));
-                color: hsl(var(--tc-accent-foreground, 40 33% 99%));
-                border-color: transparent;
-                box-shadow: var(--tc-shadow-glow, 0 8px 32px hsl(28 85% 55% / 0.18));
-            }
-
-            .nav-right {
-                display: flex;
-                align-items: center;
-                gap: 14px;
-            }
-
-            .nav-dropdown {
-                position: relative;
-            }
-
-            .nav-dropdown-btn,
-            .nav-user-btn {
-                display: inline-flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .nav-dropdown-content {
-                display: none;
-                position: absolute;
-                left: 100%;
-                top: 0;
-                margin-left: 8px;
-                background: rgba(255, 255, 255, 0.98);
-                border-radius: 12px;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-                min-width: 240px;
-                padding: 12px;
-                z-index: 1001;
-                border: 1px solid rgba(226, 232, 240, 0.8);
-                backdrop-filter: blur(18px);
-                -webkit-backdrop-filter: blur(18px);
-            }
-
-            .nav-dropdown-content.show {
-                display: block !important;
-            }
-
-            .nav-dropdown-content a {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 11px 12px;
-                color: #334155;
-                text-decoration: none;
-                border-radius: 10px;
-                transition: background 0.2s ease, color 0.2s ease;
-                font-weight: 500;
-                font-size: 0.9rem;
-            }
-
-            .nav-dropdown-content a:hover,
-            .nav-dropdown-content a:focus {
-                background: rgba(59, 130, 246, 0.12);
-                color: #1d4ed8;
-            }
-
-            .nav-dropdown-content a.active {
-                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-                color: #ffffff;
-            }
-
-            .nav-dropdown-btn.active:not(:hover) {
-                border-color: rgba(59, 130, 246, 0.45);
-                background: rgba(59, 130, 246, 0.22);
-            }
-
-            .nav-dropdown-content hr {
-                border: none;
-                border-top: 1px solid rgba(148, 163, 184, 0.22);
-                margin: 10px 0;
-            }
-
-            .nav-dropdown-content .nav-dropdown-category {
-                padding: 6px 12px 4px;
-                font-size: 0.7rem;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.06em;
-                color: #64748b;
-            }
-
-            .nav-user-menu {
-                min-width: 240px;
-            }
-
-            #nav-user-avatar {
-                width: 36px;
-                height: 36px;
-                border-radius: 50%;
-                background: linear-gradient(135deg, rgba(59, 130, 246, 0.45), rgba(37, 99, 235, 0.75));
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1rem;
-                color: #ffffff;
-                box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
-            }
-
-            .nav-label {
-                letter-spacing: 0.01em;
-            }
-
-            .iterum-nav-context-bar {
-                padding: 10px 16px 12px;
-                border-bottom: 1px solid rgba(226, 232, 240, 0.95);
-                background: rgba(248, 250, 252, 0.92);
-            }
-            .iterum-nav-context-breadcrumb {
-                font-size: 11px;
-                font-weight: 600;
-                letter-spacing: 0.04em;
-                text-transform: uppercase;
-                color: #64748b;
-                margin-bottom: 6px;
-            }
-            .iterum-nav-context-row {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 4px 8px;
-                align-items: baseline;
-                font-size: 13px;
-                color: #334155;
-                font-weight: 600;
-            }
-            .iterum-nav-context-role {
-                font-weight: 500;
-                color: #64748b;
-                font-size: 12px;
-            }
-            .nav-link-fa {
-                width: 1.35rem;
-                text-align: center;
-                margin-right: 6px;
-                opacity: 0.88;
-            }
-            .nav-dd-icon {
-                margin-right: 8px;
-                opacity: 0.85;
-            }
-
-                /* Legacy top bars only — avoid .page-header (used by audit-log and others as content heroes) */
-                .legacy-header,
-                .site-header,
-                .app-header,
-                .old-header,
-                .top-nav { display: none !important; }
+            .legacy-header,
+            .site-header,
+            .app-header,
+            .old-header,
+            .top-nav { display: none !important; }
         `;
     document.head.appendChild(style);
   }
@@ -946,7 +756,9 @@ class UnifiedNavHeader {
 
   refreshNavContextBar(projectNameOverride) {
     const projEl = document.getElementById('iterum-nav-context-project');
-    const roleEl = document.getElementById('iterum-nav-context-role');
+    const footProj = document.getElementById('tc-sidebar-footer-project');
+    const footRole = document.getElementById('tc-sidebar-footer-role');
+    const chipEl = document.getElementById('nav-project-chip');
     const bcEl = document.getElementById('iterum-nav-context-breadcrumb');
     let name = projectNameOverride;
     if (!name) {
@@ -956,11 +768,17 @@ class UnifiedNavHeader {
         name =
           localStorage.getItem('active_project_name') ||
           localStorage.getItem('active_project') ||
-          'Select project';
+          'Master Project';
       }
     }
     if (projEl) {
       projEl.textContent = name;
+    }
+    if (footProj) {
+      footProj.textContent = name;
+    }
+    if (chipEl) {
+      chipEl.textContent = name;
     }
     let rk = '';
     if (typeof window.iterumGetEffectiveRoleKey === 'function') {
@@ -979,16 +797,13 @@ class UnifiedNavHeader {
         rk = window.iterumMembership.roleKey;
       }
     }
-    const ROLE_LABELS = {
-      chef_leadership: 'Kitchen lead',
-      operations_gm: 'Operations',
-      purchasing: 'Purchasing',
-      consultant_rd: 'Consultant / R&D',
-      employee_line: 'Team member'
-    };
-    const rl = rk && ROLE_LABELS[rk] ? ROLE_LABELS[rk] : '';
+    const rl = this.formatRoleLabel(rk);
+    if (footRole) {
+      footRole.textContent = rl;
+    }
+    const roleEl = document.getElementById('iterum-nav-context-role');
     if (roleEl) {
-      roleEl.textContent = rl ? ` · ${rl}` : '';
+      roleEl.textContent = rl;
     }
     if (bcEl) {
       const bc =

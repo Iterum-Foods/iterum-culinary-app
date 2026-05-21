@@ -32,6 +32,7 @@
   <link rel="stylesheet" href="assets/css/taste-craft-revamp-tokens.css">
   <link rel="stylesheet" href="assets/css/taste-craft-revamp-ui.css">
   <link rel="stylesheet" href="assets/css/taste-craft-revamp-colors.css">
+  <link rel="stylesheet" href="assets/css/taste-craft-app-sidebar.css">
   <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
   <link rel="stylesheet" href="assets/css/header-universal.css">
   <link rel="stylesheet" href="assets/css/iterum-workflow-polish.css">
@@ -336,6 +337,7 @@
     }
 
   </style>
+  <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
 </head>
   <body class="text-primary bg-secondary tc-revamp-body" style="padding-top: 0;">
 
@@ -566,7 +568,7 @@
         <div class="space-y-5">
           
           <!-- Card 2.1: Dynamic Temperature Log -->
-          <div class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="compliance">
+          <div id="temperature" class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="compliance">
             <div class="dash-hint">
               <strong style="color: var(--brand-text-primary);">HACCP-friendly logging.</strong> Log actual readings on the line; full history sync is expanding—use this board as your daily cue.
             </div>
@@ -588,7 +590,7 @@
           </div>
           
           <!-- Card 2.2: Dynamic Sanitizer Check Log -->
-          <div class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="compliance">
+          <div id="haccp" class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="compliance">
             <div class="flex justify-between items-center mb-3 gap-2">
               <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
                 <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-vial-circle-check"></i></span>

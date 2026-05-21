@@ -3,6 +3,17 @@
  * Beats iterum-brand-kit body !important, header-universal moss/blue, and nav JS fallbacks.
  */
 
+/* Sidebar — always use taste-craft tokens when unified nav is present */
+.unified-nav-sidebar {
+  background: hsl(var(--tc-sidebar-background)) !important;
+  background-color: hsl(var(--tc-sidebar-background)) !important;
+  background-image: none !important;
+  border-right: 1px solid hsl(var(--tc-sidebar-border)) !important;
+  box-shadow: 2px 0 16px hsl(180 25% 11% / 0.12) !important;
+}
+
+/* Nav active/hover: taste-craft-app-sidebar.css (sidebar-accent, not orange CTA) */
+
 .tc-revamp-body {
   --brand-bg-gradient: var(--tc-gradient-hero);
   --brand-btn-primary: var(--tc-gradient-accent);
@@ -52,37 +63,7 @@
   color: hsl(var(--tc-sidebar-foreground)) !important;
 }
 
-.tc-revamp-body .unified-nav-sidebar .nav-link.active {
-  background: var(--tc-gradient-accent) !important;
-  color: hsl(var(--tc-accent-foreground)) !important;
-  border-color: transparent !important;
-  box-shadow: var(--tc-shadow-glow) !important;
-}
-
-.tc-revamp-body .unified-nav-sidebar .nav-link-emphasis {
-  background: hsl(var(--tc-accent) / 0.18) !important;
-  border-color: hsl(var(--tc-accent) / 0.35) !important;
-  color: hsl(var(--tc-accent-soft)) !important;
-}
-
-.tc-revamp-body .unified-nav-sidebar .nav-link-emphasis:hover,
-.tc-revamp-body .unified-nav-sidebar .nav-link-emphasis:focus {
-  background: var(--tc-gradient-accent) !important;
-  color: hsl(var(--tc-accent-foreground)) !important;
-  box-shadow: var(--tc-shadow-glow) !important;
-}
-
-.tc-revamp-body .unified-nav-sidebar .sidebar-user-avatar {
-  background: var(--tc-gradient-accent) !important;
-}
-
-.tc-revamp-body .unified-nav-sidebar .sidebar-user-name {
-  color: hsl(var(--tc-sidebar-foreground)) !important;
-}
-
-.tc-revamp-body .unified-nav-sidebar .sidebar-user-email {
-  color: hsl(var(--tc-sidebar-foreground) / 0.65) !important;
-}
+/* Sidebar nav + footer → taste-craft-app-sidebar.css */
 
 /* Legacy header rules (if any page still shows top bar) */
 .tc-revamp-body .unified-nav-header .nav-link.active,
