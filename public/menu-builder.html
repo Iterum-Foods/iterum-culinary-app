@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
     <link rel="stylesheet" href="assets/css/menu-builder-enhanced.css">
     <link rel="stylesheet" href="assets/css/menu-builder-pdf-upload.css">
+    <link rel="stylesheet" href="assets/css/menu-builder-revamp.css">
     <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
     
     <!-- Force page visibility -->
@@ -1234,8 +1235,106 @@
     <!-- Uniform Centered Header -->
     <!-- Header injected by unified-nav-header.js -->
 
-        <!-- Main Content -->
-        <main class="container">
+        <!-- Main Content — taste-craft revamp -->
+        <main class="mb-revamp-main main-content-area">
+        <div id="mb-revamp-app" class="mb-revamp-app">
+          <header class="mb-page-header">
+            <div class="mb-page-header__inner">
+              <div>
+                <h1 class="mb-page-header__title">Menu Builder</h1>
+                <p class="mb-page-header__desc">Design, cost and publish menus across services. Drag items between courses, import from PDF, or build from scratch.</p>
+              </div>
+              <div class="mb-page-header__actions">
+                <button type="button" class="tc-btn tc-btn-outline" id="mb-btn-import"><i class="fa-solid fa-upload" aria-hidden="true"></i> Import</button>
+                <button type="button" class="tc-btn tc-btn-outline" id="mb-btn-preview"><i class="fa-solid fa-eye" aria-hidden="true"></i> Preview</button>
+                <button type="button" class="tc-btn tc-btn-accent" id="mb-btn-publish"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Publish</button>
+              </div>
+            </div>
+          </header>
+
+          <div class="mb-switcher-bar">
+            <div class="mb-switcher-bar__inner">
+              <div class="mb-menu-tabs" id="mb-menu-tabs" role="tablist" aria-label="Menus"></div>
+              <button type="button" class="tc-btn tc-btn-ghost tc-btn-sm" id="mb-btn-new-menu"><i class="fa-solid fa-plus" aria-hidden="true"></i> New menu</button>
+              <div class="mb-workflow-stepper" id="mb-workflow-stepper" aria-label="Menu workflow"></div>
+            </div>
+          </div>
+
+          <div class="mb-revamp-content">
+            <section class="mb-meta-row">
+              <div>
+                <p class="mb-meta__eyebrow" id="mb-active-menu-meta"><i class="fa-solid fa-hat-chef" aria-hidden="true"></i> Menu service</p>
+                <h2 class="mb-meta__title" id="mb-active-menu-title">Select a menu</h2>
+                <p class="mb-meta__desc" id="mb-active-menu-desc"></p>
+              </div>
+            </section>
+
+            <section class="mb-health-card" id="mb-revamp-health">
+              <div class="mb-health-card__inner">
+                <div class="mb-health-score">
+                  <div>
+                    <div class="mb-health-score__label"><i class="fa-solid fa-wand-magic-sparkles" style="color:hsl(var(--tc-accent))" aria-hidden="true"></i> Menu health</div>
+                    <div class="mt-1 flex items-baseline gap-1">
+                      <span class="mb-health-score__value" id="mb-stat-health">—</span>
+                      <span class="mb-health-score__max">/ 100</span>
+                    </div>
+                  </div>
+                  <div class="mb-health-progress" aria-hidden="true"><div class="mb-health-progress__fill" id="mb-health-progress-fill" style="width:0%"></div></div>
+                </div>
+                <div>
+                  <div class="mb-inline-stat__label"><i class="fa-solid fa-list-check" aria-hidden="true"></i> Items</div>
+                  <div class="mb-inline-stat__value" id="mb-stat-items">0</div>
+                </div>
+                <div>
+                  <div class="mb-inline-stat__label"><i class="fa-solid fa-dollar-sign" aria-hidden="true"></i> Avg price</div>
+                  <div class="mb-inline-stat__value" id="mb-stat-avg-price">$0.00</div>
+                </div>
+                <div>
+                  <div class="mb-inline-stat__label"><i class="fa-solid fa-percent" aria-hidden="true"></i> Food cost</div>
+                  <div class="mb-inline-stat__value" id="mb-stat-food-cost">0%</div>
+                </div>
+                <div>
+                  <div class="mb-inline-stat__label"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Margin</div>
+                  <div class="mb-inline-stat__value" id="mb-stat-margin">0%</div>
+                </div>
+                <div class="mb-checklist">
+                  <div class="mb-checklist__row" id="mb-check-cost"></div>
+                  <div class="mb-checklist__row" id="mb-check-drafts"></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="mb-toolbar">
+              <div class="mb-search-wrap">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <input type="search" class="mb-search-input" id="mb-search" placeholder="Search items by name or description" autocomplete="off" />
+              </div>
+              <button type="button" class="tc-btn tc-btn-outline tc-btn-sm" id="mb-btn-filters"><i class="fa-solid fa-filter" aria-hidden="true"></i> Filters</button>
+              <div class="mb-view-toggle" role="group" aria-label="View mode">
+                <button type="button" class="is-active" id="mb-view-list"><i class="fa-solid fa-bars-staggered" aria-hidden="true"></i> List</button>
+                <button type="button" id="mb-view-board"><i class="fa-solid fa-table-cells" aria-hidden="true"></i> Board</button>
+              </div>
+              <button type="button" class="tc-btn tc-btn-accent" id="mb-btn-add-item"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add item</button>
+            </section>
+
+            <div id="mb-revamp-items"></div>
+
+            <section class="mb-ai-card" id="mb-revamp-ai">
+              <i class="fa-solid fa-wand-magic-sparkles text-lg" style="color:hsl(var(--tc-accent))" aria-hidden="true"></i>
+              <div class="flex-1 min-w-[12rem]">
+                <h3 class="mb-ai-card__title">AI menu assistant</h3>
+                <p class="mb-ai-card__desc">Suggest pairings, rebalance food cost, or rewrite descriptions in your voice.</p>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="tc-btn tc-btn-outline tc-btn-sm" id="mb-ai-rebalance">Rebalance cost</button>
+                <button type="button" class="tc-btn tc-btn-outline tc-btn-sm" id="mb-ai-rewrite">Rewrite descriptions</button>
+                <button type="button" class="tc-btn tc-btn-outline tc-btn-sm" id="mb-ai-pairings">Suggest pairings</button>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="mb-legacy-ui" aria-hidden="true">
         <section class="menu-hero">
             <div class="menu-hero-top">
                 <div>
@@ -2106,6 +2205,7 @@
                 </button>
             </div>
         </div>
+        </div><!-- /.mb-legacy-ui -->
     </main>
 
     <!-- Scripts -->
@@ -4395,6 +4495,7 @@
     <!-- Load Integration Scripts -->
     <script defer src="assets/js/menu-recipe-integration.js"></script>
     <script defer src="assets/js/menu-manager-enhanced.js"></script>
+    <script defer src="assets/js/menu-builder-revamp-ui.js"></script>
     <script defer src="assets/js/enhanced-menu-import.js"></script>
     
     <!-- Load Cost Calculator and Food Costing Workflow -->

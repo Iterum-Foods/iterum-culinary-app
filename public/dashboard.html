@@ -60,11 +60,16 @@
       font-family: 'Inter', system-ui, sans-serif;
       background-color: var(--brand-bg-secondary);
       color: var(--brand-text-primary);
-      overflow: hidden;
+      overflow-x: hidden;
       margin: 0;
       padding: 0;
-      width: 100vw;
       -webkit-font-smoothing: antialiased;
+    }
+
+    body.iterum-has-sidebar .main-content-wrapper .main-content-area {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .card-style {

@@ -4,7 +4,7 @@
  */
 
 /** Bump when sidebar HTML or menu structure changes (forces rebuild on cached pages). */
-const ITERUM_NAV_VERSION = '2026-05-20-tc-sidebar-contrast';
+const ITERUM_NAV_VERSION = '2026-05-21-tc-sidebar-layout';
 
 class UnifiedNavHeader {
   constructor() {
@@ -247,6 +247,10 @@ class UnifiedNavHeader {
 
     const sidebar = document.querySelector('.unified-nav-sidebar');
     if (sidebar && sidebar.getAttribute('data-nav-version') === ITERUM_NAV_VERSION) {
+      this.ensureMainContentWrapper();
+      this.injectStyles();
+      this.syncSidebarCollapseFromStorage();
+      this.setupSidebarCollapse();
       return;
     }
 
@@ -255,6 +259,51 @@ class UnifiedNavHeader {
     }
 
     this.injectHeader();
+  }
+
+  ensureMainContentWrapper() {
+    const sidebar = document.querySelector('.unified-nav-sidebar');
+    if (!sidebar) {
+      return;
+    }
+    if (document.querySelector('.main-content-wrapper')) {
+      return;
+    }
+    const wrapper = document.createElement('div');
+    wrapper.className = 'main-content-wrapper';
+    const children = Array.from(document.body.children);
+    children.forEach(child => {
+      if (
+        child !== sidebar &&
+        !child.classList.contains('main-content-wrapper')
+      ) {
+        wrapper.appendChild(child);
+      }
+    });
+    document.body.appendChild(wrapper);
+  }
+
+  finalizeSidebarSetup() {
+    this.injectStyles();
+    this.syncSidebarCollapseFromStorage();
+    this.setupSidebarCollapse();
+    this.setupDropdownHover();
+    this.setupDropdownClickToggle();
+    this.setupSignOutLink();
+    this.setupMobileToggle();
+    this.setupMobileNavLinkClose();
+    this.ensureUserRoleSetup();
+    this.initNavContextBar();
+  }
+
+  syncSidebarCollapseFromStorage() {
+    const sidebar = document.querySelector('.unified-nav-sidebar');
+    if (!sidebar) {
+      return;
+    }
+    const collapsed = localStorage.getItem('iterum_sidebar_collapsed') === '1';
+    sidebar.classList.toggle('is-collapsed', collapsed);
+    document.body.classList.toggle('sidebar-collapsed', collapsed);
   }
 
   injectHeader() {
@@ -276,46 +325,13 @@ class UnifiedNavHeader {
     // Insert at start of body
     document.body.insertBefore(sidebar, document.body.firstChild);
 
-    // Add main content wrapper if it doesn't exist
-    if (!document.querySelector('.main-content-wrapper')) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'main-content-wrapper';
+    this.ensureMainContentWrapper();
 
-      // Move all existing body children (except sidebar) into wrapper
-      const children = Array.from(document.body.children);
-      children.forEach(child => {
-        if (
-          child !== sidebar &&
-          !child.classList.contains('main-content-wrapper')
-        ) {
-          wrapper.appendChild(child);
-        }
-      });
-
-      document.body.appendChild(wrapper);
-    }
-
-    // Add styles
-    this.injectStyles();
-
-    // Setup dropdown hover delay
-    this.setupDropdownHover();
-
-    // Touch / click: open Settings & More menus (hover alone fails on mobile)
-    this.setupDropdownClickToggle();
-    this.setupSignOutLink();
-
-    // Setup mobile toggle
-    this.setupMobileToggle();
-    this.setupMobileNavLinkClose();
-    this.setupSidebarCollapse();
+    this.finalizeSidebarSetup();
 
     this.injectWorkspaceFeaturesScript();
     this.injectRestaurantLocationSidebarScript();
     this.injectHelpChefWidgetScript();
-
-    this.ensureUserRoleSetup();
-    this.initNavContextBar();
 
     console.log('✅ Navigation sidebar injected');
   }
@@ -618,6 +634,11 @@ class UnifiedNavHeader {
     if (!sidebar || !btn) {
       return;
     }
+    if (btn.dataset.iterumCollapseBound === '1') {
+      this.syncSidebarCollapseFromStorage();
+      return;
+    }
+    btn.dataset.iterumCollapseBound = '1';
     const apply = collapsed => {
       sidebar.classList.toggle('is-collapsed', collapsed);
       document.body.classList.toggle('sidebar-collapsed', collapsed);
@@ -714,8 +735,19 @@ class UnifiedNavHeader {
                 height: 100vh;
                 z-index: 1000;
             }
+            body.iterum-has-sidebar {
+                --iterum-sidebar-offset: var(--tc-sidebar-width, 16rem);
+            }
+            body.iterum-has-sidebar.sidebar-collapsed,
+            body.iterum-has-sidebar:has(.unified-nav-sidebar.is-collapsed) {
+                --iterum-sidebar-offset: var(--tc-sidebar-width-icon, 3.25rem);
+            }
             .main-content-wrapper {
+                margin-left: var(--iterum-sidebar-offset) !important;
+                width: calc(100vw - var(--iterum-sidebar-offset)) !important;
+                max-width: calc(100vw - var(--iterum-sidebar-offset)) !important;
                 min-height: 100vh;
+                box-sizing: border-box;
             }
             .legacy-header,
             .site-header,
