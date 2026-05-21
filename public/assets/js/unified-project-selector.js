@@ -290,90 +290,54 @@ class UnifiedProjectSelector {
    */
   getSelectorHTML() {
     const currentProject = this.getCurrentProject();
+    const currentName = currentProject?.name || 'Master Project';
+    const currentIcon = currentProject?.icon || '📋';
+
+    const projectRows = this.projects
+      .map(project => {
+        const active = project.id === this.currentProjectId;
+        const safeId = String(project.id || '').replace(/'/g, "\\'");
+        const name = project.name || 'Untitled';
+        const desc = project.description || 'No description';
+        return `
+                        <button type="button" class="tc-project-option${active ? ' is-active' : ''}" data-project-id="${project.id}"
+                          onclick="window.unifiedProjectSelector.setCurrentProject('${safeId}')">
+                            <span class="tc-project-option__icon" aria-hidden="true">${project.icon || '📋'}</span>
+                            <span class="tc-project-option__body">
+                              <span class="tc-project-option__name">${name}</span>
+                              <span class="tc-project-option__desc">${desc}</span>
+                            </span>
+                            ${active ? '<span class="tc-project-option__check" aria-hidden="true">✓</span>' : ''}
+                        </button>`;
+      })
+      .join('');
 
     return `
-            <div class="project-selector-unified" style="
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                padding: 8px 16px;
-                background: white;
-                border: 2px solid #e2e8f0;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            " onclick="window.unifiedProjectSelector?.toggleDropdown()">
-                <span style="font-size: 20px;">${currentProject?.icon || '📋'}</span>
-                <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                    <div style="font-size: 11px; color: #64748b; font-weight: 500;">CURRENT PROJECT</div>
-                    <div style="font-size: 14px; font-weight: 600; color: #1e293b;">${currentProject?.name || 'Master Project'}</div>
+            <div class="tc-project-select">
+              <button type="button" class="tc-project-select__trigger project-selector-unified"
+                onclick="window.unifiedProjectSelector?.toggleDropdown()"
+                aria-haspopup="listbox" aria-expanded="false" id="project-select-trigger">
+                <span class="tc-project-select__trigger-icon" aria-hidden="true">${currentIcon}</span>
+                <span class="tc-project-select__trigger-text">
+                  <span class="tc-project-select__label">Current project</span>
+                  <span class="tc-project-select__name">${currentName}</span>
+                </span>
+                <i class="fa-solid fa-chevron-down tc-project-select__chevron" aria-hidden="true"></i>
+              </button>
+              <div id="project-dropdown" class="tc-project-select__menu" role="listbox" aria-label="Your projects" hidden>
+                <div class="tc-project-select__menu-head">
+                  <p class="tc-project-select__menu-title">Your projects</p>
+                  <p class="tc-project-select__menu-sub">Select a workspace</p>
                 </div>
-                <span style="font-size: 16px; color: #64748b;">▼</span>
-            </div>
-            
-            <!-- Dropdown -->
-            <div id="project-dropdown" style="
-                display: none;
-                position: absolute;
-                top: calc(100% + 10px);
-                right: 0;
-                background: white;
-                border: 2px solid #e2e8f0;
-                border-radius: 12px;
-                box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-                min-width: 300px;
-                z-index: 9999;
-                max-height: 400px;
-                overflow-y: auto;
-            ">
-                <div style="padding: 15px; border-bottom: 1px solid #e2e8f0;">
-                    <div style="font-weight: 700; font-size: 16px; color: #1e293b; margin-bottom: 5px;">Your Projects</div>
-                    <div style="font-size: 13px; color: #64748b;">Select a project to work with</div>
+                <div id="project-list" class="tc-project-select__list">
+                    ${projectRows}
                 </div>
-                
-                <div id="project-list" style="padding: 10px;">
-                    ${this.projects
-                      .map(
-                        project => `
-                        <div class="project-option" data-project-id="${project.id}" style="
-                            padding: 12px;
-                            border-radius: 8px;
-                            cursor: pointer;
-                            margin-bottom: 5px;
-                            display: flex;
-                            align-items: center;
-                            gap: 12px;
-                            transition: all 0.2s ease;
-                            ${project.id === this.currentProjectId ? 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;' : 'background: #f8fafc;'}
-                        " onclick="window.unifiedProjectSelector.setCurrentProject('${project.id}')">
-                            <span style="font-size: 24px;">${project.icon || '📋'}</span>
-                            <div style="flex: 1;">
-                                <div style="font-weight: 600; margin-bottom: 2px;">${project.name}</div>
-                                <div style="font-size: 12px; opacity: 0.8;">${project.description || 'No description'}</div>
-                            </div>
-                            ${project.id === this.currentProjectId ? '<span style="font-size: 20px;">✓</span>' : ''}
-                        </div>
-                    `
-                      )
-                      .join('')}
-                </div>
-                
-                <div style="padding: 15px; border-top: 1px solid #e2e8f0;">
-                    <button onclick="window.unifiedProjectSelector.createNewProject()" style="
-                        width: 100%;
-                        padding: 10px;
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        color: white;
-                        border: none;
-                        border-radius: 8px;
-                        font-weight: 600;
-                        cursor: pointer;
-                        transition: transform 0.2s ease;
-                    " onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                        ➕ Create New Project
+                <div class="tc-project-select__menu-foot">
+                    <button type="button" class="tc-project-select__create" onclick="window.unifiedProjectSelector.createNewProject()">
+                      <i class="fa-solid fa-plus" aria-hidden="true"></i> Create new project
                     </button>
                 </div>
+              </div>
             </div>
         `;
   }
@@ -383,10 +347,17 @@ class UnifiedProjectSelector {
    */
   toggleDropdown() {
     const dropdown = document.getElementById('project-dropdown');
-    if (dropdown) {
-      dropdown.style.display =
-        dropdown.style.display === 'none' ? 'block' : 'none';
+    const trigger = document.getElementById('project-select-trigger');
+    if (!dropdown) {
+      return;
     }
+    const open = dropdown.hidden;
+    dropdown.hidden = !open;
+    if (trigger) {
+      trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      trigger.classList.toggle('is-open', open);
+    }
+    dropdown.classList.toggle('is-open', open);
   }
 
   /**
@@ -394,8 +365,15 @@ class UnifiedProjectSelector {
    */
   closeDropdown() {
     const dropdown = document.getElementById('project-dropdown');
+    const trigger = document.getElementById('project-select-trigger');
     if (dropdown) {
-      dropdown.style.display = 'none';
+      dropdown.hidden = true;
+      dropdown.classList.remove('is-open');
+    }
+    if (trigger) {
+      trigger.setAttribute('aria-expanded', 'false');
+      trigger.classList.remove('open');
+      trigger.classList.remove('is-open');
     }
   }
 
@@ -405,14 +383,13 @@ class UnifiedProjectSelector {
   attachEventListeners() {
     // Close dropdown when clicking outside
     document.addEventListener('click', e => {
-      const selector = document.querySelector('.project-selector-unified');
+      const root = document.querySelector('.tc-project-select');
       const dropdown = document.getElementById('project-dropdown');
 
       if (
-        selector &&
+        root &&
         dropdown &&
-        !selector.contains(e.target) &&
-        !dropdown.contains(e.target)
+        !root.contains(e.target)
       ) {
         this.closeDropdown();
       }
