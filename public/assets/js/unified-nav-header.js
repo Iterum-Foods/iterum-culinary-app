@@ -4,7 +4,7 @@
  */
 
 /** Bump when sidebar HTML or menu structure changes (forces rebuild on cached pages). */
-const ITERUM_NAV_VERSION = '2026-05-19-tc-sidebar';
+const ITERUM_NAV_VERSION = '2026-05-20-tc-sidebar-contrast';
 
 class UnifiedNavHeader {
   constructor() {

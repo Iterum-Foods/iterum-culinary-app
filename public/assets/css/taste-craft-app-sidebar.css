@@ -616,3 +616,73 @@ body.iterum-has-sidebar.sidebar-collapsed .main-content-wrapper {
     display: none !important;
   }
 }
+
+/* Beat legacy global resets (brand-kit [class*='card'], high-contrast .nav-link, Tailwind button) */
+.unified-nav-sidebar a.nav-link,
+.unified-nav-sidebar button.nav-link,
+.unified-nav-sidebar .nav-dropdown-btn {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: hsl(var(--tc-sidebar-foreground) / 0.92) !important;
+}
+
+.unified-nav-sidebar .nav-section-label {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: hsl(var(--tc-sidebar-foreground) / 0.5) !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0.875rem 0.75rem 0.375rem !important;
+}
+
+.unified-nav-sidebar .nav-link:hover,
+.unified-nav-sidebar .nav-link:focus-visible,
+.unified-nav-sidebar .nav-dropdown-btn:hover,
+.unified-nav-sidebar .nav-dropdown-btn:focus-visible {
+  background: hsl(var(--tc-sidebar-accent) / 0.6) !important;
+  color: hsl(var(--tc-sidebar-foreground)) !important;
+}
+
+.unified-nav-sidebar .nav-link.active,
+.unified-nav-sidebar .nav-dropdown-btn.active {
+  background: hsl(var(--tc-sidebar-accent)) !important;
+  color: hsl(var(--tc-sidebar-accent-foreground, var(--tc-sidebar-foreground))) !important;
+}
+
+.unified-nav-sidebar .tc-sidebar-footer-card {
+  background: hsl(var(--tc-sidebar-accent) / 0.4) !important;
+  border: 1px solid hsl(var(--tc-sidebar-border) / 0.5) !important;
+  color: hsl(var(--tc-sidebar-foreground)) !important;
+  padding: 0.75rem !important;
+  border-radius: 0.625rem !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.unified-nav-sidebar .tc-sidebar-footer-card:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  border-color: hsl(var(--tc-sidebar-border) / 0.5) !important;
+}
+
+.unified-nav-sidebar .tc-project-select__trigger {
+  background: hsl(var(--tc-sidebar-accent) / 0.5) !important;
+  border-color: hsl(var(--tc-sidebar-border)) !important;
+  color: hsl(var(--tc-sidebar-foreground)) !important;
+  box-shadow: none !important;
+}
+
+.unified-nav-sidebar .tc-project-select__label {
+  color: hsl(var(--tc-sidebar-foreground) / 0.6) !important;
+}
+
+.unified-nav-sidebar .tc-project-select__name,
+.unified-nav-sidebar .tc-project-select__chevron {
+  color: hsl(var(--tc-sidebar-foreground)) !important;
+}
+
+.unified-nav-sidebar .tc-sidebar-account-wrap .nav-user-menu-btn {
+  background: hsl(var(--tc-sidebar-accent) / 0.35) !important;
+  color: hsl(var(--tc-sidebar-foreground) / 0.9) !important;
+  border-color: hsl(var(--tc-sidebar-border) / 0.6) !important;
+}

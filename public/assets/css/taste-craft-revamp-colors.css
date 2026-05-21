@@ -50,11 +50,14 @@
 }
 
 .tc-revamp-body .unified-nav-sidebar .nav-section-label {
-  color: hsl(var(--tc-sidebar-foreground) / 0.55) !important;
+  background: transparent !important;
+  color: hsl(var(--tc-sidebar-foreground) / 0.5) !important;
 }
 
-.tc-revamp-body .unified-nav-sidebar .nav-link {
-  color: hsl(var(--tc-sidebar-foreground) / 0.88) !important;
+.tc-revamp-body .unified-nav-sidebar .nav-link,
+.tc-revamp-body .unified-nav-sidebar .nav-dropdown-btn {
+  color: hsl(var(--tc-sidebar-foreground) / 0.92) !important;
+  background-color: transparent !important;
 }
 
 .tc-revamp-body .unified-nav-sidebar .nav-link:hover,
