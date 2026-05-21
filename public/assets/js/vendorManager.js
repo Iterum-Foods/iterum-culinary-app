@@ -1051,13 +1051,18 @@ class VendorManager {
     modal.setAttribute('data-modal', 'vendor');
 
     modal.innerHTML = `
-            <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] min-h-0 flex flex-col">
+                <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50 shrink-0 flex items-start justify-between gap-4">
+                    <div>
                     <h2 class="text-xl font-semibold text-gray-900">${title}</h2>
                     <p class="text-sm text-gray-600 mt-1">${isEdit ? 'Update vendor information' : 'Add a new vendor to your system'}</p>
+                    </div>
+                    <button type="button" class="shrink-0 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50" onclick="vendorManager.closeVendorModal()" aria-label="Close">
+                        ✕ Close
+                    </button>
                 </div>
                 
-                <div class="p-6">
+                <div class="p-6 overflow-y-auto flex-1 min-h-0 overscroll-contain">
                     <form id="vendor-form" class="space-y-4">
                         <div class="grid grid-cols-2 gap-4">
                             <div>
@@ -1228,17 +1233,17 @@ class VendorManager {
                             </label>
                         </div>
                     </form>
-                    
-                    <div class="flex space-x-3 pt-6">
-                        <button onclick="vendorManager.saveVendor()" 
-                                class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors font-medium">
+                </div>
+
+                <div class="shrink-0 border-t border-gray-200 bg-gray-50 px-6 py-4 flex flex-col sm:flex-row gap-3 sm:space-x-3 sm:items-center">
+                        <button type="button" onclick="vendorManager.saveVendor()" 
+                                class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg transition-colors font-medium">
                             ${buttonText}
                         </button>
-                        <button onclick="vendorManager.closeVendorModal()" 
-                                class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg transition-colors">
+                        <button type="button" onclick="vendorManager.closeVendorModal()" 
+                                class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-3 rounded-lg transition-colors">
                             Cancel
                         </button>
-                    </div>
                 </div>
             </div>
         `;

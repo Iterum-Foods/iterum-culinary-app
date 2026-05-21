@@ -1,0 +1,36 @@
+            <div class="tc-rd-sticky-bar">
+                <div class="tc-rd-toolbar">
+                    <div class="tc-rd-toolbar__brand">
+                        <span class="tc-rd-toolbar__icon" aria-hidden="true">📖</span>
+                        <div class="min-w-0">
+                            <div class="tc-rd-toolbar__eyebrow" id="tc-rd-type-label">Kitchen dish · Working draft</div>
+                            <div class="tc-rd-toolbar__title" id="tc-rd-toolbar-title">Untitled recipe</div>
+                        </div>
+                    </div>
+                    <div class="tc-rd-toolbar__actions">
+                        <span class="tc-rd-save-hint" id="tc-rd-save-hint" aria-live="polite">Auto-save every 30s</span>
+                        <span id="recipe-status" class="tc-status-pill tc-status-pill--draft">New recipe</span>
+                        <button type="button" class="btn btn-secondary btn-sm tc-btn tc-btn-outline" onclick="saveRecipe()">Save</button>
+                        <button type="button" class="btn btn-primary btn-sm tc-btn tc-btn-accent" onclick="saveAndContinue()">Save &amp; continue</button>
+                    </div>
+                </div>
+                <div class="tc-rd-type-grid" role="group" aria-label="Recipe type">
+                    <button type="button" class="tc-rd-type-btn" data-recipe-type="bar-prep" data-category="prep-recipe">
+                        <span class="tc-rd-type-btn__glyph" aria-hidden="true">🧪</span>
+                        <span><span class="tc-rd-type-btn__label">Bar prep</span><span class="tc-rd-type-btn__sub">Syrups · infusions</span></span>
+                    </button>
+                    <button type="button" class="tc-rd-type-btn" data-recipe-type="bar" data-category="beverage">
+                        <span class="tc-rd-type-btn__glyph" aria-hidden="true">🍸</span>
+                        <span><span class="tc-rd-type-btn__label">Bar</span><span class="tc-rd-type-btn__sub">Cocktails · builds</span></span>
+                    </button>
+                    <button type="button" class="tc-rd-type-btn" data-recipe-type="kitchen-prep" data-category="prep-recipe">
+                        <span class="tc-rd-type-btn__glyph" aria-hidden="true">🍲</span>
+                        <span><span class="tc-rd-type-btn__label">Kitchen prep</span><span class="tc-rd-type-btn__sub">Stocks · sauces</span></span>
+                    </button>
+                    <button type="button" class="tc-rd-type-btn is-active" data-recipe-type="kitchen-dish" data-category="main-course">
+                        <span class="tc-rd-type-btn__glyph" aria-hidden="true">🍽️</span>
+                        <span><span class="tc-rd-type-btn__label">Kitchen dish</span><span class="tc-rd-type-btn__sub">Plated · service</span></span>
+                    </button>
+                </div>
+            <div class="recipe-progress tc-rd-step-bar">
+                <div class="progress-steps">
