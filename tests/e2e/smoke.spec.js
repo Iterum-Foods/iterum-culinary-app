@@ -26,7 +26,18 @@ test.describe('Smoke', () => {
       if (path === '/equipment-management.html') {
         await expect(page).toHaveTitle(/Equipment/i);
       }
+      if (path === '/project-hub.html') {
+        await expect(page.locator('[data-hub-section="team"]')).toHaveCount(1);
+        await expect(page.locator('#team-members-tbody')).toHaveCount(1);
+      }
     });
+  });
+
+  test('project hub team tab deep link', async ({ page }) => {
+    await page.goto('/project-hub.html#team');
+    await expect(page.locator('#hub-tab-team')).toBeVisible();
+    await expect(page.locator('#hub-tab-workspaces')).toBeHidden();
+    await expect(page.getByRole('heading', { name: /Team management/i })).toBeVisible();
   });
 
   test('sign-in page loads', async ({ page }) => {

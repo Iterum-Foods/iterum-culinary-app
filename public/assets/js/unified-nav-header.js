@@ -553,7 +553,7 @@ class UnifiedNavHeader {
                     ${this.navLink('menu-builder.html', 'menu', 'fa-solid fa-utensils', 'Menu Builder', 'menus')}
                     ${this.navLink('inventory.html', 'inventory', 'fa-solid fa-warehouse', 'Inventory', 'inventory')}
                     ${this.navLink('production-planning.html', 'reports', 'fa-solid fa-chart-line', 'Reports', 'production')}
-                    ${this.navLink('project-hub.html', 'team', 'fa-solid fa-users', 'Team', 'projects')}
+                    ${this.navLink('project-hub.html#team', 'team', 'fa-solid fa-users', 'Team', 'projects')}
 
                     <div class="nav-dropdown">
                         <button type="button" class="nav-link nav-dropdown-btn ${moreActive}" aria-expanded="false" aria-haspopup="true" aria-controls="nav-more-panel" id="nav-more-toggle">

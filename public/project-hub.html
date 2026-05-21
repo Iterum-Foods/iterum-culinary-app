@@ -10,6 +10,7 @@
     <script src="assets/js/auth-manager.js"></script>
     <script type="module" src="assets/js/firebase-auth.js"></script>
     <script type="module" src="assets/js/firestore-sync.js"></script>
+    <script src="assets/js/user-role-setup.js"></script>
     <script type="module" src="assets/js/project-hub-team.js"></script>
     <script src="assets/js/demo-seed-data.js"></script>
     
@@ -246,6 +247,93 @@
             background: #fef3c7;
             color: #92400e;
         }
+
+        .hub-section-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 28px;
+            padding: 6px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+        }
+        .hub-section-tabs button {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            background: transparent;
+            color: #64748b;
+        }
+        .hub-section-tabs button.is-active {
+            background: var(--brand-btn-primary, linear-gradient(135deg, #6b8e6f 0%, #5b9bad 100%));
+            color: white;
+        }
+        .hub-tab-panel[hidden] { display: none !important; }
+        .team-members-table-wrap {
+            overflow-x: auto;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+        }
+        .team-members-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .team-members-table th,
+        .team-members-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .team-members-table th {
+            background: #f8fafc;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #64748b;
+        }
+        .team-members-table tr:last-child td { border-bottom: none; }
+        .team-uid-cell {
+            font-family: ui-monospace, monospace;
+            font-size: 12px;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .team-role-select {
+            min-width: 180px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-size: 13px;
+        }
+        .team-btn-ghost {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #fecaca;
+            background: #fff;
+            color: #b91c1c;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .team-btn-ghost:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+        .team-add-grid {
+            display: grid;
+            gap: 14px;
+            max-width: 520px;
+        }
     </style>
     
     <!-- Unified Navigation & Project Selector -->
@@ -261,62 +349,15 @@
         <!-- Hero -->
         <div class="hero">
             <div class="hero-title">Project hub</div>
-            <div style="font-size: 18px; opacity: 0.95;">Organize your culinary work into focused projects</div>
+            <div style="font-size: 18px; opacity: 0.95;">Workspaces, templates, and team access for your locations</div>
         </div>
 
-        <!-- Team access (Firestore members -> team mobile app / dashboard) -->
-        <section id="team-access-panel" style="display: none; background: white; border-radius: 16px; padding: 28px; margin-bottom: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
-            <h2 class="section-title" style="margin-bottom: 8px;">Add teammate to a project</h2>
-            <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
-                The person must <strong>create an account</strong> first (web or <a href="mobile-compliance.html" style="color: #5b9bad; font-weight: 600;">team mobile app</a>).
-                Then paste their <strong>Firebase User UID</strong> (they can copy it from the team app after sign-in, or find it in Firebase Console Authentication users list).
-            </p>
-            <div style="display: grid; gap: 14px; max-width: 520px;">
-                <div style="padding: 12px 14px; border-radius: 10px; border: 1px solid #dbeafe; background: #eff6ff;">
-                    <div style="font-weight: 700; color: #1e3a8a; margin-bottom: 6px;">Invite helper</div>
-                    <p style="font-size: 13px; color: #334155; line-height: 1.5; margin: 0 0 10px;">
-                        Send this to an employee first so they know exactly how to get and share their UID.
-                    </p>
-                    <button type="button" id="team-copy-invite-btn" style="padding: 9px 12px; border-radius: 8px; border: 1px solid #93c5fd; background: white; color: #1d4ed8; font-weight: 700; font-size: 13px; cursor: pointer;">
-                        Copy employee invite message
-                    </button>
-                    <div id="team-invite-msg" style="margin-top: 8px; min-height: 1.1em; font-size: 12px; color: #1e40af;"></div>
-                </div>
-                <div>
-                    <label for="team-project-select" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Project</label>
-                    <select id="team-project-select" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;"></select>
-                </div>
-                <div>
-                    <label for="team-target-uid" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Teammate Firebase UID</label>
-                    <input id="team-target-uid" type="text" autocomplete="off" placeholder="From their team mobile app (Copy ID)" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;" />
-                </div>
-                <div>
-                    <label for="team-target-email" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Email (optional)</label>
-                    <input id="team-target-email" type="email" autocomplete="off" placeholder="for your records" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;" />
-                </div>
-                <div>
-                    <label for="team-member-role" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Role</label>
-                    <select id="team-member-role" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;">
-                        <option value="employee_line">Kitchen line / crew (daily app, menu read-only)</option>
-                        <option value="kitchen_staff">Kitchen / prep (daily app, menu read-only)</option>
-                        <option value="front_of_house">Front of house — service, bar, hosts (daily app)</option>
-                        <option value="bartender">Bartender (daily app, bar tab)</option>
-                        <option value="server">Server (daily app)</option>
-                        <option value="support_staff">Support — runners, dish, utility (daily app)</option>
-                        <option value="location_manager">Location manager</option>
-                        <option value="chef_leadership">Chef / leadership</option>
-                        <option value="account_admin">Account admin (full access)</option>
-                        <option value="operations_gm">Operations / GM</option>
-                        <option value="purchasing">Purchasing</option>
-                        <option value="consultant_rd">Consultant / R&amp;D</option>
-                    </select>
-                </div>
-                <button type="button" id="team-add-member-btn" style="padding: 12px 20px; border-radius: 10px; border: none; background: var(--brand-btn-primary, linear-gradient(135deg, #6b8e6f 0%, #5b9bad 100%)); color: white; font-weight: 700; font-size: 15px; cursor: pointer;">
-                    Save to project
-                </button>
-                <p id="team-access-msg" style="font-size: 14px; color: #0f766e; min-height: 1.25em;"></p>
-            </div>
-        </section>
+        <nav class="hub-section-tabs" aria-label="Project hub sections">
+            <button type="button" class="is-active" data-hub-section="workspaces" aria-selected="true">Workspaces</button>
+            <button type="button" data-hub-section="team" aria-selected="false">Team management</button>
+        </nav>
+
+        <div id="hub-tab-workspaces" class="hub-tab-panel" data-hub-panel="workspaces">
 
         <!-- Sample Project data -->
         <section id="sample-project-panel" style="background: white; border-radius: 16px; padding: 28px; margin-bottom: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
@@ -432,6 +473,84 @@
                 <!-- Archived projects will load here -->
             </div>
         </section>
+
+        </div><!-- /hub-tab-workspaces -->
+
+        <div id="hub-tab-team" class="hub-tab-panel" data-hub-panel="team" hidden>
+            <section id="team-access-panel" style="background: white; border-radius: 16px; padding: 28px; margin-bottom: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+                <h2 class="section-title" style="margin-bottom: 8px;">Team management</h2>
+                <p id="team-signin-hint" style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
+                    Sign in with your admin account to view members and assign roles. Teammates use the
+                    <a href="mobile-compliance.html" style="color: #5b9bad; font-weight: 600;">shift app</a> after you add them.
+                </p>
+
+                <div id="team-admin-body" style="display: none;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 20px; max-width: 720px;">
+                        <div style="flex: 1; min-width: 220px;">
+                            <label for="team-project-select" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Workspace / project</label>
+                            <select id="team-project-select" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;"></select>
+                        </div>
+                        <button type="button" id="team-refresh-members-btn" style="padding: 10px 16px; border-radius: 8px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: 600; font-size: 14px; cursor: pointer;">
+                            Refresh list
+                        </button>
+                    </div>
+
+                    <h3 style="font-size: 16px; font-weight: 700; color: #334155; margin: 0 0 10px;">Current members</h3>
+                    <p id="team-members-status" style="font-size: 13px; color: #64748b; min-height: 1.1em; margin-bottom: 10px;"></p>
+                    <div class="team-members-table-wrap">
+                        <table class="team-members-table" aria-label="Project members">
+                            <thead>
+                                <tr>
+                                    <th scope="col">User ID</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Access role</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="team-members-tbody">
+                                <tr><td colspan="4" style="color: #94a3b8;">Select a project to load members.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 style="font-size: 16px; font-weight: 700; color: #334155; margin: 24px 0 10px;">Invite &amp; add teammate</h3>
+                    <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+                        They must <strong>create an account</strong> first, then share their <strong>Firebase User UID</strong>
+                        (<a href="foh-first-shift.html" style="color: #5b9bad; font-weight: 600;">first-shift guide</a> ·
+                        <a href="mobile-compliance.html" style="color: #5b9bad; font-weight: 600;">shift app</a>).
+                    </p>
+                    <div class="team-add-grid">
+                        <div style="padding: 12px 14px; border-radius: 10px; border: 1px solid #dbeafe; background: #eff6ff;">
+                            <div style="font-weight: 700; color: #1e3a8a; margin-bottom: 6px;">Invite helper</div>
+                            <p style="font-size: 13px; color: #334155; line-height: 1.5; margin: 0 0 10px;">
+                                Copy a message with links so they can sign up and send you their UID.
+                            </p>
+                            <button type="button" id="team-copy-invite-btn" style="padding: 9px 12px; border-radius: 8px; border: 1px solid #93c5fd; background: white; color: #1d4ed8; font-weight: 700; font-size: 13px; cursor: pointer;">
+                                Copy employee invite message
+                            </button>
+                            <div id="team-invite-msg" style="margin-top: 8px; min-height: 1.1em; font-size: 12px; color: #1e40af;"></div>
+                        </div>
+                        <div>
+                            <label for="team-target-uid" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Teammate Firebase UID</label>
+                            <input id="team-target-uid" type="text" autocomplete="off" placeholder="From shift app — Copy my user ID" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;" />
+                        </div>
+                        <div>
+                            <label for="team-target-email" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Email (optional)</label>
+                            <input id="team-target-email" type="email" autocomplete="off" placeholder="for your records" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;" />
+                        </div>
+                        <div>
+                            <label for="team-member-role" style="display: block; font-weight: 600; margin-bottom: 6px; color: #334155;">Role for new member</label>
+                            <select id="team-member-role" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;"></select>
+                        </div>
+                        <button type="button" id="team-add-member-btn" style="padding: 12px 20px; border-radius: 10px; border: none; background: var(--brand-btn-primary, linear-gradient(135deg, #6b8e6f 0%, #5b9bad 100%)); color: white; font-weight: 700; font-size: 15px; cursor: pointer;">
+                            Add to project
+                        </button>
+                        <p id="team-access-msg" style="font-size: 14px; color: #0f766e; min-height: 1.25em;"></p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
     </div>
 
     <script src="assets/js/project-management-system.js"></script>

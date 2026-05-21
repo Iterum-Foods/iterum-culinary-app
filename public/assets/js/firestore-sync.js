@@ -219,6 +219,45 @@ class FirestoreSync {
     return memberRef;
   }
 
+  /**
+   * List `projects/{projectId}/members` (owner / account_admin per rules).
+   * @param {string} projectId
+   * @returns {Promise<Array<{ uid: string, role?: string, email?: string|null, authUid?: string }>>}
+   */
+  async listProjectMembers(projectId) {
+    if (!this.initialized || !projectId) {
+      return [];
+    }
+    const snap = await getDocs(
+      collection(this.db, 'projects', projectId, 'members')
+    );
+    return snap.docs.map(d => {
+      const data = d.data();
+      return {
+        uid: d.id,
+        role: data.role,
+        email: data.email ?? null,
+        authUid: data.authUid ?? d.id
+      };
+    });
+  }
+
+  /**
+   * Remove a member doc (owner / account_admin per rules).
+   * @param {string} projectId
+   * @param {string} memberUid
+   */
+  async removeProjectMemberDoc(projectId, memberUid) {
+    if (!this.initialized || !projectId || !memberUid) {
+      return;
+    }
+    const uid = String(memberUid).trim();
+    if (!uid) {
+      return;
+    }
+    await deleteDoc(doc(this.db, 'projects', projectId, 'members', uid));
+  }
+
   async init() {
     if (this.initialized) {
       console.log('✅ Firestore already initialized');
