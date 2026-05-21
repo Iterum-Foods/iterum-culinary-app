@@ -283,12 +283,23 @@ body.iterum-has-sidebar > .main-content-area {
   position: relative;
 }
 
-.unified-nav-sidebar .nav-dropdown-btn {
+.unified-nav-sidebar .nav-dropdown-btn,
+.unified-nav-sidebar .nav-user-menu-btn {
   width: 100%;
   cursor: pointer;
   background: transparent;
   font: inherit;
   text-align: left;
+  color: hsl(var(--tc-sidebar-foreground));
+  font-weight: 600;
+}
+
+.unified-nav-sidebar .nav-dropdown-btn .nav-more-label,
+.unified-nav-sidebar .nav-dropdown-btn .nav-link-fa,
+.unified-nav-sidebar .nav-user-menu-btn .nav-link-label,
+.unified-nav-sidebar .nav-user-menu-btn i {
+  color: hsl(var(--tc-sidebar-foreground)) !important;
+  opacity: 1;
 }
 
 .unified-nav-sidebar .nav-dropdown-content {
@@ -391,16 +402,54 @@ body.iterum-has-sidebar > .main-content-area {
   text-align: left;
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
-  border: 1px solid hsl(var(--tc-sidebar-border) / 0.6);
-  background: hsl(var(--tc-sidebar-accent) / 0.35);
-  color: hsl(var(--tc-sidebar-foreground) / 0.9);
-  font-size: 0.8125rem;
+  border: 1px solid hsl(var(--tc-sidebar-border) / 0.75);
+  background: hsl(var(--tc-sidebar-accent) / 0.55);
+  color: hsl(var(--tc-sidebar-foreground)) !important;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
+  box-shadow: none;
 }
 
-.tc-sidebar-account-wrap .nav-user-menu-btn:hover {
-  background: hsl(var(--tc-sidebar-accent) / 0.6);
+.tc-sidebar-account-wrap .nav-user-menu-btn:hover,
+.tc-sidebar-account-wrap .nav-user-menu-btn:focus-visible {
+  background: hsl(var(--tc-sidebar-accent) / 0.85) !important;
+  color: hsl(var(--tc-sidebar-foreground)) !important;
+  border-color: hsl(var(--tc-sidebar-foreground) / 0.35) !important;
+  outline: 2px solid hsl(var(--tc-accent) / 0.55);
+  outline-offset: 2px;
+}
+
+.tc-sidebar-account-wrap .nav-user-menu-btn[aria-expanded='true'] {
+  background: hsl(var(--tc-sidebar-accent)) !important;
+  color: hsl(var(--tc-sidebar-accent-foreground)) !important;
+  border-color: hsl(var(--tc-accent) / 0.5) !important;
+  box-shadow: inset 0 0 0 1px hsl(var(--tc-accent) / 0.35);
+}
+
+.tc-sidebar-account-wrap .nav-user-menu-btn[aria-expanded='true'] .nav-link-label,
+.tc-sidebar-account-wrap .nav-user-menu-btn[aria-expanded='true'] i {
+  color: hsl(var(--tc-sidebar-accent-foreground)) !important;
+}
+
+/* Account menu opens upward so it does not cover the trigger */
+.unified-nav-sidebar .tc-sidebar-account-wrap .nav-dropdown-content {
+  left: 0;
+  right: 0;
+  top: auto;
+  bottom: calc(100% + 0.5rem);
+  min-width: 12.5rem;
+}
+
+.unified-nav-sidebar .tc-sidebar-account-wrap .nav-user-menu a {
+  color: hsl(var(--tc-foreground)) !important;
+  font-weight: 500;
+}
+
+.unified-nav-sidebar .tc-sidebar-account-wrap .nav-user-menu a:hover,
+.unified-nav-sidebar .tc-sidebar-account-wrap .nav-user-menu a:focus-visible {
+  background: hsl(var(--tc-accent-soft)) !important;
+  color: hsl(var(--tc-foreground)) !important;
 }
 
 .unified-nav-sidebar .sidebar-unified-project-slot {
@@ -428,14 +477,14 @@ body.iterum-has-sidebar > .main-content-area {
   padding: 0.625rem 0.75rem;
   border: 1px solid hsl(var(--tc-sidebar-border));
   border-radius: 0.625rem;
-  background: hsl(var(--tc-card));
-  color: hsl(var(--tc-foreground));
+  background: hsl(var(--tc-sidebar-accent) / 0.55);
+  color: hsl(var(--tc-sidebar-foreground));
   cursor: pointer;
   text-align: left;
-  box-shadow: var(--tc-shadow-card);
+  box-shadow: none;
   transition:
     border-color 0.15s ease,
-    box-shadow 0.15s ease;
+    background 0.15s ease;
 }
 
 .tc-project-select__trigger:hover,
@@ -460,17 +509,17 @@ body.iterum-has-sidebar > .main-content-area {
 
 .tc-project-select__label {
   font-size: 0.625rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: hsl(var(--tc-muted-foreground));
+  letter-spacing: 0.12em;
+  color: hsl(var(--tc-sidebar-muted, 40 25% 78%));
   line-height: 1.2;
 }
 
 .tc-project-select__name {
   font-size: 0.875rem;
   font-weight: 600;
-  color: hsl(var(--tc-foreground));
+  color: hsl(var(--tc-sidebar-foreground));
   line-height: 1.3;
   max-width: 100%;
   overflow: hidden;
@@ -480,7 +529,7 @@ body.iterum-has-sidebar > .main-content-area {
 
 .tc-project-select__chevron {
   font-size: 0.75rem;
-  color: hsl(var(--tc-muted-foreground));
+  color: hsl(var(--tc-sidebar-foreground) / 0.85);
   transition: transform 0.15s ease;
   flex-shrink: 0;
 }
@@ -564,9 +613,9 @@ body.iterum-has-sidebar > .main-content-area {
 }
 
 .tc-project-option.is-active {
-  background: hsl(var(--tc-sidebar-accent));
-  border-color: hsl(var(--tc-accent) / 0.35);
-  color: hsl(var(--tc-sidebar-accent-foreground, var(--tc-foreground)));
+  background: hsl(var(--tc-accent-soft));
+  border-color: hsl(var(--tc-accent) / 0.45);
+  color: hsl(var(--tc-foreground));
 }
 
 .tc-project-option__icon {
@@ -601,7 +650,7 @@ body.iterum-has-sidebar > .main-content-area {
 }
 
 .tc-project-option.is-active .tc-project-option__desc {
-  color: hsl(var(--tc-sidebar-foreground) / 0.75);
+  color: hsl(var(--tc-muted-foreground));
 }
 
 .tc-project-option__check {
@@ -612,7 +661,7 @@ body.iterum-has-sidebar > .main-content-area {
 }
 
 .tc-project-option.is-active .tc-project-option__check {
-  color: hsl(var(--tc-accent-foreground, var(--tc-foreground)));
+  color: hsl(var(--tc-primary));
 }
 
 .tc-project-select__menu-foot {
@@ -705,14 +754,22 @@ body.iterum-has-sidebar > .main-content-area {
 .unified-nav-sidebar .nav-link:hover,
 .unified-nav-sidebar .nav-link:focus-visible,
 .unified-nav-sidebar .nav-dropdown-btn:hover,
-.unified-nav-sidebar .nav-dropdown-btn:focus-visible {
+.unified-nav-sidebar .nav-dropdown-btn:focus-visible,
+.unified-nav-sidebar .nav-user-menu-btn:hover,
+.unified-nav-sidebar .nav-user-menu-btn:focus-visible {
   background: hsl(var(--tc-sidebar-accent) / 0.6) !important;
   color: hsl(var(--tc-sidebar-foreground)) !important;
 }
 
 .unified-nav-sidebar .nav-link.active,
-.unified-nav-sidebar .nav-dropdown-btn.active {
+.unified-nav-sidebar .nav-dropdown-btn.active,
+.unified-nav-sidebar .nav-dropdown-btn[aria-expanded='true'] {
   background: hsl(var(--tc-sidebar-accent)) !important;
+  color: hsl(var(--tc-sidebar-accent-foreground, var(--tc-sidebar-foreground))) !important;
+}
+
+.unified-nav-sidebar .nav-dropdown-btn[aria-expanded='true'] .nav-more-label,
+.unified-nav-sidebar .nav-dropdown-btn[aria-expanded='true'] .nav-link-fa {
   color: hsl(var(--tc-sidebar-accent-foreground, var(--tc-sidebar-foreground))) !important;
 }
 
@@ -749,9 +806,14 @@ body.iterum-has-sidebar > .main-content-area {
 }
 
 .unified-nav-sidebar .tc-sidebar-account-wrap .nav-user-menu-btn {
-  background: hsl(var(--tc-sidebar-accent) / 0.35) !important;
-  color: hsl(var(--tc-sidebar-foreground) / 0.9) !important;
-  border-color: hsl(var(--tc-sidebar-border) / 0.6) !important;
+  background: hsl(var(--tc-sidebar-accent) / 0.55) !important;
+  color: hsl(var(--tc-sidebar-foreground)) !important;
+  border-color: hsl(var(--tc-sidebar-border) / 0.75) !important;
+}
+
+.unified-nav-sidebar .tc-sidebar-account-wrap .nav-user-menu-btn[aria-expanded='true'] {
+  background: hsl(var(--tc-sidebar-accent)) !important;
+  color: hsl(var(--tc-sidebar-accent-foreground)) !important;
 }
 
 .unified-nav-sidebar .nav-link-fa,

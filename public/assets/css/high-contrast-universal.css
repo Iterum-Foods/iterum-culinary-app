@@ -112,7 +112,7 @@ small {
 
 /* ==================== Buttons - High Contrast ==================== */
 .btn,
-button:not(.nav-link):not(.header-nav-item) {
+button:not(.nav-link):not(.header-nav-item):not(.nav-dropdown-btn):not(.nav-user-menu-btn):not(.tc-sidebar-collapse-btn):not(.tc-project-select__trigger):not(.tc-project-option) {
   font-weight: 600 !important;
   border-radius: 10px;
   padding: 12px 24px;
@@ -574,7 +574,9 @@ hr {
 .unified-nav-sidebar a.nav-link,
 .unified-nav-sidebar button.nav-link,
 .unified-nav-sidebar .nav-dropdown-btn,
-.unified-nav-sidebar .nav-link-label {
+.unified-nav-sidebar .nav-user-menu-btn,
+.unified-nav-sidebar .nav-link-label,
+.unified-nav-sidebar .nav-more-label {
   color: hsl(var(--tc-sidebar-foreground)) !important;
   font-weight: 500 !important;
 }
@@ -582,13 +584,17 @@ hr {
 .unified-nav-sidebar .nav-link:hover,
 .unified-nav-sidebar .nav-link:focus-visible,
 .unified-nav-sidebar .nav-dropdown-btn:hover,
-.unified-nav-sidebar .nav-dropdown-btn:focus-visible {
+.unified-nav-sidebar .nav-dropdown-btn:focus-visible,
+.unified-nav-sidebar .nav-user-menu-btn:hover,
+.unified-nav-sidebar .nav-user-menu-btn:focus-visible {
   color: hsl(var(--tc-sidebar-foreground)) !important;
   font-weight: 600 !important;
 }
 
 .unified-nav-sidebar .nav-link.active,
-.unified-nav-sidebar .nav-dropdown-btn.active {
+.unified-nav-sidebar .nav-dropdown-btn.active,
+.unified-nav-sidebar .nav-dropdown-btn[aria-expanded='true'],
+.unified-nav-sidebar .nav-user-menu-btn[aria-expanded='true'] {
   color: hsl(var(--tc-sidebar-accent-foreground)) !important;
   font-weight: 600 !important;
 }

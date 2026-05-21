@@ -58,16 +58,33 @@
 
 .tc-revamp-body .unified-nav-sidebar .nav-link,
 .tc-revamp-body .unified-nav-sidebar .nav-dropdown-btn,
-.tc-revamp-body .unified-nav-sidebar .nav-link-label {
+.tc-revamp-body .unified-nav-sidebar .nav-user-menu-btn,
+.tc-revamp-body .unified-nav-sidebar .nav-link-label,
+.tc-revamp-body .unified-nav-sidebar .nav-more-label {
   color: hsl(var(--tc-sidebar-foreground)) !important;
   background-color: transparent !important;
   font-weight: 500 !important;
 }
 
 .tc-revamp-body .unified-nav-sidebar .nav-link:hover,
-.tc-revamp-body .unified-nav-sidebar .nav-link:focus {
+.tc-revamp-body .unified-nav-sidebar .nav-link:focus,
+.tc-revamp-body .unified-nav-sidebar .nav-dropdown-btn:hover,
+.tc-revamp-body .unified-nav-sidebar .nav-dropdown-btn:focus,
+.tc-revamp-body .unified-nav-sidebar .nav-user-menu-btn:hover,
+.tc-revamp-body .unified-nav-sidebar .nav-user-menu-btn:focus {
   background: hsl(var(--tc-sidebar-accent)) !important;
   color: hsl(var(--tc-sidebar-foreground)) !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .tc-sidebar-account-wrap .nav-user-menu-btn {
+  background: hsl(var(--tc-sidebar-accent) / 0.55) !important;
+  color: hsl(var(--tc-sidebar-foreground)) !important;
+  border: 1px solid hsl(var(--tc-sidebar-border) / 0.75) !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .tc-sidebar-account-wrap .nav-user-menu-btn[aria-expanded='true'] {
+  background: hsl(var(--tc-sidebar-accent)) !important;
+  color: hsl(var(--tc-sidebar-accent-foreground)) !important;
 }
 
 /* Sidebar nav + footer → taste-craft-app-sidebar.css */
