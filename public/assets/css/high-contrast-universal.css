@@ -570,6 +570,29 @@ hr {
   font-weight: 600;
 }
 
+/* AppSidebar — cream on teal (beats rules above via specificity) */
+.unified-nav-sidebar a.nav-link,
+.unified-nav-sidebar button.nav-link,
+.unified-nav-sidebar .nav-dropdown-btn,
+.unified-nav-sidebar .nav-link-label {
+  color: hsl(var(--tc-sidebar-foreground)) !important;
+  font-weight: 500 !important;
+}
+
+.unified-nav-sidebar .nav-link:hover,
+.unified-nav-sidebar .nav-link:focus-visible,
+.unified-nav-sidebar .nav-dropdown-btn:hover,
+.unified-nav-sidebar .nav-dropdown-btn:focus-visible {
+  color: hsl(var(--tc-sidebar-foreground)) !important;
+  font-weight: 600 !important;
+}
+
+.unified-nav-sidebar .nav-link.active,
+.unified-nav-sidebar .nav-dropdown-btn.active {
+  color: hsl(var(--tc-sidebar-accent-foreground)) !important;
+  font-weight: 600 !important;
+}
+
 /* ==================== Filters & Search ==================== */
 .filter-section {
   background: white;

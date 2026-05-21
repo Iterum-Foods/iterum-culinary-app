@@ -296,6 +296,29 @@
 .tc-revamp-body .main-content-area {
   background: hsl(var(--tc-background));
   background-image: none;
+  color: hsl(var(--tc-foreground));
+}
+
+/* Dashboard — stronger type contrast on cream background */
+.tc-revamp-body .main-content-area .tc-page-hero__title,
+.tc-revamp-body .main-content-area h1,
+.tc-revamp-body .main-content-area h2 {
+  color: hsl(var(--tc-foreground)) !important;
+}
+
+.tc-revamp-body .main-content-area .tc-page-hero__desc,
+.tc-revamp-body .main-content-area p.text-sm {
+  color: hsl(var(--tc-muted-foreground)) !important;
+}
+
+.tc-revamp-body .main-content-area label,
+.tc-revamp-body .main-content-area .text-xs.font-medium {
+  color: hsl(180 16% 32%) !important;
+}
+
+.tc-revamp-body .main-content-area #task-status,
+.tc-revamp-body .main-content-area #idea-status {
+  color: hsl(180 14% 38%) !important;
 }
 
 /* Unified nav sidebar tint (when present) */

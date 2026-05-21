@@ -58,11 +58,12 @@
     0 2px 4px hsl(180 25% 11% / 0.04);
   --tc-shadow-glow: 0 8px 32px hsl(28 85% 55% / 0.18);
 
-  --tc-sidebar-background: 182 38% 13%;
-  --tc-sidebar-foreground: 40 30% 88%;
-  --tc-sidebar-accent: 182 30% 18%;
-  --tc-sidebar-accent-foreground: 40 33% 97%;
-  --tc-sidebar-border: 182 25% 20%;
+  --tc-sidebar-background: 182 42% 10%;
+  --tc-sidebar-foreground: 40 45% 97%;
+  --tc-sidebar-accent: 182 32% 20%;
+  --tc-sidebar-accent-foreground: 40 50% 99%;
+  --tc-sidebar-border: 182 24% 26%;
+  --tc-sidebar-muted: 40 25% 78%;
 
   /* Bridge → iterum-brand-kit consumers */
   --brand-bg-primary: hsl(var(--tc-background));
@@ -73,8 +74,8 @@
   --brand-card-bg-subtle: hsl(var(--tc-muted));
   --brand-border-light: hsl(var(--tc-border));
   --brand-text-primary: hsl(var(--tc-foreground));
-  --brand-text-secondary: hsl(var(--tc-muted-foreground));
-  --brand-text-muted: hsl(180 12% 42%);
+  --brand-text-secondary: hsl(180 16% 32%);
+  --brand-text-muted: hsl(180 14% 38%);
   --brand-primary-accent: hsl(var(--tc-accent));
   --brand-secondary-accent: hsl(var(--tc-primary));
   --brand-accent-primary: hsl(var(--tc-primary));

@@ -51,13 +51,17 @@
 
 .tc-revamp-body .unified-nav-sidebar .nav-section-label {
   background: transparent !important;
-  color: hsl(var(--tc-sidebar-foreground) / 0.5) !important;
+  color: hsl(var(--tc-sidebar-muted)) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.14em !important;
 }
 
 .tc-revamp-body .unified-nav-sidebar .nav-link,
-.tc-revamp-body .unified-nav-sidebar .nav-dropdown-btn {
-  color: hsl(var(--tc-sidebar-foreground) / 0.92) !important;
+.tc-revamp-body .unified-nav-sidebar .nav-dropdown-btn,
+.tc-revamp-body .unified-nav-sidebar .nav-link-label {
+  color: hsl(var(--tc-sidebar-foreground)) !important;
   background-color: transparent !important;
+  font-weight: 500 !important;
 }
 
 .tc-revamp-body .unified-nav-sidebar .nav-link:hover,
