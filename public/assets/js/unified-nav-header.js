@@ -650,6 +650,10 @@ class UnifiedNavHeader {
         'aria-label',
         collapsed ? 'Expand sidebar' : 'Collapse sidebar'
       );
+      btn.setAttribute(
+        'title',
+        collapsed ? 'Expand sidebar' : 'Collapse sidebar'
+      );
     };
     apply(localStorage.getItem('iterum_sidebar_collapsed') === '1');
     btn.addEventListener('click', () => {
