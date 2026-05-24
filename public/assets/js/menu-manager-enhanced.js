@@ -388,6 +388,9 @@ class EnhancedMenuManager {
    */
   async saveMenu() {
     const projectId = this.getCurrentProjectId();
+    if (typeof window.iterumWarnIfMasterWorkspace === 'function') {
+      window.iterumWarnIfMasterWorkspace('menu');
+    }
     const menuKey = `${this.storageKey}_${projectId}`;
 
     const data = {

@@ -5,8 +5,7 @@
 (function () {
   function isSignedIn() {
     return !!(
-      window.authManager?.currentUser ||
-      window.firebaseAuth?.auth?.currentUser
+      window.authManager?.currentUser || window.firebaseAuth?.auth?.currentUser
     );
   }
 
@@ -14,11 +13,7 @@
     const list = window.projectManager?.projects || [];
     return list.filter(
       p =>
-        p &&
-        !p.isArchived &&
-        p.id &&
-        p.id !== 'master' &&
-        p.type !== 'master'
+        p && !p.isArchived && p.id && p.id !== 'master' && p.type !== 'master'
     );
   }
 
@@ -69,8 +64,11 @@
 
   function resolveCloudStatus() {
     const signedIn = isSignedIn();
-    const fsReady = !!(window.firestoreSync && window.firestoreSync.initialized);
-    const online = typeof navigator !== 'undefined' ? navigator.onLine !== false : true;
+    const fsReady = !!(
+      window.firestoreSync && window.firestoreSync.initialized
+    );
+    const online =
+      typeof navigator !== 'undefined' ? navigator.onLine !== false : true;
 
     let queueLength = 0;
     let isSyncing = false;
@@ -106,7 +104,8 @@
       cloudLabel = `Saving to cloud (${queueLength} pending)`;
       cloudState = 'pending';
     } else {
-      cloudLabel = 'Cloud sync on — menus & checklists use this workspace in Firestore';
+      cloudLabel =
+        'Cloud sync on — menus & checklists use this workspace in Firestore';
       cloudState = 'ok';
     }
 
@@ -186,11 +185,55 @@
     `;
   }
 
+  let lastMasterWarnAt = 0;
+  const MASTER_WARN_COOLDOWN_MS = 45000;
+
+  function showMasterWorkspaceToast(message) {
+    if (typeof window.showWarning === 'function') {
+      window.showWarning(message, 7000);
+      return;
+    }
+    if (window.toast && typeof window.toast.warning === 'function') {
+      window.toast.warning(message, 7000);
+      return;
+    }
+    console.warn(message);
+  }
+
+  /**
+   * @param {string} [actionLabel] e.g. "menu", "checklist"
+   * @returns {boolean} true when save targets Master but named projects exist
+   */
+  function warnIfMasterWorkspace(actionLabel) {
+    const project = resolveProjectContext();
+    if (!project.shouldWarnMaster) {
+      return false;
+    }
+    const now = Date.now();
+    if (now - lastMasterWarnAt < MASTER_WARN_COOLDOWN_MS) {
+      return true;
+    }
+    lastMasterWarnAt = now;
+    const label = actionLabel ? String(actionLabel) : 'data';
+    showMasterWorkspaceToast(
+      `Saving ${label} to the Master workspace. Pick a named project in the sidebar first so your team sees it on the shift app.`
+    );
+    return true;
+  }
+
+  window.iterumGetWorkspaceContext = resolveProjectContext;
+  window.iterumWarnIfMasterWorkspace = warnIfMasterWorkspace;
+
   function refreshAll() {
-    document.querySelectorAll('[data-workspace-save-indicator]').forEach(host => {
-      renderHost(host);
-    });
-    if (window.syncStatusIndicator && typeof window.syncStatusIndicator.checkSyncStatus === 'function') {
+    document
+      .querySelectorAll('[data-workspace-save-indicator]')
+      .forEach(host => {
+        renderHost(host);
+      });
+    if (
+      window.syncStatusIndicator &&
+      typeof window.syncStatusIndicator.checkSyncStatus === 'function'
+    ) {
       window.syncStatusIndicator.checkSyncStatus();
     }
   }

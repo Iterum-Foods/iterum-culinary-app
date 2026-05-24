@@ -33,11 +33,11 @@
 | 1 | Line tester | Open `{base}/signin.html` → **create account** (or sign in if already exists). | Auth succeeds. |
 | 2 | Line tester | Open `{base}/mobile-compliance.html` → sign in → find **Workspace (team project)** dropdown (`#project-picker`) and **Copy my user ID** (`#my-firebase-uid`). | UID visible; copy works. |
 | 3 | Line tester | Send **UID only** to admin (secure channel — not in ticket body if policy forbids). | Admin receives UID. |
-| 4 | Admin | Open `{base}/project-hub.html` → sign in → scroll to **Add teammate to a project**. | Panel visible (`#team-access-panel`). |
-| 5 | Admin | Select **Project** (`#team-project-select`) = target workspace. Paste **Firebase User UID** (`#team-target-uid`). Choose **Role** (`#team-member-role`) e.g. Line / crew. Click **Save to project** (`#team-add-member-btn`). | `#team-access-msg` shows success (e.g. saved / they should sign in…). |
+| 4 | Admin | Open `{base}/project-hub.html#team` → sign in → **Team management** tab. | Team panel visible (`#team-access-panel`, member table). |
+| 5 | Admin | Select **Project** (`#team-project-select`) = target workspace. Paste **Firebase User UID** (`#team-target-uid`). Choose **Role** (`#team-member-role`) e.g. Line / crew. Click **Add to project** (`#team-add-member-btn`). | `#team-access-msg` shows success (e.g. saved / they should sign in…). |
 | 6 | Line tester | Refresh `mobile-compliance.html` (or sign out/in). Open **Workspace** dropdown. | Expected project **name** or **id** appears (not only “No shared projects yet”). |
 | 7 | Line tester | Select that workspace; complete one harmless action (e.g. open a tab, or add a test fridge if policy allows). | No persistent **permission denied**; status line not stuck on Firestore index error. |
-| 8 | Admin (optional) | Open `{base}/dashboard.html` → confirm **current project** in UI matches the same workspace (project selector / header). | Same logical `projectId` as chosen in hub. |
+| 8 | Admin (optional) | Open `{base}/dashboard.html` → confirm **Saving to workspace** banner matches the same project (sidebar selector + `#workspace-save-indicator-root`). | Same logical `projectId` as chosen in hub. |
 
 ---
 

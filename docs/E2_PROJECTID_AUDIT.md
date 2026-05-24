@@ -44,7 +44,7 @@
 | Item | Notes |
 |------|--------|
 | Unify `getCurrentProjectId()` helpers | Several copies in menu* files; consolidate in a later refactor. |
-| Warn when saving to `master` while user has real projects | UX toast: “Select a workspace before saving.” |
+| Warn when saving to `master` while user has real projects | Done — `iterumWarnIfMasterWorkspace` toast + workspace banner. |
 | Calendar / equipment pages | Secondary; audit when those join pilot scope. |
 
 ---

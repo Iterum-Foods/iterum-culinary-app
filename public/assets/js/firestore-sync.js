@@ -381,6 +381,10 @@ class FirestoreSync {
       return false;
     }
 
+    if (typeof window.iterumWarnIfMasterWorkspace === 'function') {
+      window.iterumWarnIfMasterWorkspace('menu to cloud');
+    }
+
     try {
       const userId = this.resolveUserId(payload.userId);
       const projectRef = await this.ensureProjectDoc(projectId, {

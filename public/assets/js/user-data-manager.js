@@ -149,6 +149,13 @@ class UserDataManager {
       // Update current project
       this.updateCurrentProject();
 
+      if (
+        dataType !== 'projects' &&
+        typeof window.iterumWarnIfMasterWorkspace === 'function'
+      ) {
+        window.iterumWarnIfMasterWorkspace(dataType);
+      }
+
       console.log(
         `💾 Saving ${dataType} for user ${this.userEmail} in project ${this.currentProjectId}...`
       );

@@ -114,7 +114,7 @@
 | S3-H-01 | Fill pilot definitions (margin formula, tax note) | COO | [PILOT_DEFINITIONS_SHEET.md](./PILOT_DEFINITIONS_SHEET.md) | [H] |
 | S3-H-02 | Three-role QA full pass (admin, kitchen, FOH) | COO | [QA_FEATURE_TEST_WORKFLOW.md](./QA_FEATURE_TEST_WORKFLOW.md) | [H] |
 | S3-H-03 | [PILOT_ACCEPTANCE_CRITERIA_WEB.md](./PILOT_ACCEPTANCE_CRITERIA_WEB.md) evidence folder | COO | 5 criteria | [H] |
-| S3-H-04 | Set `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` in CI; confirm auth spec runs | Eng | CI logs | [H] |
+| S3-H-04 | Set `E2E_TEST_EMAIL` / `E2E_TEST_PASSWORD` in GitHub repo secrets; auth spec runs in CI | Eng | [.github/workflows/e2e.yml](../.github/workflows/e2e.yml) | [ ] |
 | S3-H-05 | Retro → P1 backlog (E4 compare, email invite) | CEO/PM | Ticket list | [H] |
 
 ### S3 — Sign-off

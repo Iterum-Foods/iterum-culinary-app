@@ -33,6 +33,8 @@ jobs:
         run: npx playwright test --project=chromium
         env:
           CI: true
+          E2E_TEST_EMAIL: ${{ secrets.E2E_TEST_EMAIL }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v5
