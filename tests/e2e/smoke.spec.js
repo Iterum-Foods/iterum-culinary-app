@@ -22,6 +22,10 @@ test.describe('Smoke', () => {
         await expect(page.locator('body')).toContainText(
           /Operations exceptions/i
         );
+        await expect(page.locator('[data-workspace-save-indicator]')).toHaveCount(1);
+        await expect(page.locator('.iterum-workspace-banner')).toContainText(
+          /Saving to workspace/i
+        );
       }
       if (path === '/equipment-management.html') {
         await expect(page).toHaveTitle(/Equipment/i);

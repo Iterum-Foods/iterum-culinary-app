@@ -869,6 +869,9 @@ class UnifiedNavHeader {
     if (menuChip) {
       menuChip.textContent = label;
     }
+    if (typeof window.refreshWorkspaceSaveIndicator === 'function') {
+      window.refreshWorkspaceSaveIndicator();
+    }
   }
 
   updateProjectChip(projectName = 'Master Project') {

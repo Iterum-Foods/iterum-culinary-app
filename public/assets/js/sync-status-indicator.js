@@ -106,31 +106,49 @@ class SyncStatusIndicator {
     textEl.textContent = text;
   }
 
+  getWorkspaceShortLabel() {
+    const name =
+      window.projectManager?.currentProject?.name ||
+      localStorage.getItem('active_project_name') ||
+      null;
+    if (!name || name === 'Master Project') {
+      return '';
+    }
+    const short =
+      name.length > 18 ? `${name.slice(0, 16)}…` : name;
+    return ` · ${short}`;
+  }
+
   checkSyncStatus() {
+    const ws = this.getWorkspaceShortLabel();
+
     if (!window.cloudDataSync) {
+      if (window.firestoreSync?.initialized) {
+        this.updateStatus('idle', `Cloud ready${ws}`);
+      }
       return;
     }
 
     const status = window.cloudDataSync.getSyncStatus();
 
     if (status.isSyncing) {
-      this.updateStatus('syncing', 'Syncing...');
+      this.updateStatus('syncing', `Syncing${ws}`);
     } else if (status.queueLength > 0) {
-      this.updateStatus('saving', `Saving (${status.queueLength})`);
+      this.updateStatus('saving', `Saving (${status.queueLength})${ws}`);
     } else if (status.online) {
       const lastSync = status.lastSync ? new Date(status.lastSync) : null;
       if (lastSync) {
         const minutesAgo = Math.floor((Date.now() - lastSync) / 60000);
         if (minutesAgo < 1) {
-          this.updateStatus('synced', 'Just synced');
+          this.updateStatus('synced', `Just synced${ws}`);
         } else {
-          this.updateStatus('idle', `${minutesAgo}m ago`);
+          this.updateStatus('idle', `${minutesAgo}m ago${ws}`);
         }
       } else {
-        this.updateStatus('idle', 'Ready');
+        this.updateStatus('idle', `Ready${ws}`);
       }
     } else {
-      this.updateStatus('error', 'Offline');
+      this.updateStatus('error', `Offline${ws}`);
     }
   }
 }

@@ -612,3 +612,155 @@
   flex-wrap: wrap;
   gap: 0.5rem;
 }
+
+/* Workspace save indicator (dashboard, menu builder) */
+.iterum-workspace-banner-wrap {
+  margin-bottom: 1.25rem;
+}
+
+.iterum-workspace-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--tc-radius);
+  border: 1px solid hsl(var(--tc-border));
+  background: hsl(var(--tc-card));
+  box-shadow: var(--tc-shadow-card);
+}
+
+.iterum-workspace-banner[data-state='ok'] {
+  border-color: hsl(var(--tc-success) / 0.35);
+  background: hsl(var(--tc-success) / 0.06);
+}
+
+.iterum-workspace-banner[data-state='warn'] {
+  border-color: hsl(var(--tc-warning) / 0.55);
+  background: hsl(var(--tc-warning) / 0.1);
+}
+
+.iterum-workspace-banner[data-state='local'],
+.iterum-workspace-banner[data-state='pending'] {
+  border-color: hsl(var(--tc-accent) / 0.4);
+  background: hsl(var(--tc-accent-soft));
+}
+
+.iterum-workspace-banner[data-state='offline'] {
+  border-color: hsl(var(--tc-muted-foreground) / 0.35);
+  background: hsl(var(--tc-muted));
+}
+
+.iterum-workspace-banner__main {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.iterum-workspace-banner__icon {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  background: hsl(var(--tc-primary) / 0.12);
+  color: hsl(var(--tc-primary));
+  flex-shrink: 0;
+}
+
+.iterum-workspace-banner__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.iterum-workspace-banner__label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: hsl(var(--tc-muted-foreground));
+}
+
+.iterum-workspace-banner__name {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: hsl(var(--tc-foreground));
+  line-height: 1.25;
+}
+
+.iterum-workspace-banner__id {
+  font-size: 0.6875rem;
+  font-family: ui-monospace, monospace;
+  color: hsl(var(--tc-muted-foreground));
+}
+
+.iterum-workspace-banner__cloud {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 14rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: hsl(var(--tc-foreground) / 0.88);
+  line-height: 1.35;
+}
+
+.iterum-workspace-banner__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: hsl(var(--tc-muted-foreground));
+}
+
+.iterum-workspace-banner__cloud[data-cloud='ok'] .iterum-workspace-banner__dot {
+  background: hsl(var(--tc-success));
+}
+
+.iterum-workspace-banner__cloud[data-cloud='syncing'],
+.iterum-workspace-banner__cloud[data-cloud='pending'] .iterum-workspace-banner__dot {
+  background: hsl(var(--tc-accent));
+  animation: iterum-ws-pulse 1.4s ease-in-out infinite;
+}
+
+.iterum-workspace-banner__cloud[data-cloud='local'] .iterum-workspace-banner__dot {
+  background: hsl(var(--tc-warning));
+}
+
+.iterum-workspace-banner__link {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: hsl(var(--tc-primary));
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.iterum-workspace-banner__link:hover {
+  text-decoration: underline;
+}
+
+.iterum-workspace-banner__warn {
+  margin: 0.5rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: hsl(var(--tc-foreground));
+  background: hsl(var(--tc-warning) / 0.15);
+  border: 1px solid hsl(var(--tc-warning) / 0.35);
+}
+
+@keyframes iterum-ws-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
