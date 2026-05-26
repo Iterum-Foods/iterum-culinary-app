@@ -7,6 +7,7 @@ test.describe('Smoke', () => {
     { name: 'dashboard HTML', path: '/dashboard.html' },
     { name: 'menu builder', path: '/menu-builder.html' },
     { name: 'project hub', path: '/project-hub.html' },
+    { name: 'archive hub', path: '/archive-hub.html' },
     { name: 'equipment management', path: '/equipment-management.html' }
   ];
 
@@ -17,6 +18,11 @@ test.describe('Smoke', () => {
       await expect(page.locator('body')).toBeVisible();
       if (title) {
         await expect(page).toHaveTitle(title);
+      }
+      if (path === '/') {
+        await expect(page.locator('#who-its-for')).toBeVisible();
+        await expect(page.locator('#pillars')).toContainText(/Develop/i);
+        await expect(page.locator('#pillars')).toContainText(/Archive/i);
       }
       if (path === '/dashboard.html') {
         await expect(page.locator('body')).toContainText(
@@ -33,6 +39,10 @@ test.describe('Smoke', () => {
       if (path === '/project-hub.html') {
         await expect(page.locator('[data-hub-section="team"]')).toHaveCount(1);
         await expect(page.locator('#team-members-tbody')).toHaveCount(1);
+      }
+      if (path === '/archive-hub.html') {
+        await expect(page.getByRole('heading', { level: 1, name: /Archive/i })).toBeVisible();
+        await expect(page.locator('#archive-projects-tbody')).toHaveCount(1);
       }
     });
   });

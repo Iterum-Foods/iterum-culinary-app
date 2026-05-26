@@ -3,6 +3,7 @@
 **Purpose:** Capture the **ideal customer profile** lock for the next 90 days so product and engineering align.  
 **Exec checklist:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) P1 row “Confirm ICP…”  
 **CEO memo (options + analysis):** [ICP_CEO_MEMO.md](./ICP_CEO_MEMO.md)  
+**Audience personas (GTM / product copy):** [ICP_AUDIENCE_PERSONAS.md](./ICP_AUDIENCE_PERSONAS.md) — owner (compliance + data ownership), launch chef, career cook; mapped to three pillars. Does **not** replace the Decision table until CEO re-ratifies.  
 **RACI:** **CEO** = final ratification (signature below). **COO (operations agent)** = packaged this recommendation; **CTO** = technical feasibility.
 
 ---
@@ -56,3 +57,4 @@
 |------|--------|
 | 2026-03-27 | COO operations agent: recommended ICP filled; CEO ratification pending. |
 | 2026-04-14 | CEO ratification signed; ICP locked 90 days (primary: multi-unit 2–8; secondary: consultant opportunistic). |
+| 2026-05-19 | Linked [ICP_AUDIENCE_PERSONAS.md](./ICP_AUDIENCE_PERSONAS.md) — founder audience definition (owner / launch chef / career cook). |

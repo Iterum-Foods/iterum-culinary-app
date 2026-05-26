@@ -620,11 +620,12 @@
     <script src="assets/js/user-data-manager.js" defer></script>
     <script src="assets/js/cloud-data-sync.js" defer></script>
 </head>
-<body class="page-body tc-revamp-body" style="padding-top: 90px;">
+<body class="page-body tc-revamp-body iterum-has-sidebar">
     <!-- Header injected by unified-nav-header.js -->
 
     <!-- Main Content -->
     <main class="page-shell">
+        <div class="tc-rd-sticky-shell">
         <header class="tc-page-hero tc-rd-page-hero">
             <div class="tc-page-hero__inner">
                 <div>
@@ -641,7 +642,6 @@
                 </div>
             </div>
         </header>
-        <div class="page-layout tc-rd-workspace">
             <div class="tc-rd-sticky-bar">
                 <div class="tc-rd-toolbar">
                     <div class="tc-rd-toolbar__brand">
@@ -688,7 +688,9 @@
                 </div>
                 </div>
             </div>
+        </div>
 
+        <div class="page-layout tc-rd-workspace">
             <div class="recipe-development-layout tc-rd-grid">
                 <aside class="tc-rd-rail">
                 <div class="recipe-ideas-sidebar">
@@ -811,15 +813,16 @@
                     <div class="tc-rd-ingredients-head" aria-hidden="true"><span>Qty</span><span>Unit</span><span>Ingredient</span><span>Notes</span><span></span></div>
                     <div id="ingredients-container">
                         <div class="ingredient-row" data-ingredient-index="0">
-                            <div id="ingredient-select-0" class="ingredient-select-container"></div>
                             <div id="ingredient-qty-unit-0" class="quantity-unit-container"></div>
+                            <div id="ingredient-select-0" class="ingredient-select-container"></div>
                             <input type="text" class="form-input ingredient-notes" placeholder="Notes">
-                            <button class="btn btn-secondary" onclick="removeIngredient(this)">🗑️</button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="removeIngredient(this)" title="Remove">🗑️</button>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-primary" onclick="addIngredient()">➕ Add Ingredient</button>
-                        <button class="btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;" onclick="openCreateIngredientModal()">✨ Create New Ingredient</button>
+                    <div class="tc-rd-ingredient-actions">
+                        <button type="button" class="btn btn-primary" onclick="addIngredient()">➕ Add ingredient</button>
+                        <button type="button" class="btn btn-secondary tc-btn-outline" onclick="openAddPrepRecipeIngredient()">🧪 Add prep recipe</button>
+                        <button type="button" class="btn btn-secondary" onclick="openCreateIngredientModal()">✨ Create new ingredient</button>
                     </div>
                 </div>
 
@@ -1239,12 +1242,7 @@
                 window.ingredientsManager.init();
             }
             
-            // Initialize ingredient selector
-            if (window.ingredientSelector) {
-                window.ingredientSelector.init().then(() => {
-                    initializeIngredientSelectors();
-                });
-            }
+            // Ingredient rows boot in recipe-developer-ingredients.js
             
             // Load ingredients database
             loadIngredientsDatabase();
@@ -1605,15 +1603,12 @@
         }
 
         function loadIngredientsIntoForm(ingredients) {
-            const container = document.getElementById('ingredients-container');
-            if (!container) return;
-            
-            // Clear existing ingredients
-            container.innerHTML = '';
-            
-            // Add ingredients
-            ingredients.forEach((ingredient, index) => {
-                addIngredient(ingredient.name, ingredient.amount, ingredient.unit, ingredient.notes);
+            if (window.RecipeDeveloperIngredients) {
+                window.RecipeDeveloperIngredients.loadIntoForm(ingredients);
+                return;
+            }
+            ingredients.forEach(ingredient => {
+                addIngredient(ingredient);
             });
         }
 
@@ -1841,27 +1836,8 @@
             document.getElementById('recipe-category').value = '';
             document.getElementById('recipe-servings').value = '4';
             
-            // Clear ingredients
-            const ingredientsContainer = document.getElementById('ingredients-container');
-            if (ingredientsContainer) {
-                ingredientsContainer.innerHTML = `
-                    <div class="ingredient-row">
-                        <input type="text" class="form-input" placeholder="Ingredient name">
-                        <input type="text" class="form-input" placeholder="Amount">
-                        <select class="form-select">
-                            <option value="g">grams</option>
-                            <option value="kg">kilograms</option>
-                            <option value="ml">milliliters</option>
-                            <option value="l">liters</option>
-                            <option value="tsp">teaspoon</option>
-                            <option value="tbsp">tablespoon</option>
-                            <option value="cup">cup</option>
-                            <option value="piece">piece</option>
-                        </select>
-                        <input type="text" class="form-input" placeholder="Notes">
-                        <button class="btn btn-secondary" onclick="removeIngredient(this)">🗑️</button>
-                    </div>
-                `;
+            if (window.RecipeDeveloperIngredients) {
+                window.RecipeDeveloperIngredients.reset();
             }
             
             // Clear instructions
@@ -2019,16 +1995,14 @@
                 }
             });
             
-            // Load ingredients if available
             if (recipe.ingredients && Array.isArray(recipe.ingredients)) {
                 console.log(`📝 Loading ${recipe.ingredients.length} ingredients...`);
-                // TODO: Add ingredients to the form
+                loadIngredientsIntoForm(recipe.ingredients);
             }
-            
-            // Load instructions if available
+
             if (recipe.instructions && Array.isArray(recipe.instructions)) {
                 console.log(`📝 Loading ${recipe.instructions.length} instructions...`);
-                // TODO: Add instructions to the form
+                loadInstructionsIntoForm(recipe.instructions);
             }
             
             // 🔗 Load component recipes if available
@@ -2621,40 +2595,7 @@
             }
         }
 
-        // Recipe Form Functions
-        function addIngredient(name = '', amount = '', unit = 'g', notes = '', wastePercentage = 0) {
-            const container = document.getElementById('ingredients-container');
-            if (!container) return;
-            
-            const ingredientRow = document.createElement('div');
-            ingredientRow.className = 'ingredient-row';
-            ingredientRow.innerHTML = `
-                <input type="text" class="form-input" placeholder="Ingredient name" value="${name}">
-                <input type="text" class="form-input" placeholder="Amount" value="${amount}">
-                <select class="form-select">
-                    <option value="g" ${unit === 'g' ? 'selected' : ''}>grams</option>
-                    <option value="kg" ${unit === 'kg' ? 'selected' : ''}>kilograms</option>
-                    <option value="ml" ${unit === 'ml' ? 'selected' : ''}>milliliters</option>
-                    <option value="l" ${unit === 'l' ? 'selected' : ''}>liters</option>
-                    <option value="tsp" ${unit === 'tsp' ? 'selected' : ''}>teaspoon</option>
-                    <option value="tbsp" ${unit === 'tbsp' ? 'selected' : ''}>tablespoon</option>
-                    <option value="cup" ${unit === 'cup' ? 'selected' : ''}>cup</option>
-                    <option value="piece" ${unit === 'piece' ? 'selected' : ''}>piece</option>
-                </select>
-                <input type="number" class="form-input" placeholder="Waste %" min="0" max="100" step="0.1" value="${wastePercentage}" style="width: 90px;" title="Phase 2: Trim/Waste percentage (e.g., 10 for 10% waste)">
-                <input type="text" class="form-input" placeholder="Notes" value="${notes}">
-                <button class="btn btn-secondary" onclick="removeIngredient(this)">🗑️</button>
-            `;
-            
-            container.appendChild(ingredientRow);
-        }
-
-        function removeIngredient(button) {
-            const row = button.closest('.ingredient-row');
-            if (row) {
-                row.remove();
-            }
-        }
+        // Recipe Form Functions — ingredient rows: recipe-developer-ingredients.js
 
         function addInstruction(instruction = '') {
             const container = document.getElementById('instructions-container');
@@ -2882,41 +2823,10 @@
         }
 
         function collectIngredients() {
-            const ingredients = [];
-            const rows = document.querySelectorAll('.ingredient-row');
-            
-            rows.forEach(row => {
-                // Get the ingredient select dropdown (first element)
-                const ingredientSelect = row.querySelector('.ingredient-select');
-                const inputs = row.querySelectorAll('input');
-                const amountInput = inputs[0];
-                const wasteInput = inputs[1] && inputs[1].type === 'number' && inputs[1].placeholder.includes('Waste') ? inputs[1] : null;
-                const notesInput = inputs.find(inp => inp.type === 'text' && inp.placeholder && inp.placeholder.toLowerCase().includes('note'));
-                const unitSelect = row.querySelectorAll('select')[1];
-                
-                if (ingredientSelect && ingredientSelect.value) {
-                    // Get ingredient name from dropdown
-                    const ingredientId = ingredientSelect.value;
-                    const ingredientName = ingredientSelect.options[ingredientSelect.selectedIndex].text;
-                    
-                    // Phase 2: Get waste/trim percentage
-                    const wastePercentage = wasteInput ? parseFloat(wasteInput.value) || 0 : 0;
-                    
-                    ingredients.push({
-                        id: ingredientId,
-                        name: ingredientName,
-                        quantity: amountInput ? amountInput.value.trim() : '',
-                        amount: amountInput ? amountInput.value.trim() : '', // Legacy support
-                        unit: unitSelect ? unitSelect.value : '',
-                        wastePercentage: wastePercentage, // Phase 2: Trim/Waste %
-                        trimPercentage: wastePercentage, // Alias for compatibility
-                        waste: wastePercentage, // Legacy support
-                        notes: notesInput ? notesInput.value.trim() : ''
-                    });
-                }
-            });
-            
-            return ingredients;
+            if (typeof collectIngredientsFromRows === 'function') {
+                return collectIngredientsFromRows();
+            }
+            return [];
         }
 
         function collectInstructions() {
@@ -3409,51 +3319,6 @@
             }
         }
         
-        function addIngredient() {
-            const container = document.getElementById('ingredients-container');
-            const index = container.querySelectorAll('.ingredient-row').length;
-            
-            const newRow = document.createElement('div');
-            newRow.className = 'ingredient-row';
-            newRow.setAttribute('data-ingredient-index', index);
-            
-            newRow.innerHTML = `
-                <div id="ingredient-select-${index}" class="ingredient-select-container" style="flex: 2;"></div>
-                <div id="ingredient-qty-unit-${index}" class="quantity-unit-container" style="display: flex; gap: 8px; flex: 1.5;"></div>
-                <input type="number" class="form-input ingredient-waste" placeholder="Waste %" min="0" max="100" step="0.1" style="width: 90px;" title="Trim/Waste percentage">
-                <input type="text" class="form-input ingredient-notes" placeholder="Notes" style="flex: 1;">
-                <button class="btn btn-secondary" onclick="removeIngredient(this)">🗑️</button>
-            `;
-            
-            container.appendChild(newRow);
-            
-            // Initialize selector for new row
-            if (window.ingredientSelector && window.ingredientSelector.initialized) {
-                const selectContainer = newRow.querySelector('.ingredient-select-container');
-                const qtyContainer = newRow.querySelector('.quantity-unit-container');
-                
-                // Create ingredient selector
-                const selector = window.ingredientSelector.createSelector({
-                    id: `ingredient-select-${index}`,
-                    name: `ingredient_${index}`,
-                    onSelect: (ingredient) => {
-                        updateQuantityUnitSelector(index, ingredient);
-                    }
-                });
-                selectContainer.appendChild(selector);
-            } else {
-                console.warn('⚠️ Ingredient selector not ready, using fallback');
-                // Fallback to old dropdown
-                const selectContainer = newRow.querySelector('.ingredient-select-container');
-                selectContainer.innerHTML = `
-                    <select class="form-select ingredient-select" onchange="handleIngredientSelect(this)">
-                        <option value="">Select ingredient...</option>
-                        ${getIngredientOptions()}
-                    </select>
-                `;
-            }
-        }
-        
         // Component Recipes Management
         let componentRecipes = [];
         // Prep Items Management
@@ -3899,10 +3764,6 @@
             if (modal) modal.remove();
         }
 
-        function removeIngredient(button) {
-            button.closest('.ingredient-row').remove();
-        }
-
         function addInstruction() {
             const container = document.getElementById('instructions-container');
             const stepCount = container.children.length + 1;
@@ -4138,6 +3999,7 @@
     
     <!-- Integrated Ingredient Selector -->
     <script src="assets/js/ingredient-selector-integrated.js"></script>
+    <script src="assets/js/recipe-developer-ingredients.js"></script>
     
     <!-- Enhanced Recipe Cost Integration -->
     <script src="assets/js/recipe-cost-integration-enhanced.js"></script>

@@ -4,7 +4,7 @@
  */
 
 /** Bump when sidebar HTML or menu structure changes (forces rebuild on cached pages). */
-const ITERUM_NAV_VERSION = '2026-05-21-tc-sidebar-contrast-v2';
+const ITERUM_NAV_VERSION = '2026-05-21-three-pillars-archive-v1';
 
 class UnifiedNavHeader {
   constructor() {
@@ -56,6 +56,9 @@ class UnifiedNavHeader {
     }
     if (path.includes('project-hub')) {
       return 'team';
+    }
+    if (path.includes('archive-hub')) {
+      return 'archive';
     }
     if (path.includes('contact_management')) {
       return 'crm';
@@ -541,19 +544,25 @@ class UnifiedNavHeader {
 
             <nav class="sidebar-nav" id="unified-sidebar-nav" aria-label="Main">
                 <div class="nav-links">
-                    <div class="nav-section-label">Daily Ops</div>
+                    <div class="nav-section-label">Run the shift</div>
                     ${this.navLink('dashboard.html', 'dashboard', 'fa-solid fa-table-columns', 'Dashboard', 'dashboard')}
                     ${this.navLink('dashboard.html#haccp', 'haccp', 'fa-solid fa-clipboard-check', 'HACCP Log', 'compliance')}
                     ${this.navLink('dashboard.html#temperature', 'temperature', 'fa-solid fa-temperature-half', 'Temperature', 'compliance')}
                     ${this.navLink('calendar.html', 'calendar', 'fa-solid fa-calendar-days', 'Calendar', 'calendar')}
+                    ${this.navLink('project-hub.html#team', 'team', 'fa-solid fa-users', 'Team', 'projects')}
+                    ${this.navLink('mobile-compliance.html', 'shift', 'fa-solid fa-mobile-screen', 'Shift app', 'compliance')}
 
-                    <div class="nav-section-label">Kitchen</div>
+                    <div class="nav-section-label">Develop</div>
                     ${this.navLink('recipe-library.html', 'recipes', 'fa-solid fa-book', 'Recipes', 'recipes')}
                     ${this.navLink('recipe-developer.html', 'developer', 'fa-solid fa-flask', 'Recipe Developer', 'recipes')}
                     ${this.navLink('menu-builder.html', 'menu', 'fa-solid fa-utensils', 'Menu Builder', 'menus')}
                     ${this.navLink('inventory.html', 'inventory', 'fa-solid fa-warehouse', 'Inventory', 'inventory')}
                     ${this.navLink('production-planning.html', 'reports', 'fa-solid fa-chart-line', 'Reports', 'production')}
-                    ${this.navLink('project-hub.html#team', 'team', 'fa-solid fa-users', 'Team', 'projects')}
+
+                    <div class="nav-section-label">Archive</div>
+                    ${this.navLink('archive-hub.html', 'archive', 'fa-solid fa-box-archive', 'Archive', 'backup')}
+                    ${this.navLink('data-backup-center.html', 'backup', 'fa-solid fa-database', 'Backup center', 'backup')}
+                    ${this.navLink('audit-log.html', 'audit', 'fa-solid fa-scroll', 'Audit log', 'data_tools')}
 
                     <div class="nav-dropdown">
                         <button type="button" class="nav-link nav-dropdown-btn ${moreActive}" aria-expanded="false" aria-haspopup="true" aria-controls="nav-more-panel" id="nav-more-toggle">
@@ -570,7 +579,6 @@ class UnifiedNavHeader {
                             <a href="spec-library.html" class="${p('spec_library')}" data-iterum-feature="ingredients"><i class="fa-solid fa-file-lines fa-fw nav-dd-icon" aria-hidden="true"></i>Spec library</a>
                             <a href="vendor-price-comparison.html" class="${p('vendorprice')}" data-iterum-feature="vendors"><i class="fa-solid fa-scale-balanced fa-fw nav-dd-icon" aria-hidden="true"></i>Price compare</a>
                             <a href="equipment-management.html" class="${p('equipment')}" data-iterum-feature="equipment"><i class="fa-solid fa-screwdriver-wrench fa-fw nav-dd-icon" aria-hidden="true"></i>Equipment</a>
-                            <a href="mobile-compliance.html" class="${p('shift')}" data-iterum-feature="compliance"><i class="fa-solid fa-mobile-screen fa-fw nav-dd-icon" aria-hidden="true"></i>Shift tools</a>
                             <a href="ingredients.html" class="${p('ingredients')}" data-iterum-feature="ingredients"><i class="fa-solid fa-carrot fa-fw nav-dd-icon" aria-hidden="true"></i>Ingredients</a>
                             <a href="vendor-management.html" class="${p('vendors')}" data-iterum-feature="vendors"><i class="fa-solid fa-truck-field fa-fw nav-dd-icon" aria-hidden="true"></i>Vendors</a>
                             <a href="recipe-canvas.html" class="${p('canvas')}" data-iterum-feature="recipes"><i class="fa-solid fa-pen-ruler fa-fw nav-dd-icon" aria-hidden="true"></i>Recipe canvas</a>
@@ -581,11 +589,9 @@ class UnifiedNavHeader {
                             <a href="bulk-recipe-import.html" class="${p('import_recipe')}" data-iterum-feature="import_export"><i class="fa-solid fa-file-import fa-fw nav-dd-icon" aria-hidden="true"></i>Recipe import</a>
                             <a href="bulk-ingredient-import.html" class="${p('import_ing')}" data-iterum-feature="import_export"><i class="fa-solid fa-file-arrow-up fa-fw nav-dd-icon" aria-hidden="true"></i>Ingredient import</a>
                             <hr>
-                            <div class="nav-dropdown-category">Organization &amp; data</div>
+                            <div class="nav-dropdown-category">Organization</div>
                             <a href="restaurant-group-onboarding.html" class="${p('rgo')}" data-iterum-feature="projects"><i class="fa-solid fa-location-dot fa-fw nav-dd-icon" aria-hidden="true"></i>Add a restaurant group</a>
-                            <a href="data-backup-center.html" class="${p('backup')}" data-iterum-feature="backup"><i class="fa-solid fa-database fa-fw nav-dd-icon" aria-hidden="true"></i>Backup center</a>
-                            <a href="data-management-dashboard.html" class="${p('datamgmt')}" data-iterum-feature="data_tools"><i class="fa-solid fa-network-wired fa-fw nav-dd-icon" aria-hidden="true"></i>Data management</a>
-                            <a href="audit-log.html" class="${p('audit')}" data-iterum-feature="data_tools"><i class="fa-solid fa-scroll fa-fw nav-dd-icon" aria-hidden="true"></i>Audit log</a>
+                            <a href="archive-hub.html" class="${p('archive')}" data-iterum-feature="backup"><i class="fa-solid fa-box-archive fa-fw nav-dd-icon" aria-hidden="true"></i>Archive hub</a>
                             <a href="contact_management.html" class="${p('crm')}" data-iterum-feature="data_tools"><i class="fa-solid fa-address-book fa-fw nav-dd-icon" aria-hidden="true"></i>CRM &amp; contacts</a>
                             <a href="user_management.html" class="${p('admin')}" data-iterum-feature="data_tools"><i class="fa-solid fa-user-shield fa-fw nav-dd-icon" aria-hidden="true"></i>User admin</a>
                         </div>

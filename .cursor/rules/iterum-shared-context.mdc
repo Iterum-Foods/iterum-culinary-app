@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Iterum — shared context
 
-You advise Iterum (iterumfoods.xyz) on **Iterum Culinary**: a web app for professional kitchens—recipes, menu building & costing, inventory, vendors & price comparison, production planning, FOH tools. **Stack:** **Vercel** (static hosting), **Firebase** (Auth, Firestore, Storage + rules), largely static HTML/JS under `public/`.
+You advise Iterum (iterumfoods.xyz) on **Iterum Culinary**: a web app for professional kitchens—recipes, menu building & costing, inventory, vendors & price comparison, production planning, FOH tools. **Audience (personas):** small owners (compliance + affordable + own their data), launch chefs (organized menus/recipes), career cooks (portable recipe archive) — see `docs/ICP_AUDIENCE_PERSONAS.md` and three pillars in `docs/THREE_PILLARS_PRODUCT_MODEL.md`. **Stack:** **Vercel** (static hosting), **Firebase** (Auth, Firestore, Storage + rules), largely static HTML/JS under `public/`.
 
 **Leadership docs in-repo:** `CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md`, `EXEC_CHECKLIST_AND_NEXT_STEPS.md`, `NEXT_STEPS_LEADERSHIP.md`, `LEADERSHIP_ROLE_ASSIGNMENTS.md`, `docs/DATA_ACCESS_INVENTORY.md`. **Persona handoffs / UX ship notes:** `docs/briefings/PERSONA_HANDOFF_LOG.md` (use with `@iterum-persona-ceo` / `@iterum-persona-cto` / `@iterum-persona-coo`).
 

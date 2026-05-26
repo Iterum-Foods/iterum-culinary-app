@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iterum - Professional Culinary R&D Platform</title>
-    <meta name="description" content="Transform your culinary creativity into reality with Iterum - the professional chef's digital notebook for recipe development, menu planning, and culinary innovation.">
+    <title>Iterum Culinary — Recipes, compliance &amp; your data</title>
+    <meta name="description" content="Stay compliant without enterprise pricing. Organize recipes and menus for launch. Export and archive your work—you own your data. Built for small restaurants, chefs, and cooks.">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -206,6 +206,52 @@
             transform: translateY(-6px);
             border-color: rgba(125, 211, 252, 0.7);
             box-shadow: 0 30px 60px rgba(15, 23, 42, 0.35);
+        }
+
+        .audience-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-top: 48px;
+        }
+
+        .audience-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 28px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+        }
+
+        .audience-card .audience-icon {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            line-height: 1;
+        }
+
+        .audience-card h3 {
+            font-size: 1.25rem;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+            color: #0f172a;
+        }
+
+        .audience-card p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #475569;
+            margin: 0;
+        }
+
+        .pillar-card .pillar-cta {
+            margin-top: auto;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #93c5fd;
+        }
+
+        .pillar-card .pillar-cta:hover {
+            color: #e0f2fe;
         }
 
         .service-pillars {
@@ -1086,24 +1132,24 @@
         <div class="hero-shell">
             <!-- Left: value prop (no competing primary CTAs) -->
             <div class="hero-left">
-                <div class="mono-heading hero-eyebrow">Turning complexity into clarity</div>
-                <h1>Smart systems for modern culinary teams.</h1>
+                <div class="mono-heading hero-eyebrow">Develop · Run the shift · Archive</div>
+                <h1>Kitchen ops and recipes—without enterprise pricing.</h1>
                 <p class="description">
-                    Recipes, menus, and costs in one workflow—built for professional kitchens.
-                    Sign in to open your workspace, or create an account to get started.
+                    Built for small restaurants, chefs launching a menu, and cooks saving recipes for their career.
+                    Stay compliant, keep menus organized, and <strong>own your data</strong> with backups and exports you control.
                 </p>
                 <p class="description" style="font-size: 0.95rem; margin-top: 0.75rem;">
-                    <a href="mobile-compliance.html" style="font-weight: 600;">Free line log for kitchens</a>
-                    — fridge temperatures &amp; sanitizer checks on your phone (same account as the full app).
+                    <a href="mobile-compliance.html" style="font-weight: 600;">Free line log</a>
+                    — HACCP-style temperature &amp; sanitizer checks on your phone (same account as the full app).
                 </p>
                 <ul class="hero-benefits" aria-label="What Iterum helps you do">
-                    <li>Menu and recipe data tied to real costing</li>
-                    <li>Ops-ready daily tasks and notes in one place</li>
-                    <li>Room to grow as you add locations and vendors</li>
+                    <li>Compliance-sized for independents—not priced like the chains</li>
+                    <li>Recipes &amp; menus systemized per workspace, ready for launch</li>
+                    <li>Download backups—your archive moves with you</li>
                 </ul>
                 <div class="hero-left-actions">
                     <button type="button" class="btn-signup-ghost" onclick="scrollToSignUp()">Create an account</button>
-                    <a href="#capabilities" class="hero-link-explore">How Iterum works →</a>
+                    <a href="#pillars" class="hero-link-explore">See the three pillars →</a>
                 </div>
             </div>
 
@@ -1244,142 +1290,119 @@
         </div>
     </section>
 
-    <section class="section-wrapper dark" id="capabilities">
+    <section class="section-wrapper light" id="who-its-for">
         <div class="page-container">
             <div class="section-heading">
-                <span class="badge">Process-driven impact</span>
-                <h2>We turn culinary operations into intelligent, scalable systems.</h2>
+                <span class="badge">Who it’s for</span>
+                <h2>Built for real kitchens—not corporate IT departments.</h2>
                 <p>
-                    Remote-ready teams, senior-level expertise, and a framework that adapts to every project.
-                    Iterum keeps your crews connected, your recipes in motion, and your business aligned on outcomes—without sacrificing clarity.
+                    Whether you run the business, open a new concept, or build a recipe portfolio for your career,
+                    Iterum keeps work organized in one workspace and saved where you can reach it.
                 </p>
             </div>
 
-            <div class="capabilities-grid">
-                <article class="capability-card">
-                    <h3>Digital Competence</h3>
+            <div class="audience-grid">
+                <article class="audience-card">
+                    <div class="audience-icon" aria-hidden="true">🏪</div>
+                    <h3>Small business owners</h3>
                     <p>
-                        We build interoperable stacks that connect recipe development, menu engineering, analytics,
-                        and inventory. You gain a single source of truth for your kitchen and front office.
+                        Worried about staying compliant but can’t afford large-vendor stacks?
+                        Run HACCP-style logs on the floor, then export and back up records you own—not locked in someone else’s cloud.
                     </p>
-                    <ul>
-                        <li>Unified tooling with zero copy/paste drift</li>
-                        <li>Structured data ready for costing, prep, and FOH handoff</li>
-                        <li>Secure-by-default architecture for multi-location teams</li>
-                    </ul>
                 </article>
-
-                <article class="capability-card">
-                    <h3>Creativity &amp; Problem Solving</h3>
+                <article class="audience-card">
+                    <div class="audience-icon" aria-hidden="true">🍽️</div>
+                    <h3>Chefs &amp; restaurants launching</h3>
                     <p>
-                        Our operators think like R&amp;D chefs: experiment, iterate, refine. We apply that mindset to
-                        your systems, uncovering smarter workflows, better integrations, and measurable wins you can trust.
+                        Get recipes, costing, and menus systemized before doors open.
+                        One workspace for launch so your team isn’t hunting spreadsheets on night one.
                     </p>
-                    <ul>
-                        <li>Facilitated recipe workshops that ladder into documentation instantly</li>
-                        <li>Rapid prototypes for menu launches and limited-time offers</li>
-                        <li>Metrics that prove the value of every change</li>
-                    </ul>
                 </article>
-
-                <article class="capability-card">
-                    <h3>Adaptability</h3>
+                <article class="audience-card">
+                    <div class="audience-icon" aria-hidden="true">👨‍🍳</div>
+                    <h3>Cooks building a career archive</h3>
                     <p>
-                        Hybrid, agile, or classic—every engagement is tuned to your pace. We embed quickly, scale when
-                        you need it, and keep documentation, SOPs, and reporting tidy even as priorities shift.
+                        Save every recipe in a library that grows with you.
+                        Download your archive when you change jobs—your craft history stays portable.
                     </p>
-                    <ul>
-                        <li>Flexible retainers and sprint-based support</li>
-                        <li>Tooling guidance that meets people where they already work</li>
-                        <li>Built-in change tracking for internal audits</li>
-                    </ul>
                 </article>
             </div>
         </div>
     </section>
 
-    <section class="section-wrapper" id="services">
+    <section class="section-wrapper dark" id="pillars">
         <div class="page-container">
             <div class="section-heading">
-                <span class="badge">Service pillars</span>
-                <h2>Senior-level teams where you need them most.</h2>
+                <span class="badge">Three pillars</span>
+                <h2>Develop. Run the shift. Archive.</h2>
                 <p>
-                    From SAP-grade rigor to frontline execution, we blend culinary expertise with enterprise operations.
-                    Every engagement focuses on business value first, code and tooling second.
+                    Everything in Iterum rolls up to three jobs: build the menu, operate today’s service, and keep it all organized and recoverable per workspace.
                 </p>
             </div>
 
             <div class="service-pillars">
                 <article class="pillar-card">
-                    <div class="tag">01</div>
-                    <h3>SAP Team as a Service</h3>
+                    <div class="tag">1 — Develop</div>
+                    <h3>Recipes &amp; menus</h3>
                     <p>
-                        Architecture, integration, and senior consultants that turn SAP into a growth engine instead of
-                        a bottleneck.
+                        Recipe library, developer, menu builder, vendors, and ingredients—tied to real costing so launch day isn’t a scramble.
                     </p>
                     <ul class="pillar-list">
-                        <li>Scalable expertise without ramp-up</li>
-                        <li>Integration that connects your enterprise</li>
-                        <li>Designs measured on business outcomes</li>
+                        <li>Version and organize recipes per workspace</li>
+                        <li>Build menus with costing before service</li>
+                        <li>Grow from one kitchen to several workspaces</li>
                     </ul>
+                    <a class="pillar-cta" href="recipe-library.html">Open recipe library →</a>
                 </article>
 
                 <article class="pillar-card">
-                    <div class="tag">02</div>
-                    <h3>Enterprise Intelligence</h3>
+                    <div class="tag">2 — Run the shift</div>
+                    <h3>Compliance on the floor</h3>
                     <p>
-                        AI that inspires new service models. We link data across SAP, cloud, and third-party platforms
-                        so decisions flow without friction.
+                        Dashboard checklists, temperature logs, calendar, and the mobile shift app—sized for small teams, not enterprise rollouts.
                     </p>
                     <ul class="pillar-list">
-                        <li>Tailored automations that spark innovation</li>
-                        <li>Connected ecosystems with zero silos</li>
-                        <li>Insights that move teams from analysis to action</li>
+                        <li>HACCP-style logs where your crew already is</li>
+                        <li>Team and workspace context on every save</li>
+                        <li>Free line log on your phone today</li>
                     </ul>
+                    <a class="pillar-cta" href="dashboard.html">Open dashboard →</a>
                 </article>
 
                 <article class="pillar-card">
-                    <div class="tag">03</div>
-                    <h3>Agile Management</h3>
+                    <div class="tag">3 — Archive</div>
+                    <h3>Your data, saved</h3>
                     <p>
-                        Leadership that energizes projects. We balance flexibility with precision and keep stakeholders
-                        aligned on the goals that matter.
+                        Per-workspace inventory, full account backups, and exports you can store off-device—because your business shouldn’t depend on a vendor black box.
                     </p>
                     <ul class="pillar-list">
-                        <li>Adaptive frameworks for any environment</li>
-                        <li>Radical transparency and progress tracking</li>
-                        <li>Impulse givers who convert momentum into results</li>
+                        <li>See what’s saved in each workspace</li>
+                        <li>Download JSON bundles and full backups</li>
+                        <li>Cloud sync where sign-in is enabled</li>
                     </ul>
+                    <a class="pillar-cta" href="archive-hub.html">Open archive hub →</a>
                 </article>
-                        </div>
-                    </div>
+            </div>
+        </div>
     </section>
 
     <section class="section-wrapper dark">
         <div class="page-container">
-            <div class="logos-row">
-                <span>🥘 Atelier 54</span>
-                <span>🍽️ Northbound Collective</span>
-                <span>🥗 Verde Group</span>
-                <span>🍷 Meridian Hospitality</span>
-                <span>🧑‍🍳 Lineage Labs</span>
-                </div>
-
             <div class="metric-banner">
                 <div class="metric-tile">
-                    <h3>96%</h3>
-                    <span>Client retention</span>
-                    <p>Long-term partnerships built on measurable outcomes.</p>
-                        </div>
+                    <h3>Your export</h3>
+                    <span>Data you control</span>
+                    <p>Back up and download your workspaces—store files on Drive or a USB, not only in our app.</p>
+                </div>
                 <div class="metric-tile">
-                    <h3>20+</h3>
-                    <span>Transformations delivered</span>
-                    <p>Enterprise programs spanning SAP, menu operations, and AI.</p>
-                    </div>
+                    <h3>Per workspace</h3>
+                    <span>Organized by location</span>
+                    <p>Recipes, menus, and ops data scoped to each project so multi-site teams stay clear.</p>
+                </div>
                 <div class="metric-tile">
-                    <h3>10+</h3>
-                    <span>Countries served</span>
-                    <p>Remote teams embedded across Europe, North America, and APAC.</p>
+                    <h3>Free line log</h3>
+                    <span>Start on mobile</span>
+                    <p>Temperature and sanitizer checks on your phone—upgrade to the full app when you’re ready.</p>
                 </div>
             </div>
         </div>
@@ -1388,39 +1411,33 @@
     <section class="section-wrapper light" id="process">
         <div class="page-container">
             <div class="section-heading">
-                <span class="badge">How we deliver</span>
-                <h2>A framework that evolves with your kitchen.</h2>
+                <span class="badge">Get started</span>
+                <h2>From sign-up to archive in four steps.</h2>
                 <p>
-                    From first conversation to steady-state operations, we keep teams aligned, stakeholders informed,
-                    and momentum moving toward clear results.
+                    Create a free account, pick a workspace, build your menu, run today’s shift, then confirm everything is backed up.
                 </p>
             </div>
 
             <div class="process-grid">
                 <article class="process-card">
                     <strong>01</strong>
-                    <h4>Understand</h4>
-                    <p>Listen first. Map the systems, recipes, and constraints before prescribing change.</p>
+                    <h4>Create a workspace</h4>
+                    <p>Sign up free—one account for your restaurant, pop-up, or personal recipe portfolio.</p>
                 </article>
                 <article class="process-card">
                     <strong>02</strong>
-                    <h4>Plan</h4>
-                    <p>Design pragmatic strategies that match your pace, infrastructure, and KPIs.</p>
+                    <h4>Develop</h4>
+                    <p>Add recipes, vendors, and your opening menu while costing stays tied to ingredients.</p>
                 </article>
                 <article class="process-card">
                     <strong>03</strong>
-                    <h4>Build &amp; Integrate</h4>
-                    <p>Deliver smart tools that connect seamlessly with your daily workflows.</p>
+                    <h4>Run the shift</h4>
+                    <p>Use the dashboard and mobile line log for daily checks—compliance without a corporate IT project.</p>
                 </article>
                 <article class="process-card">
                     <strong>04</strong>
-                    <h4>Evolve</h4>
-                    <p>Scale rapidly as your business grows. Adjust priorities without losing clarity.</p>
-                </article>
-                <article class="process-card">
-                    <strong>05</strong>
-                    <h4>Deliver Results</h4>
-                    <p>Measure progress, surface insights, and keep the momentum anchored in value.</p>
+                    <h4>Archive</h4>
+                    <p>Export per workspace or download a full backup from Archive hub—weekly is a good habit.</p>
                 </article>
             </div>
         </div>

@@ -7,6 +7,7 @@
 class IngredientSelectorIntegrated {
   constructor() {
     this.ingredients = [];
+    this.prepRecipes = [];
     this.unitConverter = window.unitConverter;
     this.vendorComparator = window.vendorPriceComparator;
     this.initialized = false;
@@ -21,6 +22,7 @@ class IngredientSelectorIntegrated {
     }
 
     await this.loadIngredients();
+    await this.loadPrepRecipes();
     this.initialized = true;
     console.log('✅ Integrated Ingredient Selector initialized');
   }
@@ -44,6 +46,81 @@ class IngredientSelectorIntegrated {
     console.log(
       `📦 Loaded ${this.ingredients.length} ingredients for selector`
     );
+  }
+
+  /**
+   * Load prep recipes (bar/kitchen) for use as sub-recipe ingredients
+   */
+  async loadPrepRecipes() {
+    const prepCategories = new Set([
+      'prep-recipe',
+      'prep',
+      'bar-prep',
+      'kitchen-prep',
+    ]);
+    let all = [];
+
+    if (window.userDataManager) {
+      all = window.userDataManager.loadData('recipes', { filterByProject: false });
+    } else if (window.universalRecipeManager) {
+      all = window.universalRecipeManager.getAllRecipes();
+    } else {
+      try {
+        all = JSON.parse(localStorage.getItem('recipes') || '[]');
+      } catch (_e) {
+        all = [];
+      }
+    }
+
+    const editingId = localStorage.getItem('editing_recipe_id');
+
+    this.prepRecipes = all
+      .filter(r => {
+        if (!r || r.id === editingId) return false;
+        const cat = (r.category || '').toLowerCase();
+        const type = (r.recipeType || '').toLowerCase();
+        return prepCategories.has(cat) || prepCategories.has(type);
+      })
+      .map(r => ({
+        id: `prep:${r.id}`,
+        recipeId: r.id,
+        name: r.title || r.name || 'Prep recipe',
+        category: 'Prep recipe',
+        unit: r.defaultUnit || r.yieldUnit || 'oz',
+        isPrepRecipe: true,
+        bestPrice: null,
+      }));
+
+    console.log(
+      `🧪 Loaded ${this.prepRecipes.length} prep recipes for ingredient picker`
+    );
+  }
+
+  /**
+   * Search raw ingredients + prep recipes
+   */
+  searchItems(query) {
+    const q = query.toLowerCase().trim();
+    if (!q) return [];
+
+    const fromIngredients = this.ingredients
+      .filter(
+        ing =>
+          ing.name.toLowerCase().includes(q) ||
+          (ing.category && ing.category.toLowerCase().includes(q)) ||
+          (ing.subcategory && ing.subcategory.toLowerCase().includes(q))
+      )
+      .slice(0, 16);
+
+    const fromPrep = this.prepRecipes
+      .filter(
+        ing =>
+          ing.name.toLowerCase().includes(q) ||
+          (ing.category && ing.category.toLowerCase().includes(q))
+      )
+      .slice(0, 8);
+
+    return [...fromPrep, ...fromIngredients];
   }
 
   /**
@@ -77,6 +154,7 @@ class IngredientSelectorIntegrated {
                 <input type="hidden" id="${id}-name" name="${name}_name" />
                 <input type="hidden" id="${id}-base-unit" name="${name}_base_unit" />
                 <input type="hidden" id="${id}-best-price" name="${name}_best_price" />
+                <input type="hidden" id="${id}-kind" name="${name}_kind" value="ingredient" />
             </div>
             <div id="${id}-info" class="ingredient-info hidden"></div>
         `;
@@ -97,9 +175,8 @@ class IngredientSelectorIntegrated {
     const hiddenName = document.getElementById(`${id}-name`);
     const hiddenUnit = document.getElementById(`${id}-base-unit`);
     const hiddenPrice = document.getElementById(`${id}-best-price`);
+    const hiddenKind = document.getElementById(`${id}-kind`);
     const info = document.getElementById(`${id}-info`);
-
-    let filteredIngredients = [];
 
     // Search input handler
     input.addEventListener('input', e => {
@@ -110,15 +187,7 @@ class IngredientSelectorIntegrated {
         return;
       }
 
-      // Filter ingredients
-      filteredIngredients = this.ingredients
-        .filter(
-          ing =>
-            ing.name.toLowerCase().includes(query) ||
-            (ing.category && ing.category.toLowerCase().includes(query)) ||
-            (ing.subcategory && ing.subcategory.toLowerCase().includes(query))
-        )
-        .slice(0, 20); // Limit to 20 results
+      const filteredIngredients = this.searchItems(query).slice(0, 24);
 
       this.renderDropdown(dropdown, filteredIngredients, ingredient => {
         this.selectIngredient(
@@ -130,6 +199,7 @@ class IngredientSelectorIntegrated {
           hiddenName,
           hiddenUnit,
           hiddenPrice,
+          hiddenKind,
           info,
           showVendorInfo,
           showPrice,
@@ -141,7 +211,24 @@ class IngredientSelectorIntegrated {
     // Focus handler
     input.addEventListener('focus', () => {
       if (input.value.length >= 1) {
-        dropdown.classList.remove('hidden');
+        const filteredIngredients = this.searchItems(input.value).slice(0, 24);
+        this.renderDropdown(dropdown, filteredIngredients, ingredient => {
+          this.selectIngredient(
+            ingredient,
+            id,
+            input,
+            dropdown,
+            hiddenId,
+            hiddenName,
+            hiddenUnit,
+            hiddenPrice,
+            hiddenKind,
+            info,
+            showVendorInfo,
+            showPrice,
+            onSelect
+          );
+        });
       }
     });
 
@@ -169,12 +256,19 @@ class IngredientSelectorIntegrated {
         const bestPrice = ing.bestPrice || {};
         const vendorCount = ing.vendorPrices?.length || 0;
         const isBuiltIn = /^ing_\d+$/.test(ing.id);
+        const isPrep = !!ing.isPrepRecipe;
 
         return `
                 <div class="dropdown-item ingredient-item" data-id="${ing.id}">
                     <div class="ingredient-item-name">
                         ${ing.name}
-                        ${isBuiltIn ? '<span class="badge-builtin">📦 Built-in</span>' : '<span class="badge-custom">➕ My Product</span>'}
+                        ${
+                          isPrep
+                            ? '<span class="badge-prep-recipe">🧪 Prep</span>'
+                            : isBuiltIn
+                              ? '<span class="badge-builtin">📦 Built-in</span>'
+                              : '<span class="badge-custom">➕ My Product</span>'
+                        }
                     </div>
                     <div class="ingredient-item-meta">
                         <span class="ingredient-category">${ing.category || 'Uncategorized'}</span>
@@ -196,9 +290,9 @@ class IngredientSelectorIntegrated {
     dropdown.querySelectorAll('.ingredient-item').forEach(item => {
       item.addEventListener('click', () => {
         const ingredientId = item.dataset.id;
-        const ingredient = this.ingredients.find(
-          ing => ing.id === ingredientId
-        );
+        const ingredient =
+          this.ingredients.find(ing => ing.id === ingredientId) ||
+          this.prepRecipes.find(ing => ing.id === ingredientId);
         if (ingredient) {
           onSelect(ingredient);
         }
@@ -220,15 +314,21 @@ class IngredientSelectorIntegrated {
     hiddenName,
     hiddenUnit,
     hiddenPrice,
+    hiddenKind,
     info,
     showVendorInfo,
     showPrice,
     onSelect
   ) {
+    const isPrep = !!ingredient.isPrepRecipe;
+
     // Update hidden fields
     hiddenId.value = ingredient.id;
     hiddenName.value = ingredient.name;
-    hiddenUnit.value = ingredient.unit || ingredient.default_unit || 'g';
+    hiddenUnit.value = ingredient.unit || ingredient.default_unit || (isPrep ? 'oz' : 'g');
+    if (hiddenKind) {
+      hiddenKind.value = isPrep ? 'prep-recipe' : 'ingredient';
+    }
 
     // Get best price
     const bestPrice = ingredient.bestPrice || {
@@ -246,9 +346,20 @@ class IngredientSelectorIntegrated {
     dropdown.classList.add('hidden');
 
     // Show info panel
-    if (showVendorInfo || showPrice) {
+    if (isPrep) {
+      info.innerHTML = `
+        <div class="ingredient-info-content">
+          <div class="info-row">
+            <span class="info-label">Type:</span>
+            <span class="info-value">Prep recipe (linked sub-recipe)</span>
+          </div>
+        </div>`;
+      info.classList.remove('hidden');
+    } else if (showVendorInfo || showPrice) {
       this.renderInfo(ingredient, info, showVendorInfo, showPrice);
       info.classList.remove('hidden');
+    } else {
+      info.classList.add('hidden');
     }
 
     // Callback
@@ -463,6 +574,7 @@ class IngredientSelectorIntegrated {
    */
   async refresh() {
     await this.loadIngredients();
+    await this.loadPrepRecipes();
   }
 }
 
@@ -562,6 +674,11 @@ style.textContent = `
 
     .badge-custom {
         background: #10b981;
+        color: white;
+    }
+
+    .badge-prep-recipe {
+        background: #0d9488;
         color: white;
     }
 

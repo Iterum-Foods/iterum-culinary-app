@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archive — Iterum Culinary</title>
+
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    <script type="module" src="assets/js/firebase-auth.js"></script>
+    <script type="module" src="assets/js/firestore-sync.js"></script>
+    <script src="assets/js/user-role-setup.js"></script>
+    <script src="assets/js/project-management-system.js" defer></script>
+    <script src="assets/js/unified-nav-header.js" defer></script>
+    <script src="assets/js/unified-project-selector.js" defer></script>
+    <script src="assets/js/user-data-manager.js" defer></script>
+    <script src="assets/js/backup-manager.js" defer></script>
+    <script src="assets/js/toast-notifications.js" defer></script>
+    <script src="assets/js/workspace-save-indicator.js" defer></script>
+    <script src="assets/js/archive-hub.js" defer></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
+
+    <style>
+        body {
+            background: var(--brand-bg-gradient, #f8fafc);
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+        }
+        .archive-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 20px;
+        }
+        .archive-hero {
+            background: linear-gradient(135deg, hsl(182 38% 22%) 0%, hsl(182 32% 32%) 100%);
+            color: #f8fafc;
+            border-radius: 16px;
+            padding: 32px 28px;
+            margin-bottom: 24px;
+        }
+        .archive-hero h1 { margin: 0 0 8px; font-size: 1.75rem; font-weight: 700; }
+        .archive-hero p { margin: 0; opacity: 0.92; line-height: 1.55; max-width: 42rem; }
+        .archive-pillars {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .archive-pillar-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .archive-pillar-card.is-active {
+            border-color: hsl(182 38% 40%);
+            box-shadow: 0 0 0 2px hsl(182 38% 40% / 0.2);
+        }
+        .archive-pillar-card h3 {
+            margin: 0 0 6px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+        }
+        .archive-pillar-card p { margin: 0; font-size: 0.875rem; line-height: 1.45; color: #334155; }
+        .archive-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+        .archive-panel h2 { margin: 0 0 12px; font-size: 1.125rem; }
+        .archive-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .archive-btn {
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .archive-btn-primary {
+            background: var(--brand-btn-primary, linear-gradient(135deg, #6b8e6f 0%, #5b9bad 100%));
+            color: white;
+        }
+        .archive-btn-secondary {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+        .archive-table-wrap { overflow-x: auto; }
+        .archive-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .archive-table th,
+        .archive-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .archive-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #64748b;
+            background: #f8fafc;
+        }
+        .archive-badge-current,
+        .archive-badge-archived {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .archive-badge-current { background: #dcfce7; color: #166534; }
+        .archive-badge-archived { background: #f1f5f9; color: #475569; }
+        .archive-btn-sm {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .archive-btn-sm:hover { background: #f8fafc; }
+        #archive-inventory-status { font-size: 13px; color: #64748b; margin: 0 0 12px; }
+    </style>
+</head>
+<body class="tc-revamp-body" style="padding-top: 0;">
+
+    <div class="archive-container">
+        <div class="archive-hero">
+            <h1><i class="fa-solid fa-box-archive" aria-hidden="true"></i> Archive</h1>
+            <p>
+                Your third pillar: everything organized and saved by workspace — local copies, downloadable backups,
+                and cloud sync where enabled. Develop menus and recipes, run the shift on mobile, then confirm it is all archived here.
+            </p>
+        </div>
+
+        <div class="archive-pillars" aria-label="Product pillars">
+            <div class="archive-pillar-card">
+                <h3>1 — Develop</h3>
+                <p>Recipes, menus, costing, vendors</p>
+            </div>
+            <div class="archive-pillar-card">
+                <h3>2 — Run the shift</h3>
+                <p>HACCP, checklists, team mobile app</p>
+            </div>
+            <div class="archive-pillar-card is-active">
+                <h3>3 — Archive</h3>
+                <p>Organized, saved, recoverable per project</p>
+            </div>
+        </div>
+
+        <div id="workspace-save-indicator-root" data-workspace-save-indicator></div>
+
+        <div class="archive-panel">
+            <h2>Backup &amp; recovery</h2>
+            <p style="color:#64748b;font-size:14px;line-height:1.5;margin:0 0 16px;">
+                Download a full account backup (all projects in this browser) or use Backup center to restore.
+                Store files on Google Drive or an external drive weekly.
+            </p>
+            <div class="archive-actions">
+                <button type="button" class="archive-btn archive-btn-primary" id="archive-full-backup-btn">
+                    <i class="fa-solid fa-download" aria-hidden="true"></i> Download full backup
+                </button>
+                <a href="data-backup-center.html" class="archive-btn archive-btn-secondary" data-iterum-feature="backup">
+                    <i class="fa-solid fa-database" aria-hidden="true"></i> Backup center
+                </a>
+                <a href="data-management-dashboard.html" class="archive-btn archive-btn-secondary" data-iterum-feature="data_tools">
+                    <i class="fa-solid fa-network-wired" aria-hidden="true"></i> Data management
+                </a>
+                <a href="audit-log.html" class="archive-btn archive-btn-secondary" data-iterum-feature="data_tools">
+                    <i class="fa-solid fa-scroll" aria-hidden="true"></i> Audit log
+                </a>
+                <a href="project-hub.html" class="archive-btn archive-btn-secondary" data-iterum-feature="projects">
+                    <i class="fa-solid fa-folder-tree" aria-hidden="true"></i> Workspaces
+                </a>
+            </div>
+        </div>
+
+        <div class="archive-panel">
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;">
+                <h2 style="margin:0;">Data by workspace</h2>
+                <button type="button" class="archive-btn archive-btn-secondary" id="archive-refresh-btn" style="padding:8px 14px;">
+                    <i class="fa-solid fa-rotate" aria-hidden="true"></i> Refresh
+                </button>
+            </div>
+            <p id="archive-inventory-status">Loading inventory…</p>
+            <div class="archive-table-wrap">
+                <table class="archive-table" aria-label="Workspace data inventory">
+                    <thead>
+                        <tr>
+                            <th scope="col">Workspace</th>
+                            <th scope="col">Recipes*</th>
+                            <th scope="col">Menu items</th>
+                            <th scope="col">Vendors</th>
+                            <th scope="col">Ingredients</th>
+                            <th scope="col">Export</th>
+                        </tr>
+                    </thead>
+                    <tbody id="archive-projects-tbody">
+                        <tr><td colspan="6" style="color:#94a3b8;">Loading…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size:12px;color:#64748b;margin:12px 0 0;">
+                *Recipe counts reflect this browser’s library; use per-workspace export for menu JSON.
+                Cloud menus and team data live under <code>projects/{id}/</code> when signed in and synced.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

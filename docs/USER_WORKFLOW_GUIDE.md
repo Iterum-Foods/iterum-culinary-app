@@ -9,6 +9,18 @@
 
 ---
 
+## Three pillars
+
+| Pillar | You are… | Start here |
+|--------|----------|------------|
+| **Develop** | Building menus, recipes, costing | [D — Workflows by task](#d-workflows-by-task) → menu / recipe rows |
+| **Run the shift** | Daily ops, HACCP, team on the floor | Dashboard, Calendar, **Shift app**, Team |
+| **Archive** | Saving, organizing, backups | **[archive-hub.html](../public/archive-hub.html)** · [THREE_PILLARS_PRODUCT_MODEL.md](./THREE_PILLARS_PRODUCT_MODEL.md) |
+
+**Who this is for:** small owners staying compliant without enterprise pricing, chefs launching with an organized menu, cooks archiving recipes for their career — see [ICP_AUDIENCE_PERSONAS.md](./ICP_AUDIENCE_PERSONAS.md).
+
+---
+
 ## How to use this document
 
 | If you are… | Start with section… |
