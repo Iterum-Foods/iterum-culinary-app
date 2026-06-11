@@ -13,6 +13,7 @@
 | Deploy + smoke + pilot demo | [HOW_WE_SHIP.md](./HOW_WE_SHIP.md) |
 | Pilot acceptance + support | [PILOT_ACCEPTANCE_CRITERIA_WEB.md](./PILOT_ACCEPTANCE_CRITERIA_WEB.md), [SUPPORT_PLAYBOOK_PILOT.md](./SUPPORT_PLAYBOOK_PILOT.md) |
 | Operator journeys in the app | [USER_WORKFLOW_GUIDE.md](./USER_WORKFLOW_GUIDE.md) |
+| Owner Bot (Iterum + RBP bridge) | [OWNER_BOT_AND_RBP_BRIDGE.md](./OWNER_BOT_AND_RBP_BRIDGE.md), [scripts/owner-bot/README.md](../scripts/owner-bot/README.md) |
 | Release validation | [QA_FEATURE_TEST_WORKFLOW.md](./QA_FEATURE_TEST_WORKFLOW.md) |
 | **Phase 2–3 execution** (stores + GTM checklists) | [PHASE_2_3_EXECUTION.md](./PHASE_2_3_EXECUTION.md) |
 

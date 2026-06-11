@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "1.0",
+  "description": "Shared owner test plan — Iterum Culinary today; link to Restaurant Business Planner via linkedApps.",
+  "linkedApps": {
+    "iterumCulinary": {
+      "baseUrlEnv": "ITERUM_BASE_URL",
+      "defaultBaseUrl": "http://localhost:8080"
+    },
+    "restaurantBusinessPlanner": {
+      "baseUrlEnv": "RBP_BASE_URL",
+      "defaultBaseUrl": "http://localhost:3000",
+      "businessPlanPathEnv": "RBP_BUSINESS_PLAN_PATH",
+      "notes": "Point RBP_BUSINESS_PLAN_PATH at your business_plan.json (e.g. C:\\Users\\chefm\\business_plan.json) for cross-app menu/restaurant checks."
+    }
+  },
+  "restaurant": {
+    "name": "Hot Chix Boston",
+    "type": "Fast Casual - Nashville Hot Chicken",
+    "location": "Boston, MA",
+    "cuisineType": "American",
+    "openingDate": "2026-06-01"
+  },
+  "menu": [
+    {
+      "name": "Nashville Hot Chicken Sandwich",
+      "category": "Sandwiches",
+      "price": 11.99,
+      "cogs": 3.5
+    }
+  ],
+  "iterumExpectations": {
+    "landing": {
+      "whoItsForSectionId": "who-its-for",
+      "pillarsSectionId": "pillars"
+    },
+    "develop": {
+      "paths": ["/recipe-library.html", "/menu-builder.html"]
+    },
+    "runTheShift": {
+      "paths": ["/dashboard.html", "/mobile-compliance.html"]
+    },
+    "archive": {
+      "paths": ["/archive-hub.html"]
+    },
+    "team": {
+      "path": "/project-hub.html#team"
+    }
+  },
+  "ownerAgent": {
+    "persona": "You are Alex, owner-operator of Hot Chix Boston (Nashville hot chicken, fast casual). You worry about passing health inspections, cannot afford enterprise kitchen software, and refuse to lose control of your recipes and menus. You think in shifts: open, service, close, Friday backup.",
+    "scenarios": [
+      {
+        "id": "morning_open",
+        "title": "Monday 9am — open the kitchen",
+        "goal": "Dashboard: confirm workspace, find HACCP/temperature/checklists for today.",
+        "startPath": "/dashboard.html",
+        "pillar": "run",
+        "maxSteps": 4
+      },
+      {
+        "id": "line_check",
+        "title": "10am — line log on the floor",
+        "goal": "Mobile shift app: workspace picker and a quick compliance action.",
+        "startPath": "/mobile-compliance.html",
+        "pillar": "run",
+        "maxSteps": 3
+      },
+      {
+        "id": "menu_work",
+        "title": "Tuesday — LTO menu work",
+        "goal": "Recipe library then menu builder — verify Nashville sandwich specs and costing path.",
+        "startPath": "/recipe-library.html",
+        "pillar": "develop",
+        "maxSteps": 4
+      },
+      {
+        "id": "weekly_archive",
+        "title": "Friday — backup you own",
+        "goal": "Archive hub: inventory per workspace and download backup.",
+        "startPath": "/archive-hub.html",
+        "pillar": "archive",
+        "maxSteps": 3
+      },
+      {
+        "id": "team_setup",
+        "title": "Hiring — crew on the workspace",
+        "goal": "Project hub team tab: see how you'd add a line cook.",
+        "startPath": "/project-hub.html#team",
+        "pillar": "run",
+        "maxSteps": 3
+      }
+    ]
+  }
+}

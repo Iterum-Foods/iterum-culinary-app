@@ -119,6 +119,8 @@ secrets.txt
 # Playwright
 /playwright-report/
 /test-results/
+/scripts/owner-bot/output/
+/scripts/owner-bot/.env.owner-bot
 /blob-report/
 playwright/.cache/
 

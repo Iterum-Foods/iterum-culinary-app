@@ -21,6 +21,11 @@
 - [ ] Eng sequences **E3** in [P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md).
 - [ ] File map + golden-path tasks: [GOLDEN_PATH_AUDIT.md](./docs/GOLDEN_PATH_AUDIT.md).
 
+**Owner Bot (pilot walkthrough)**
+
+- [ ] `npm run owner-bot:init` → edit `scripts/owner-bot/.env.owner-bot` with test Firebase user
+- [ ] Terminal 1: `npm run serve:test` · Terminal 2: `npm run owner-bot:run` — see [scripts/owner-bot/README.md](./scripts/owner-bot/README.md)
+
 **CI / automation (optional)**
 
 - [ ] If you use **Automated Dependency Updates**: repo **Settings → Actions → General** — allow Actions to **create pull requests** (see comment in [dependency-update.yml](./.github/workflows/dependency-update.yml)).
