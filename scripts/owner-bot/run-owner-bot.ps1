@@ -1,4 +1,4 @@
-# Run Iterum Owner Bot — loads scripts/owner-bot/.env.owner-bot if present.
+# Run Iterum Owner Bot - loads scripts/owner-bot/.env.owner-bot if present.
 $ErrorActionPreference = "Stop"
 $BotDir = $PSScriptRoot
 $RepoRoot = Resolve-Path (Join-Path $BotDir "..\..")
@@ -18,7 +18,7 @@ if (Test-Path $envFile) {
         }
     }
 } else {
-    Write-Host "No .env.owner-bot — run: npm run owner-bot:init"
+    Write-Host "No .env.owner-bot - run: npm run owner-bot:init"
     Write-Host "Or set ITERUM_TEST_EMAIL / ITERUM_TEST_PASSWORD manually."
 }
 
@@ -35,5 +35,6 @@ try {
 }
 
 Write-Host "Starting owner bot..."
-node (Join-Path $BotDir "owner-bot-iterum.js")
+$botScript = Join-Path $BotDir "owner-bot-iterum.js"
+& node $botScript
 exit $LASTEXITCODE
