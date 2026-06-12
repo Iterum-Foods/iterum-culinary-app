@@ -20,6 +20,24 @@ npm run owner-bot:run
 
 Or without the wrapper: `npm run owner-bot` (still auto-loads `.env.owner-bot` if present).
 
+## Provision a restaurant (workspace + recipes + menu)
+
+Creates a **new workspace** (or reuses same name), seeds **recipes** and a **launch menu** from `iterum_test_plan.json` + `RBP_BUSINESS_PLAN_PATH`:
+
+```powershell
+npm run serve:test
+npm run owner-bot:provision
+```
+
+Outputs: `scripts/owner-bot/output/provision_result.json`, screenshots on menu builder and recipe library.
+
+| Env | Purpose |
+|-----|---------|
+| `OWNER_BOT_FORCE_NEW_PROJECT=true` | Always create a new workspace (don’t reuse by name) |
+| `RBP_BUSINESS_PLAN_PATH` | Hot Chix / RBP menu + restaurant metadata |
+
+Then verify: `npm run owner-bot:run`
+
 Open when finished:
 
 - `scripts/owner-bot/output/owner_bot_iterum_report.html`
