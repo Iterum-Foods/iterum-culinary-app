@@ -340,6 +340,7 @@
     <script src="assets/js/project-management-system.js" defer></script>
   <script src="assets/js/unified-nav-header.js" defer></script>
     <script src="assets/js/unified-project-selector.js" defer></script>
+    <script src="assets/js/workspace-save-indicator.js" defer></script>
 </head>
 <body class="tc-revamp-body" style="padding-top: 80px;">
     <!-- Header -->
@@ -351,6 +352,8 @@
             <div class="hero-title">Project hub</div>
             <div style="font-size: 18px; opacity: 0.95;">Workspaces, templates, and team access for your locations</div>
         </div>
+
+        <div id="workspace-save-indicator-root" data-workspace-save-indicator aria-label="Active workspace and cloud save status" style="margin-bottom: 16px;"></div>
 
         <nav class="hub-section-tabs" aria-label="Project hub sections">
             <button type="button" class="is-active" data-hub-section="workspaces" aria-selected="true">Workspaces</button>

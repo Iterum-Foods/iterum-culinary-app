@@ -1968,6 +1968,23 @@ function wirePersonalWorkspaceUi(uid, email) {
   }
 }
 
+function updateMobileWorkspaceContext() {
+  const el = document.getElementById('mobile-workspace-context');
+  const sel = document.getElementById('project-picker');
+  if (!el || !sel) {
+    return;
+  }
+  const v = sel.value;
+  if (!v) {
+    el.hidden = true;
+    el.textContent = '';
+    return;
+  }
+  const label = sel.options[sel.selectedIndex]?.textContent?.trim() || v;
+  el.textContent = `Saving to workspace: ${label}`;
+  el.hidden = false;
+}
+
 async function refreshProjectPicker(uid) {
   migrateLegacyMobileDefault();
   const sel = document.getElementById('project-picker');
@@ -2109,8 +2126,10 @@ async function refreshProjectPicker(uid) {
     if (modal && !modal.hidden) {
       void loadComplianceArchiveMonthIntoModal();
     }
+    updateMobileWorkspaceContext();
   };
 
+  updateMobileWorkspaceContext();
   updateWorkspaceFirstRunVisibility(uid);
 
   const u = auth?.currentUser;

@@ -254,12 +254,47 @@ async function trySignIn(page, report) {
   return true;
 }
 
-async function visitPath(page, report, label, urlPath, checks) {
+async function ensureMobileSignedIn(page, report) {
+  if (!TEST_EMAIL || !TEST_PASSWORD) {
+    return false;
+  }
+  await page.goto(`${BASE_URL}/mobile-compliance.html`, {
+    waitUntil: 'domcontentloaded',
+    timeout: 45000
+  });
+  await delay(2500);
+  const appPanel = page.locator('#app-panel');
+  if (await appPanel.isVisible({ timeout: 4000 }).catch(() => false)) {
+    report.addTest('Mobile shift auth', '✅', 'Already signed in on shift app');
+    return true;
+  }
+  const email = page.locator('#auth-email');
+  if (!(await email.isVisible({ timeout: 4000 }).catch(() => false))) {
+    report.addTest('Mobile shift auth', '⚠️', 'Shift app auth form not found');
+    return false;
+  }
+  await email.fill(TEST_EMAIL);
+  await page.locator('#auth-password').fill(TEST_PASSWORD);
+  await page.locator('#btn-signin').click();
+  await delay(6000);
+  const ok = await appPanel.isVisible({ timeout: 10000 }).catch(() => false);
+  report.addTest(
+    'Mobile shift auth',
+    ok ? '✅' : '⚠️',
+    ok ? 'Signed in on mobile shift app' : 'Shift app sign-in may have failed'
+  );
+  return ok;
+}
+
+async function visitPath(page, report, label, urlPath, checks, afterGoto) {
   const url = `${BASE_URL}${urlPath}`;
   console.log(`\n→ ${label}: ${url}`);
   try {
     const res = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
     await delay(2000);
+    if (typeof afterGoto === 'function') {
+      await afterGoto(page);
+    }
     const ok = res && res.ok();
     if (!ok) {
       report.addTest(`Access: ${label}`, '❌', `HTTP ${res ? res.status() : 'no response'}`);
@@ -327,6 +362,9 @@ async function runOwnerBot() {
     report.addTest('App load', '✅', 'Iterum Culinary reachable');
 
     const signedIn = await trySignIn(page, report);
+    if (signedIn) {
+      await ensureMobileSignedIn(page, report);
+    }
     await screenshot(page, 'step_2_after_auth.png');
 
     console.log('\n=== PHASE 2: Navigation structure ===\n');
@@ -364,7 +402,11 @@ async function runOwnerBot() {
         if (p.includes('mobile-compliance')) {
           checks.push({
             name: 'project picker',
-            locator: page.locator('#project-picker, [data-project-picker]')
+            locator: page.locator('#project-picker')
+          });
+          checks.push({
+            name: 'workspace context',
+            locator: page.locator('#mobile-workspace-context, [data-workspace-save-indicator]')
           });
         }
         await visitPath(page, report, `Run the shift — ${name}`, p, checks);
@@ -383,10 +425,27 @@ async function runOwnerBot() {
       }
 
       const teamPath = exp.team?.path || '/project-hub.html#team';
-      await visitPath(page, report, 'Team — project hub', teamPath, [
-        { name: 'team panel', locator: page.locator('#team-access-panel, [data-hub-section="team"]') },
-        { name: 'members table', locator: page.locator('#team-members-tbody') }
-      ]);
+      await visitPath(
+        page,
+        report,
+        'Team — project hub',
+        teamPath,
+        [
+          { name: 'team tab panel', locator: page.locator('#hub-tab-team') },
+          { name: 'team panel', locator: page.locator('#team-access-panel') },
+          { name: 'members table', locator: page.locator('#team-members-tbody') }
+        ],
+        async p => {
+          const teamPanel = p.locator('#hub-tab-team');
+          const isHidden = await teamPanel.evaluate(el => el.hasAttribute('hidden')).catch(() => true);
+          if (isHidden) {
+            await p.locator('[data-hub-section="team"]').click();
+            await delay(800);
+          }
+          await teamPanel.waitFor({ state: 'visible', timeout: 10000 });
+          await delay(500);
+        }
+      );
       await screenshot(page, 'step_team_hub.png');
     } else {
       report.addIssue(
@@ -400,6 +459,7 @@ async function runOwnerBot() {
       await runOwnerDayWalkthrough(page, BASE_URL, testPlan, report, {
         outputDir: OUTPUT_DIR,
         screenshotPerScenario: true,
+        signedIn,
         maxScenarios: parseInt(process.env.OWNER_BOT_AI_SCENARIOS || '5', 10) || 5
       });
       if (report.meta.agentSummary) {

@@ -98,6 +98,17 @@ function setHubSection(section) {
   }
 }
 
+function applyHashSection() {
+  const hash = (window.location.hash || '').replace('#', '').toLowerCase();
+  if (hash === 'team') {
+    setHubSection('team');
+    return;
+  }
+  if (hash === 'workspaces' || !hash) {
+    setHubSection('workspaces');
+  }
+}
+
 function initHubTabs() {
   document.querySelectorAll('[data-hub-section]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -109,10 +120,8 @@ function initHubTabs() {
       }
     });
   });
-  const hash = (window.location.hash || '').replace('#', '');
-  if (hash === 'team') {
-    setHubSection('team');
-  }
+  applyHashSection();
+  window.addEventListener('hashchange', applyHashSection);
 }
 
 function buildInviteText() {

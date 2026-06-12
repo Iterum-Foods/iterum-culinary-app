@@ -40,6 +40,10 @@ test.describe('Smoke', () => {
         await expect(page.locator('[data-hub-section="team"]')).toHaveCount(1);
         await expect(page.locator('#team-members-tbody')).toHaveCount(1);
       }
+      if (path === '/mobile-compliance.html') {
+        await expect(page.locator('#project-picker')).toHaveCount(1);
+        await expect(page.locator('#mobile-workspace-context')).toHaveCount(1);
+      }
       if (path === '/archive-hub.html') {
         await expect(page.getByRole('heading', { level: 1, name: /Archive/i })).toBeVisible();
         await expect(page.locator('#archive-projects-tbody')).toHaveCount(1);

@@ -114,13 +114,20 @@ async function capturePageContext(page) {
         href: el.getAttribute('href') || null
       }))
       .filter(x => x.text || x.href);
-    const banner = document.querySelector('.iterum-workspace-banner, [data-workspace-save-indicator]');
+    const banner = document.querySelector(
+      '.iterum-workspace-banner, [data-workspace-save-indicator]:not([hidden])'
+    );
+    const picker = document.getElementById('project-picker');
+    const pickerVisible =
+      picker && picker.offsetParent !== null && !picker.hidden;
     return {
       url: location.href,
       pathname: location.pathname,
       title: document.title,
       headings,
       workspaceBanner: banner ? (banner.innerText || '').trim().slice(0, 200) : null,
+      hasProjectPicker: pickerVisible,
+      projectPickerValue: pickerVisible ? picker.value : null,
       bodyPreview: (document.body.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 2400),
       interactives
     };
@@ -236,7 +243,31 @@ async function planWithAi(scenario, persona, context, history, allowedPaths) {
   });
 }
 
-function planWithScript(scenario, context, stepIndex) {
+function hasWorkspaceContext(context) {
+  return Boolean(
+    context.workspaceBanner ||
+      context.hasProjectPicker ||
+      /Saving to workspace/i.test(context.bodyPreview || '')
+  );
+}
+
+function isAuthLandingPage(context) {
+  const path = (context.pathname || '').toLowerCase();
+  if (
+    /dashboard|recipe|menu|archive|project-hub|mobile-compliance|ingredients|vendor/.test(
+      path
+    )
+  ) {
+    return false;
+  }
+  return (
+    path === '/' ||
+    path.endsWith('/index.html') ||
+    path.includes('signin')
+  );
+}
+
+function planWithScript(scenario, context, stepIndex, options = {}) {
   const thoughts = {
     morning_open: [
       'First thing Monday: I need to see if yesterday’s logs are here and which workspace I’m saving to.',
@@ -266,23 +297,27 @@ function planWithScript(scenario, context, stepIndex) {
 
   const actions = [{ type: 'observe' }];
   const text = (context.bodyPreview || '').toLowerCase();
-  if (scenario.pillar === 'run' && /haccp|temperature|checklist/i.test(text)) {
+  if (scenario.id === 'team_setup') {
+    actions.push({ type: 'click', text: 'Team management' });
+  } else if (scenario.pillar === 'run' && /haccp|temperature|checklist/i.test(text)) {
     actions.push({ type: 'click', text: 'HACCP' });
   } else if (scenario.pillar === 'archive' && /backup|download|export/i.test(text)) {
     actions.push({ type: 'click', text: 'backup' });
   } else if (scenario.pillar === 'develop' && /recipe|menu/i.test(text)) {
     actions.push({ type: 'click', text: 'recipe' });
-  } else if (/team|member|add/i.test(text) && scenario.id === 'team_setup') {
-    actions.push({ type: 'click', text: 'Team' });
   } else {
     actions.push({ type: 'scroll', pixels: 500 });
   }
 
   const blockers = [];
-  if (!context.workspaceBanner && scenario.pillar !== 'archive') {
-    blockers.push('Workspace save banner not visible — unclear which store data goes to');
+  if (!hasWorkspaceContext(context) && scenario.pillar !== 'archive') {
+    if (options.signedIn) {
+      blockers.push('Workspace context not obvious on this screen (banner or picker)');
+    } else {
+      blockers.push('Workspace save banner not visible — unclear which store data goes to');
+    }
   }
-  if (/sign in|welcome back/i.test(text) && !/dashboard|archive|recipe/i.test(context.pathname)) {
+  if (!options.signedIn && isAuthLandingPage(context)) {
     blockers.push('Still on auth/landing — full owner flow needs sign-in');
   }
 
@@ -296,7 +331,7 @@ function planWithScript(scenario, context, stepIndex) {
   };
 }
 
-async function runScenario(page, baseUrl, scenario, testPlan, report, journal) {
+async function runScenario(page, baseUrl, scenario, testPlan, report, journal, options = {}) {
   const persona = buildPersona(testPlan);
   const maxSteps = scenario.maxSteps || MAX_STEPS_PER_SCENARIO;
   const startPath = scenario.startPath || '/dashboard.html';
@@ -369,6 +404,7 @@ async function runScenario(page, baseUrl, scenario, testPlan, report, journal) {
 }
 
 async function runOwnerDayWalkthrough(page, baseUrl, testPlan, report, options = {}) {
+  const signedIn = options.signedIn === true;
   const journal = [];
   const scenarios = (options.scenarios || defaultScenarios(testPlan)).slice(
     0,
@@ -385,7 +421,9 @@ async function runOwnerDayWalkthrough(page, baseUrl, testPlan, report, options =
   );
 
   for (const scenario of scenarios) {
-    await runScenario(page, baseUrl, scenario, testPlan, report, journal);
+    await runScenario(page, baseUrl, scenario, testPlan, report, journal, {
+      signedIn
+    });
     if (options.screenshotPerScenario) {
       const shot = `agent_${scenario.id}.png`;
       await page.screenshot({
