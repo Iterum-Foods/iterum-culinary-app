@@ -52,6 +52,8 @@ const {
   renderAgentHtml,
   isAgentEnabled
 } = require('./owner-agent');
+const { runDevelopWorkflows } = require('./owner-bot-workflows');
+const { runComplianceWorkflows } = require('./owner-bot-compliance');
 
 const ROOT = path.join(__dirname, '..', '..');
 const OUTPUT_DIR =
@@ -447,6 +449,16 @@ async function runOwnerBot() {
         }
       );
       await screenshot(page, 'step_team_hub.png');
+
+      await runDevelopWorkflows(page, BASE_URL, report, {
+        signedIn,
+        screenshot: name => screenshot(page, name)
+      });
+
+      await runComplianceWorkflows(page, BASE_URL, report, {
+        signedIn,
+        screenshot: name => screenshot(page, name)
+      });
     } else {
       report.addIssue(
         'MAJOR',

@@ -26,6 +26,7 @@ const ALLOWED_PATH_PREFIXES = [
   '/menu-builder.html',
   '/recipe-library.html',
   '/recipe-developer.html',
+  '/kitchen-management.html',
   '/archive-hub.html',
   '/mobile-compliance.html',
   '/project-hub.html',

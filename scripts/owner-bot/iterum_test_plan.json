@@ -34,7 +34,12 @@
       "pillarsSectionId": "pillars"
     },
     "develop": {
-      "paths": ["/recipe-library.html", "/menu-builder.html"]
+      "paths": [
+        "/recipe-library.html",
+        "/menu-builder.html",
+        "/kitchen-management.html",
+        "/recipe-developer.html"
+      ]
     },
     "runTheShift": {
       "paths": ["/dashboard.html", "/mobile-compliance.html"]
@@ -66,10 +71,42 @@
         "maxSteps": 3
       },
       {
+        "id": "haccp_temp_logs",
+        "title": "Open — fridge temps & sanitizer",
+        "goal": "Dashboard and shift app: log cold-holding temps and sanitizer PPM for Hot Chix Boston workspace today.",
+        "startPath": "/dashboard.html#temperature",
+        "pillar": "run",
+        "maxSteps": 4
+      },
+      {
         "id": "menu_work",
         "title": "Tuesday — LTO menu work",
         "goal": "Recipe library then menu builder — verify Nashville sandwich specs and costing path.",
         "startPath": "/recipe-library.html",
+        "pillar": "develop",
+        "maxSteps": 4
+      },
+      {
+        "id": "prep_list_kitchen",
+        "title": "Wednesday 7am — next-day prep list",
+        "goal": "Kitchen management: generate tomorrow prep list from Hot Chix launch menu with station tasks and shopping list.",
+        "startPath": "/kitchen-management.html",
+        "pillar": "develop",
+        "maxSteps": 3
+      },
+      {
+        "id": "line_prep_lists",
+        "title": "Wednesday open — crew prep checklist",
+        "goal": "Mobile shift app Lists tab: build and save today's prep checklist for the line.",
+        "startPath": "/mobile-compliance.html",
+        "pillar": "run",
+        "maxSteps": 3
+      },
+      {
+        "id": "recipe_dev_sandwich",
+        "title": "Thursday — develop the signature sandwich",
+        "goal": "Recipe developer: open Nashville Hot Chicken Sandwich, add prep items, notes, and save.",
+        "startPath": "/recipe-developer.html",
         "pillar": "develop",
         "maxSteps": 4
       },

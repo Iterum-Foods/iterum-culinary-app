@@ -13,6 +13,9 @@
     <script src="assets/js/user-role-setup.js"></script>
     <script type="module" src="assets/js/project-hub-team.js"></script>
     <script src="assets/js/demo-seed-data.js"></script>
+    <script src="assets/js/user-data-manager.js" defer></script>
+    <script src="assets/js/rbp-provision.js" defer></script>
+    <script src="assets/js/rbp-develop-seed.js" defer></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
@@ -376,6 +379,21 @@
                     Install sample data
                 </button>
                 <a href="demo-prep.html" style="font-size: 14px; font-weight: 600; color: #5b9bad;">Advanced demo options →</a>
+            </div>
+        </section>
+
+        <!-- RBP / Hot Chix workspace -->
+        <section id="rbp-import-panel" style="background: white; border-radius: 16px; padding: 28px; margin-bottom: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
+            <h2 class="section-title" style="margin-bottom: 8px;">🍗 Hot Chix Boston (from business plan)</h2>
+            <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 16px; max-width: 640px;">
+                Import the <strong>Hot Chix Boston</strong> workspace into <em>this browser</em>: restaurant project, launch menu, and published recipes from the Restaurant Business Planner plan.
+                Safe to run again — matching IDs are updated in place.
+            </p>
+            <p id="rbp-import-status" style="font-size: 14px; color: #0f766e; min-height: 1.25em; margin-bottom: 12px;" role="status"></p>
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+                <button type="button" id="btn-import-hotchix" style="padding: 12px 20px; border-radius: 10px; border: none; background: linear-gradient(135deg, #dc2626 0%, #ea580c 100%); color: white; font-weight: 700; font-size: 15px; cursor: pointer;">
+                    Import Hot Chix Boston
+                </button>
             </div>
         </section>
 
@@ -1124,17 +1142,131 @@
             installSampleProjectData();
         });
 
+        function setRbpProvisionSignal(status, detail) {
+            document.documentElement.setAttribute('data-rbp-provision-done', status);
+            if (detail) {
+                document.documentElement.setAttribute('data-rbp-provision-detail', detail);
+            }
+        }
+
+        async function importHotchixBoston(options) {
+            var silent = options && options.silent;
+            var forceNew = options && options.forceNew;
+            var statusEl = document.getElementById('rbp-import-status');
+            if (typeof window.iterumProvisionHotchixBoston !== 'function') {
+                if (!silent) {
+                    alert('Import script not loaded. Refresh the page and try again.');
+                }
+                setRbpProvisionSignal('error', 'script_missing');
+                return null;
+            }
+            if (!window.projectManager) {
+                if (!silent) {
+                    alert('Project system not ready. Refresh and try again.');
+                }
+                setRbpProvisionSignal('error', 'project_manager_missing');
+                return null;
+            }
+            if (
+                !silent &&
+                !confirm(
+                    'Import Hot Chix Boston workspace, recipes, and launch menu into this browser?\n\nSafe to run again — existing Hot Chix IDs are updated in place.'
+                )
+            ) {
+                setRbpProvisionSignal('cancelled', 'user_cancelled');
+                return null;
+            }
+            if (statusEl) {
+                statusEl.textContent = 'Importing Hot Chix Boston…';
+            }
+            try {
+                var result = await window.iterumProvisionHotchixBoston({
+                    forceNew: !!forceNew,
+                    syncCloud: true
+                });
+                var msg =
+                    'Hot Chix Boston: ' +
+                    result.recipeCount +
+                    ' recipes, ' +
+                    result.menuItemCount +
+                    ' menu items' +
+                    (result.cloudSync && result.cloudSync.cloud ? ' (cloud synced)' : '');
+                if (statusEl) {
+                    statusEl.textContent = msg;
+                }
+                loadProjects();
+                setRbpProvisionSignal('ok', result.projectId);
+                if (!silent) {
+                    alert('✅ ' + msg);
+                }
+                return result;
+            } catch (err) {
+                var code = (err && err.message) || 'unknown';
+                if (statusEl) {
+                    statusEl.textContent = '';
+                }
+                setRbpProvisionSignal('error', code);
+                if (code === 'not_signed_in') {
+                    if (!silent) {
+                        alert('Sign in first, then import Hot Chix Boston.');
+                    }
+                } else if (!silent) {
+                    alert('Could not import: ' + code);
+                }
+                return null;
+            }
+        }
+
+        document.getElementById('btn-import-hotchix')?.addEventListener('click', function () {
+            importHotchixBoston({ silent: false });
+        });
+
         // Load on init
         document.addEventListener('DOMContentLoaded', function() {
-            // Wait for project manager
-            setTimeout(() => {
-                if (window.projectManager) {
-                    loadProjects();
-                } else {
-                    console.error('Project manager not available');
-                    alert('Project system not ready. Please refresh the page.');
+            var params = new URLSearchParams(window.location.search);
+            var autoImport =
+                params.get('importRestaurant') === 'hotchix' ||
+                params.get('rbp_provision') === '1';
+            var autoDevelop = params.get('rbp_develop') === '1';
+
+            function setRbpDevelopSignal(status, detail) {
+                document.documentElement.setAttribute('data-rbp-develop-done', status);
+                if (detail) {
+                    document.documentElement.setAttribute('data-rbp-develop-detail', detail);
                 }
-            }, 500);
+            }
+
+            // Wait for project manager
+            setTimeout(async function () {
+                if (!window.projectManager) {
+                    console.error('Project manager not available');
+                    if (!autoImport && !autoDevelop) {
+                        alert('Project system not ready. Please refresh the page.');
+                    }
+                    setRbpProvisionSignal('error', 'project_manager_missing');
+                    setRbpDevelopSignal('error', 'project_manager_missing');
+                    return;
+                }
+                loadProjects();
+                if (autoImport || autoDevelop) {
+                    await importHotchixBoston({
+                        silent: true,
+                        forceNew: params.get('forceNew') === '1'
+                    });
+                }
+                if (autoDevelop) {
+                    try {
+                        if (typeof window.iterumEnrichHotchixRecipes !== 'function') {
+                            setRbpDevelopSignal('error', 'script_missing');
+                        } else {
+                            var developResult = window.iterumEnrichHotchixRecipes();
+                            setRbpDevelopSignal('ok', JSON.stringify(developResult));
+                        }
+                    } catch (developErr) {
+                        setRbpDevelopSignal('error', (developErr && developErr.message) || 'unknown');
+                    }
+                }
+            }, 800);
         });
     </script>
 </body>

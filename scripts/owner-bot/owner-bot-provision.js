@@ -13,8 +13,7 @@ const {
   loadLocalEnv,
   loadTestPlan,
   delay,
-  trySignIn,
-  waitForProjectManager
+  trySignIn
 } = require('./owner-bot-lib');
 
 loadLocalEnv();
@@ -37,199 +36,56 @@ function ensureOutputDir() {
 }
 
 /**
- * Runs in the browser on dashboard.html after sign-in.
+ * Runs in the signed-in user's browser via project-hub import (shared rbp-provision.js).
  */
-async function provisionInBrowser(page, plan) {
-  const ready = await waitForProjectManager(page);
-  if (!ready) {
-    throw new Error('projectManager not ready — open dashboard after sign-in');
+async function provisionInBrowser(page) {
+  const forceQs = FORCE_NEW ? '&forceNew=1' : '';
+  await page.goto(
+    `${BASE_URL}/project-hub.html?importRestaurant=hotchix&owner_bot=1${forceQs}`,
+    { waitUntil: 'domcontentloaded', timeout: 45000 }
+  );
+
+  await page.waitForFunction(
+    () => {
+      const status = document.documentElement.getAttribute('data-rbp-provision-done');
+      return status === 'ok' || status === 'error' || status === 'cancelled';
+    },
+    { timeout: 60000 }
+  );
+
+  const outcome = await page.evaluate(() => ({
+    status: document.documentElement.getAttribute('data-rbp-provision-done'),
+    detail: document.documentElement.getAttribute('data-rbp-provision-detail')
+  }));
+
+  if (outcome.status !== 'ok') {
+    throw new Error(
+      `provision failed: ${outcome.status}${outcome.detail ? ` (${outcome.detail})` : ''}`
+    );
   }
 
-  return page.evaluate(
-    async ({ restaurant, menu, forceNew }) => {
-      const pm = window.projectManager;
-      const udm = window.userDataManager;
-      const uid =
-        pm.currentUserId ||
-        udm?.userId ||
-        window.authManager?.currentUser?.userId ||
-        window.authManager?.currentUser?.id;
-
-      if (!uid) {
-        throw new Error('No user id after sign-in');
-      }
-
-      const slug = (restaurant.name || 'restaurant')
-        .replace(/[^a-z0-9]+/gi, '_')
-        .toLowerCase()
-        .slice(0, 28);
-
-      let project = null;
-      if (!forceNew) {
-        project = pm.projects.find(
-          p =>
-            p &&
-            !p.isArchived &&
-            (p.name === restaurant.name ||
-              (Array.isArray(p.tags) && p.tags.includes('owner-bot')))
-        );
-      }
-
-      if (project) {
-        pm.setCurrentProject(project.id);
-      } else {
-        project = pm.createProject({
-          name: restaurant.name,
-          description: [
-            restaurant.type,
-            restaurant.location,
-            restaurant.openingDate ? `Opens ${restaurant.openingDate}` : ''
-          ]
-            .filter(Boolean)
-            .join(' · '),
-          type: 'restaurant',
-          icon: '🍽️',
-          tags: ['owner-bot', 'rbp'],
-          cuisineType: restaurant.cuisineType,
-          location: restaurant.location,
-          openingDate: restaurant.openingDate
-        });
-      }
-
-      const skipCategories = new Set(['spice level', 'modifier']);
-      const menuSource = Array.isArray(menu) ? menu : [];
-      const sellable = menuSource.filter(item => {
-        if (!item || !item.name) return false;
-        const cat = String(item.category || '').toLowerCase();
-        if (skipCategories.has(cat)) return false;
-        return Number(item.price) > 0 || cat === 'sides' || cat === 'beverages';
-      });
-
-      const recipes = [];
-      const menuRows = [];
-      const now = new Date().toISOString();
-
-      sellable.forEach((item, index) => {
-        const recipeId = `rbp_${slug}_r${item.id != null ? item.id : index + 1}`;
-        const foodCost = Number(item.cogs) || 0;
-        const price = Number(item.price) || 0;
-        const margin =
-          price > 0 ? Math.round(((price - foodCost) / price) * 1000) / 10 : null;
-
-        const recipe = {
-          id: recipeId,
-          title: item.name,
-          name: item.name,
-          category: item.category || 'Menu',
-          status: 'published',
-          projectId: project.id,
-          project: project.id,
-          userId: uid,
-          servings: 1,
-          yield: item.quantity || '1 serving',
-          ingredients: [],
-          instructions: [
-            `Standard prep for ${item.name}.`,
-            'Verify heat level and plating before service.'
-          ],
-          notes: `Provisioned from Restaurant Business Planner. Target COGS $${foodCost.toFixed(2)}.`,
-          cost: foodCost,
-          source: 'owner-bot-provision',
-          lastModified: now
-        };
-        recipes.push(recipe);
-
-        menuRows.push({
-          id: `rbp_${slug}_m${item.id != null ? item.id : index + 1}`,
-          name: item.name,
-          category: item.category || 'Menu',
-          price,
-          foodCost,
-          marginPercent: margin,
-          recipeId,
-          recipeName: item.name,
-          projectId: project.id,
-          status: 'active',
-          description: item.quantity || ''
-        });
-      });
-
-      function mergeById(existing, incoming) {
-        const map = new Map((existing || []).map(row => [row.id, row]));
-        incoming.forEach(row => map.set(row.id, row));
-        return Array.from(map.values());
-      }
-
-      if (udm && typeof udm.saveData === 'function') {
-        const existing = udm.loadData('recipes') || [];
-        udm.saveData('recipes', mergeById(existing, recipes));
-      } else {
-        const key = `recipes_${uid}`;
-        const existing = JSON.parse(localStorage.getItem(key) || '[]');
-        localStorage.setItem(key, JSON.stringify(mergeById(existing, recipes)));
-        localStorage.setItem('recipes', JSON.stringify(mergeById(existing, recipes)));
-      }
-
-      const menuId = `menu_${project.id}_launch`;
-      const menuPayload = {
-        menu: {
-          id: menuId,
-          name: `${restaurant.name} — Launch Menu`,
-          projectId: project.id,
-          status: 'active',
-          updatedAt: now
-        },
-        items: menuRows,
-        updatedAt: now
-      };
-      localStorage.setItem(`menu_data_${project.id}`, JSON.stringify(menuPayload));
-
-      const menusKey = `menus_${uid}`;
-      const menusList = JSON.parse(localStorage.getItem(menusKey) || '[]');
-      const menuEntry = {
-        id: menuId,
-        name: menuPayload.menu.name,
-        projectId: project.id,
-        itemCount: menuRows.length,
-        updatedAt: now
-      };
-      const idx = menusList.findIndex(m => m.id === menuId);
-      if (idx >= 0) menusList[idx] = menuEntry;
-      else menusList.push(menuEntry);
-      localStorage.setItem(menusKey, JSON.stringify(menusList));
-
-      try {
-        localStorage.setItem('active_project', project.id);
-        localStorage.setItem('active_project_name', project.name);
-        localStorage.setItem('active_project_id', project.id);
-        localStorage.setItem(`iterum_current_project_user_${uid}`, project.id);
-      } catch (e) {
-        void e;
-      }
-
-      document.dispatchEvent(
-        new CustomEvent('projectChanged', {
-          bubbles: true,
-          detail: { projectId: project.id, project, userId: uid }
-        })
-      );
-
-      return {
-        projectId: project.id,
-        projectName: project.name,
-        recipeCount: recipes.length,
-        menuItemCount: menuRows.length,
-        menuId,
-        menuName: menuPayload.menu.name,
-        skippedMenuRows: menuSource.length - sellable.length
-      };
-    },
-    {
-      restaurant: plan.restaurant,
-      menu: plan.menu,
-      forceNew: FORCE_NEW
-    }
-  );
+  return page.evaluate(async () => {
+    const pm = window.projectManager;
+    const projectId = document.documentElement.getAttribute('data-rbp-provision-detail');
+    const project = pm?.projects?.find(p => p.id === projectId);
+    const menuRaw = projectId
+      ? localStorage.getItem(`menu_data_${projectId}`)
+      : null;
+    const menuPayload = menuRaw ? JSON.parse(menuRaw) : null;
+    const recipes = window.userDataManager?.loadData('recipes') || [];
+    const projectRecipes = recipes.filter(
+      r => r && (r.projectId === projectId || r.project === projectId)
+    );
+    return {
+      projectId,
+      projectName: project?.name || 'Hot Chix Boston',
+      recipeCount: projectRecipes.length,
+      menuItemCount: menuPayload?.items?.length || 0,
+      menuId: menuPayload?.menu?.id,
+      menuName: menuPayload?.menu?.name,
+      skippedMenuRows: 0
+    };
+  });
 }
 
 async function runProvision() {
@@ -265,14 +121,8 @@ async function runProvision() {
       return;
     }
 
-    await page.goto(`${BASE_URL}/dashboard.html`, {
-      waitUntil: 'domcontentloaded',
-      timeout: 45000
-    });
-    await delay(3000);
-
-    console.log('\nProvisioning workspace, recipes, and menu...');
-    const result = await provisionInBrowser(page, plan);
+    console.log('\nProvisioning workspace, recipes, and menu (project-hub import)...');
+    const result = await provisionInBrowser(page);
     console.log('\nProvisioned:');
     console.log(`  Workspace: ${result.projectName} (${result.projectId})`);
     console.log(`  Recipes:   ${result.recipeCount}`);

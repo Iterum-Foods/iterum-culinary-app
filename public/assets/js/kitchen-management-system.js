@@ -51,14 +51,6 @@ class KitchenManagementSystem {
    */
   async loadUserData() {
     try {
-      // Load recipes from universal recipe manager
-      if (window.universalRecipeManager?.getRecipeLibrary) {
-        this.currentRecipes = window.universalRecipeManager.getRecipeLibrary();
-      } else {
-        const allRecipes = JSON.parse(localStorage.getItem('recipes') || '[]');
-        this.currentRecipes = allRecipes;
-      }
-
       // Determine project ID and load menu data
       const projectId =
         this.currentProjectId ||
@@ -66,6 +58,27 @@ class KitchenManagementSystem {
         window.projectManager?.masterProjectId ||
         'master';
       this.currentProjectId = projectId;
+
+      // Prefer workspace-scoped recipes from user data, then universal library
+      let allRecipes = [];
+      if (window.userDataManager?.loadData) {
+        allRecipes = window.userDataManager.loadData('recipes') || [];
+      }
+      if (!allRecipes.length && window.universalRecipeManager?.getAllRecipes) {
+        allRecipes = window.universalRecipeManager.getAllRecipes();
+      } else if (!allRecipes.length && window.universalRecipeManager?.getRecipeLibrary) {
+        allRecipes = window.universalRecipeManager.getRecipeLibrary();
+      } else if (!allRecipes.length) {
+        allRecipes = JSON.parse(localStorage.getItem('recipes') || '[]');
+      }
+      if (projectId && projectId !== 'master') {
+        const scoped = allRecipes.filter(
+          r => r && (!r.projectId || r.projectId === projectId)
+        );
+        this.currentRecipes = scoped.length ? scoped : allRecipes;
+      } else {
+        this.currentRecipes = allRecipes;
+      }
       const menuKey = `${window.enhancedMenuManager?.storageKey || 'menu_data'}_${projectId}`;
       const storedMenu = localStorage.getItem(menuKey);
       if (storedMenu) {

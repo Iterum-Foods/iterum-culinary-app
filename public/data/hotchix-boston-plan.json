@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.0",
+  "restaurant": {
+    "name": "Hot Chix Boston",
+    "type": "Fast Casual - Nashville Hot Chicken",
+    "location": "Boston, MA",
+    "cuisineType": "American",
+    "openingDate": "2026-06-01"
+  },
+  "menu": [
+    {
+      "id": 1,
+      "name": "Nashville Hot Chicken Sandwich",
+      "category": "Sandwiches",
+      "price": 11.99,
+      "cogs": 3.5,
+      "quantity": "1 sandwich"
+    },
+    {
+      "id": 2,
+      "name": "Heat Level 3 (Medium)",
+      "category": "Spice Level",
+      "price": 0,
+      "cogs": 0.25
+    },
+    {
+      "id": 3,
+      "name": "Heat Level 5 (Extra Hot)",
+      "category": "Spice Level",
+      "price": 1.5,
+      "cogs": 0.35
+    },
+    {
+      "id": 4,
+      "name": "3-Piece Tenders",
+      "category": "Mains",
+      "price": 10.99,
+      "cogs": 3.25
+    },
+    {
+      "id": 5,
+      "name": "6-Piece Tenders",
+      "category": "Mains",
+      "price": 18.99,
+      "cogs": 5.75
+    },
+    {
+      "id": 6,
+      "name": "Fried Oreos",
+      "category": "Desserts",
+      "price": 6.99,
+      "cogs": 1.5
+    },
+    {
+      "id": 7,
+      "name": "Mac & Cheese",
+      "category": "Sides",
+      "price": 4.99,
+      "cogs": 1.2
+    },
+    {
+      "id": 8,
+      "name": "Coleslaw",
+      "category": "Sides",
+      "price": 2.99,
+      "cogs": 0.6
+    },
+    {
+      "id": 9,
+      "name": "Fries",
+      "category": "Sides",
+      "price": 3.99,
+      "cogs": 0.75
+    },
+    {
+      "id": 10,
+      "name": "Soft Drink",
+      "category": "Beverages",
+      "price": 2.99,
+      "cogs": 0.4
+    },
+    {
+      "id": 11,
+      "name": "Beer (Domestic)",
+      "category": "Beverages",
+      "price": 5.5,
+      "cogs": 1.8
+    },
+    {
+      "id": 12,
+      "name": "Combo Meal",
+      "category": "Combos",
+      "price": 16.99,
+      "cogs": 5.1,
+      "quantity": "Sandwich, Fries, Drink"
+    }
+  ]
+}
