@@ -17,6 +17,8 @@
     "owner-bot:provision": "node scripts/owner-bot/owner-bot-provision.js",
     "owner-bot:develop": "node scripts/owner-bot/owner-bot-develop.js",
     "owner-bot:compliance": "node scripts/owner-bot/owner-bot-compliance.js",
+    "owner-bot:profiles": "node scripts/owner-bot/owner-bot-profiles.js",
+    "test:profiles": "playwright test tests/e2e/project-profiles.spec.js --project=chromium",
     "verify:sprints": "npm run lint && npm run format:check && npm run test:chromium",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",

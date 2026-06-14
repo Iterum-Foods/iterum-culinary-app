@@ -764,3 +764,61 @@
     opacity: 0.45;
   }
 }
+
+.iterum-workspace-identity {
+  margin: 0.75rem 0 1rem;
+}
+
+.iterum-workspace-identity__inner {
+  padding: 0.875rem 1rem;
+  border-radius: 0.625rem;
+  border: 1px solid hsl(var(--tc-border));
+  background: hsl(var(--tc-muted) / 0.35);
+}
+
+.iterum-workspace-identity__badge,
+.iterum-workspace-identity__pillar {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  margin-right: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.iterum-workspace-identity__badge {
+  background: hsl(var(--tc-primary) / 0.12);
+  color: hsl(var(--tc-primary));
+}
+
+.iterum-workspace-identity__pillar {
+  background: hsl(var(--tc-accent, 24 95% 53%) / 0.12);
+  color: hsl(var(--tc-foreground));
+}
+
+.iterum-workspace-identity__tagline {
+  margin: 0.35rem 0 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: hsl(var(--tc-muted-foreground));
+}
+
+.iterum-workspace-identity__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+}
+
+.iterum-workspace-identity__link {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: hsl(var(--tc-primary));
+  text-decoration: none;
+}
+
+.iterum-workspace-identity__link:hover {
+  text-decoration: underline;
+}

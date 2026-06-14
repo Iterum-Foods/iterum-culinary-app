@@ -1,0 +1,71 @@
+[
+  {
+    "id": "owner-restaurant",
+    "persona": "A",
+    "label": "Small business owner",
+    "projectType": "restaurant",
+    "primaryPillar": "run",
+    "paths": [
+      { "path": "/dashboard.html#temperature", "expect": "Temperature" },
+      { "path": "/mobile-compliance.html", "expect": "shift" },
+      { "path": "/archive-hub.html", "expect": "Archive" }
+    ]
+  },
+  {
+    "id": "chef-launch",
+    "persona": "B",
+    "label": "Chef launching",
+    "projectType": "restaurant-menu",
+    "primaryPillar": "develop",
+    "paths": [
+      { "path": "/recipe-library.html", "expect": "Recipe Library" },
+      { "path": "/menu-builder.html", "expect": "menu" },
+      { "path": "/project-hub.html", "expect": "Quick Start" }
+    ]
+  },
+  {
+    "id": "cook-career",
+    "persona": "C",
+    "label": "Career cook portfolio",
+    "projectType": "home-cookbook",
+    "primaryPillar": "develop",
+    "paths": [
+      { "path": "/recipe-library.html", "expect": "Recipe Library" },
+      { "path": "/recipe-developer.html", "expect": "recipe" },
+      { "path": "/archive-hub.html", "expect": "Archive" }
+    ]
+  },
+  {
+    "id": "catering-event",
+    "persona": "B",
+    "label": "Catering event",
+    "projectType": "catering-event",
+    "primaryPillar": "develop",
+    "paths": [
+      { "path": "/menu-builder.html", "expect": "menu" },
+      { "path": "/production-planning.html", "expect": "Production" }
+    ]
+  },
+  {
+    "id": "recipe-rd",
+    "persona": "C",
+    "label": "Recipe R&D lab",
+    "projectType": "recipe-testing",
+    "primaryPillar": "develop",
+    "paths": [
+      { "path": "/recipe-developer.html", "expect": "recipe" },
+      { "path": "/recipe-library.html", "expect": "Recipe Library" }
+    ]
+  },
+  {
+    "id": "seasonal-menu",
+    "persona": "B",
+    "label": "Seasonal menu",
+    "projectType": "seasonal-menu",
+    "primaryPillar": "develop",
+    "paths": [
+      { "path": "/menu-builder.html", "expect": "menu" },
+      { "path": "/ingredients.html", "expect": "ingredient" }
+    ]
+  }
+]
