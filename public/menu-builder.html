@@ -1200,6 +1200,7 @@
     <script src="assets/js/toast-notifications.js" defer></script>
     <script src="assets/js/workspace-save-indicator.js" defer></script>
     <script src="assets/js/workspace-identity.js" defer></script>
+    <script src="assets/js/menu-plan-format.js" defer></script>
 </head>
 <body class="menu-builder-page tc-revamp-body min-h-screen" style="padding-top: 0;">
     <!-- Emergency Loading Fix Button -->
@@ -1217,11 +1218,31 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label for="create-menu-name" class="form-label">Menu name *</label>
-                    <input type="text" id="create-menu-name" class="form-input" required placeholder="e.g. Spring tasting 2026">
+                    <input type="text" id="create-menu-name" class="form-input" required placeholder="e.g. Spring dinner 2026">
+                </div>
+                <div class="form-group">
+                    <label for="create-menu-type" class="form-label">Menu format</label>
+                    <select id="create-menu-type" class="form-select" onchange="updateCreateMenuSectionPreview()">
+                        <option value="dinner">Dinner (à la carte)</option>
+                        <option value="brunch">Boozy brunch</option>
+                        <option value="lunch">Lunch</option>
+                        <option value="tasting">Tasting menu</option>
+                        <option value="club">Club snacks &amp; small plates</option>
+                        <option value="seasonal">Seasonal dinner</option>
+                        <option value="blank">Blank — add sections as you go</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="create-menu-target-check" class="form-label">Target check (optional, all-in)</label>
+                    <input type="number" id="create-menu-target-check" class="form-input" min="0" step="1" placeholder="e.g. 85">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sections (pre-filled)</label>
+                    <p id="create-menu-sections-preview" class="text-sm" style="color: var(--brand-text-muted); margin: 0; line-height: 1.5;"></p>
                 </div>
                 <div class="form-group">
                     <label for="create-menu-desc" class="form-label">Description (optional)</label>
-                    <textarea id="create-menu-desc" class="form-textarea" rows="2" placeholder="Short note for your team"></textarea>
+                    <textarea id="create-menu-desc" class="form-textarea" rows="2" placeholder="Concept, season, or service notes for your team"></textarea>
                 </div>
                 <label class="checkbox-item" style="display:flex;align-items:center;gap:8px;margin-top:8px;">
                     <input type="checkbox" id="create-menu-then-add-dish" checked>
@@ -2537,6 +2558,18 @@
             
             // Display menu items using the display function
             displayMenuItems(menu);
+
+            if (window.MenuPlanFormat?.fillCategorySelects) {
+                const cats =
+                    menu.categories ||
+                    menu.sections?.map(s => s.name).filter(Boolean);
+                if (cats?.length) {
+                    window.MenuPlanFormat.fillCategorySelects(
+                        ['item-category', 'edit-item-category', 'dish-category'],
+                        cats
+                    );
+                }
+            }
             
             // Scroll to menu items
             setTimeout(() => {
@@ -2741,15 +2774,40 @@
             }
         }
 
+        function updateCreateMenuSectionPreview() {
+            const type = document.getElementById('create-menu-type')?.value || 'dinner';
+            const preview = document.getElementById('create-menu-sections-preview');
+            const targetInput = document.getElementById('create-menu-target-check');
+            if (!preview || !window.MenuPlanFormat) return;
+            const sections = window.MenuPlanFormat.previewSectionsForType(type);
+            preview.textContent = sections.length
+                ? sections.join(' · ')
+                : 'No preset sections — add dishes and categories as you build.';
+            if (targetInput && !targetInput.value) {
+                const defaults = window.MenuPlanFormat.MENU_TYPE_DEFAULTS[type];
+                if (defaults?.targetCheck != null) {
+                    targetInput.placeholder = `e.g. ${defaults.targetCheck}`;
+                }
+            }
+        }
+
         function openCreateMenuModal() {
             const m = document.getElementById('create-menu-modal');
             if (!m) return;
             const n = document.getElementById('create-menu-name');
             const d = document.getElementById('create-menu-desc');
+            const type = document.getElementById('create-menu-type');
+            const target = document.getElementById('create-menu-target-check');
             if (n) n.value = '';
             if (d) d.value = '';
+            if (type) type.value = 'dinner';
+            if (target) {
+                target.value = '';
+                target.placeholder = 'e.g. 85';
+            }
             const cb = document.getElementById('create-menu-then-add-dish');
             if (cb) cb.checked = true;
+            updateCreateMenuSectionPreview();
             m.style.display = 'flex';
             setTimeout(() => n && n.focus(), 50);
         }
@@ -2761,40 +2819,99 @@
                 return;
             }
             const description = document.getElementById('create-menu-desc')?.value.trim() || '';
+            const menuType = document.getElementById('create-menu-type')?.value || 'dinner';
+            const targetRaw = document.getElementById('create-menu-target-check')?.value.trim();
+            const targetCheck = targetRaw ? parseFloat(targetRaw) : null;
             const thenAdd = document.getElementById('create-menu-then-add-dish')?.checked;
             closeModal('create-menu-modal');
-            createNewMenuWithOptions(name, description, thenAdd);
+            createNewMenuWithOptions(name, description, thenAdd, {
+                menuType,
+                targetCheck
+            });
         }
 
-        function createNewMenuWithOptions(menuName, menuDescription, openAddDish) {
-            const newMenu = {
-                id: 'menu_' + Date.now(),
-                name: menuName,
-                description: menuDescription || '',
-                items: [],
-                categories: [],
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                userId: window.authManager?.currentUser?.userId,
-                userEmail: window.authManager?.currentUser?.email
-            };
+        function createNewMenuWithOptions(menuName, menuDescription, openAddDish, options) {
             const user = window.authManager?.currentUser;
             if (!user) {
                 alert('Sign in to create a menu.');
                 return;
             }
+
+            const opts = options || {};
+            let newMenu;
+
+            if (window.MenuPlanFormat) {
+                const plan = window.MenuPlanFormat.createEmptyPlan({
+                    name: menuName,
+                    description: menuDescription,
+                    menuType: opts.menuType || 'dinner',
+                    targetCheck: opts.targetCheck
+                });
+                newMenu = window.MenuPlanFormat.planToMenuRecord(plan, user);
+            } else {
+                newMenu = {
+                    id: 'menu_' + Date.now(),
+                    name: menuName,
+                    description: menuDescription || '',
+                    items: [],
+                    categories: [],
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    userId: user.userId || user.id,
+                    userEmail: user.email
+                };
+            }
+
             const userId = user.userId || user.id;
             const menuKey = `menus_${userId}`;
             let menus = JSON.parse(localStorage.getItem(menuKey) || '[]');
             menus.push(newMenu);
             localStorage.setItem(menuKey, JSON.stringify(menus));
+
+            const projectId =
+                window.projectManager?.getCurrentProject?.()?.id ||
+                window.projectManager?.currentProject?.id;
+            if (projectId && window.MenuPlanFormat) {
+                const payload = window.MenuPlanFormat.planToProjectMenuPayload(
+                    {
+                        menu: {
+                            id: newMenu.id,
+                            name: newMenu.name,
+                            description: newMenu.description,
+                            menuType: newMenu.menuType,
+                            service: newMenu.service,
+                            sections: newMenu.sections,
+                            status: 'draft'
+                        },
+                        items: []
+                    },
+                    projectId
+                );
+                localStorage.setItem(
+                    `menu_data_${projectId}`,
+                    JSON.stringify(payload)
+                );
+            }
+
             populateMenuSelector();
             const newIndex = menus.length - 1;
             const selector = document.getElementById('menu-selector');
             if (selector) selector.value = String(newIndex);
             selectMenuToEdit(newIndex);
+            if (window.MenuPlanFormat?.fillCategorySelects && newMenu.categories?.length) {
+                window.MenuPlanFormat.fillCategorySelects(
+                    ['item-category', 'edit-item-category', 'dish-category'],
+                    newMenu.categories
+                );
+            }
             if (window.enhancedMenuManager?.showToast) {
-                window.enhancedMenuManager.showToast(`Menu “${menuName}” created.`, 'success');
+                const sectionHint = newMenu.categories?.length
+                    ? ` Sections: ${newMenu.categories.join(', ')}.`
+                    : '';
+                window.enhancedMenuManager.showToast(
+                    `Menu “${menuName}” created.${sectionHint}`,
+                    'success'
+                );
             }
             if (openAddDish) {
                 setTimeout(() => {

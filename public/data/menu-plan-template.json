@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "1.0",
+  "restaurant": {
+    "name": "Your Restaurant",
+    "type": "Fine Dining",
+    "location": "City, ST"
+  },
+  "menu": {
+    "name": "Dinner — Opening Menu",
+    "description": "Seasonal New England, fireside club energy upstairs.",
+    "menuType": "dinner",
+    "status": "draft",
+    "service": {
+      "days": ["wed", "thu", "fri", "sat", "sun"],
+      "mealPeriods": ["dinner"],
+      "targetCheck": 85,
+      "targetCheckIncludesBev": true
+    },
+    "sections": [
+      { "id": "to-begin", "name": "To Begin", "sort": 1 },
+      { "id": "hearth-field", "name": "From the Hearth & Field", "sort": 2 },
+      { "id": "after", "name": "After", "sort": 3 },
+      { "id": "beverages", "name": "Beverages", "sort": 4 }
+    ]
+  },
+  "items": [
+    {
+      "name": "Smoked bluefish rillettes",
+      "section": "To Begin",
+      "description": "Rye crisps, pickled mustard seed",
+      "price": 18,
+      "targetFoodCostPercent": 28,
+      "recipeStatus": "stub",
+      "mealPeriods": ["dinner"]
+    },
+    {
+      "name": "Line-caught cod",
+      "section": "From the Hearth & Field",
+      "description": "Clam broth, fennel, saffron",
+      "price": 44,
+      "targetFoodCostPercent": 30,
+      "recipeStatus": "stub",
+      "mealPeriods": ["dinner"]
+    },
+    {
+      "name": "Apple tart Tatin",
+      "section": "After",
+      "description": "Crème fraîche",
+      "price": 14,
+      "targetFoodCostPercent": 25,
+      "recipeStatus": "stub",
+      "mealPeriods": ["dinner"]
+    }
+  ]
+}
