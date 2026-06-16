@@ -115,7 +115,11 @@
   }
 
   function menuService(menu) {
-    return menu.service || menu.menuType || 'Menu';
+    const type = menu?.menuType || menu?.menu_type;
+    if (type && window.MenuPlanFormat?.beverageMenuLabel && window.MenuPlanFormat.isBeverageMenuType(type)) {
+      return window.MenuPlanFormat.beverageMenuLabel(type);
+    }
+    return menu?.service?.mealPeriods?.join(' · ') || menu?.menuType || menu?.menu_type || 'Menu';
   }
 
   function formatUpdated(menu) {
@@ -458,8 +462,8 @@
         <div class="mb-empty">
           <div class="mb-empty__icon"><i class="fa-solid fa-list-check" aria-hidden="true"></i></div>
           <h3 class="mb-meta__title" style="font-size:1.125rem">No items match</h3>
-          <p class="mb-meta__desc">Try clearing search or add a new dish.</p>
-          <button type="button" class="tc-btn tc-btn-accent mt-4" id="mb-empty-add">Add menu item</button>
+          <p class="mb-meta__desc">Try clearing search or add a new ${window.MenuBeverageHelper?.isBeverageMenuActive(menu) ? 'drink' : 'dish'}.</p>
+          <button type="button" class="tc-btn tc-btn-accent mt-4" id="mb-empty-add">Add ${window.MenuBeverageHelper?.isBeverageMenuActive(menu) ? 'drink' : 'menu item'}</button>
         </div>`;
       document.getElementById('mb-empty-add')?.addEventListener('click', () => openAddItem());
       return;
@@ -518,8 +522,20 @@
     if (titleEl) titleEl.textContent = menu?.name || 'Select a menu';
     if (descEl) descEl.textContent = menu?.description || '';
     if (metaEl && menu) {
-      metaEl.innerHTML = `<i class="fa-solid fa-hat-chef" aria-hidden="true"></i> ${escapeHtml(menuService(menu))} service · updated ${formatUpdated(menu)}`;
+      const icon = window.MenuBeverageHelper?.isBeverageMenuActive(menu)
+        ? 'fa-wine-glass'
+        : 'fa-hat-chef';
+      metaEl.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i> ${escapeHtml(menuService(menu))} · updated ${formatUpdated(menu)}`;
     }
+
+    const costLabel = document.querySelector('#mb-stat-food-cost')?.previousElementSibling;
+    if (costLabel && menu) {
+      costLabel.innerHTML = window.MenuBeverageHelper?.isBeverageMenuActive(menu)
+        ? '<i class="fa-solid fa-percent" aria-hidden="true"></i> Pour cost'
+        : '<i class="fa-solid fa-percent" aria-hidden="true"></i> Food cost';
+    }
+
+    window.MenuBeverageHelper?.updateQuickBarVisibility?.();
 
     const set = (id, val) => {
       const n = document.getElementById(id);
@@ -581,6 +597,14 @@
       if (typeof window.openCreateMenuModal === 'function') window.openCreateMenuModal();
     });
     document.getElementById('mb-btn-add-item')?.addEventListener('click', () => openAddItem(state.defaultCategory));
+
+    document.getElementById('mb-beverage-quick-bar')?.addEventListener('click', e => {
+      const btn = e.target.closest('[data-bev-quick]');
+      if (!btn) return;
+      if (window.MenuBeverageHelper?.openQuickAdd) {
+        window.MenuBeverageHelper.openQuickAdd({ kind: btn.dataset.bevQuick });
+      }
+    });
     document.getElementById('mb-btn-filters')?.addEventListener('click', () => {
       showToast('Filters coming soon', 'info');
     });

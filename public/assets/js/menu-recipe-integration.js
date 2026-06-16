@@ -90,6 +90,70 @@ class MenuRecipeIntegration {
       };
     }
 
+    if (menuItem.beverageKind || menuItem.beverageMeta) {
+      const meta = menuItem.beverageMeta || {};
+      const kind = menuItem.beverageKind || 'cocktail';
+      baseStub.category = 'beverage';
+      baseStub.recipe_type = menuItem.recipeType || (kind === 'wine' || kind === 'beer' ? 'beverage' : 'bar');
+      baseStub.type = baseStub.recipe_type;
+      baseStub.prepStation = menuItem.prepStation || 'Bar';
+      baseStub.targetFoodCostPercent =
+        menuItem.targetFoodCost || (kind === 'wine' ? 25 : kind === 'beer' ? 22 : 18);
+
+      if (meta.glass) baseStub.glass = meta.glass;
+      if (meta.method) baseStub.method = meta.method;
+      if (meta.garnish) baseStub.garnish = meta.garnish;
+      if (meta.pourSize) baseStub.pourSize = meta.pourSize;
+      if (meta.producer) baseStub.producer = meta.producer;
+      if (meta.region) baseStub.region = meta.region;
+      if (meta.varietal) baseStub.varietal = meta.varietal;
+      if (meta.vintage) baseStub.vintage = meta.vintage;
+      if (meta.brewery) baseStub.brewery = meta.brewery;
+      if (meta.style) baseStub.beerStyle = meta.style;
+      if (meta.format) baseStub.serveFormat = meta.format;
+      if (meta.abv) baseStub.abv = meta.abv;
+
+      if (meta.build) {
+        const lines = String(meta.build)
+          .split('\n')
+          .map(l => l.trim())
+          .filter(Boolean);
+        baseStub.ingredients = lines.map(line => {
+          const m = line.match(/^([\d./\s]+)\s*([a-z]+)?\s+(.+)$/i);
+          if (m) {
+            return {
+              name: m[3].trim(),
+              amount: m[1].trim(),
+              unit: (m[2] || 'oz').trim()
+            };
+          }
+          return { name: line, amount: '', unit: '' };
+        });
+      }
+
+      const instructionLines = Array.isArray(menuItem.recipeInstructions)
+        ? menuItem.recipeInstructions
+        : [];
+      if (instructionLines.length) {
+        baseStub.instructions = instructionLines.map((text, i) => ({
+          step: i + 1,
+          text
+        }));
+      } else if (meta.method) {
+        baseStub.instructions = [
+          { step: 1, text: `${meta.method}${meta.glass ? ` · ${meta.glass}` : ''}` }
+        ];
+      }
+
+      if (kind === 'mocktail') {
+        baseStub.dietary_restrictions = ['Non-alcoholic'];
+        baseStub.tags.push('non-alcoholic', 'mocktail');
+      }
+      if (kind === 'cocktail') baseStub.tags.push('cocktail');
+      if (kind === 'wine') baseStub.tags.push('wine');
+      if (kind === 'beer') baseStub.tags.push('beer');
+    }
+
     baseStub.recipe_completion_required = true;
 
     if (menuItem.copiedFromRecipeId) {

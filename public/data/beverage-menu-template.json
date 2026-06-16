@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "1.0",
+  "menu": {
+    "name": "Bar — Opening List",
+    "description": "Cocktails, wine by the glass, draft beer, and zero-proof.",
+    "menuType": "bar-full",
+    "status": "draft",
+    "service": {
+      "days": ["wed", "thu", "fri", "sat", "sun"],
+      "mealPeriods": ["dinner", "brunch"],
+      "targetCheck": 14,
+      "targetCheckIncludesBev": false
+    },
+    "sections": [
+      { "id": "cocktails", "name": "Cocktails", "sort": 1 },
+      { "id": "wine-btg", "name": "Wine by the Glass", "sort": 2 },
+      { "id": "beer", "name": "Beer", "sort": 3 },
+      { "id": "zero-proof", "name": "Zero-Proof", "sort": 4 }
+    ]
+  },
+  "items": [
+    {
+      "name": "House Old Fashioned",
+      "section": "Cocktails",
+      "price": 16,
+      "beverageKind": "cocktail",
+      "recipeStatus": "stub",
+      "description": "Bourbon, demerara, aromatic bitters · rocks"
+    },
+    {
+      "name": "Sancerre — Pascal Jolivet",
+      "section": "Wine by the Glass",
+      "price": 15,
+      "beverageKind": "wine",
+      "recipeStatus": "stub",
+      "description": "Sauvignon Blanc · Loire · 6 oz"
+    },
+    {
+      "name": "Jack's Abby House Lager",
+      "section": "Beer",
+      "price": 9,
+      "beverageKind": "beer",
+      "recipeStatus": "stub",
+      "description": "Framingham, MA · Draft"
+    },
+    {
+      "name": "Cucumber Cooler",
+      "section": "Zero-Proof",
+      "price": 12,
+      "beverageKind": "mocktail",
+      "recipeStatus": "stub",
+      "description": "Cucumber, lime, soda, mint"
+    }
+  ]
+}

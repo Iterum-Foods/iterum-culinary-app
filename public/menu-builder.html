@@ -1201,6 +1201,7 @@
     <script src="assets/js/workspace-save-indicator.js" defer></script>
     <script src="assets/js/workspace-identity.js" defer></script>
     <script src="assets/js/menu-plan-format.js" defer></script>
+    <script src="assets/js/menu-beverage-helper.js" defer></script>
 </head>
 <body class="menu-builder-page tc-revamp-body min-h-screen" style="padding-top: 0;">
     <!-- Emergency Loading Fix Button -->
@@ -1223,13 +1224,22 @@
                 <div class="form-group">
                     <label for="create-menu-type" class="form-label">Menu format</label>
                     <select id="create-menu-type" class="form-select" onchange="updateCreateMenuSectionPreview()">
-                        <option value="dinner">Dinner (à la carte)</option>
-                        <option value="brunch">Boozy brunch</option>
-                        <option value="lunch">Lunch</option>
-                        <option value="tasting">Tasting menu</option>
-                        <option value="club">Club snacks &amp; small plates</option>
-                        <option value="seasonal">Seasonal dinner</option>
-                        <option value="blank">Blank — add sections as you go</option>
+                        <optgroup label="Food menus">
+                            <option value="dinner">Dinner (à la carte)</option>
+                            <option value="brunch">Boozy brunch</option>
+                            <option value="lunch">Lunch</option>
+                            <option value="tasting">Tasting menu</option>
+                            <option value="club">Club snacks &amp; small plates</option>
+                            <option value="seasonal">Seasonal dinner</option>
+                            <option value="blank">Blank — add sections as you go</option>
+                        </optgroup>
+                        <optgroup label="Beverage menus">
+                            <option value="cocktails">Cocktail menu</option>
+                            <option value="wine">Wine list</option>
+                            <option value="beer">Beer list</option>
+                            <option value="mocktails">Mocktail / zero-proof menu</option>
+                            <option value="bar-full">Full bar (cocktails + wine + beer + NA)</option>
+                        </optgroup>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1339,6 +1349,14 @@
                 <button type="button" id="mb-view-board"><i class="fa-solid fa-table-cells" aria-hidden="true"></i> Board</button>
               </div>
               <button type="button" class="tc-btn tc-btn-accent" id="mb-btn-add-item"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add item</button>
+            </section>
+
+            <section class="mb-bev-quick" id="mb-beverage-quick-bar" hidden aria-label="Quick add beverages">
+              <span class="mb-bev-quick__label">Quick add:</span>
+              <button type="button" class="tc-btn tc-btn-outline tc-btn-sm" data-bev-quick="cocktail">🍸 Cocktail</button>
+              <button type="button" class="tc-btn tc-btn-outline tc-btn-sm" data-bev-quick="wine">🍷 Wine</button>
+              <button type="button" class="tc-btn tc-btn-outline tc-btn-sm" data-bev-quick="beer">🍺 Beer</button>
+              <button type="button" class="tc-btn tc-btn-outline tc-btn-sm" data-bev-quick="mocktail">🫧 Mocktail</button>
             </section>
 
             <div id="mb-revamp-items"></div>
@@ -2570,6 +2588,8 @@
                     );
                 }
             }
+
+            window.MenuBeverageHelper?.updateQuickBarVisibility?.();
             
             // Scroll to menu items
             setTimeout(() => {
@@ -2915,7 +2935,14 @@
             }
             if (openAddDish) {
                 setTimeout(() => {
-                    if (typeof window.showAddItemModal === 'function') window.showAddItemModal();
+                    if (
+                        window.MenuBeverageHelper?.isBeverageMenuActive(newMenu) &&
+                        window.MenuBeverageHelper?.openQuickAdd
+                    ) {
+                        window.MenuBeverageHelper.openQuickAdd({});
+                    } else if (typeof window.showAddItemModal === 'function') {
+                        window.showAddItemModal();
+                    }
                 }, 350);
             }
         }
@@ -4568,10 +4595,16 @@
       }
       
       // Global wrapper function for showing add item modal
-      window.showAddItemModal = function() {
+      window.showAddItemModal = function(category) {
         // Ensure a menu is selected
         if (!currentSelectedMenu && !window.enhancedMenuManager?.currentMenu) {
           alert('Please select a menu first by clicking on a menu card above, or create a new menu.');
+          return;
+        }
+
+        const menu = currentSelectedMenu || window.enhancedMenuManager?.currentMenu;
+        if (window.MenuBeverageHelper?.isBeverageMenuActive(menu)) {
+          window.MenuBeverageHelper.openQuickAdd({ category });
           return;
         }
         

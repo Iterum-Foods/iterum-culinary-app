@@ -36,7 +36,33 @@
       'Beverages'
     ],
     'fast-casual': ['Mains', 'Sides', 'Desserts', 'Beverages'],
+    cocktails: [
+      'Signature Cocktails',
+      'Classics',
+      'Zero-Proof',
+      'Beer & Wine by the Glass'
+    ],
+    wine: ['Sparkling', 'White', 'Rosé', 'Red', 'Dessert & Fortified'],
+    beer: ['On Draft', 'Bottles & Cans', 'Large Format'],
+    mocktails: ['Signature Zero-Proof', 'Refreshers', 'Espresso & Tea'],
+    'bar-full': ['Cocktails', 'Wine by the Glass', 'Beer', 'Zero-Proof'],
     blank: []
+  };
+
+  const BEVERAGE_MENU_TYPES = [
+    'cocktails',
+    'wine',
+    'beer',
+    'mocktails',
+    'bar-full'
+  ];
+
+  const BEVERAGE_MENU_LABELS = {
+    cocktails: 'Cocktail menu',
+    wine: 'Wine list',
+    beer: 'Beer list',
+    mocktails: 'Mocktail menu',
+    'bar-full': 'Full bar menu'
   };
 
   const MENU_TYPE_DEFAULTS = {
@@ -81,6 +107,36 @@
       mealPeriods: ['dinner'],
       targetCheck: null,
       targetCheckIncludesBev: true
+    },
+    cocktails: {
+      preset: 'cocktails',
+      mealPeriods: ['dinner', 'brunch'],
+      targetCheck: 16,
+      targetCheckIncludesBev: false
+    },
+    wine: {
+      preset: 'wine',
+      mealPeriods: ['dinner', 'lunch', 'brunch'],
+      targetCheck: 15,
+      targetCheckIncludesBev: false
+    },
+    beer: {
+      preset: 'beer',
+      mealPeriods: ['dinner', 'lunch', 'brunch'],
+      targetCheck: 9,
+      targetCheckIncludesBev: false
+    },
+    mocktails: {
+      preset: 'mocktails',
+      mealPeriods: ['dinner', 'brunch', 'lunch'],
+      targetCheck: 12,
+      targetCheckIncludesBev: false
+    },
+    'bar-full': {
+      preset: 'bar-full',
+      mealPeriods: ['dinner', 'brunch', 'lunch'],
+      targetCheck: 14,
+      targetCheckIncludesBev: false
     }
   };
 
@@ -163,7 +219,9 @@
         mealPeriods
       },
       status: raw.status || 'draft',
-      sort: raw.sort != null ? raw.sort : null
+      sort: raw.sort != null ? raw.sort : null,
+      beverageKind: raw.beverageKind || null,
+      recipeType: raw.recipeType || null
     };
   }
 
@@ -294,6 +352,32 @@
     return SECTION_PRESETS[defaults.preset] || [];
   }
 
+  function isBeverageMenuType(menuType) {
+    return BEVERAGE_MENU_TYPES.includes(menuType);
+  }
+
+  function beverageMenuLabel(menuType) {
+    return BEVERAGE_MENU_LABELS[menuType] || menuType;
+  }
+
+  function inferBeverageKindFromSection(sectionName, menuType) {
+    const s = String(sectionName || '').toLowerCase();
+    if (s.includes('wine')) return 'wine';
+    if (s.includes('beer') || s.includes('draft')) return 'beer';
+    if (
+      s.includes('zero') ||
+      s.includes('mock') ||
+      s.includes('na ') ||
+      s.includes('non-alc')
+    ) {
+      return 'mocktail';
+    }
+    if (menuType === 'wine') return 'wine';
+    if (menuType === 'beer') return 'beer';
+    if (menuType === 'mocktails') return 'mocktail';
+    return 'cocktail';
+  }
+
   function fillCategorySelects(selectIds, categories, fallback) {
     const list =
       categories?.length ? categories : fallback || ['Main Courses'];
@@ -319,6 +403,8 @@
     SCHEMA_VERSION,
     SECTION_PRESETS,
     MENU_TYPE_DEFAULTS,
+    BEVERAGE_MENU_TYPES,
+    BEVERAGE_MENU_LABELS,
     createEmptyPlan,
     normalizePlan,
     normalizeItem,
@@ -326,6 +412,9 @@
     planToProjectMenuPayload,
     getPresetOptions,
     previewSectionsForType,
-    fillCategorySelects
+    fillCategorySelects,
+    isBeverageMenuType,
+    beverageMenuLabel,
+    inferBeverageKindFromSection
   };
 })();

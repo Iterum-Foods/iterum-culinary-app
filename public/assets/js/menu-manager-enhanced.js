@@ -479,6 +479,11 @@ class EnhancedMenuManager {
         isSignature: itemData.isSignature || false,
         isNew: itemData.isNew || false,
         isSeasonal: itemData.isSeasonal || false,
+        recipeType: itemData.recipeType || null,
+        beverageKind: itemData.beverageKind || null,
+        beverageMeta: itemData.beverageMeta || null,
+        recipeInstructions: itemData.recipeInstructions || null,
+        components: itemData.components || [],
         availability: itemData.availability || {
           daysAvailable: ['all'],
           mealPeriods: ['dinner']
