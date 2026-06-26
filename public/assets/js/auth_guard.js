@@ -105,197 +105,73 @@
 
   console.log('✅ Auth Guard complete - access granted');
 
+  function ensureAuthGuardStyles() {
+    if (document.getElementById('auth-guard-modal-styles')) return;
+    const script = document.querySelector('script[src*="auth_guard"]');
+    const base = script
+      ? script.src.replace(/\/assets\/js\/auth_guard\.js(?:\?.*)?$/, '')
+      : '';
+    const link = document.createElement('link');
+    link.id = 'auth-guard-modal-styles';
+    link.rel = 'stylesheet';
+    link.href = `${base}/assets/css/auth-guard-modal.css`;
+    document.head.appendChild(link);
+  }
+
   // Function to show sign-in modal
   function showSignInModal() {
-    // Create modal HTML
+    ensureAuthGuardStyles();
+
     const modal = document.createElement('div');
     modal.id = 'auth-guard-modal';
-    modal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            z-index: 999999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        `;
 
     modal.innerHTML = `
-            <style>
-                @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                @keyframes slideUp {
-                    from { transform: translateY(30px); opacity: 0; }
-                    to { transform: translateY(0); opacity: 1; }
-                }
-                #auth-guard-content {
-                    animation: slideUp 0.4s ease;
-                }
-                .auth-input {
-                    width: 100%;
-                    padding: 12px 16px;
-                    border: 2px solid #e5e7eb;
-                    border-radius: 8px;
-                    font-size: 15px;
-                    transition: all 0.2s;
-                }
-                .auth-input:focus {
-                    outline: none;
-                    border-color: #4a7c2c;
-                    box-shadow: 0 0 0 3px rgba(74, 124, 44, 0.1);
-                }
-                .auth-btn {
-                    width: 100%;
-                    padding: 14px;
-                    border: none;
-                    border-radius: 8px;
-                    font-size: 16px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                }
-                .auth-btn-primary {
-                    background: linear-gradient(135deg, #4a7c2c, #6ba83d);
-                    color: white;
-                }
-                .auth-btn-primary:hover:not(:disabled) {
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 12px rgba(74, 124, 44, 0.3);
-                }
-                .auth-btn-primary:disabled {
-                    opacity: 0.6;
-                    cursor: not-allowed;
-                }
-                .auth-btn-secondary {
-                    background: white;
-                    color: #4a7c2c;
-                    border: 2px solid #4a7c2c;
-                }
-                .auth-btn-secondary:hover {
-                    background: #f0f9ff;
-                }
-                .auth-link {
-                    color: #4a7c2c;
-                    text-decoration: none;
-                    font-weight: 600;
-                    transition: color 0.2s;
-                }
-                .auth-link:hover {
-                    color: #3d6a25;
-                    text-decoration: underline;
-                }
-                .auth-error {
-                    background: #fee2e2;
-                    border: 1px solid #ef4444;
-                    color: #991b1b;
-                    padding: 12px;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    margin-top: 12px;
-                    display: none;
-                }
-                .auth-success {
-                    background: #d1fae5;
-                    border: 1px solid #10b981;
-                    color: #065f46;
-                    padding: 12px;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    margin-top: 12px;
-                    display: none;
-                }
-            </style>
-            
-            <div id="auth-guard-content" style="
-                background: white;
-                border-radius: 20px;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                max-width: 450px;
-                width: 90%;
-                max-height: 90vh;
-                overflow-y: auto;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            ">
-                <!-- Header -->
-                <div style="
-                    background: linear-gradient(135deg, #4a7c2c, #6ba83d);
-                    color: white;
-                    padding: 32px;
-                    border-radius: 20px 20px 0 0;
-                    text-align: center;
-                ">
-                    <div style="font-size: 48px; margin-bottom: 12px;">🔐</div>
-                    <h2 style="margin: 0 0 8px 0; font-size: 28px; font-weight: 700;">Sign In Required</h2>
-                    <p style="margin: 0; opacity: 0.9; font-size: 15px;">Sign in to continue to your desired page</p>
-                </div>
-                
-                <!-- Content -->
-                <div style="padding: 32px;">
-                    <!-- Sign In Form -->
+            <div id="auth-guard-content" role="dialog" aria-labelledby="ag-modal-title" aria-modal="true">
+                <header class="ag-modal-header">
+                    <p class="ag-modal-eyebrow">Iterum Culinary OS</p>
+                    <span class="ag-modal-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                            <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+                        </svg>
+                    </span>
+                    <h2 id="ag-modal-title">Sign in required</h2>
+                    <p>Sign in to continue to your workspace.</p>
+                </header>
+
+                <div class="ag-modal-body">
                     <form id="modal-signin-form">
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">
-                                Email Address
-                            </label>
-                            <input type="email" id="modal-email" class="auth-input" 
-                                   placeholder="your@email.com" required>
+                        <div class="ag-field">
+                            <label for="modal-email">Email address</label>
+                            <input type="email" id="modal-email" class="ag-input"
+                                   placeholder="you@restaurant.com" required autocomplete="email">
                         </div>
-                        
-                        <div style="margin-bottom: 24px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">
-                                Password
-                            </label>
-                            <input type="password" id="modal-password" class="auth-input" 
-                                   placeholder="Enter your password" required>
+
+                        <div class="ag-field">
+                            <label for="modal-password">Password</label>
+                            <input type="password" id="modal-password" class="ag-input"
+                                   placeholder="Enter your password" required autocomplete="current-password">
                         </div>
-                        
-                        <button type="submit" class="auth-btn auth-btn-primary" id="modal-signin-btn">
-                            <span id="modal-signin-text">🚀 Sign In & Continue</span>
-                            <span id="modal-signin-spinner" style="display: none;">⏳ Signing in...</span>
+
+                        <button type="submit" class="ag-btn ag-btn-primary" id="modal-signin-btn">
+                            <span id="modal-signin-text">Sign in &amp; continue</span>
+                            <span id="modal-signin-spinner" style="display: none;">Signing in…</span>
                         </button>
-                        
-                        <div id="modal-error" class="auth-error"></div>
-                        <div id="modal-success" class="auth-success"></div>
+
+                        <div id="modal-error" class="ag-error" role="alert"></div>
+                        <div id="modal-success" class="ag-success" role="status"></div>
                     </form>
-                    
-                    <!-- Divider -->
-                    <div style="
-                        display: flex;
-                        align-items: center;
-                        margin: 24px 0;
-                        color: #9ca3af;
-                        font-size: 14px;
-                    ">
-                        <div style="flex: 1; height: 1px; background: #e5e7eb;"></div>
-                        <div style="padding: 0 12px;">OR</div>
-                        <div style="flex: 1; height: 1px; background: #e5e7eb;"></div>
-                    </div>
-                    
-                    <!-- Alternative Actions -->
-                    <button type="button" onclick="window.location.href='launch.html?tab=signup'" class="auth-btn auth-btn-secondary" style="margin-bottom: 12px;">
-                        ✨ Create New Account
+
+                    <div class="ag-divider" aria-hidden="true">or</div>
+
+                    <button type="button" onclick="window.location.href='index.html?tab=signup'" class="ag-btn ag-btn-secondary">
+                        Create new account
                     </button>
-                    
-                    <div style="text-align: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
-                        <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">
-                            Don't have an account?
-                        </div>
-                        <a href="launch.html?tab=signup" class="auth-link" style="font-size: 15px;">
-                            Sign up for free →
-                        </a>
-                    </div>
-                    
-                    <div style="text-align: center; margin-top: 12px; font-size: 13px; color: #9ca3af;">
-                        <a href="launch.html" class="auth-link" style="font-size: 13px; font-weight: normal;">
-                            Go to full login page
-                        </a>
+
+                    <div class="ag-footer">
+                        <p class="ag-footer-note">Don&apos;t have an account?</p>
+                        <a href="index.html?tab=signup" class="ag-link">Sign up for free</a>
+                        <a href="index.html" class="ag-link ag-link-muted">Go to full login page</a>
                     </div>
                 </div>
             </div>
@@ -335,7 +211,7 @@
           await window.authManager.signInWithEmail(email, password);
 
           // Show success
-          successDiv.textContent = '✅ Sign-in successful! Redirecting...';
+          successDiv.textContent = 'Sign-in successful. Reloading your workspace…';
           successDiv.style.display = 'block';
 
           // Reload page after short delay
@@ -345,8 +221,7 @@
         } catch (error) {
           console.error('Modal sign-in error:', error);
           errorDiv.textContent =
-            '❌ ' +
-            (error.message || 'Sign-in failed. Please check your credentials.');
+            error.message || 'Sign-in failed. Please check your credentials.';
           errorDiv.style.display = 'block';
           btn.disabled = false;
           btnText.style.display = 'block';
@@ -360,7 +235,7 @@
         const content = document.getElementById('auth-guard-content');
         content.style.animation = 'none';
         setTimeout(() => {
-          content.style.animation = 'slideUp 0.4s ease';
+          content.style.animation = 'ag-slide-up 0.35s ease';
         }, 10);
       }
     });

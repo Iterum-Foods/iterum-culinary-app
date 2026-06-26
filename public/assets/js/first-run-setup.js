@@ -777,25 +777,15 @@
                     <p style="color: #475569; margin-bottom: 28px;">Projects keep recipes, menus, testing notes, and vendor data organized for each client or initiative.</p>
 
                     <div class="frs-form-group">
-                        <label for="frs-project-name">Project name</label>
+                        <label for="frs-project-name">Restaurant name</label>
                         <input id="frs-project-name" type="text" value="${suggestedName}" />
                     </div>
 
-                    <div class="frs-form-group">
-                        <label for="frs-project-type">Project type</label>
-                        <select id="frs-project-type">
-                            <option value="culinary">Culinary Development</option>
-                            <option value="menu_launch">Menu Launch</option>
-                            <option value="client_pitch">Client Pitch</option>
-                            <option value="seasonal_refresh">Seasonal Refresh</option>
-                            <option value="innovation_lab">Innovation Lab</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
+                    <input type="hidden" id="frs-project-type" value="restaurant" />
 
                     <div class="frs-form-group">
-                        <label for="frs-project-description">Project goals</label>
-                        <textarea id="frs-project-description" placeholder="Capture the vision, target audience, or deliverables for this project..."></textarea>
+                        <label for="frs-project-description">Workspace notes (optional)</label>
+                        <textarea id="frs-project-description" placeholder="Location, concept, or opening goals for this restaurant…"></textarea>
                     </div>
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-top: 20px;">
@@ -1014,7 +1004,6 @@
       }
 
       const nameInput = this.modal.querySelector('#frs-project-name');
-      const typeInput = this.modal.querySelector('#frs-project-type');
       const descriptionInput = this.modal.querySelector(
         '#frs-project-description'
       );
@@ -1029,9 +1018,9 @@
 
       const projectData = {
         name,
-        type: typeInput.value,
+        type: 'restaurant',
         description: descriptionInput.value.trim(),
-        icon: '🧪',
+        icon: '🍽️',
         color: '#2563eb',
         status: 'active',
         tags: ['first-run']

@@ -1234,10 +1234,53 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     }
   }
 
+  function renderSopPackBody(body, pack) {
+    const sops = pack.sops || [];
+    if (!sops.length) {
+      body.innerHTML =
+        '<p class="mc-empty">SOP pack is empty. Ask your manager to add entries.</p>';
+      return;
+    }
+
+    const categories = pack.categories?.length
+      ? pack.categories
+      : [{ id: 'all', name: 'Guides', icon: '📋' }];
+
+    const byCat = new Map();
+    categories.forEach(c => byCat.set(c.id, []));
+    sops.forEach(s => {
+      const key = byCat.has(s.categoryId) ? s.categoryId : categories[0]?.id;
+      const list = byCat.get(key) || [];
+      list.push(s);
+      byCat.set(key, list);
+    });
+
+    const parts = [];
+    categories.forEach(cat => {
+      const list = (byCat.get(cat.id) || []).sort(
+        (a, b) => (a.sort || 0) - (b.sort || 0)
+      );
+      if (!list.length) return;
+      parts.push(
+        `<section class="mc-sop-category"><h3 class="mc-section-title mc-sop-category__title">${escapeHtml((cat.icon ? cat.icon + ' ' : '') + (cat.name || 'Guides'))}</h3><div class="mc-stack-gap">` +
+          list
+            .map(
+              (s, i) =>
+                `<article class="mc-card mc-stack-gap"><strong>${escapeHtml(s.title || `Guide ${i + 1}`)}</strong><div class="mc-note-body mc-note-body-sm">${escapeHtml(s.body || '')}</div></article>`
+            )
+            .join('') +
+          '</div></section>'
+      );
+    });
+
+    body.innerHTML = parts.length
+      ? parts.join('')
+      : '<p class="mc-empty">No guides in this pack.</p>';
+  }
+
   async function loadSops() {
-    const db = getDb();
     const body = document.getElementById('sops-body');
-    if (!db || !body) return;
+    if (!body) return;
     if (!teamProjectSelected()) {
       body.innerHTML =
         '<p class="mc-empty">Pick your <strong>location</strong> above for how-to guides.</p>';
@@ -1245,26 +1288,34 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     }
     body.innerHTML = '<p class="mc-hint">Loading…</p>';
     try {
-      const sref = doc(db, 'projects', pid(), 'snapshots', SNAPSHOT_SOP_DOC);
-      const snap = await getDoc(sref);
-      if (!snap.exists()) {
+      let pack = null;
+      const db = getDb();
+      if (db) {
+        const sref = doc(db, 'projects', pid(), 'snapshots', SNAPSHOT_SOP_DOC);
+        const snap = await getDoc(sref);
+        if (snap.exists()) {
+          pack =
+            typeof window.iterumSopPack?.normalizePack === 'function'
+              ? window.iterumSopPack.normalizePack(snap.data())
+              : {
+                  categories: [],
+                  sops: Array.isArray(snap.data().sops) ? snap.data().sops : []
+                };
+        }
+      }
+      if (
+        (!pack || !(pack.sops || []).length) &&
+        typeof window.iterumSopPack?.loadLocal === 'function' &&
+        pid()
+      ) {
+        pack = window.iterumSopPack.loadLocal(pid());
+      }
+      if (!pack || !(pack.sops || []).length) {
         body.innerHTML =
-          '<p class="mc-empty">No guides uploaded yet. Your manager can add them from the office side.</p>';
+          '<p class="mc-empty">No guides published yet. Managers add them in <strong>SOP Hub</strong> on the office app, then <strong>Publish to Shift</strong>.</p>';
         return;
       }
-      const data = snap.data();
-      const sops = Array.isArray(data.sops) ? data.sops : [];
-      if (!sops.length) {
-        body.innerHTML =
-          '<p class="mc-empty">SOP pack is empty. Ask your manager to add entries.</p>';
-        return;
-      }
-      body.innerHTML = sops
-        .map(
-          (s, i) =>
-            `<article class="mc-card mc-stack-gap"><strong>${escapeHtml(s.title || `SOP ${i + 1}`)}</strong><div class="mc-note-body mc-note-body-sm">${escapeHtml(s.body || '')}</div></article>`
-        )
-        .join('');
+      renderSopPackBody(body, pack);
     } catch (e) {
       console.error(e);
       body.innerHTML = '<p class="mc-empty">Could not load SOPs.</p>';

@@ -1,0 +1,263 @@
+/**
+ * Inventory — Taste Craft revamp (cream / teal / orange).
+ */
+
+.tc-revamp-body.inv-page-body {
+  padding-top: 0 !important;
+  background: hsl(var(--tc-background));
+  color: hsl(var(--tc-foreground));
+}
+
+.tc-revamp-body .inv-page-shell {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem 2.5rem;
+}
+
+.tc-revamp-body .inv-hero {
+  margin-bottom: 1.25rem;
+}
+
+.tc-revamp-body .inv-hero__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tc-revamp-body .inv-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.tc-revamp-body .inv-stats {
+  margin-bottom: 1.25rem;
+}
+
+.tc-revamp-body .inv-stats .tc-stat-card__value {
+  color: hsl(var(--tc-primary));
+}
+
+.tc-revamp-body .inv-stats .tc-stat-card__value.is-warning {
+  color: hsl(var(--tc-warning));
+}
+
+.tc-revamp-body .inv-stats .tc-stat-card__value.is-critical {
+  color: hsl(var(--tc-destructive));
+}
+
+.tc-revamp-body .inv-stats .tc-stat-card__value.is-accent {
+  color: hsl(var(--tc-accent));
+}
+
+.tc-revamp-body .inv-alert {
+  display: none;
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: calc(var(--tc-radius) - 2px);
+  background: hsl(var(--tc-warning) / 0.12);
+  border: 1px solid hsl(var(--tc-warning) / 0.35);
+  color: hsl(38 70% 28%);
+  font-size: 0.875rem;
+}
+
+.tc-revamp-body .inv-alert.is-visible {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.tc-revamp-body .inv-filters {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: hsl(var(--tc-card));
+  border: 1px solid hsl(var(--tc-border) / 0.65);
+  border-radius: var(--tc-radius);
+  box-shadow: var(--tc-shadow-card);
+}
+
+.tc-revamp-body .inv-filters__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .tc-revamp-body .inv-filters__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tc-revamp-body .inv-field {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid hsl(var(--tc-input));
+  border-radius: calc(var(--tc-radius) - 4px);
+  background: hsl(var(--tc-background));
+  color: hsl(var(--tc-foreground));
+  font: inherit;
+  font-size: 0.875rem;
+}
+
+.tc-revamp-body .inv-field:focus {
+  outline: none;
+  border-color: hsl(var(--tc-primary) / 0.5);
+  box-shadow: 0 0 0 3px hsl(var(--tc-primary) / 0.1);
+}
+
+.tc-revamp-body .inv-table-wrap {
+  overflow-x: auto;
+  background: hsl(var(--tc-card));
+  border: 1px solid hsl(var(--tc-border) / 0.65);
+  border-radius: var(--tc-radius);
+  box-shadow: var(--tc-shadow-card);
+}
+
+.tc-revamp-body .inv-table {
+  width: 100%;
+  min-width: 56rem;
+  border-collapse: collapse;
+}
+
+.tc-revamp-body .inv-table thead th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: hsl(var(--tc-primary-foreground));
+  background: linear-gradient(
+    135deg,
+    hsl(var(--tc-primary)) 0%,
+    hsl(var(--tc-primary-glow)) 100%
+  );
+  white-space: nowrap;
+}
+
+.tc-revamp-body .inv-table tbody td {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid hsl(var(--tc-border) / 0.55);
+  font-size: 0.875rem;
+  color: hsl(var(--tc-foreground));
+  vertical-align: middle;
+}
+
+.tc-revamp-body .inv-table tbody tr:hover td {
+  background: hsl(var(--tc-muted) / 0.45);
+}
+
+.tc-revamp-body .inv-table tbody tr.is-low td {
+  background: hsl(var(--tc-warning) / 0.08);
+}
+
+.tc-revamp-body .inv-table tbody tr.is-out td {
+  background: hsl(var(--tc-destructive) / 0.06);
+}
+
+.tc-revamp-body .inv-table .inv-name {
+  font-weight: 600;
+}
+
+.tc-revamp-body .inv-table .inv-muted {
+  color: hsl(var(--tc-muted-foreground));
+}
+
+.tc-revamp-body .inv-table .inv-actions {
+  display: flex;
+  gap: 0.35rem;
+  justify-content: center;
+}
+
+.tc-revamp-body .inv-qty-btn {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid hsl(var(--tc-border));
+  border-radius: calc(var(--tc-radius) - 6px);
+  background: hsl(var(--tc-card));
+  color: hsl(var(--tc-primary));
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.tc-revamp-body .inv-qty-btn:hover {
+  background: hsl(var(--tc-accent-soft));
+  border-color: hsl(var(--tc-accent) / 0.35);
+}
+
+.tc-revamp-body .inv-qty-btn--minus {
+  color: hsl(var(--tc-destructive));
+}
+
+.tc-revamp-body .inv-empty {
+  text-align: center;
+  padding: 2.5rem 1rem !important;
+  color: hsl(var(--tc-muted-foreground));
+}
+
+.tc-revamp-body .inv-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: hsl(182 42% 10% / 0.65);
+  backdrop-filter: blur(6px);
+}
+
+.tc-revamp-body .inv-modal.is-open {
+  display: flex;
+}
+
+.tc-revamp-body .inv-modal__dialog {
+  width: min(100%, 28rem);
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: hsl(var(--tc-card));
+  border: 1px solid hsl(var(--tc-border));
+  border-radius: var(--tc-radius);
+  box-shadow: var(--tc-shadow-elevated);
+}
+
+.tc-revamp-body .inv-modal__title {
+  margin: 0 0 1rem;
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.tc-revamp-body .inv-form-group {
+  margin-bottom: 1rem;
+}
+
+.tc-revamp-body .inv-form-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: hsl(var(--tc-foreground));
+}
+
+.tc-revamp-body .inv-modal__actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.tc-revamp-body .inv-modal__actions .tc-btn {
+  flex: 1;
+}
+
+.tc-revamp-body .tc-btn.tc-btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8125rem;
+}

@@ -108,27 +108,27 @@ test.describe('Workspace identity strip (mock project)', () => {
     await expect(identity).toContainText(/Compliance|backup|export/i);
   });
 
-  test('home-cookbook project shows cook / develop identity', async ({
+  test('restaurant workspace shows operator identity on recipe library', async ({
     page
   }) => {
     await page.addInitScript(() => {
       const project = {
-        id: 'test_cookbook_ws',
-        name: 'My Recipe Portfolio',
-        type: 'home-cookbook',
+        id: 'test_bistro_ws',
+        name: 'Northside Bistro',
+        type: 'restaurant',
         isArchived: false
       };
       localStorage.setItem('iterum_current_project', project.id);
       localStorage.setItem('session_active', 'true');
       localStorage.setItem(
         'current_user',
-        JSON.stringify({ userId: 'u_cook', email: 'cook@local.dev' })
+        JSON.stringify({ userId: 'u_bistro', email: 'bistro@local.dev' })
       );
       localStorage.setItem(
-        'iterum_projects_user_u_cook',
+        'iterum_projects_user_u_bistro',
         JSON.stringify([project])
       );
-      localStorage.setItem('iterum_current_project_user_u_cook', project.id);
+      localStorage.setItem('iterum_current_project_user_u_bistro', project.id);
     });
 
     await page.goto('/recipe-library.html');
@@ -140,8 +140,8 @@ test.describe('Workspace identity strip (mock project)', () => {
 
     const identity = page.locator('[data-workspace-identity]');
     await expect(identity).toBeVisible();
-    await expect(identity).toHaveAttribute('data-persona', 'cook');
-    await expect(identity).toHaveAttribute('data-pillar', 'develop');
-    await expect(identity).toContainText(/portable|career/i);
+    await expect(identity).toHaveAttribute('data-persona', 'owner');
+    await expect(identity).toHaveAttribute('data-pillar', 'run');
+    await expect(identity).toContainText(/compliance|restaurant/i);
   });
 });

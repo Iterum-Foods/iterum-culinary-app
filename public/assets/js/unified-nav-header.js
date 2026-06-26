@@ -4,7 +4,7 @@
  */
 
 /** Bump when sidebar HTML or menu structure changes (forces rebuild on cached pages). */
-const ITERUM_NAV_VERSION = '2026-05-21-three-pillars-archive-v1';
+const ITERUM_NAV_VERSION = '2026-06-19-inventory-ingredients-nav-v1';
 
 class UnifiedNavHeader {
   constructor() {
@@ -78,6 +78,9 @@ class UnifiedNavHeader {
     if (path.includes('calendar')) {
       return 'calendar';
     }
+    if (path.includes('sop-hub')) {
+      return 'sop_hub';
+    }
     if (path.includes('kitchen-management')) {
       return 'kitchen';
     }
@@ -131,22 +134,18 @@ class UnifiedNavHeader {
       'spec_library',
       'vendorprice',
       'equipment',
-      'production',
-      'reports',
-      'team',
-      'haccp',
-      'temperature',
+      'kitchen',
+      'canvas',
+      'vendors',
+      'ingredients',
       'import_recipe',
       'import_ing',
       'rgo',
       'datamgmt',
-      'backup',
-      'audit',
-      'profile',
-      'setup',
       'invvar',
       'crm',
-      'admin'
+      'admin',
+      'team'
     ];
     return inMore.indexOf(this.currentPage) >= 0 ? 'active' : '';
   }
@@ -252,8 +251,11 @@ class UnifiedNavHeader {
     if (sidebar && sidebar.getAttribute('data-nav-version') === ITERUM_NAV_VERSION) {
       this.ensureMainContentWrapper();
       this.injectStyles();
+      this.ensureMobileNavShell();
       this.syncSidebarCollapseFromStorage();
       this.setupSidebarCollapse();
+      this.setupMobileToggle();
+      this.setupMobileNavLinkClose();
       return;
     }
 
@@ -288,6 +290,7 @@ class UnifiedNavHeader {
 
   finalizeSidebarSetup() {
     this.injectStyles();
+    this.ensureMobileNavShell();
     this.syncSidebarCollapseFromStorage();
     this.setupSidebarCollapse();
     this.setupDropdownHover();
@@ -549,13 +552,14 @@ class UnifiedNavHeader {
                     ${this.navLink('dashboard.html#haccp', 'haccp', 'fa-solid fa-clipboard-check', 'HACCP Log', 'compliance')}
                     ${this.navLink('dashboard.html#temperature', 'temperature', 'fa-solid fa-temperature-half', 'Temperature', 'compliance')}
                     ${this.navLink('calendar.html', 'calendar', 'fa-solid fa-calendar-days', 'Calendar', 'calendar')}
-                    ${this.navLink('project-hub.html#team', 'team', 'fa-solid fa-users', 'Team', 'projects')}
                     ${this.navLink('mobile-compliance.html', 'shift', 'fa-solid fa-mobile-screen', 'Shift app', 'compliance')}
+                    ${this.navLink('sop-hub.html', 'sop_hub', 'fa-solid fa-book-open', 'How-to guides', 'compliance')}
 
                     <div class="nav-section-label">Develop</div>
                     ${this.navLink('recipe-library.html', 'recipes', 'fa-solid fa-book', 'Recipes', 'recipes')}
                     ${this.navLink('recipe-developer.html', 'developer', 'fa-solid fa-flask', 'Recipe Developer', 'recipes')}
                     ${this.navLink('menu-builder.html', 'menu', 'fa-solid fa-utensils', 'Menu Builder', 'menus')}
+                    ${this.navLink('ingredients.html', 'ingredients', 'fa-solid fa-carrot', 'Ingredients', 'ingredients')}
                     ${this.navLink('inventory.html', 'inventory', 'fa-solid fa-warehouse', 'Inventory', 'inventory')}
                     ${this.navLink('production-planning.html', 'reports', 'fa-solid fa-chart-line', 'Reports', 'production')}
 
@@ -579,7 +583,6 @@ class UnifiedNavHeader {
                             <a href="spec-library.html" class="${p('spec_library')}" data-iterum-feature="ingredients"><i class="fa-solid fa-file-lines fa-fw nav-dd-icon" aria-hidden="true"></i>Spec library</a>
                             <a href="vendor-price-comparison.html" class="${p('vendorprice')}" data-iterum-feature="vendors"><i class="fa-solid fa-scale-balanced fa-fw nav-dd-icon" aria-hidden="true"></i>Price compare</a>
                             <a href="equipment-management.html" class="${p('equipment')}" data-iterum-feature="equipment"><i class="fa-solid fa-screwdriver-wrench fa-fw nav-dd-icon" aria-hidden="true"></i>Equipment</a>
-                            <a href="ingredients.html" class="${p('ingredients')}" data-iterum-feature="ingredients"><i class="fa-solid fa-carrot fa-fw nav-dd-icon" aria-hidden="true"></i>Ingredients</a>
                             <a href="vendor-management.html" class="${p('vendors')}" data-iterum-feature="vendors"><i class="fa-solid fa-truck-field fa-fw nav-dd-icon" aria-hidden="true"></i>Vendors</a>
                             <a href="recipe-canvas.html" class="${p('canvas')}" data-iterum-feature="recipes"><i class="fa-solid fa-pen-ruler fa-fw nav-dd-icon" aria-hidden="true"></i>Recipe canvas</a>
                             <a href="kitchen-management.html" class="${p('kitchen')}" data-iterum-feature="kitchen"><i class="fa-solid fa-fire-burner fa-fw nav-dd-icon" aria-hidden="true"></i>Kitchen hub</a>
@@ -591,7 +594,7 @@ class UnifiedNavHeader {
                             <hr>
                             <div class="nav-dropdown-category">Organization</div>
                             <a href="restaurant-group-onboarding.html" class="${p('rgo')}" data-iterum-feature="projects"><i class="fa-solid fa-location-dot fa-fw nav-dd-icon" aria-hidden="true"></i>Add a restaurant group</a>
-                            <a href="archive-hub.html" class="${p('archive')}" data-iterum-feature="backup"><i class="fa-solid fa-box-archive fa-fw nav-dd-icon" aria-hidden="true"></i>Archive hub</a>
+                            <a href="project-hub.html#team" class="${p('team')}" data-iterum-feature="projects"><i class="fa-solid fa-users fa-fw nav-dd-icon" aria-hidden="true"></i>Team</a>
                             <a href="contact_management.html" class="${p('crm')}" data-iterum-feature="data_tools"><i class="fa-solid fa-address-book fa-fw nav-dd-icon" aria-hidden="true"></i>CRM &amp; contacts</a>
                             <a href="user_management.html" class="${p('admin')}" data-iterum-feature="data_tools"><i class="fa-solid fa-user-shield fa-fw nav-dd-icon" aria-hidden="true"></i>User admin</a>
                         </div>
@@ -676,51 +679,167 @@ class UnifiedNavHeader {
     });
   }
 
-  setupMobileToggle() {
-    const toggle = document.getElementById('sidebar-toggle');
+  isMobileNavViewport() {
+    return window.innerWidth <= 768;
+  }
+
+  setMobileNavOpen(open) {
     const sidebar = document.querySelector('.unified-nav-sidebar');
+    const backdrop = document.getElementById('iterum-mobile-nav-backdrop');
+    if (!sidebar) {
+      return;
+    }
+    sidebar.classList.toggle('mobile-open', open);
+    document.body.classList.toggle('iterum-mobile-nav-open', open);
+    if (backdrop) {
+      backdrop.hidden = !open;
+      backdrop.setAttribute('aria-hidden', open ? 'false' : 'true');
+    }
+    [
+      document.getElementById('sidebar-toggle'),
+      document.getElementById('iterum-mobile-nav-toggle'),
+      document.getElementById('dash-menu-toggle')
+    ].forEach(btn => {
+      if (!btn) {
+        return;
+      }
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (btn.id === 'iterum-mobile-nav-toggle') {
+        btn.innerHTML = open
+          ? '<i class="fa-solid fa-xmark" aria-hidden="true"></i>'
+          : '<i class="fa-solid fa-bars" aria-hidden="true"></i>';
+        btn.setAttribute(
+          'aria-label',
+          open ? 'Close menu' : 'Open menu'
+        );
+      }
+    });
+  }
 
-    if (toggle && sidebar) {
-      toggle.addEventListener('click', () => {
-        sidebar.classList.toggle('mobile-open');
-        const open = sidebar.classList.contains('mobile-open');
-        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  ensureMobileNavShell() {
+    if (!document.getElementById('iterum-mobile-nav-backdrop')) {
+      const backdrop = document.createElement('div');
+      backdrop.className = 'tc-mobile-nav-backdrop';
+      backdrop.id = 'iterum-mobile-nav-backdrop';
+      backdrop.hidden = true;
+      backdrop.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(backdrop);
+    }
+
+    if (!document.getElementById('iterum-mobile-nav-bar')) {
+      const bar = document.createElement('header');
+      bar.className = 'tc-mobile-nav-bar';
+      bar.id = 'iterum-mobile-nav-bar';
+      bar.innerHTML =
+        '<a href="dashboard.html" class="tc-mobile-nav-bar__brand">' +
+        '<span class="tc-mobile-nav-bar__icon" aria-hidden="true">' +
+        '<i class="fa-solid fa-wand-magic-sparkles"></i></span>' +
+        '<span class="tc-mobile-nav-bar__text">' +
+        '<span class="tc-mobile-nav-bar__title">Iterum</span>' +
+        '<span class="tc-mobile-nav-bar__eyebrow">Culinary OS</span>' +
+        '</span></a>' +
+        '<button type="button" class="tc-mobile-nav-bar__toggle" id="iterum-mobile-nav-toggle" ' +
+        'aria-label="Open menu" aria-expanded="false" aria-controls="unified-sidebar-nav">' +
+        '<i class="fa-solid fa-bars" aria-hidden="true"></i></button>';
+      const sidebar = document.querySelector('.unified-nav-sidebar');
+      if (sidebar && sidebar.nextSibling) {
+        document.body.insertBefore(bar, sidebar.nextSibling);
+      } else {
+        document.body.appendChild(bar);
+      }
+    }
+  }
+
+  setupMobileToggle() {
+    const sidebar = document.querySelector('.unified-nav-sidebar');
+    if (!sidebar) {
+      return;
+    }
+
+    const toggleOpen = () => {
+      if (!this.isMobileNavViewport()) {
+        return;
+      }
+      this.setMobileNavOpen(!sidebar.classList.contains('mobile-open'));
+    };
+
+    const closeIfOpen = () => {
+      if (sidebar.classList.contains('mobile-open')) {
+        this.setMobileNavOpen(false);
+      }
+    };
+
+    [
+      document.getElementById('sidebar-toggle'),
+      document.getElementById('iterum-mobile-nav-toggle'),
+      document.getElementById('dash-menu-toggle')
+    ].forEach(btn => {
+      if (!btn || btn.dataset.iterumMobileToggleBound === '1') {
+        return;
+      }
+      btn.dataset.iterumMobileToggleBound = '1';
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleOpen();
       });
+    });
 
-      // Close sidebar when clicking outside on mobile
-      document.addEventListener('click', e => {
-        if (
-          window.innerWidth <= 768 &&
-          sidebar.classList.contains('mobile-open') &&
-          !sidebar.contains(e.target) &&
-          !toggle.contains(e.target) &&
-          !(
-            e.target &&
-            e.target.closest &&
-            e.target.closest('#dash-menu-toggle')
-          )
-        ) {
-          sidebar.classList.remove('mobile-open');
-          toggle.setAttribute('aria-expanded', 'false');
-        }
+    if (sidebar.dataset.iterumMobileNavBound === '1') {
+      return;
+    }
+    sidebar.dataset.iterumMobileNavBound = '1';
+
+    const backdrop = document.getElementById('iterum-mobile-nav-backdrop');
+    if (backdrop) {
+      backdrop.addEventListener('click', () => {
+        this.setMobileNavOpen(false);
       });
     }
+
+    document.addEventListener('click', e => {
+      if (
+        !this.isMobileNavViewport() ||
+        !sidebar.classList.contains('mobile-open')
+      ) {
+        return;
+      }
+      if (sidebar.contains(e.target)) {
+        return;
+      }
+      if (
+        e.target &&
+        e.target.closest &&
+        (e.target.closest('#iterum-mobile-nav-toggle') ||
+          e.target.closest('#sidebar-toggle') ||
+          e.target.closest('#dash-menu-toggle'))
+      ) {
+        return;
+      }
+      closeIfOpen();
+    });
+
+    window.addEventListener('resize', () => {
+      if (!this.isMobileNavViewport()) {
+        closeIfOpen();
+      }
+    });
   }
 
   /** Collapse the drawer after navigating on small screens */
   setupMobileNavLinkClose() {
     const sidebar = document.querySelector('.unified-nav-sidebar');
     if (!sidebar) return;
+    if (sidebar.dataset.iterumMobileNavCloseBound === '1') {
+      return;
+    }
+    sidebar.dataset.iterumMobileNavCloseBound = '1';
     sidebar.addEventListener('click', e => {
       const a = e.target.closest('a[href]');
-      if (!a || window.innerWidth > 768) return;
+      if (!a || !this.isMobileNavViewport()) return;
       const href = (a.getAttribute('href') || '').trim();
       if (!href || href === '#') return;
-      sidebar.classList.remove('mobile-open');
-      const t = document.getElementById('sidebar-toggle');
-      if (t) t.setAttribute('aria-expanded', 'false');
-      const dash = document.getElementById('dash-menu-toggle');
-      if (dash) dash.setAttribute('aria-expanded', 'false');
+      this.setMobileNavOpen(false);
     });
   }
 
@@ -734,6 +853,12 @@ class UnifiedNavHeader {
             body.iterum-has-sidebar,
             body.tc-revamp-body:has(.unified-nav-sidebar) {
                 padding-top: 0 !important;
+            }
+            @media (max-width: 768px) {
+                body.iterum-has-sidebar,
+                body.tc-revamp-body:has(.unified-nav-sidebar) {
+                    padding-top: var(--iterum-mobile-nav-height, 3.25rem) !important;
+                }
             }
             body.iterum-has-sidebar > nav[aria-label="App shortcuts"] {
                 display: none !important;

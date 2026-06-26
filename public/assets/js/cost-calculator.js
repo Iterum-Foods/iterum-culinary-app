@@ -494,8 +494,14 @@ class CostCalculator {
    * @returns {number} Total minutes
    */
   parseTime(timeStr) {
-    if (!timeStr) {
+    if (timeStr == null || timeStr === '') {
       return 0;
+    }
+    if (typeof timeStr === 'number' && !isNaN(timeStr)) {
+      return timeStr;
+    }
+    if (typeof timeStr !== 'string') {
+      timeStr = String(timeStr);
     }
 
     let minutes = 0;

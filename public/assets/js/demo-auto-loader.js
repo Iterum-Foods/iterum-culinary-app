@@ -5,8 +5,8 @@
 (function () {
   'use strict';
 
-  var LOCAL_SEED_VERSION = 6;
-  var FIRESTORE_SEED_VERSION = 3;
+  var LOCAL_SEED_VERSION = 7;
+  var FIRESTORE_SEED_VERSION = 4;
 
   function localVersionKey(uid) {
     return 'iterum_demo_local_seed_applied_v_' + (uid || 'na');
@@ -234,8 +234,33 @@
       }
     }
 
+    if (window.ITERUM_SOP_SAMPLE) {
+      try {
+        var sopPack =
+          typeof window.iterumSopPack?.normalizePack === 'function'
+            ? window.iterumSopPack.normalizePack(window.ITERUM_SOP_SAMPLE)
+            : window.ITERUM_SOP_SAMPLE;
+        await setDoc(
+          doc(db, 'projects', projectId, 'snapshots', 'employee_line_pack'),
+          Object.assign({}, sopPack, {
+            updatedAt: fs.serverTimestamp(),
+            seededBy: 'demo-auto-loader'
+          }),
+          { merge: true }
+        );
+        if (typeof window.iterumSopPack?.saveLocal === 'function') {
+          window.iterumSopPack.saveLocal(projectId, sopPack);
+        }
+      } catch (e) {
+        console.warn('[Iterum demo] SOP pack Firestore mirror failed', e);
+      }
+    }
+
     localStorage.setItem(doneKey, String(FIRESTORE_SEED_VERSION));
-    console.log('[Iterum demo] Firestore compliance sample saved for uid', uid);
+    console.log(
+      '[Iterum demo] Firestore compliance + SOP sample saved for uid',
+      uid
+    );
   }
 
   function userMayReceiveDemoSeed(user) {

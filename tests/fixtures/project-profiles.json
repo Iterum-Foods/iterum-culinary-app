@@ -15,7 +15,7 @@
     "id": "chef-launch",
     "persona": "B",
     "label": "Chef launching",
-    "projectType": "restaurant-menu",
+    "projectType": "restaurant",
     "primaryPillar": "develop",
     "paths": [
       { "path": "/recipe-library.html", "expect": "Recipe Library" },
@@ -27,7 +27,7 @@
     "id": "cook-career",
     "persona": "C",
     "label": "Career cook portfolio",
-    "projectType": "home-cookbook",
+    "projectType": "restaurant",
     "primaryPillar": "develop",
     "paths": [
       { "path": "/recipe-library.html", "expect": "Recipe Library" },
@@ -39,7 +39,7 @@
     "id": "catering-event",
     "persona": "B",
     "label": "Catering event",
-    "projectType": "catering-event",
+    "projectType": "restaurant",
     "primaryPillar": "develop",
     "paths": [
       { "path": "/menu-builder.html", "expect": "menu" },
@@ -50,7 +50,7 @@
     "id": "recipe-rd",
     "persona": "C",
     "label": "Recipe R&D lab",
-    "projectType": "recipe-testing",
+    "projectType": "restaurant",
     "primaryPillar": "develop",
     "paths": [
       { "path": "/recipe-developer.html", "expect": "recipe" },
@@ -61,7 +61,7 @@
     "id": "seasonal-menu",
     "persona": "B",
     "label": "Seasonal menu",
-    "projectType": "seasonal-menu",
+    "projectType": "restaurant",
     "primaryPillar": "develop",
     "paths": [
       { "path": "/menu-builder.html", "expect": "menu" },

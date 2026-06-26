@@ -10,6 +10,7 @@
   <script src="assets/js/firebase-config.js"></script>
   <script type="module" src="assets/js/firebase-auth.js"></script>
   <script src="assets/js/auth-manager.js"></script>
+  <script src="assets/js/sop-pack-seed.js"></script>
   <script src="assets/js/demo-seed-data.js"></script>
   <script src="assets/js/demo-auto-loader.js"></script>
   <script src="assets/js/auth-api-helper.js"></script>
@@ -738,6 +739,27 @@
 
           <div class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="compliance">
             <div id="checklist-dashboard-card"></div>
+          </div>
+
+          <div class="card-style" data-dash-roles="account_admin,operations_gm,chef_leadership,location_manager" data-dash-features="compliance">
+            <div class="dash-card-head">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
+                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span>
+                How-to guides (SOPs)
+              </h2>
+            </div>
+            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
+              Standard procedures for opening, kitchen, bar, FOH, and safety. Publish to the mobile Shift
+              <strong>How-to</strong> tab for line staff.
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <a href="sop-hub.html" class="text-xs py-2 px-2.5 rounded-md shadow-sm text-white hover:opacity-90 transition-opacity" style="background: var(--brand-primary-accent); text-decoration: none;">
+                <i class="fa-solid fa-pen-to-square mr-1" aria-hidden="true"></i>Open SOP Hub
+              </a>
+              <a href="mobile-compliance.html" target="_blank" rel="noopener" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary); text-decoration: none;">
+                <i class="fa-solid fa-mobile-screen mr-1" aria-hidden="true"></i>Shift app
+              </a>
+            </div>
           </div>
 
           <div class="card-style" data-dash-roles="account_admin,operations_gm,chef_leadership,location_manager" data-dash-features="bar">

@@ -23,6 +23,7 @@
   </script>
   <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
   <script src="assets/js/user-role-setup.js"></script>
+  <script src="assets/js/sop-pack-seed.js"></script>
   <script src="assets/js/demo-seed-data.js"></script>
   <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
 </head>
@@ -53,9 +54,9 @@
       <div class="flex items-center gap-2 text-moss-dark font-semibold text-lg mb-1">
         <span aria-hidden="true">◇</span> Iterum
       </div>
-      <h1 class="text-2xl sm:text-3xl font-semibold text-ink tracking-tight">Load Sample Project data</h1>
+      <h1 class="text-2xl sm:text-3xl font-semibold text-ink tracking-tight">Load Sample Restaurant data</h1>
       <p class="text-slate mt-2 text-base leading-relaxed">
-        Merges the <strong>Sample Project</strong> workspace, two menus (lunch + bar), recipes (published + WIP), recipe ideas, ingredients, inventory, vendors, menu–recipe links, equipment for HACCP, and sanitizer / temperature / dishwasher logs into this browser.
+        Merges the <strong>Sample Restaurant</strong> workspace, two menus (lunch + bar), recipes (published + WIP), recipe ideas, ingredients, inventory, vendors, HACCP logs, and <strong>11 how-to guides (SOPs)</strong> into this browser.
         Optional URL opt-in for any account: add <code class="bg-slate-100 px-1 rounded">?demo=1</code> (or <code class="bg-slate-100 px-1 rounded">?iterum_demo=1</code>) when opening the app so demo auto-merge can run after sign-in, or set <code class="bg-slate-100 px-1 rounded">localStorage.iterum_demo_seed</code> to <code class="bg-slate-100 px-1 rounded">1</code>. The demo email still qualifies without extra flags. Create the demo user in Firebase Authentication if it does not exist yet.
       </p>
     </div>
@@ -73,6 +74,7 @@
         <a href="dashboard.html" class="flex-1 text-center rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-ink hover:bg-slate-50 transition-colors">Open dashboard</a>
         <a href="recipe-developer.html" class="flex-1 text-center rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-ink hover:bg-slate-50 transition-colors">Recipe developer</a>
         <a href="menu-builder.html" class="flex-1 text-center rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-ink hover:bg-slate-50 transition-colors">Menu builder</a>
+        <a href="sop-hub.html" class="flex-1 text-center rounded-xl border border-slate-200 py-2.5 text-sm font-medium text-ink hover:bg-slate-50 transition-colors">SOP Hub</a>
       </div>
     </div>
   </div>
@@ -102,7 +104,9 @@
             s.sanitizerChecks +
             ' sanitizer checks, ' +
             s.temperatureLogs +
-            ' temp logs. Open Kitchen/HACCP or Menu builder to browse.';
+            ' temp logs. SOP guides: ' +
+            (s.sops || 0) +
+            '. Open SOP Hub or Shift How-to tab.';
           statusEl.className = 'text-sm text-moss-dark font-medium';
         } else if (r.error === 'not_signed_in') {
           statusEl.textContent = 'Session missing — sign in first.';

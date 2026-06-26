@@ -137,9 +137,9 @@
     return [
       {
         id: DEMO_PROJECT_ID,
-        name: 'Sample Project',
+        name: 'Sample Restaurant',
         description:
-          'Pre-loaded recipes, menus, vendors, inventory, and HACCP logs for exploring Iterum.',
+          'Demo workspace: recipes, menus, vendors, HACCP logs, and how-to guides (SOPs) for Shift.',
         type: 'restaurant',
         status: 'active',
         createdAt: now,
@@ -1525,8 +1525,26 @@
     );
     global.localStorage.setItem(projectsKey, JSON.stringify(existingProjects));
 
-    var demoName = 'Sample Project';
+    var demoName = 'Sample Restaurant';
     setActiveProjectKeys(uid, DEMO_PROJECT_ID, demoName);
+
+    var sopCount = 0;
+    if (global.iterumSopPack && typeof global.iterumSopPack.seedSampleLocal === 'function') {
+      var seededPack = global.iterumSopPack.seedSampleLocal(DEMO_PROJECT_ID);
+      sopCount = seededPack && seededPack.sops ? seededPack.sops.length : 0;
+    } else if (global.ITERUM_SOP_SAMPLE) {
+      try {
+        global.localStorage.setItem(
+          'iterum_sop_pack_' + DEMO_PROJECT_ID,
+          JSON.stringify(global.ITERUM_SOP_SAMPLE)
+        );
+        sopCount = Array.isArray(global.ITERUM_SOP_SAMPLE.sops)
+          ? global.ITERUM_SOP_SAMPLE.sops.length
+          : 0;
+      } catch (eSop) {
+        void eSop;
+      }
+    }
 
     var maps = demoDashboardMaps(DEMO_PROJECT_ID, userLabel);
     var tasksKey = DASH_PREFIX + '.tasks.' + DEMO_PROJECT_ID;
@@ -1731,7 +1749,8 @@
         menuItems: builder.menuDataPayload.items.length + barList.items.length,
         sanitizerChecks: demoSanitizerTests().length,
         temperatureLogs: demoTemperatureReadings().length,
-        menuKey: menuKey
+        menuKey: menuKey,
+        sops: sopCount
       }
     };
   };

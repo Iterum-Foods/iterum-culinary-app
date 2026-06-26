@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How-to guides (SOPs) — Iterum Culinary</title>
+
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    <script type="module" src="assets/js/firebase-auth.js"></script>
+    <script type="module" src="assets/js/firestore-sync.js"></script>
+    <script src="assets/js/user-role-setup.js"></script>
+    <script src="assets/js/project-management-system.js" defer></script>
+    <script src="assets/js/unified-nav-header.js" defer></script>
+    <script src="assets/js/unified-project-selector.js" defer></script>
+    <script src="assets/js/toast-notifications.js" defer></script>
+    <script src="assets/js/workspace-save-indicator.js" defer></script>
+    <script src="assets/js/sop-pack-seed.js" defer></script>
+    <script src="assets/js/sop-pack-store.js" defer></script>
+    <script src="assets/js/sop-hub.js" defer></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
+
+    <style>
+        body { background: hsl(var(--tc-background)); font-family: 'Inter', sans-serif; color: hsl(var(--tc-foreground)); }
+        .sop-container { max-width: 1100px; margin: 0 auto; padding: 24px 20px 48px; }
+        .sop-hero {
+            background: linear-gradient(135deg, hsl(182 38% 22%) 0%, hsl(182 32% 32%) 100%);
+            color: #f8fafc;
+            border-radius: 16px;
+            padding: 28px 24px;
+            margin-bottom: 20px;
+        }
+        .sop-hero h1 { margin: 0 0 8px; font-size: 1.6rem; }
+        .sop-hero p { margin: 0; opacity: 0.92; line-height: 1.5; max-width: 40rem; font-size: 0.95rem; }
+        .sop-panel {
+            background: hsl(var(--tc-card));
+            border: 1px solid hsl(var(--tc-border));
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .sop-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; align-items: center; }
+        .sop-btn {
+            padding: 9px 14px;
+            border-radius: 10px;
+            border: 1px solid hsl(var(--tc-border));
+            background: hsl(var(--tc-background));
+            font-weight: 600;
+            font-size: 0.8125rem;
+            cursor: pointer;
+        }
+        .sop-btn-primary {
+            background: hsl(var(--tc-primary));
+            color: hsl(var(--tc-primary-foreground));
+            border-color: transparent;
+        }
+        .sop-cat-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+        .sop-cat-tab {
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid hsl(var(--tc-border));
+            background: hsl(var(--tc-muted) / 0.3);
+            font-size: 0.8125rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .sop-cat-tab.is-active {
+            background: hsl(var(--tc-primary) / 0.12);
+            border-color: hsl(var(--tc-primary));
+            color: hsl(var(--tc-primary));
+        }
+        .sop-list { display: grid; gap: 12px; }
+        .sop-card {
+            border: 1px solid hsl(var(--tc-border));
+            border-radius: 12px;
+            padding: 14px 16px;
+            background: hsl(var(--tc-background));
+        }
+        .sop-card h3 { margin: 0 0 6px; font-size: 1rem; }
+        .sop-card pre {
+            margin: 0;
+            white-space: pre-wrap;
+            font-family: inherit;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: hsl(var(--tc-muted-foreground));
+        }
+        .sop-card-actions { display: flex; gap: 8px; margin-top: 10px; }
+        .sop-status { font-size: 0.8125rem; color: hsl(var(--tc-muted-foreground)); min-height: 1.25em; }
+        .sop-modal {
+            position: fixed; inset: 0; background: rgba(15,23,42,0.45);
+            display: none; align-items: center; justify-content: center; z-index: 9999; padding: 16px;
+        }
+        .sop-modal.is-open { display: flex; }
+        .sop-modal__dialog {
+            background: hsl(var(--tc-card));
+            border-radius: 14px;
+            max-width: 520px;
+            width: 100%;
+            padding: 20px;
+            border: 1px solid hsl(var(--tc-border));
+        }
+        .sop-field { margin-bottom: 12px; }
+        .sop-field label { display: block; font-size: 0.8125rem; font-weight: 600; margin-bottom: 4px; }
+        .sop-field input, .sop-field select, .sop-field textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid hsl(var(--tc-border));
+            font: inherit;
+        }
+        .sop-mobile-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: hsl(var(--tc-primary));
+            text-decoration: none;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body class="tc-revamp-body" style="padding-top: 80px;">
+    <div class="sop-container">
+        <div class="sop-hero">
+            <h1><i class="fa-solid fa-book-open" aria-hidden="true"></i> How-to guides (SOPs)</h1>
+            <p>
+                Build standard procedures for your team. <strong>Publish</strong> pushes to the mobile Shift app
+                <strong>How-to</strong> tab for the active workspace.
+            </p>
+            <a href="mobile-compliance.html" class="sop-mobile-link" target="_blank" rel="noopener">
+                <i class="fa-solid fa-mobile-screen" aria-hidden="true"></i> Preview on Shift app
+            </a>
+        </div>
+
+        <div id="workspace-save-indicator-root" data-workspace-save-indicator></div>
+
+        <div class="sop-panel">
+            <div class="sop-toolbar">
+                <button type="button" class="sop-btn" id="sop-btn-refresh"><i class="fa-solid fa-rotate" aria-hidden="true"></i> Refresh</button>
+                <button type="button" class="sop-btn" id="sop-btn-import"><i class="fa-solid fa-file-import" aria-hidden="true"></i> Import test pack</button>
+                <button type="button" class="sop-btn sop-btn-primary" id="sop-btn-add"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add guide</button>
+                <button type="button" class="sop-btn sop-btn-primary" id="sop-btn-publish"><i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i> Publish to Shift</button>
+            </div>
+            <p id="sop-status" class="sop-status" aria-live="polite"></p>
+            <div id="sop-cat-tabs" class="sop-cat-tabs" role="tablist" aria-label="SOP categories"></div>
+            <div id="sop-list" class="sop-list"></div>
+        </div>
+    </div>
+
+    <div id="sop-modal" class="sop-modal" role="dialog" aria-modal="true" aria-labelledby="sop-modal-title">
+        <div class="sop-modal__dialog">
+            <h2 id="sop-modal-title" style="margin:0 0 12px;font-size:1.125rem;">Add guide</h2>
+            <div class="sop-field">
+                <label for="sop-f-title">Title</label>
+                <input type="text" id="sop-f-title" required />
+            </div>
+            <div class="sop-field">
+                <label for="sop-f-category">Category</label>
+                <select id="sop-f-category"></select>
+            </div>
+            <div class="sop-field">
+                <label for="sop-f-body">Steps / body (one step per line works well)</label>
+                <textarea id="sop-f-body" rows="8"></textarea>
+            </div>
+            <div class="sop-toolbar" style="margin:0;">
+                <button type="button" class="sop-btn" id="sop-btn-cancel">Cancel</button>
+                <button type="button" class="sop-btn sop-btn-primary" id="sop-btn-save">Save guide</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

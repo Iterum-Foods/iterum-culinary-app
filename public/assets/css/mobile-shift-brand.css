@@ -425,6 +425,16 @@
   margin-top: 0;
 }
 
+.mc-sop-category {
+  margin-bottom: 1rem;
+}
+
+.mc-sop-category__title {
+  margin-top: 0;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--mc-border, rgba(255, 255, 255, 0.12));
+}
+
 .mc-hint-top0 {
   margin-top: 0;
 }

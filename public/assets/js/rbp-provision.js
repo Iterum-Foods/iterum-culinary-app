@@ -226,6 +226,11 @@
       await fs.saveRecipeLibrarySnapshot(result.recipes, {
         userId: result.userId
       });
+      if (window.iterumSopPack && window.ITERUM_SOP_SAMPLE && fs.db) {
+        await window.iterumSopPack.seedSamplePack(fs.db, result.projectId);
+      } else if (window.iterumSopPack && window.ITERUM_SOP_SAMPLE) {
+        window.iterumSopPack.seedSampleLocal(result.projectId);
+      }
       return { cloud: true };
     } catch (err) {
       console.warn('rbp-provision: cloud sync failed', err);
@@ -243,6 +248,9 @@
       throw new Error('project_manager_not_ready');
     }
     const result = buildProvisionPayload(plan, opts);
+    if (window.iterumSopPack && window.ITERUM_SOP_SAMPLE) {
+      window.iterumSopPack.seedSampleLocal(result.projectId);
+    }
     let cloud = { cloud: false, reason: 'skipped' };
     if (opts.syncCloud !== false) {
       cloud = await syncProvisionToCloud(result);

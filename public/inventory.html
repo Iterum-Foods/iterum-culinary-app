@@ -13,241 +13,127 @@
     <script src="assets/js/auth-manager.js"></script>
     <script src="assets/js/auth-api-helper.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- UNIFIED COLOR SYSTEM - MUST LOAD FIRST -->
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
+    <link rel="stylesheet" href="assets/css/taste-craft-revamp-tokens.css">
+    <link rel="stylesheet" href="assets/css/taste-craft-revamp-ui.css">
+    <link rel="stylesheet" href="assets/css/taste-craft-revamp-colors.css">
+    <link rel="stylesheet" href="assets/css/taste-craft-app-sidebar.css">
     <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
-    <link rel="stylesheet" href="assets/css/tailwind-output.css">
-    <link rel="stylesheet" href="assets/css/iterum-design-system.css">
-    <link rel="stylesheet" href="assets/css/premium-ui-system.css">
-    <link rel="stylesheet" href="assets/css/unified-cards.css">
-    <link rel="stylesheet" href="assets/css/page-layouts.css">
-    <link rel="stylesheet" href="assets/css/high-contrast-universal.css">
+    <link rel="stylesheet" href="assets/css/header-universal.css">
+    <link rel="stylesheet" href="assets/css/iterum-workflow-polish.css">
+    <link rel="stylesheet" href="assets/css/inventory-revamp.css">
     <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
-    
-    <style>
-        body { background: #f8fafc; font-family: 'Inter', sans-serif; }
-        .container { width: 100%; margin: 0; padding: 32px 20px; }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 32px;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-        
-        .stat-value { font-size: 32px; font-weight: 800; color: #667eea; margin-bottom: 4px; }
-        .stat-label { font-size: 13px; color: #64748b; text-transform: uppercase; }
-        
-        .inventory-table {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-        
-        table { width: 100%; border-collapse: collapse; }
-        th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px; text-align: left; font-weight: 600; }
-        td { padding: 16px; border-bottom: 1px solid #f1f5f9; }
-        tr:hover { background: #f8fafc; }
-        
-        .low-stock { background: #fef3c7; }
-        .out-of-stock { background: #fee2e2; }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .btn-secondary { background: #f1f5f9; color: #475569; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-        }
-        
-        .modal.show { display: flex; }
-        
-        .modal-content {
-            background: white;
-            padding: 32px;
-            border-radius: 16px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: #475569; }
-        .form-input, .form-select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .form-select {
-            cursor: pointer;
-            background: white;
-        }
-        
-        .form-select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .alert {
-            padding: 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .alert-warning { background: #fef3c7; border: 2px solid #fbbf24; color: #92400e; }
-        .alert-info { background: #dbeafe; border: 2px solid #3b82f6; color: #1e40af; }
-    </style>
     
     <!-- Unified Navigation & Project Selector -->
     <script src="assets/js/workspace-features.js" defer></script>
     <script src="assets/js/project-management-system.js" defer></script>
-  <script src="assets/js/unified-nav-header.js" defer></script>
+    <script src="assets/js/unified-nav-header.js" defer></script>
     <script src="assets/js/unified-project-selector.js" defer></script>
-    <link rel="stylesheet" href="assets/css/header-universal.css">
-    <link rel="stylesheet" href="assets/css/iterum-workflow-polish.css">
-  <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
 </head>
-<body style="padding-top: 80px;" class="tc-revamp-body">
+<body class="page-body tc-revamp-body inv-page-body iterum-has-sidebar">
     <!-- Header injected by unified-nav-header.js -->
 
-    <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
-            <div>
-                <h1 style="font-size: 32px; font-weight: 800; margin-bottom: 8px;">📦 Inventory Management</h1>
-                <p style="color: #64748b;">Track stock levels, manage reorders, and prevent waste</p>
+    <main class="inv-page-shell page-shell">
+        <header class="tc-page-hero inv-hero">
+            <div class="inv-hero__top">
+                <div>
+                    <p class="tc-eyebrow">Iterum Kitchen OS · Stock</p>
+                    <h1 class="tc-page-hero__title">Inventory management</h1>
+                    <p class="tc-page-hero__desc">Track stock levels, manage reorders, and prevent waste.</p>
+                </div>
+                <div class="inv-hero__actions">
+                    <a href="inventory-variance.html" class="tc-btn tc-btn-outline" data-iterum-feature="inventory">Variance analysis</a>
+                    <button type="button" class="tc-btn tc-btn-outline" onclick="exportInventory()">Export</button>
+                    <button type="button" class="tc-btn tc-btn-outline" onclick="showImportModal()">Import</button>
+                    <button type="button" class="tc-btn tc-btn-accent" onclick="showAddStockModal()">+ Add stock</button>
+                </div>
             </div>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                <a href="inventory-variance.html" class="btn btn-secondary" data-iterum-feature="inventory" style="text-decoration: none; display: inline-flex; align-items: center;">📉 Variance analysis</a>
-                <button class="btn btn-secondary" onclick="exportInventory()">📥 Export</button>
-                <button class="btn btn-secondary" onclick="showImportModal()">📤 Import</button>
-                <button class="btn btn-primary" onclick="showAddStockModal()">+ Add Stock</button>
+        </header>
+
+        <div class="tc-stat-grid inv-stats">
+            <div class="tc-card tc-stat-card">
+                <div class="tc-stat-card__label">Total items</div>
+                <div class="tc-stat-card__value" id="total-items">0</div>
+            </div>
+            <div class="tc-card tc-stat-card">
+                <div class="tc-stat-card__label">Low stock</div>
+                <div class="tc-stat-card__value is-warning" id="low-stock-count">0</div>
+            </div>
+            <div class="tc-card tc-stat-card">
+                <div class="tc-stat-card__label">Out of stock</div>
+                <div class="tc-stat-card__value is-critical" id="out-of-stock-count">0</div>
+            </div>
+            <div class="tc-card tc-stat-card">
+                <div class="tc-stat-card__label">Total value</div>
+                <div class="tc-stat-card__value is-accent" id="inventory-value">$0</div>
             </div>
         </div>
 
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value" id="total-items">0</div>
-                <div class="stat-label">Total Items</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="low-stock-count" style="color: #f59e0b;">0</div>
-                <div class="stat-label">Low Stock</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="out-of-stock-count" style="color: #ef4444;">0</div>
-                <div class="stat-label">Out of Stock</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="inventory-value">$0</div>
-                <div class="stat-label">Total Value</div>
-            </div>
-        </div>
-
-        <!-- Low Stock Alert -->
-        <div id="low-stock-alert" class="alert alert-warning" style="display: none;">
-            <strong>⚠️ Low Stock Alert:</strong>
+        <div id="low-stock-alert" class="inv-alert" role="status">
+            <strong>Low stock alert:</strong>
             <span id="low-stock-message"></span>
-            <button onclick="generateShoppingList()" style="margin-left: 12px; padding: 6px 12px; background: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">
-                View Shopping List
-            </button>
+            <button type="button" class="tc-btn tc-btn-outline tc-btn-sm" onclick="generateShoppingList()">View shopping list</button>
         </div>
 
-        <!-- Filter/Search -->
-        <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px;">
-                <input type="text" id="search-input" placeholder="Search inventory..." class="form-input" oninput="filterInventory()">
-                <select id="location-filter" class="form-select" onchange="filterInventory()">
-                    <option value="">All Locations</option>
+        <div class="inv-filters">
+            <div class="inv-filters__grid">
+                <input type="text" id="search-input" placeholder="Search inventory…" class="inv-field" oninput="filterInventory()">
+                <select id="location-filter" class="inv-field" onchange="filterInventory()">
+                    <option value="">All locations</option>
                     <option value="Main Kitchen">Main Kitchen</option>
                     <option value="Prep Station">Prep Station</option>
                     <option value="Walk-in Cooler">Walk-in Cooler</option>
                     <option value="Dry Storage">Dry Storage</option>
                 </select>
-                <select id="status-filter" class="form-select" onchange="filterInventory()">
-                    <option value="">All Status</option>
-                    <option value="low">Low Stock</option>
-                    <option value="out">Out of Stock</option>
-                    <option value="good">Good Stock</option>
+                <select id="status-filter" class="inv-field" onchange="filterInventory()">
+                    <option value="">All status</option>
+                    <option value="low">Low stock</option>
+                    <option value="out">Out of stock</option>
+                    <option value="good">Good stock</option>
                 </select>
-                <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+                <button type="button" class="tc-btn tc-btn-outline" onclick="clearFilters()">Clear</button>
             </div>
         </div>
 
-        <!-- Inventory Table -->
-        <div class="inventory-table" style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; min-width: 1000px;">
+        <div class="inv-table-wrap">
+            <table class="inv-table">
                 <thead>
-                    <tr style="background: linear-gradient(135deg, #5B9BAD 0%, #6B8E6F 100%); color: white;">
-                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap; position: sticky; left: 0; z-index: 10;">Ingredient</th>
-                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Quantity</th>
-                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Unit</th>
-                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Location</th>
-                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Par Level</th>
-                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Reorder Point</th>
-                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Status</th>
-                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Last Updated</th>
-                        <th style="padding: 14px 16px; text-align: center; font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Actions</th>
+                    <tr>
+                        <th>Ingredient</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                        <th>Location</th>
+                        <th>Par level</th>
+                        <th>Reorder point</th>
+                        <th>Status</th>
+                        <th>Last updated</th>
+                        <th style="text-align:center;">Actions</th>
                     </tr>
                 </thead>
-                <tbody id="inventory-tbody">
-                    <!-- Populated by JS -->
-                </tbody>
+                <tbody id="inventory-tbody"></tbody>
             </table>
         </div>
-    </div>
+    </main>
 
-    <!-- Add/Edit Stock Modal -->
-    <div id="stock-modal" class="modal">
-        <div class="modal-content">
-            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 20px;">Add/Adjust Stock</h2>
+    <div id="stock-modal" class="inv-modal" role="dialog" aria-labelledby="stock-modal-title" aria-modal="true">
+        <div class="inv-modal__dialog">
+            <h2 class="inv-modal__title" id="stock-modal-title">Add / adjust stock</h2>
             <form id="stock-form" onsubmit="saveStock(event)">
-                <div class="form-group">
-                    <label class="form-label">Ingredient</label>
-                    <select id="stock-ingredient" class="form-select" required>
-                        <option value="">Select ingredient...</option>
+                <div class="inv-form-group">
+                    <label class="inv-form-label" for="stock-ingredient">Ingredient</label>
+                    <select id="stock-ingredient" class="inv-field" required>
+                        <option value="">Select ingredient…</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Quantity</label>
-                    <input type="number" id="stock-quantity" class="form-input" step="0.01" required>
+                <div class="inv-form-group">
+                    <label class="inv-form-label" for="stock-quantity">Quantity</label>
+                    <input type="number" id="stock-quantity" class="inv-field" step="0.01" required>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Unit</label>
-                    <select id="stock-unit" class="form-select" required>
+                <div class="inv-form-group">
+                    <label class="inv-form-label" for="stock-unit">Unit</label>
+                    <select id="stock-unit" class="inv-field" required>
                         <option value="lb">lb</option>
                         <option value="oz">oz</option>
                         <option value="kg">kg</option>
@@ -258,26 +144,26 @@
                         <option value="tsp">tsp</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Location</label>
-                    <select id="stock-location" class="form-select">
+                <div class="inv-form-group">
+                    <label class="inv-form-label" for="stock-location">Location</label>
+                    <select id="stock-location" class="inv-field">
                         <option value="Main Kitchen">Main Kitchen</option>
                         <option value="Prep Station">Prep Station</option>
                         <option value="Walk-in Cooler">Walk-in Cooler</option>
                         <option value="Dry Storage">Dry Storage</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Par Level (Optional)</label>
-                    <input type="number" id="stock-par-level" class="form-input" min="0">
+                <div class="inv-form-group">
+                    <label class="inv-form-label" for="stock-par-level">Par level (optional)</label>
+                    <input type="number" id="stock-par-level" class="inv-field" min="0">
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Reorder Point (Optional)</label>
-                    <input type="number" id="stock-reorder-point" class="form-input" min="0">
+                <div class="inv-form-group">
+                    <label class="inv-form-label" for="stock-reorder-point">Reorder point (optional)</label>
+                    <input type="number" id="stock-reorder-point" class="inv-field" min="0">
                 </div>
-                <div style="display: flex; gap: 12px; margin-top: 24px;">
-                    <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeModal('stock-modal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary" style="flex: 1;">Save</button>
+                <div class="inv-modal__actions">
+                    <button type="button" class="tc-btn tc-btn-outline" onclick="closeModal('stock-modal')">Cancel</button>
+                    <button type="submit" class="tc-btn tc-btn-accent">Save</button>
                 </div>
             </form>
         </div>
@@ -312,67 +198,45 @@
             const tbody = document.getElementById('inventory-tbody');
             
             if (inventory.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #94a3b8;">No inventory items yet. Click "Add Stock" to get started.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="inv-empty">No inventory items yet. Click “Add stock” to get started.</td></tr>';
                 return;
             }
 
             tbody.innerHTML = inventory.map(item => {
                 const status = getStockStatus(item);
-                const rowClass = status === 'Low Stock' ? 'low-stock' : status === 'Out of Stock' ? 'out-of-stock' : '';
-                const statusBg = getStatusColor(status);
+                const rowClass = status === 'Low Stock' ? 'is-low' : status === 'Out of Stock' ? 'is-out' : '';
                 
                 return `
-                    <tr class="${rowClass}" style="border-bottom: 1px solid #e2e8f0; transition: background 0.2s;">
-                        <td style="padding: 14px 16px; font-weight: 600; color: #2C4A52; position: sticky; left: 0; background: ${rowClass ? (status === 'Low Stock' ? '#fef3c7' : '#fee2e2') : 'white'}; z-index: 1;">${item.ingredientName}</td>
-                        <td style="padding: 14px 16px; color: #3E4C54; font-weight: 500;">${item.quantity.toFixed(2)}</td>
-                        <td style="padding: 14px 16px; color: #64748b;">${item.unit}</td>
-                        <td style="padding: 14px 16px; color: #3E4C54;">${item.location}</td>
-                        <td style="padding: 14px 16px; color: #64748b;">${item.parLevel || '-'}</td>
-                        <td style="padding: 14px 16px; color: #64748b;">${item.reorderPoint || '-'}</td>
-                        <td style="padding: 14px 16px;">
-                            <span style="padding: 6px 12px; background: ${statusBg}; color: white; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
-                                ${status}
-                            </span>
-                        </td>
-                        <td style="padding: 14px 16px; color: #64748b; font-size: 0.875rem;">${new Date(item.lastUpdated).toLocaleDateString()}</td>
-                        <td style="padding: 14px 16px; text-align: center;">
-                            <div style="display: flex; gap: 6px; justify-content: center;">
-                                <button onclick="adjustStock('${item.id}', 'add')" style="padding: 6px 12px; background: #6B8E6F; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500;">+</button>
-                                <button onclick="adjustStock('${item.id}', 'remove')" style="padding: 6px 12px; background: #C97676; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-weight: 500;">-</button>
+                    <tr class="${rowClass}">
+                        <td class="inv-name">${item.ingredientName}</td>
+                        <td>${item.quantity.toFixed(2)}</td>
+                        <td class="inv-muted">${item.unit}</td>
+                        <td>${item.location}</td>
+                        <td class="inv-muted">${item.parLevel || '—'}</td>
+                        <td class="inv-muted">${item.reorderPoint || '—'}</td>
+                        <td><span class="${getStatusPillClass(status)}">${status}</span></td>
+                        <td class="inv-muted">${new Date(item.lastUpdated).toLocaleDateString()}</td>
+                        <td>
+                            <div class="inv-actions">
+                                <button type="button" class="inv-qty-btn" onclick="adjustStock('${item.id}', 'add')" title="Add stock">+</button>
+                                <button type="button" class="inv-qty-btn inv-qty-btn--minus" onclick="adjustStock('${item.id}', 'remove')" title="Remove stock">−</button>
                             </div>
                         </td>
                     </tr>
                 `;
             }).join('');
+        }
 
-            // Add hover effects
-            const rows = tbody.querySelectorAll('tr');
-            rows.forEach(row => {
-                row.addEventListener('mouseenter', function() {
-                    const currentBg = this.classList.contains('low-stock') ? '#fef3c7' : this.classList.contains('out-of-stock') ? '#fee2e2' : '#E8F4F8';
-                    this.style.background = currentBg;
-                    const stickyCell = this.querySelector('td:first-child');
-                    if (stickyCell) stickyCell.style.background = currentBg;
-                });
-                row.addEventListener('mouseleave', function() {
-                    const defaultBg = this.classList.contains('low-stock') ? '#fef3c7' : this.classList.contains('out-of-stock') ? '#fee2e2' : '';
-                    this.style.background = defaultBg;
-                    const stickyCell = this.querySelector('td:first-child');
-                    if (stickyCell) stickyCell.style.background = defaultBg || 'white';
-                });
-            });
+        function getStatusPillClass(status) {
+            if (status === 'Out of Stock') return 'tc-status-pill tc-status-pill--critical';
+            if (status === 'Low Stock') return 'tc-status-pill tc-status-pill--warning';
+            return 'tc-status-pill tc-status-pill--ok';
         }
 
         function getStockStatus(item) {
             if (item.quantity <= 0) return 'Out of Stock';
             if (item.reorderPoint > 0 && item.quantity <= item.reorderPoint) return 'Low Stock';
             return 'Good';
-        }
-
-        function getStatusColor(status) {
-            if (status === 'Out of Stock') return '#ef4444';
-            if (status === 'Low Stock') return '#f59e0b';
-            return '#22c55e';
         }
 
         function updateStats() {
@@ -382,22 +246,22 @@
             document.getElementById('out-of-stock-count').textContent = stats.outOfStockCount;
             document.getElementById('inventory-value').textContent = '$' + stats.totalValue.toFixed(2);
 
-            // Show low stock alert
+            const alertEl = document.getElementById('low-stock-alert');
             if (stats.lowStockCount > 0) {
-                document.getElementById('low-stock-alert').style.display = 'block';
+                alertEl.classList.add('is-visible');
                 document.getElementById('low-stock-message').textContent = `${stats.lowStockCount} items need reordering`;
             } else {
-                document.getElementById('low-stock-alert').style.display = 'none';
+                alertEl.classList.remove('is-visible');
             }
         }
 
         function showAddStockModal() {
-            document.getElementById('stock-modal').classList.add('show');
+            document.getElementById('stock-modal').classList.add('is-open');
             document.getElementById('stock-form').reset();
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('show');
+            document.getElementById(modalId).classList.remove('is-open');
         }
 
         function loadIngredientOptions() {

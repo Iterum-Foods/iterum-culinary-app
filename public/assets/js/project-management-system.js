@@ -4,6 +4,10 @@
  */
 
 class ProjectManagementSystem {
+  static get RESTAURANT_TYPE() {
+    return 'restaurant';
+  }
+
   constructor() {
     this.projects = [];
     this.currentProject = null;
@@ -14,6 +18,98 @@ class ProjectManagementSystem {
     /** @type {'single'|'all'} View scope for multi-location restaurant groups */
     this._restaurantLocationScope = 'single';
     this.init();
+  }
+
+  isMasterProject(project) {
+    if (!project) {
+      return false;
+    }
+    return (
+      project.id === this.masterProjectId ||
+      project.type === 'master' ||
+      !!project.isMaster
+    );
+  }
+
+  isDemoProject(project) {
+    if (!project) {
+      return false;
+    }
+    const tags = Array.isArray(project.tags) ? project.tags : [];
+    return project.id === 'sample_project' || tags.includes('demo');
+  }
+
+  isRestaurantProject(project) {
+    if (!project || this.isMasterProject(project)) {
+      return false;
+    }
+    return (
+      project.type === ProjectManagementSystem.RESTAURANT_TYPE ||
+      this.isDemoProject(project)
+    );
+  }
+
+  isSelectableRestaurantProject(project) {
+    if (!this.isRestaurantProject(project)) {
+      return false;
+    }
+    return !project.isArchived && project.status !== 'archived';
+  }
+
+  getSelectableRestaurantProjects() {
+    return this.projects.filter(p => this.isSelectableRestaurantProject(p));
+  }
+
+  /**
+   * One-time: archive legacy template types; keep master + demo + restaurant active.
+   */
+  migrateToRestaurantOnlyWorkspaces() {
+    this.syncUserIdFromEnvironment();
+    const flagKey = `iterum_restaurant_only_v1_${this.currentUserId || 'guest'}`;
+    if (localStorage.getItem(flagKey) === '1') {
+      return;
+    }
+
+    let changed = false;
+    this.projects.forEach(p => {
+      if (
+        this.isMasterProject(p) ||
+        this.isDemoProject(p) ||
+        p.type === ProjectManagementSystem.RESTAURANT_TYPE
+      ) {
+        return;
+      }
+      p.isArchived = true;
+      p.status = 'archived';
+      p.archivedAt = p.archivedAt || new Date().toISOString();
+      p.archiveReason = p.archiveReason || 'legacy-project-type';
+      p.legacyProjectType = p.legacyProjectType || p.type;
+      const tags = Array.isArray(p.tags) ? p.tags.slice() : [];
+      if (!tags.includes('legacy-type')) {
+        tags.push('legacy-type');
+      }
+      p.tags = tags;
+      changed = true;
+    });
+
+    if (changed) {
+      this.saveProjects();
+      console.log('📦 Archived legacy non-restaurant workspaces');
+    }
+
+    const cur = this.currentProject;
+    if (
+      cur &&
+      !this.isMasterProject(cur) &&
+      !this.isSelectableRestaurantProject(cur)
+    ) {
+      const pick = this.getSelectableRestaurantProjects()[0];
+      if (pick) {
+        this.setCurrentProject(pick.id);
+      }
+    }
+
+    localStorage.setItem(flagKey, '1');
   }
 
   /**
@@ -159,6 +255,7 @@ class ProjectManagementSystem {
 
       // Ensure master project exists for current user
       this.ensureMasterProject();
+      this.migrateToRestaurantOnlyWorkspaces();
 
       console.log(
         `📚 Loaded ${this.projects.length} projects for user ${this.currentUserId}`
@@ -408,25 +505,42 @@ class ProjectManagementSystem {
 
     this.syncUserIdFromEnvironment();
 
+    const requestedType = projectData.type;
+    const isMasterRow =
+      projectData.id === this.masterProjectId ||
+      projectData.type === 'master' ||
+      projectData.isMaster;
+
     const newProject = {
       id: this.generateProjectId(),
       name: projectData.name || 'New Project',
       description: projectData.description || '',
-      type: projectData.type || 'culinary',
+      type: isMasterRow
+        ? projectData.type || 'master'
+        : ProjectManagementSystem.RESTAURANT_TYPE,
       status: 'active',
       createdAt: new Date().toISOString(),
-      isMaster: false,
+      isMaster: !!projectData.isMaster,
       color: projectData.color || this.getRandomProjectColor(),
-      icon: projectData.icon || '📋',
-      tags: projectData.tags || [],
-      userId: this.currentUserId, // Ensure user ID is set
+      icon: projectData.icon || (isMasterRow ? '📋' : '🍽️'),
+      tags: Array.isArray(projectData.tags) ? projectData.tags.slice() : [],
+      userId: this.currentUserId,
       ...projectData
     };
 
-    const isMasterRow =
-      newProject.id === this.masterProjectId ||
-      newProject.type === 'master' ||
-      newProject.isMaster;
+    if (!isMasterRow) {
+      newProject.type = ProjectManagementSystem.RESTAURANT_TYPE;
+      newProject.icon = projectData.icon || '🍽️';
+      if (
+        requestedType &&
+        requestedType !== ProjectManagementSystem.RESTAURANT_TYPE &&
+        requestedType !== 'master'
+      ) {
+        if (!newProject.tags.includes(`created-as:${requestedType}`)) {
+          newProject.tags.push(`created-as:${requestedType}`);
+        }
+      }
+    }
     if (!isMasterRow) {
       newProject.parentProjectId =
         projectData.parentProjectId || this.masterProjectId;
@@ -1310,26 +1424,16 @@ class ProjectManagementSystem {
                             <form id="create-project-form" class="space-y-3">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     <div class="form-group">
-                                        <label for="new-project-name" class="form-label text-sm">Project Name</label>
-                                        <input type="text" id="new-project-name" class="form-input form-input-sm" placeholder="Enter project name" required>
+                                        <label for="new-project-name" class="form-label text-sm">Restaurant name</label>
+                                        <input type="text" id="new-project-name" class="form-input form-input-sm" placeholder="e.g., Northside Bistro" required>
                                     </div>
                                     
-                                    <div class="form-group">
-                                        <label for="new-project-type" class="form-label text-sm">Project Type</label>
-                                        <select id="new-project-type" class="form-select form-select-sm">
-                                            <option value="culinary">Culinary</option>
-                                            <option value="catering">Catering</option>
-                                            <option value="restaurant">Restaurant</option>
-                                            <option value="food-truck">Food Truck</option>
-                                            <option value="popup">Pop-up</option>
-                                            <option value="private-chef">Private Chef</option>
-                                        </select>
-                                    </div>
+                                    <input type="hidden" id="new-project-type" value="restaurant">
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="new-project-description" class="form-label text-sm">Description</label>
-                                    <textarea id="new-project-description" class="form-input form-input-sm" rows="2" placeholder="Describe your project"></textarea>
+                                    <textarea id="new-project-description" class="form-input form-input-sm" rows="2" placeholder="Location or concept notes"></textarea>
                                 </div>
                                 
                                 <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
@@ -1355,8 +1459,7 @@ class ProjectManagementSystem {
 
           const projectData = {
             name: document.getElementById('new-project-name')?.value || '',
-            type:
-              document.getElementById('new-project-type')?.value || 'culinary',
+            type: 'restaurant',
             description:
               document.getElementById('new-project-description')?.value || ''
           };

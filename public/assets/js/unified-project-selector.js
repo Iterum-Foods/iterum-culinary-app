@@ -285,6 +285,20 @@ class UnifiedProjectSelector {
     }
   }
 
+  getSelectableProjects() {
+    const pm = window.projectManager;
+    if (pm && typeof pm.getSelectableRestaurantProjects === 'function') {
+      return pm.getSelectableRestaurantProjects();
+    }
+    return this.projects.filter(
+      p =>
+        p.id !== 'master' &&
+        p.type === 'restaurant' &&
+        !p.isArchived &&
+        p.status !== 'archived'
+    );
+  }
+
   /**
    * Get selector HTML
    */
@@ -293,7 +307,7 @@ class UnifiedProjectSelector {
     const currentName = currentProject?.name || 'Master Project';
     const currentIcon = currentProject?.icon || '📋';
 
-    const projectRows = this.projects
+    const projectRows = this.getSelectableProjects()
       .map(project => {
         const active = project.id === this.currentProjectId;
         const safeId = String(project.id || '').replace(/'/g, "\\'");
@@ -412,24 +426,40 @@ class UnifiedProjectSelector {
    * Create new project
    */
   createNewProject() {
-    const projectName = prompt('Enter project name:');
+    const projectName = prompt('Restaurant name (new workspace):');
     if (!projectName) {
+      return;
+    }
+
+    if (
+      window.projectManager &&
+      typeof window.projectManager.createProject === 'function'
+    ) {
+      const project = window.projectManager.createProject({
+        name: projectName.trim(),
+        description: 'Restaurant workspace',
+        type: 'restaurant',
+        icon: '🍽️'
+      });
+      if (project) {
+        this.loadProjects();
+        this.setCurrentProject(project.id);
+      }
       return;
     }
 
     const newProject = {
       id: `project_${Date.now()}`,
-      name: projectName,
-      icon: '📁',
-      description: 'New project',
+      name: projectName.trim(),
+      icon: '🍽️',
+      type: 'restaurant',
+      description: 'Restaurant workspace',
       createdAt: new Date().toISOString()
     };
 
     this.projects.push(newProject);
     this.saveProjects();
     this.setCurrentProject(newProject.id);
-
-    alert(`✅ Project "${projectName}" created!`);
   }
 
   /**

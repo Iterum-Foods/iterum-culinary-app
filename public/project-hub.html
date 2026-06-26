@@ -12,6 +12,8 @@
     <script type="module" src="assets/js/firestore-sync.js"></script>
     <script src="assets/js/user-role-setup.js"></script>
     <script type="module" src="assets/js/project-hub-team.js"></script>
+    <script src="assets/js/sop-pack-seed.js"></script>
+    <script src="assets/js/sop-pack-store.js"></script>
     <script src="assets/js/demo-seed-data.js"></script>
     <script src="assets/js/user-data-manager.js" defer></script>
     <script src="assets/js/rbp-provision.js" defer></script>
@@ -369,10 +371,10 @@
 
         <!-- Sample Project data -->
         <section id="sample-project-panel" style="background: white; border-radius: 16px; padding: 28px; margin-bottom: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e2e8f0;">
-            <h2 class="section-title" style="margin-bottom: 8px;">📦 Sample Project</h2>
+            <h2 class="section-title" style="margin-bottom: 8px;">📦 Sample Restaurant</h2>
             <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 16px; max-width: 640px;">
-                Install a full demo workspace in this browser: <strong>Sample Project</strong> with recipes (published + in progress),
-                two menus (lunch + bar), ingredients, vendors, inventory, menu–recipe links, and HACCP logs.
+                Install a full demo workspace in this browser: <strong>Sample Restaurant</strong> with recipes (published + in progress),
+                two menus (lunch + bar), ingredients, vendors, inventory, HACCP logs, and <strong>11 how-to guides (SOPs)</strong> for Shift.
                 Safe to run again — matching sample IDs are updated in place.
             </p>
             <p id="sample-project-status" style="font-size: 14px; color: #0f766e; min-height: 1.25em; margin-bottom: 12px;" role="status"></p>
@@ -408,9 +410,9 @@
             <div class="templates-grid">
                 <div class="template-card" id="template-sample-project-card">
                     <div class="template-icon">📦</div>
-                    <div class="template-name">Sample Project</div>
-                    <div class="template-desc">One click: recipes, menus, vendors, inventory, and compliance logs under a dedicated sample workspace</div>
-                    <div class="template-features">✓ Lunch + bar menus • ✓ HACCP demo logs • ✓ Switches active project</div>
+                    <div class="template-name">Sample Restaurant</div>
+                    <div class="template-desc">One click: recipes, menus, vendors, inventory, compliance logs, and SOP how-to guides</div>
+                    <div class="template-features">✓ Lunch + bar menus • ✓ HACCP demo logs • ✓ 11 Shift guides</div>
                     <button type="button" class="template-btn" id="btn-template-sample-project">Install sample data</button>
                 </div>
 
@@ -422,52 +424,20 @@
                     <button type="button" class="template-btn">Open setup</button>
                 </div>
 
-                <div class="template-card" onclick="createFromTemplate('restaurant-menu')">
+                <div class="template-card" onclick="createRestaurantWorkspace()">
                     <div class="template-icon">🍽️</div>
-                    <div class="template-name">Restaurant Menu</div>
-                    <div class="template-desc">Develop and cost a full restaurant menu with recipes and pricing</div>
-                    <div class="template-features">✓ Cost tracking • ✓ Menu builder • ✓ Recipe testing</div>
-                    <button class="template-btn">Use Template</button>
-                </div>
-                
-                <div class="template-card" onclick="createFromTemplate('home-cookbook')">
-                    <div class="template-icon">🏠</div>
-                    <div class="template-name">Home Cookbook</div>
-                    <div class="template-desc">Organize your personal recipe collection and family favorites</div>
-                    <div class="template-features">✓ Recipe library • ✓ Meal planning • ✓ Shopping lists</div>
-                    <button class="template-btn">Use Template</button>
-                </div>
-                
-                <div class="template-card" onclick="createFromTemplate('catering-event')">
-                    <div class="template-icon">🎂</div>
-                    <div class="template-name">Catering Event</div>
-                    <div class="template-desc">Plan and execute catering events with batch recipes and timelines</div>
-                    <div class="template-features">✓ Batch scaling • ✓ Timeline • ✓ Shopping lists</div>
-                    <button class="template-btn">Use Template</button>
-                </div>
-                
-                <div class="template-card" onclick="createFromTemplate('recipe-testing')">
-                    <div class="template-icon">🧪</div>
-                    <div class="template-name">Recipe Testing Lab</div>
-                    <div class="template-desc">R&D workspace for developing and testing new recipe concepts</div>
-                    <div class="template-features">✓ Testing notes • ✓ Versions • ✓ Feedback</div>
-                    <button class="template-btn">Use Template</button>
-                </div>
-                
-                <div class="template-card" onclick="createFromTemplate('seasonal-menu')">
-                    <div class="template-icon">🌱</div>
-                    <div class="template-name">Seasonal Menu</div>
-                    <div class="template-desc">Create seasonal menus with ingredient availability tracking</div>
-                    <div class="template-features">✓ Seasonal focus • ✓ Availability • ✓ Rotation</div>
-                    <button class="template-btn">Use Template</button>
+                    <div class="template-name">New restaurant</div>
+                    <div class="template-desc">One location — menus, compliance logs, shift app, and team access</div>
+                    <div class="template-features">✓ Menu builder • ✓ HACCP • ✓ Shift app</div>
+                    <button type="button" class="template-btn">Create workspace</button>
                 </div>
                 
                 <div class="template-card" onclick="createCustomProject()">
                     <div class="template-icon">➕</div>
-                    <div class="template-name">Custom Project</div>
-                    <div class="template-desc">Start from scratch and build your own project structure</div>
-                    <div class="template-features">✓ Full flexibility • ✓ All features • ✓ Your way</div>
-                    <button class="template-btn">Create Custom</button>
+                    <div class="template-name">Another location</div>
+                    <div class="template-desc">Add a second restaurant workspace (same type — switch between sites anytime)</div>
+                    <div class="template-features">✓ Full flexibility • ✓ Own menus &amp; logs • ✓ Optional group label</div>
+                    <button type="button" class="template-btn">Add restaurant</button>
                 </div>
             </div>
         </section>
@@ -475,7 +445,7 @@
         <!-- Active Projects -->
         <section>
             <div class="section-header">
-                <h2 class="section-title">📁 Active Projects</h2>
+                <h2 class="section-title">🍽️ Active restaurants</h2>
                 <button class="btn btn-primary" onclick="createCustomProject()">
                     ➕ New Project
                 </button>
@@ -585,104 +555,64 @@
             return d.innerHTML;
         }
 
-        const projectTemplates = {
-            'restaurant-menu': {
-                name: 'Restaurant Menu Development',
-                description: 'Full restaurant menu with costing and recipe development',
-                icon: '🍽️',
-                color: '#8b5cf6',
-                settings: {
-                    enableCosting: true,
-                    enableMenuBuilder: true,
-                    enableTesting: true
-                }
-            },
-            'home-cookbook': {
-                name: 'My Home Cookbook',
-                description: 'Personal recipe collection and meal planning',
-                icon: '🏠',
-                color: '#10b981',
-                settings: {
-                    enableMealPlanning: true,
-                    enableShoppingLists: true
-                }
-            },
-            'catering-event': {
-                name: 'Catering Event',
-                description: 'Event planning with batch recipes and timelines',
-                icon: '🎂',
-                color: '#f59e0b',
-                settings: {
-                    enableBatchScaling: true,
-                    enableTimelines: true,
-                    enableShoppingLists: true
-                }
-            },
-            'recipe-testing': {
-                name: 'Recipe Testing Lab',
-                description: 'R&D workspace for recipe development',
-                icon: '🧪',
-                color: '#06b6d4',
-                settings: {
-                    enableVersioning: true,
-                    enableTesting: true,
-                    enableNotes: true
-                }
-            },
-            'seasonal-menu': {
-                name: 'Seasonal Menu',
-                description: 'Season-specific menu development',
-                icon: '🌱',
-                color: '#84cc16',
-                settings: {
-                    enableSeasonalTracking: true,
-                    enableMenuBuilder: true
-                }
+        const restaurantWorkspaceDefaults = {
+            description: 'Restaurant workspace — menus, compliance, and shift operations',
+            icon: '🍽️',
+            color: '#8b5cf6',
+            settings: {
+                enableCosting: true,
+                enableMenuBuilder: true,
+                enableTesting: true
             }
         };
 
-        function createFromTemplate(templateId) {
-            const template = projectTemplates[templateId];
-            if (!template) return;
-
-            const projectName = prompt(`Create new project from "${template.name}" template\n\nEnter project name:`, template.name);
+        function createRestaurantWorkspace() {
+            const defaultName = 'My restaurant';
+            const projectName = prompt(
+                'New restaurant workspace\n\nEnter a name for this location:',
+                defaultName
+            );
             if (!projectName) return;
+            createRestaurantProject(projectName.trim());
+        }
 
-            if (window.projectManager) {
-                const activeProj = window.projectManager.getCurrentProject?.();
-                const groupTemplates = ['restaurant-menu', 'catering', 'restaurant'];
-                const groupExtras =
-                    groupTemplates.includes(templateId) &&
-                    activeProj?.restaurantGroupId &&
-                    activeProj?.restaurantGroupName
-                        ? {
-                            restaurantGroupId: activeProj.restaurantGroupId,
-                            restaurantGroupName: activeProj.restaurantGroupName,
-                            tags: Array.from(
-                                new Set([
-                                    ...(Array.isArray(activeProj.tags)
-                                        ? activeProj.tags
-                                        : []),
-                                    'restaurant-group'
-                                ])
-                            )
-                        }
-                        : {};
-                const project = window.projectManager.createProject({
-                    name: projectName,
-                    description: template.description,
-                    type: templateId,
-                    color: template.color,
-                    icon: template.icon,
-                    settings: template.settings,
-                    ...groupExtras
-                });
-
-                loadProjects();
-
-                alert(`✅ Project "${projectName}" created!\n\nOpening project...`);
-                openProject(project.id);
+        function createRestaurantProject(projectName) {
+            if (!window.projectManager) {
+                alert('Project manager not available');
+                return;
             }
+
+            const activeProj = window.projectManager.getCurrentProject?.();
+            const groupExtras =
+                activeProj?.restaurantGroupId && activeProj?.restaurantGroupName
+                    ? {
+                        restaurantGroupId: activeProj.restaurantGroupId,
+                        restaurantGroupName: activeProj.restaurantGroupName,
+                        tags: Array.from(
+                            new Set([
+                                ...(Array.isArray(activeProj.tags)
+                                    ? activeProj.tags
+                                    : []),
+                                'restaurant-group'
+                            ])
+                        )
+                    }
+                    : {};
+
+            const project = window.projectManager.createProject({
+                name: projectName,
+                type: 'restaurant',
+                ...restaurantWorkspaceDefaults,
+                ...groupExtras
+            });
+
+            loadProjects();
+            alert(`✅ Restaurant "${projectName}" created!\n\nOpening workspace...`);
+            openProject(project.id);
+        }
+
+        function createFromTemplate(templateId) {
+            createRestaurantWorkspace();
         }
 
         function createCustomProject() {
@@ -697,36 +627,25 @@
                 <div class="modal-content" style="max-width: 600px; background: white; border-radius: 16px; padding: 32px; position: relative; z-index: 10001;">
                     <button class="modal-close" onclick="this.parentElement.parentElement.remove()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: #94a3b8;">✕</button>
                     
-                    <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 8px; color: #1e293b;">📋 Create New Project</h2>
-                    <p style="color: #64748b; margin-bottom: 24px;">Set up a new project to organize your work</p>
+                    <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 8px; color: #1e293b;">🍽️ New restaurant</h2>
+                    <p style="color: #64748b; margin-bottom: 24px;">Each location gets its own workspace — same type, separate menus and logs.</p>
                     
                     <form id="create-project-form" onsubmit="submitNewProject(event)">
                         <div style="margin-bottom: 20px;">
-                            <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #475569;">Project Name *</label>
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #475569;">Restaurant name *</label>
                             <input type="text" id="new-project-name" required
                                    style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;"
-                                   placeholder="e.g., Fall Menu 2025, Weekend Brunch Ideas">
+                                   placeholder="e.g., Northside Bistro, Hot Chix — Cambridge">
                         </div>
                         
                         <div style="margin-bottom: 20px;">
-                            <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #475569;">Description</label>
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #475569;">Notes (optional)</label>
                             <textarea id="new-project-desc" rows="3"
                                      style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; resize: vertical;"
-                                     placeholder="What's this project about?"></textarea>
+                                     placeholder="Address, concept, or opening notes"></textarea>
                         </div>
                         
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #475569;">Project Type</label>
-                            <select id="new-project-type" 
-                                    style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px;">
-                                <option value="personal">Personal Collection</option>
-                                <option value="restaurant">Restaurant/Business</option>
-                                <option value="catering">Catering Event</option>
-                                <option value="testing">Recipe Testing</option>
-                                <option value="client">Client Project</option>
-                                <option value="custom">Custom</option>
-                            </select>
-                        </div>
+                        <input type="hidden" id="new-project-type" value="restaurant">
                         
                         <div style="margin-bottom: 20px;">
                             <label style="display: block; font-weight: 600; margin-bottom: 12px; color: #475569;">Color Theme</label>
@@ -793,7 +712,6 @@
             
             const name = document.getElementById('new-project-name').value.trim();
             const description = document.getElementById('new-project-desc').value.trim();
-            const type = document.getElementById('new-project-type').value;
             const color = document.getElementById('selected-color').value;
             const ownerOnly = document.getElementById('project-owner-only').checked;
 
@@ -811,14 +729,9 @@
             const userId = window.authManager?.currentUser?.userId || 'guest';
             const userName = window.authManager?.currentUser?.displayName || 'Guest User';
 
-            // Link new restaurant projects to the current multi-location group when applicable
             const activeProj = window.projectManager.getCurrentProject?.();
-            const restaurantLikeTypes = ['restaurant', 'restaurant-menu', 'catering'];
             const groupExtras =
-                restaurantLikeTypes.includes(type) &&
-                activeProj &&
-                activeProj.restaurantGroupId &&
-                activeProj.restaurantGroupName
+                activeProj?.restaurantGroupId && activeProj?.restaurantGroupName
                     ? {
                         restaurantGroupId: activeProj.restaurantGroupId,
                         restaurantGroupName: activeProj.restaurantGroupName,
@@ -836,14 +749,18 @@
             // Create project
             const project = window.projectManager.createProject({
                 name: name,
-                description: description || `${type.charAt(0).toUpperCase() + type.slice(1)} project`,
-                type: type,
+                description: description || 'Restaurant workspace',
+                type: 'restaurant',
                 color: color,
-                icon: getIconForType(type),
+                icon: '🍽️',
                 isPrivate: ownerOnly,
                 createdBy: userId,
                 createdByName: userName,
-                settings: getSettingsForType(type),
+                settings: {
+                    enableCosting: true,
+                    enableMenuBuilder: true,
+                    enableTesting: true
+                },
                 ...groupExtras
             });
 
@@ -859,30 +776,6 @@
             openProject(project.id);
         }
 
-        function getIconForType(type) {
-            const icons = {
-                'personal': '🏠',
-                'restaurant': '🍽️',
-                'catering': '🎂',
-                'testing': '🧪',
-                'client': '👥',
-                'custom': '📁'
-            };
-            return icons[type] || '📁';
-        }
-
-        function getSettingsForType(type) {
-            const settings = {
-                'personal': { enableMealPlanning: true, enableShoppingLists: true },
-                'restaurant': { enableCosting: true, enableMenuBuilder: true, enableTesting: true },
-                'catering': { enableBatchScaling: true, enableTimelines: true, enableShoppingLists: true },
-                'testing': { enableVersioning: true, enableTesting: true, enableNotes: true },
-                'client': { enableSharing: true, enableReporting: true },
-                'custom': {}
-            };
-            return settings[type] || {};
-        }
-
         function loadProjects() {
             if (!window.projectManager) {
                 console.error('Project manager not available');
@@ -891,15 +784,15 @@
 
             const projects = window.projectManager.projects || [];
             const currentProject = window.projectManager.currentProject;
+            const isSelectable = p =>
+                window.projectManager.isSelectableRestaurantProject
+                    ? window.projectManager.isSelectableRestaurantProject(p)
+                    : !p.isArchived &&
+                      p.type === 'restaurant' &&
+                      p.id !== 'master' &&
+                      !p.isMaster;
 
-            // Separate active and archived (hide master / default workspace)
-            const active = projects.filter(
-                p =>
-                    !p.isArchived &&
-                    p.type !== 'master' &&
-                    p.id !== 'master' &&
-                    !p.isMaster
-            );
+            const active = projects.filter(isSelectable);
             const archived = projects.filter(p => p.isArchived);
 
             // Render active projects
@@ -908,8 +801,8 @@
                 activeContainer.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: #94a3b8;">
                         <div style="font-size: 64px; margin-bottom: 16px;">📋</div>
-                        <h3 style="font-size: 20px; margin-bottom: 8px;">No Projects Yet</h3>
-                        <p>Get started by creating a project from a template above</p>
+                        <h3 style="font-size: 20px; margin-bottom: 8px;">No restaurants yet</h3>
+                        <p>Create your first restaurant workspace from a template above</p>
                     </div>
                 `;
             } else {
@@ -1092,7 +985,7 @@
             }
             if (
                 !confirm(
-                    'Install sample recipes, menus, vendors, and logs into "Sample Project"?\n\nSafe to run again — existing sample IDs are updated in place.'
+                    'Install sample recipes, menus, vendors, logs, and SOP guides into "Sample Restaurant"?\n\nSafe to run again — existing sample IDs are updated in place.'
                 )
             ) {
                 return;
@@ -1118,16 +1011,31 @@
                 window.projectManager.setCurrentProject(projectId);
                 loadProjects();
             }
+            (async function publishSampleSops() {
+                if (!window.iterumSopPack || !window.ITERUM_SOP_SAMPLE) return;
+                try {
+                    var db = window.firestoreSync?.db || window.firebaseDb || null;
+                    if (db && typeof window.iterumSopPack.seedSamplePack === 'function') {
+                        await window.iterumSopPack.seedSamplePack(db, projectId);
+                    } else {
+                        window.iterumSopPack.seedSampleLocal(projectId);
+                    }
+                } catch (e) {
+                    console.warn('Sample SOP publish skipped', e);
+                }
+            })();
             var msg =
-                'Sample Project ready. Recipes: ' +
+                'Sample Restaurant ready. Recipes: ' +
                 (s.recipes || 0) +
                 ', menu dishes: ' +
                 (s.menuItems || 0) +
+                ', SOP guides: ' +
+                (s.sops || 0) +
                 ', HACCP checks: ' +
                 (s.sanitizerChecks || 0) +
                 ' sanitizer / ' +
                 (s.temperatureLogs || 0) +
-                ' temp. Open Dashboard or Menu builder.';
+                ' temp. Open SOP Hub or Shift How-to tab.';
             if (statusEl) {
                 statusEl.textContent = msg;
             }

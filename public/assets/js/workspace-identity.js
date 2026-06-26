@@ -111,17 +111,20 @@
 
   function resolveProfile(project) {
     if (!project) {
-      return PROFILES.general;
-    }
-    const type = String(project.type || 'general').toLowerCase();
-    const tags = Array.isArray(project.tags) ? project.tags : [];
-    if (type === 'restaurant' || tags.includes('rbp') || tags.includes('owner-bot')) {
       return PROFILES.restaurant;
     }
+    const tags = Array.isArray(project.tags) ? project.tags : [];
     if (project.id === 'sample_project' || tags.includes('demo')) {
       return PROFILES.sample_project;
     }
-    return PROFILES[type] || PROFILES.general;
+    if (project.isArchived && project.legacyProjectType) {
+      return (
+        PROFILES[project.legacyProjectType] ||
+        PROFILES[project.legacyProjectType?.replace(/-/g, '_')] ||
+        PROFILES.restaurant
+      );
+    }
+    return PROFILES.restaurant;
   }
 
   function loadProjectsFromStorage(uid) {

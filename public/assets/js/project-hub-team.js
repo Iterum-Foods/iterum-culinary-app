@@ -36,7 +36,15 @@ function fillTeamProjectSelect() {
   }
   const prev = sel.value;
   sel.innerHTML = '';
-  const list = window.projectManager.projects.filter(p => !p.isArchived);
+  const list = window.projectManager.getSelectableRestaurantProjects
+    ? window.projectManager.getSelectableRestaurantProjects()
+    : window.projectManager.projects.filter(
+        p =>
+          !p.isArchived &&
+          p.type === 'restaurant' &&
+          p.id !== 'master' &&
+          !p.isMaster
+      );
   if (!list.length) {
     const o = document.createElement('option');
     o.value = '';
