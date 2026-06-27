@@ -484,6 +484,7 @@ class EnhancedMenuManager {
         beverageMeta: itemData.beverageMeta || null,
         recipeInstructions: itemData.recipeInstructions || null,
         components: itemData.components || [],
+        serviceWare: itemData.serviceWare || null,
         availability: itemData.availability || {
           daysAvailable: ['all'],
           mealPeriods: ['dinner']
@@ -1099,7 +1100,92 @@ class EnhancedMenuManager {
   }
 
   /**
-   * Export menu as JSON
+   * Publish menu to Firestore so the Shift app Menu tab can load it.
+   * Path: projects/{projectId}/menus/primary (see mobile-line-employee.js).
+   */
+  async publishMenuToShift(options = {}) {
+    const projectId = this.getCurrentProjectId();
+    if (!projectId || projectId === 'master') {
+      this.showToast(
+        'Select a restaurant workspace first (not Master Project).',
+        'error'
+      );
+      return { ok: false, error: 'no_project' };
+    }
+    if (!this.currentMenu) {
+      this.showToast('Create or select a menu before publishing.', 'error');
+      return { ok: false, error: 'no_menu' };
+    }
+    if (!this.menuItems.length) {
+      this.showToast('Add at least one menu item before publishing.', 'error');
+      return { ok: false, error: 'no_items' };
+    }
+
+    const now = new Date().toISOString();
+    if (!this.currentMenu.id) {
+      this.currentMenu.id = 'primary';
+    }
+    this.currentMenu = {
+      ...this.currentMenu,
+      id: this.currentMenu.id || 'primary',
+      isPublished: true,
+      publishedAt: now,
+      updatedAt: now,
+      projectId
+    };
+
+    const menuKey = `${this.storageKey}_${projectId}`;
+    localStorage.setItem(
+      menuKey,
+      JSON.stringify({
+        menu: this.currentMenu,
+        items: this.menuItems
+      })
+    );
+
+    const cloudOk = await this.syncToCloud(options);
+
+    window.dispatchEvent(
+      new CustomEvent('menuPublishedToShift', {
+        bubbles: true,
+        detail: {
+          projectId,
+          menuId: this.currentMenu.id,
+          itemCount: this.menuItems.length,
+          cloud: cloudOk
+        }
+      })
+    );
+
+    window.dispatchEvent(
+      new CustomEvent('menuWorkflowUpdated', {
+        detail: {
+          projectId,
+          menuId: this.currentMenu?.id || null,
+          itemCount: this.menuItems.length,
+          published: true,
+          cloud: cloudOk
+        }
+      })
+    );
+
+    if (cloudOk) {
+      this.showToast(
+        `Published ${this.menuItems.length} item(s) to Shift app (Menu tab).`,
+        'success'
+      );
+      return { ok: true, cloud: true, itemCount: this.menuItems.length };
+    }
+
+    this.showToast(
+      'Saved on this device. Sign in and publish again to push to Shift when online.',
+      'error'
+    );
+    return { ok: true, cloud: false, itemCount: this.menuItems.length };
+  }
+
+  /**
+   * Export menu as JSON file download (backup / share).
    */
   exportMenu() {
     const data = {

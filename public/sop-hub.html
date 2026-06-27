@@ -17,11 +17,14 @@
     <script src="assets/js/workspace-save-indicator.js" defer></script>
     <script src="assets/js/sop-pack-seed.js" defer></script>
     <script src="assets/js/sop-pack-store.js" defer></script>
+    <script src="assets/js/supplies-inventory.js" defer></script>
+    <script src="assets/js/service-ware-picker.js" defer></script>
     <script src="assets/js/sop-hub.js" defer></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
+    <link rel="stylesheet" href="assets/css/service-ware-picker.css">
 
     <style>
         body { background: hsl(var(--tc-background)); font-family: 'Inter', sans-serif; color: hsl(var(--tc-foreground)); }
@@ -166,6 +169,11 @@
             <div class="sop-field">
                 <label for="sop-f-body">Steps / body (one step per line works well)</label>
                 <textarea id="sop-f-body" rows="8"></textarea>
+            </div>
+            <div class="sop-field">
+                <label>Supplies for this guide</label>
+                <p style="margin:0 0 8px;font-size:0.8rem;color:hsl(var(--tc-muted-foreground));">Paper goods, service ware, office, first aid, or cleaning chemicals. Manage catalog in Inventory → Supplies &amp; ops.</p>
+                <div id="sop-service-ware-picker" data-sw-picker-host></div>
             </div>
             <div class="sop-toolbar" style="margin:0;">
                 <button type="button" class="sop-btn" id="sop-btn-cancel">Cancel</button>

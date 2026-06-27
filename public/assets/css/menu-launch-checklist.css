@@ -1,0 +1,209 @@
+/* Menu Launch checklist — dashboard + Menu Builder */
+.mlc-card {
+  --mlc-ok: hsl(142 55% 38%);
+  --mlc-pending: hsl(var(--tc-muted-foreground, 215 16% 47%));
+  --mlc-accent: hsl(var(--tc-accent, 24 90% 50%));
+  border: 1px solid hsl(var(--tc-border, 214 20% 90%));
+  border-radius: 12px;
+  background: hsl(var(--tc-card, 0 0% 100%));
+  padding: 1rem 1.1rem;
+}
+
+.mlc-card--compact {
+  margin-bottom: 1rem;
+}
+
+.mlc-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.mlc-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: hsl(var(--tc-foreground, 222 47% 11%));
+}
+
+.mlc-sub {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  color: hsl(var(--tc-muted-foreground, 215 16% 47%));
+  line-height: 1.4;
+}
+
+.mlc-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 7rem;
+}
+
+.mlc-progress__value {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--mlc-accent);
+  min-width: 2.25rem;
+}
+
+.mlc-progress {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: hsl(var(--tc-muted, 210 20% 96%));
+  overflow: hidden;
+  min-width: 4rem;
+}
+
+.mlc-progress__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--mlc-accent);
+  transition: width 0.25s ease;
+}
+
+.mlc-progress__meta {
+  font-size: 0.7rem;
+  color: hsl(var(--tc-muted-foreground, 215 16% 47%));
+}
+
+.mlc-empty {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  color: hsl(var(--tc-muted-foreground, 215 16% 47%));
+}
+
+.mlc-phase + .mlc-phase {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid hsl(var(--tc-border, 214 20% 92%));
+}
+
+.mlc-phase__title {
+  margin: 0 0 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: hsl(var(--tc-muted-foreground, 215 16% 47%));
+}
+
+.mlc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.mlc-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.35rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+}
+
+.mlc-row:hover {
+  background: hsl(var(--tc-muted, 210 20% 97%) / 0.7);
+}
+
+.mlc-row.is-done .mlc-label {
+  color: hsl(var(--tc-muted-foreground, 215 16% 47%));
+  text-decoration: line-through;
+  text-decoration-color: hsl(var(--tc-border, 214 20% 82%));
+}
+
+.mlc-row__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.mlc-label {
+  font-weight: 500;
+  color: hsl(var(--tc-foreground, 222 47% 11%));
+}
+
+.mlc-detail {
+  font-size: 0.72rem;
+  color: hsl(var(--tc-muted-foreground, 215 16% 47%));
+}
+
+.mlc-icon--ok {
+  color: var(--mlc-ok);
+  flex-shrink: 0;
+}
+
+.mlc-icon--pending {
+  color: var(--mlc-pending);
+  opacity: 0.55;
+  flex-shrink: 0;
+}
+
+.mlc-icon--manual {
+  color: var(--mlc-pending);
+  opacity: 0.45;
+  flex-shrink: 0;
+}
+
+.mlc-link {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--mlc-accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mlc-link:hover {
+  text-decoration: underline;
+}
+
+.mlc-toggle {
+  flex-shrink: 0;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 6px;
+  border: 1px solid hsl(var(--tc-border, 214 20% 88%));
+  background: hsl(var(--tc-background, 0 0% 100%));
+  color: hsl(var(--tc-muted-foreground, 215 16% 47%));
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+}
+
+.mlc-toggle:hover {
+  border-color: var(--mlc-accent);
+  color: var(--mlc-accent);
+}
+
+.mlc-row.is-done .mlc-toggle {
+  background: hsl(142 55% 38% / 0.12);
+  border-color: hsl(142 55% 38% / 0.35);
+  color: var(--mlc-ok);
+}
+
+/* Dashboard card wrapper */
+#menu-launch-checklist-dashboard .mlc-card {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+#menu-launch-checklist-dashboard .mlc-title {
+  font-size: 1.05rem;
+}

@@ -259,14 +259,11 @@
   }
 
   function openAddItem(category) {
-    state.defaultCategory = category || null;
-    if (typeof window.showAddItemModal === 'function') {
-      window.showAddItemModal();
-      return;
-    }
-    if (window.enhancedMenuManager?.showAddItemModal) {
-      window.enhancedMenuManager.showAddItemModal();
-    }
+    const params = new URLSearchParams({ return: 'menu-builder.html' });
+    if (category) params.set('category', category);
+    const menu = getActiveMenu();
+    if (menu?.id) params.set('menuId', menu.id);
+    window.location.href = `dish-creator.html?${params.toString()}`;
   }
 
   function removeItem(itemIndex) {
@@ -573,6 +570,7 @@
     renderWorkflow();
     renderMetaAndStats();
     renderItems();
+    window.iterumMenuLaunchChecklist?.refresh?.();
   }
 
   function bindRoot() {
@@ -586,15 +584,18 @@
     document.getElementById('mb-btn-preview')?.addEventListener('click', () => {
       showToast('Preview opened in new tab', 'success');
     });
-    document.getElementById('mb-btn-publish')?.addEventListener('click', () => {
-      if (window.enhancedMenuManager?.exportMenu) {
-        window.enhancedMenuManager.exportMenu();
+    document.getElementById('mb-btn-publish')?.addEventListener('click', async () => {
+      if (window.enhancedMenuManager?.publishMenuToShift) {
+        await window.enhancedMenuManager.publishMenuToShift();
       } else {
-        showToast('Menu published to service', 'success');
+        showToast('Menu manager not ready — refresh and try again.', 'error');
       }
     });
     document.getElementById('mb-btn-new-menu')?.addEventListener('click', () => {
       if (typeof window.openCreateMenuModal === 'function') window.openCreateMenuModal();
+    });
+    document.getElementById('mb-btn-new-dish')?.addEventListener('click', () => {
+      openAddItem(state.defaultCategory);
     });
     document.getElementById('mb-btn-add-item')?.addEventListener('click', () => openAddItem(state.defaultCategory));
 

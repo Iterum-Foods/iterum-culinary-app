@@ -41,7 +41,7 @@
                 <div>
                     <p class="tc-eyebrow">Iterum Kitchen OS · Stock</p>
                     <h1 class="tc-page-hero__title">Inventory management</h1>
-                    <p class="tc-page-hero__desc">Track stock levels, manage reorders, and prevent waste.</p>
+                    <p class="tc-page-hero__desc">Track food stock, paper goods, service ware, office supplies, first aid, and cleaning chemicals.</p>
                 </div>
                 <div class="inv-hero__actions">
                     <a href="inventory-variance.html" class="tc-btn tc-btn-outline" data-iterum-feature="inventory">Variance analysis</a>
@@ -52,6 +52,12 @@
             </div>
         </header>
 
+        <div class="inv-main-tabs" role="tablist" aria-label="Inventory sections">
+            <button type="button" class="inv-main-tab is-active" data-inv-main-tab="food">Food stock</button>
+            <button type="button" class="inv-main-tab" data-inv-main-tab="supplies">Supplies &amp; ops</button>
+        </div>
+
+        <div id="inv-panel-food">
         <div class="tc-stat-grid inv-stats">
             <div class="tc-card tc-stat-card">
                 <div class="tc-stat-card__label">Total items</div>
@@ -115,6 +121,34 @@
                 <tbody id="inventory-tbody"></tbody>
             </table>
         </div>
+        </div>
+
+        <div id="inv-panel-supplies" hidden>
+            <p id="supplies-stats" class="inv-supplies-meta"></p>
+            <div id="supplies-tabs-root" class="inv-supplies-tabs" role="tablist" aria-label="Supplies type"></div>
+            <div class="inv-hero__actions" style="margin:0 0 1rem;">
+                <button type="button" class="tc-btn tc-btn-accent" id="supplies-btn-add">+ Add item</button>
+                <button type="button" class="tc-btn tc-btn-outline" id="supplies-btn-seed">Load samples</button>
+            </div>
+            <p class="inv-supplies-hint">Service ware links to <a href="dish-creator.html">Dish Creator</a>. All supply types can attach to <a href="sop-hub.html">SOP Hub</a> guides (cleaning, opening, safety).</p>
+            <div class="inv-table-wrap">
+                <table class="inv-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Unit</th>
+                            <th>Location</th>
+                            <th>Par</th>
+                            <th>Reorder</th>
+                            <th>Status</th>
+                            <th style="text-align:center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="supplies-tbody"></tbody>
+                </table>
+            </div>
+        </div>
     </main>
 
     <div id="stock-modal" class="inv-modal" role="dialog" aria-labelledby="stock-modal-title" aria-modal="true">
@@ -169,6 +203,72 @@
         </div>
     </div>
 
+    <div id="supplies-modal" class="inv-modal" role="dialog" aria-labelledby="supplies-modal-title" aria-modal="true">
+        <div class="inv-modal__dialog">
+            <h2 class="inv-modal__title" id="supplies-modal-title">Add item</h2>
+            <div class="inv-form-group">
+                <label class="inv-form-label" for="sup-f-name">Name</label>
+                <input type="text" id="sup-f-name" class="inv-field" required>
+            </div>
+            <div class="inv-form-group">
+                <label class="inv-form-label" for="sup-f-desc">Description (optional)</label>
+                <input type="text" id="sup-f-desc" class="inv-field">
+            </div>
+            <div class="inv-form-group">
+                <label class="inv-form-label" for="sup-f-sku">SKU / vendor code</label>
+                <input type="text" id="sup-f-sku" class="inv-field">
+            </div>
+            <div class="inv-form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                <div>
+                    <label class="inv-form-label" for="sup-f-qty">Quantity</label>
+                    <input type="number" id="sup-f-qty" class="inv-field" min="0" step="1">
+                </div>
+                <div>
+                    <label class="inv-form-label" for="sup-f-unit">Unit</label>
+                    <select id="sup-f-unit" class="inv-field">
+                        <option value="each">Each</option>
+                        <option value="case">Case</option>
+                        <option value="box">Box</option>
+                        <option value="pack">Pack</option>
+                        <option value="roll">Roll</option>
+                    </select>
+                </div>
+            </div>
+            <div class="inv-form-group">
+                <label class="inv-form-label" for="sup-f-location">Storage location</label>
+                <select id="sup-f-location" class="inv-field">
+                    <option value="Dry Storage">Dry Storage</option>
+                    <option value="FOH Storage">FOH Storage</option>
+                    <option value="Bar Storage">Bar Storage</option>
+                    <option value="Office">Office</option>
+                    <option value="Office / BOH">Office / BOH</option>
+                    <option value="Kitchen office">Kitchen office</option>
+                    <option value="Janitor closet">Janitor closet</option>
+                    <option value="Kitchen chemical shelf">Kitchen chemical shelf</option>
+                    <option value="Back of house">Back of house</option>
+                </select>
+            </div>
+            <div class="inv-form-group" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;">
+                <div>
+                    <label class="inv-form-label" for="sup-f-par">Par level</label>
+                    <input type="number" id="sup-f-par" class="inv-field" min="0">
+                </div>
+                <div>
+                    <label class="inv-form-label" for="sup-f-reorder">Reorder at</label>
+                    <input type="number" id="sup-f-reorder" class="inv-field" min="0">
+                </div>
+                <div>
+                    <label class="inv-form-label" for="sup-f-cost">Unit cost ($)</label>
+                    <input type="number" id="sup-f-cost" class="inv-field" min="0" step="0.01">
+                </div>
+            </div>
+            <div class="inv-modal__actions">
+                <button type="button" class="tc-btn tc-btn-outline" id="supplies-btn-cancel">Cancel</button>
+                <button type="button" class="tc-btn tc-btn-accent" id="supplies-btn-save">Save</button>
+            </div>
+        </div>
+    </div>
+
     <script src="assets/js/central-data-loader.js"></script>
     
     <!-- State Persistence Manager - Ensures user and project persist across pages -->
@@ -178,6 +278,8 @@
     <script src="assets/js/secure-storage-manager.js"></script>
     
     <script src="assets/js/inventory-manager.js"></script>
+    <script src="assets/js/supplies-inventory.js"></script>
+    <script src="assets/js/supplies-inventory-ui.js"></script>
     <script src="assets/js/auth_guard.js" defer></script>
     <script>
         let currentFilters = { search: '', location: '', status: '' };
@@ -187,6 +289,11 @@
             loadInventory();
             loadIngredientOptions();
             updateStats();
+            if (window.iterumSuppliesInventory && !window.iterumSuppliesInventory.loadAll().length) {
+                window.iterumSuppliesInventory.seedSamples();
+            } else if (window.iterumSuppliesInventory) {
+                window.iterumSuppliesInventory.ensureMissingTypeSamples();
+            }
         });
 
         function loadInventory() {

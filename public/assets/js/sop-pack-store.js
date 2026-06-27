@@ -34,6 +34,32 @@
     };
   }
 
+  function normalizeServiceWare(raw) {
+    var types =
+      global.iterumSuppliesInventory?.TYPE_ORDER ||
+      ['paper_goods', 'plateware', 'tableware', 'office_supplies', 'first_aid', 'cleaning_chemicals'];
+    var out = {};
+    types.forEach(function (type) {
+      out[type] = [];
+    });
+    if (!raw || typeof raw !== 'object') return out;
+    types.forEach(function (type) {
+      out[type] = (Array.isArray(raw[type]) ? raw[type] : [])
+        .filter(function (row) {
+          return row && (row.id || row.name);
+        })
+        .map(function (row, i) {
+          return {
+            id: String(row.id || 'sw_' + type + '_' + i),
+            type: type,
+            name: String(row.name || 'Item'),
+            qty: row.qty != null ? Math.max(1, parseInt(row.qty, 10) || 1) : 1
+          };
+        });
+    });
+    return out;
+  }
+
   function normalizePack(raw) {
     var pack = emptyPack();
     if (!raw || typeof raw !== 'object') return pack;
@@ -74,7 +100,8 @@
               : fallbackCat,
           title: String(s.title || 'Untitled guide'),
           body: String(s.body || ''),
-          sort: s.sort != null ? s.sort : i + 1
+          sort: s.sort != null ? s.sort : i + 1,
+          serviceWare: normalizeServiceWare(s.serviceWare)
         };
       });
 

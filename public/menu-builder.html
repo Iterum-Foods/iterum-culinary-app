@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="assets/css/menu-builder-enhanced.css">
     <link rel="stylesheet" href="assets/css/menu-builder-pdf-upload.css">
     <link rel="stylesheet" href="assets/css/menu-builder-revamp.css">
+    <link rel="stylesheet" href="assets/css/menu-launch-checklist.css">
     <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
     
     <!-- Force page visibility -->
@@ -1281,7 +1282,8 @@
               <div class="mb-page-header__actions">
                 <button type="button" class="tc-btn tc-btn-outline" id="mb-btn-import"><i class="fa-solid fa-upload" aria-hidden="true"></i> Import</button>
                 <button type="button" class="tc-btn tc-btn-outline" id="mb-btn-preview"><i class="fa-solid fa-eye" aria-hidden="true"></i> Preview</button>
-                <button type="button" class="tc-btn tc-btn-accent" id="mb-btn-publish"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Publish</button>
+                <button type="button" class="tc-btn tc-btn-outline" id="mb-btn-new-dish"><i class="fa-solid fa-plus" aria-hidden="true"></i> New dish</button>
+                <button type="button" class="tc-btn tc-btn-accent" id="mb-btn-publish"><i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i> Publish to Shift</button>
               </div>
             </div>
           </header>
@@ -1337,6 +1339,8 @@
                 </div>
               </div>
             </section>
+
+            <div id="mb-launch-checklist-root" aria-label="Menu launch checklist"></div>
 
             <section class="mb-toolbar">
               <div class="mb-search-wrap">
@@ -1509,6 +1513,20 @@
 
             <!-- Quick Actions -->
             <section class="menu-quick-actions" id="menu-export-section">
+                <div class="iterum-card">
+                    <div class="iterum-card-header">
+                        <h2 class="heading-2">📱 Publish to Shift app</h2>
+                    </div>
+                    <div class="iterum-card-body">
+                        <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-bottom: 16px;">
+                            Push this menu to the mobile <strong>Menu</strong> tab for your team. Select the restaurant workspace in the sidebar and sign in before publishing.
+                        </p>
+                        <button type="button" class="btn btn-primary btn-large" onclick="window.enhancedMenuManager?.publishMenuToShift?.()">
+                            <span style="font-size: 24px;">☁️</span>
+                            <span>Publish to Shift</span>
+                        </button>
+                    </div>
+                </div>
                 <div class="iterum-card">
                     <div class="iterum-card-header">
                         <h2 class="heading-2">🚀 Quick Actions</h2>
@@ -4651,6 +4669,7 @@
     <script defer src="assets/js/menu-recipe-integration.js"></script>
     <script defer src="assets/js/menu-manager-enhanced.js"></script>
     <script defer src="assets/js/menu-builder-revamp-ui.js"></script>
+    <script defer src="assets/js/menu-launch-checklist.js"></script>
     <script defer src="assets/js/enhanced-menu-import.js"></script>
     
     <!-- Load Cost Calculator and Food Costing Workflow -->

@@ -10,7 +10,61 @@ class QuickDishCreator {
     this.instructions = [];
     this.templates = this.loadDishTemplates();
     this.ingredientSuggestions = this.loadIngredientSuggestions();
+    this.mode = 'modal';
+    this.returnTo = null;
+    this.defaultCategory = '';
+    this.serviceWarePicker = null;
     this.init();
+  }
+
+  notify(message, type) {
+    if (window.enhancedMenuManager?.showToast) {
+      window.enhancedMenuManager.showToast(message, type || 'success');
+    } else if (window.showSuccess && type === 'success') {
+      window.showSuccess(message);
+    } else if (window.showError && type === 'error') {
+      window.showError(message);
+    } else {
+      alert(message);
+    }
+  }
+
+  mapCategoryForMenu(category) {
+    const map = {
+      appetizer: 'Appetizers',
+      soup: 'Soups',
+      salad: 'Salads',
+      main: 'Main Courses',
+      side: 'Sides',
+      dessert: 'Desserts',
+      beverage: 'Beverages',
+      'prep-recipe': 'Prep'
+    };
+    return map[category] || category || 'Main Courses';
+  }
+
+  mapMenuCategoryToDish(category) {
+    if (!category) return '';
+    const lower = String(category).toLowerCase();
+    if (lower.includes('appet')) return 'appetizer';
+    if (lower.includes('soup')) return 'soup';
+    if (lower.includes('salad')) return 'salad';
+    if (lower.includes('main')) return 'main';
+    if (lower.includes('side')) return 'side';
+    if (lower.includes('dessert')) return 'dessert';
+    if (lower.includes('bev') || lower.includes('cocktail') || lower.includes('bar')) {
+      return 'beverage';
+    }
+    if (lower.includes('prep')) return 'prep-recipe';
+    return '';
+  }
+
+  afterSaveNavigate() {
+    if (this.mode === 'page' && this.returnTo) {
+      window.location.href = this.returnTo;
+      return;
+    }
+    this.closeCreator();
   }
 
   /**
@@ -22,15 +76,18 @@ class QuickDishCreator {
   }
 
   /**
-   * Show the Quick Dish Creator modal
+   * Show Dish Creator (modal or full page)
+   * @param {object|null} dishData
+   * @param {{ mode?: 'modal'|'page', root?: Element|string, returnTo?: string, category?: string }} options
    */
-  showCreator(dishData = null) {
-    console.log('🎨 Showing Quick Dish Creator...');
+  showCreator(dishData = null, options = {}) {
+    this.mode = options.mode || 'modal';
+    this.returnTo = options.returnTo || null;
+    this.defaultCategory = this.mapMenuCategoryToDish(options.category) || options.category || '';
 
-    // If dishData provided, we're editing an existing dish idea
     this.currentDish = dishData || {
       name: '',
-      category: '',
+      category: this.defaultCategory,
       price: null,
       description: '',
       ingredients: [],
@@ -40,29 +97,25 @@ class QuickDishCreator {
       servings: 4,
       difficulty: 'medium',
       cuisine: '',
-      tags: []
+      tags: [],
+      serviceWare: dishData?.serviceWare || { plateware: [], tableware: [] }
     };
 
-    this.renderCreatorModal();
+    if (this.mode === 'page') {
+      const root =
+        typeof options.root === 'string'
+          ? document.querySelector(options.root)
+          : options.root;
+      if (!root) return;
+      this.renderPage(root);
+    } else {
+      this.renderCreatorModal();
+    }
     this.loadDishData();
   }
 
-  /**
-   * Render the Quick Dish Creator modal
-   */
-  renderCreatorModal() {
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.id = 'quick-dish-creator-modal';
-
-    modal.innerHTML = `
-            <div class="modal-content modal-extra-large">
-                <div class="modal-header">
-                    <h3>🎨 Quick Dish Creator</h3>
-                    <span class="modal-close" onclick="quickDishCreator.closeCreator()">&times;</span>
-                </div>
-                
-                <div class="modal-body">
+  getCreatorBodyHTML() {
+    return `
                     <div class="dish-creator-container">
                         <!-- Basic Information -->
                         <div class="creator-section">
@@ -209,6 +262,12 @@ class QuickDishCreator {
                             </div>
                         </div>
 
+                        <div class="creator-section" id="dish-service-ware-section">
+                            <h4 class="section-title">Service ware &amp; paper goods</h4>
+                            <p style="margin:0 0 12px;font-size:13px;color:#64748b;">Link plates, flatware, and disposables for this dish. Manage catalog in Inventory.</p>
+                            <div id="dish-service-ware-picker" data-sw-picker-host></div>
+                        </div>
+
                         <!-- Cost Analysis -->
                         <div class="creator-section" id="cost-analysis-section" style="display: none;">
                             <h4 class="section-title">💰 Cost Analysis</h4>
@@ -235,27 +294,57 @@ class QuickDishCreator {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                
-                <div class="modal-footer">
+                    </div>`;
+  }
+
+  getCreatorFooterHTML() {
+    const cancelLabel = this.mode === 'page' ? 'Back' : 'Cancel';
+    return `
+                <div class="modal-footer dc-creator-footer">
                     <div class="footer-left">
-                        <button class="btn btn-secondary" onclick="quickDishCreator.saveAsTemplate()">
-                            💾 Save as Template
+                        <button type="button" class="btn btn-secondary" onclick="quickDishCreator.saveAsTemplate()">
+                            Save as template
                         </button>
                     </div>
                     <div class="footer-right">
-                        <button class="btn btn-secondary" onclick="quickDishCreator.closeCreator()">
-                            Cancel
+                        <button type="button" class="btn btn-secondary" onclick="quickDishCreator.closeCreator()">
+                            ${cancelLabel}
                         </button>
-                        <button class="btn btn-primary" onclick="quickDishCreator.saveAndAddToMenu()">
-                            ✅ Add to Menu
+                        <button type="button" class="btn btn-primary" onclick="quickDishCreator.saveAndAddToMenu()">
+                            Save &amp; add to menu
                         </button>
-                        <button class="btn btn-success" onclick="quickDishCreator.saveAsRecipe()">
-                            📚 Save as Recipe
+                        <button type="button" class="btn btn-success" onclick="quickDishCreator.saveAsRecipe()">
+                            Save to library
                         </button>
                     </div>
+                </div>`;
+  }
+
+  renderPage(root) {
+    this.addCreatorStyles();
+    root.innerHTML =
+      '<div class="dc-form-shell">' +
+      this.getCreatorBodyHTML() +
+      this.getCreatorFooterHTML() +
+      '</div>';
+    this.initializeCreator();
+  }
+
+  renderCreatorModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'quick-dish-creator-modal';
+
+    modal.innerHTML = `
+            <div class="modal-content modal-extra-large">
+                <div class="modal-header">
+                    <h3>Dish Creator</h3>
+                    <span class="modal-close" onclick="quickDishCreator.closeCreator()">&times;</span>
                 </div>
+                <div class="modal-body">
+                    ${this.getCreatorBodyHTML()}
+                </div>
+                ${this.getCreatorFooterHTML()}
             </div>
         `;
 
@@ -286,6 +375,21 @@ class QuickDishCreator {
                 display: flex;
                 flex-direction: column;
                 gap: 24px;
+            }
+
+            .dc-form-shell {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .dc-creator-footer {
+                position: sticky;
+                bottom: 0;
+                background: hsl(var(--tc-card, 0 0% 100%));
+                border-top: 1px solid hsl(var(--tc-border, 214 20% 90%));
+                padding: 16px 0 0;
+                margin-top: 8px;
             }
             
             .creator-section {
@@ -542,12 +646,28 @@ class QuickDishCreator {
    * Initialize the creator with default values
    */
   initializeCreator() {
-    // Add initial ingredient and instruction
     this.addIngredient();
     this.addInstruction();
-
-    // Setup auto-suggestions
     this.setupAutoSuggestions();
+
+    if (this.mode === 'page') {
+      const rb = document.getElementById('recipe-builder');
+      if (rb) rb.style.display = 'block';
+      const icon = document.getElementById('recipe-toggle-icon');
+      if (icon) icon.textContent = '▲';
+    }
+
+    const host = document.getElementById('dish-service-ware-picker');
+    if (host && window.iterumServiceWarePicker && window.iterumSuppliesInventory) {
+      if (!window.iterumSuppliesInventory.loadAll().length) {
+        window.iterumSuppliesInventory.seedSamples();
+      }
+      this.serviceWarePicker = window.iterumServiceWarePicker.mount(host, {
+        types: window.iterumSuppliesInventory.DISH_ATTACH_TYPES,
+        serviceWare: this.currentDish?.serviceWare || null
+      });
+      host._swPicker = this.serviceWarePicker;
+    }
   }
 
   /**
@@ -561,7 +681,7 @@ class QuickDishCreator {
     // Load basic information
     document.getElementById('dish-name').value = this.currentDish.name || '';
     document.getElementById('dish-category').value =
-      this.currentDish.category || '';
+      this.currentDish.category || this.defaultCategory || '';
     document.getElementById('dish-price').value = this.currentDish.price || '';
     document.getElementById('dish-servings').value =
       this.currentDish.servings || 4;
@@ -964,59 +1084,10 @@ class QuickDishCreator {
     alert('Dish template saved successfully!');
   }
 
-  /**
-   * Save dish and add to menu
-   */
-  saveAndAddToMenu() {
-    const dishData = this.collectDishData();
-
-    // Validate required fields
-    if (!dishData.name || !dishData.category) {
-      alert('Please fill in dish name and category.');
-      return;
-    }
-
-    // Add to menu using existing menu manager
-    if (window.menuManager) {
-      const menuItem = {
-        name: dishData.name,
-        description: dishData.description,
-        price: dishData.price,
-        category: dishData.category,
-        ingredients: dishData.ingredients,
-        instructions: dishData.instructions,
-        prepTime: dishData.prepTime,
-        cookTime: dishData.cookTime,
-        servings: dishData.servings,
-        difficulty: dishData.difficulty,
-        cuisine: dishData.cuisine
-      };
-
-      const category = window.menuManager.ensureDefaultCategory();
-      window.menuManager.addItem(category.id, menuItem);
-
-      this.closeCreator();
-      alert('Dish added to menu successfully!');
-    } else {
-      alert('Menu manager not available.');
-    }
-  }
-
-  /**
-   * Save dish as full recipe
-   */
-  saveAsRecipe() {
-    const dishData = this.collectDishData();
-
-    // Validate required fields
-    if (!dishData.name || !dishData.category) {
-      alert('Please fill in dish name and category.');
-      return;
-    }
-
-    // Create recipe data
+  persistRecipe(dishData) {
     const recipeData = {
       name: dishData.name,
+      title: dishData.name,
       description: dishData.description,
       category: dishData.category,
       cuisine: dishData.cuisine,
@@ -1028,47 +1099,120 @@ class QuickDishCreator {
       instructions: dishData.instructions,
       tags: [dishData.category, dishData.cuisine].filter(Boolean),
       status: 'draft',
-      type: 'dish'
+      type: 'dish',
+      serviceWare: dishData.serviceWare || { plateware: [], tableware: [] }
     };
 
-    // Save to recipe library
     const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
     const finalRecipe = {
-      id: Date.now(),
+      id: 'recipe_' + Date.now(),
       ...recipeData,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
     recipes.push(finalRecipe);
-
     localStorage.setItem('recipes', JSON.stringify(recipes));
 
-    // ✅ NEW: Add to universal recipe library
     if (window.universalRecipeManager) {
-      window.universalRecipeManager.addToLibrary(
-        finalRecipe,
-        'quick-dish-creator'
-      );
-      console.log(
-        '📚 Recipe added to universal library from quick dish creator'
-      );
+      window.universalRecipeManager.addToLibrary(finalRecipe, 'dish-creator');
     }
 
-    // Dispatch event
     window.dispatchEvent(
       new CustomEvent('recipeSaved', {
-        detail: { recipe: finalRecipe, source: 'quick-dish-creator' }
+        detail: { recipe: finalRecipe, source: 'dish-creator' }
       })
     );
 
-    this.closeCreator();
-    alert('✅ Recipe saved to library successfully!');
+    return finalRecipe;
+  }
+
+  /**
+   * Save dish and add to menu
+   */
+  async saveAndAddToMenu() {
+    const dishData = this.collectDishData();
+
+    if (!dishData.name || !dishData.category) {
+      this.notify('Please fill in dish name and category.', 'error');
+      return;
+    }
+
+    const recipe = this.persistRecipe(dishData);
+    const em = window.enhancedMenuManager;
+
+    if (em?.addMenuItem) {
+      try {
+        await em.addMenuItem(
+          {
+            name: dishData.name,
+            description: dishData.description,
+            price: dishData.price,
+            category: this.mapCategoryForMenu(dishData.category),
+            recipeId: recipe.id,
+            recipeLinkStatus: 'linked',
+            recipeName: dishData.name,
+            serviceWare: dishData.serviceWare
+          },
+          false
+        );
+        this.notify('Dish saved and added to your menu.', 'success');
+        this.afterSaveNavigate();
+        return;
+      } catch (err) {
+        console.warn('enhancedMenuManager add failed', err);
+      }
+    }
+
+    if (window.menuManager) {
+      const menuItem = {
+        name: dishData.name,
+        description: dishData.description,
+        price: dishData.price,
+        category: this.mapCategoryForMenu(dishData.category),
+        ingredients: dishData.ingredients,
+        instructions: dishData.instructions,
+        prepTime: dishData.prepTime,
+        cookTime: dishData.cookTime,
+        servings: dishData.servings,
+        difficulty: dishData.difficulty,
+        cuisine: dishData.cuisine,
+        recipeId: recipe.id
+      };
+
+      const category = window.menuManager.ensureDefaultCategory();
+      window.menuManager.addItem(category.id, menuItem);
+      this.notify('Dish added to menu.', 'success');
+      this.afterSaveNavigate();
+      return;
+    }
+
+    this.notify('Menu manager not available — recipe saved to library only.', 'error');
+    this.afterSaveNavigate();
+  }
+
+  /**
+   * Save dish as full recipe
+   */
+  saveAsRecipe() {
+    const dishData = this.collectDishData();
+
+    if (!dishData.name || !dishData.category) {
+      this.notify('Please fill in dish name and category.', 'error');
+      return;
+    }
+
+    this.persistRecipe(dishData);
+    this.notify('Dish saved to recipe library.', 'success');
+    this.afterSaveNavigate();
   }
 
   /**
    * Collect all dish data from the form
    */
   collectDishData() {
+    const serviceWare = this.serviceWarePicker
+      ? this.serviceWarePicker.getValue()
+      : this.currentDish?.serviceWare || { plateware: [], tableware: [] };
     return {
       name: document.getElementById('dish-name').value,
       category: document.getElementById('dish-category').value,
@@ -1082,7 +1226,8 @@ class QuickDishCreator {
       cookTime:
         parseInt(document.getElementById('dish-cook-time').value) || null,
       ingredients: this.ingredients.filter(ing => ing.name.trim()),
-      instructions: this.instructions.filter(inst => inst.instruction.trim())
+      instructions: this.instructions.filter(inst => inst.instruction.trim()),
+      serviceWare: serviceWare
     };
   }
 
@@ -1090,6 +1235,11 @@ class QuickDishCreator {
    * Close the creator modal
    */
   closeCreator() {
+    if (this.mode === 'page') {
+      window.location.href = this.returnTo || 'recipe-library.html';
+      return;
+    }
+
     const modal = document.getElementById('quick-dish-creator-modal');
     if (modal) {
       modal.remove();
@@ -1392,3 +1542,15 @@ class QuickDishCreator {
 
 // Initialize global instance
 window.quickDishCreator = new QuickDishCreator();
+
+document.addEventListener('DOMContentLoaded', function () {
+  var root = document.getElementById('dish-creator-root');
+  if (!root || !window.quickDishCreator) return;
+  var params = new URLSearchParams(window.location.search);
+  window.quickDishCreator.showCreator(null, {
+    mode: 'page',
+    root: root,
+    returnTo: params.get('return') || 'recipe-library.html',
+    category: params.get('category') || ''
+  });
+});

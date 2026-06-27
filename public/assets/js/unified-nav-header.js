@@ -66,6 +66,9 @@ class UnifiedNavHeader {
     if (path.includes('user_management')) {
       return 'admin';
     }
+    if (path.includes('dish-creator')) {
+      return 'dish_creator';
+    }
     if (path.includes('recipe-library')) {
       return 'recipes';
     }
@@ -557,7 +560,7 @@ class UnifiedNavHeader {
 
                     <div class="nav-section-label">Develop</div>
                     ${this.navLink('recipe-library.html', 'recipes', 'fa-solid fa-book', 'Recipes', 'recipes')}
-                    ${this.navLink('recipe-developer.html', 'developer', 'fa-solid fa-flask', 'Recipe Developer', 'recipes')}
+                    ${this.navLink('dish-creator.html', 'dish_creator', 'fa-solid fa-plus', 'Dish Creator', 'recipes')}
                     ${this.navLink('menu-builder.html', 'menu', 'fa-solid fa-utensils', 'Menu Builder', 'menus')}
                     ${this.navLink('ingredients.html', 'ingredients', 'fa-solid fa-carrot', 'Ingredients', 'ingredients')}
                     ${this.navLink('inventory.html', 'inventory', 'fa-solid fa-warehouse', 'Inventory', 'inventory')}
@@ -584,6 +587,7 @@ class UnifiedNavHeader {
                             <a href="vendor-price-comparison.html" class="${p('vendorprice')}" data-iterum-feature="vendors"><i class="fa-solid fa-scale-balanced fa-fw nav-dd-icon" aria-hidden="true"></i>Price compare</a>
                             <a href="equipment-management.html" class="${p('equipment')}" data-iterum-feature="equipment"><i class="fa-solid fa-screwdriver-wrench fa-fw nav-dd-icon" aria-hidden="true"></i>Equipment</a>
                             <a href="vendor-management.html" class="${p('vendors')}" data-iterum-feature="vendors"><i class="fa-solid fa-truck-field fa-fw nav-dd-icon" aria-hidden="true"></i>Vendors</a>
+                            <a href="recipe-developer.html" class="${p('developer')}" data-iterum-feature="recipes"><i class="fa-solid fa-flask fa-fw nav-dd-icon" aria-hidden="true"></i>Full recipe editor</a>
                             <a href="recipe-canvas.html" class="${p('canvas')}" data-iterum-feature="recipes"><i class="fa-solid fa-pen-ruler fa-fw nav-dd-icon" aria-hidden="true"></i>Recipe canvas</a>
                             <a href="kitchen-management.html" class="${p('kitchen')}" data-iterum-feature="kitchen"><i class="fa-solid fa-fire-burner fa-fw nav-dd-icon" aria-hidden="true"></i>Kitchen hub</a>
                             <a href="inventory-variance.html" class="${p('invvar')}" data-iterum-feature="inventory"><i class="fa-solid fa-chart-line fa-fw nav-dd-icon" aria-hidden="true"></i>Inventory variance</a>

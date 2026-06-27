@@ -392,7 +392,7 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     const db = getDb();
     const body = document.getElementById('menu-published-body');
     const uid = getAuth()?.currentUser?.uid;
-    if (!db || !body) return;
+    if (!body) return;
     if (!teamProjectSelected()) {
       body.innerHTML =
         '<p class="mc-empty">Pick your <strong>location</strong> above to see today’s menu.</p>';
@@ -416,6 +416,20 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
       body.innerHTML = `${hint}<p class="mc-panel-title">${escapeHtml(menuName)}</p><ul class="mc-list">${rows}</ul>`;
     }
     try {
+      if (!db) {
+        const localOnly = tryLocalPublishedMenu(uid, pid());
+        if (localOnly) {
+          renderMenuRows(
+            localOnly.menuName,
+            localOnly.items,
+            'Showing menu saved on this device (office app must publish while signed in for other devices).'
+          );
+          return;
+        }
+        body.innerHTML =
+          '<p class="mc-empty">No menu here yet. Ask a manager to publish from Menu Builder.</p>';
+        return;
+      }
       const projectRef = doc(db, 'projects', pid());
       let menuSnap = await getDoc(
         doc(collection(projectRef, 'menus'), 'primary')
@@ -1234,6 +1248,25 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     }
   }
 
+  function formatServiceWareSummary(serviceWare) {
+    if (window.iterumServiceWarePicker?.formatSummary) {
+      return window.iterumServiceWarePicker.formatSummary(serviceWare);
+    }
+    if (!serviceWare || typeof serviceWare !== 'object') return '';
+    const bits = [];
+    const types =
+      window.iterumSuppliesInventory?.TYPE_ORDER ||
+      ['paper_goods', 'plateware', 'tableware', 'office_supplies', 'first_aid', 'cleaning_chemicals'];
+    types.forEach(type => {
+      (serviceWare[type] || []).forEach(row => {
+        if (row && row.name) {
+          bits.push(row.qty > 1 ? `${row.qty}× ${row.name}` : row.name);
+        }
+      });
+    });
+    return bits.join(', ');
+  }
+
   function renderSopPackBody(body, pack) {
     const sops = pack.sops || [];
     if (!sops.length) {
@@ -1265,8 +1298,16 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
         `<section class="mc-sop-category"><h3 class="mc-section-title mc-sop-category__title">${escapeHtml((cat.icon ? cat.icon + ' ' : '') + (cat.name || 'Guides'))}</h3><div class="mc-stack-gap">` +
           list
             .map(
-              (s, i) =>
-                `<article class="mc-card mc-stack-gap"><strong>${escapeHtml(s.title || `Guide ${i + 1}`)}</strong><div class="mc-note-body mc-note-body-sm">${escapeHtml(s.body || '')}</div></article>`
+              (s, i) => {
+                const ware = formatServiceWareSummary(s.serviceWare);
+                return (
+                  `<article class="mc-card mc-stack-gap"><strong>${escapeHtml(s.title || `Guide ${i + 1}`)}</strong>` +
+                  (ware
+                    ? `<p class="mc-hint" style="margin:0;"><i class="fa-solid fa-utensils" aria-hidden="true"></i> ${escapeHtml(ware)}</p>`
+                    : '') +
+                  `<div class="mc-note-body mc-note-body-sm">${escapeHtml(s.body || '')}</div></article>`
+                );
+              }
             )
             .join('') +
           '</div></section>'

@@ -7,7 +7,8 @@
   var state = {
     pack: null,
     activeCategory: 'all',
-    editingId: null
+    editingId: null,
+    sopPicker: null
   };
 
   function $(id) {
@@ -132,6 +133,9 @@
     el.innerHTML = sops
       .map(function (s) {
         var catName = window.iterumSopPack.categoryName(state.pack, s.categoryId);
+        var wareSummary = window.iterumServiceWarePicker
+          ? window.iterumServiceWarePicker.formatSummary(s.serviceWare)
+          : '';
         return (
           '<article class="sop-card" data-sop-id="' +
           s.id +
@@ -142,6 +146,11 @@
           '<h3>' +
           escapeHtml(s.title) +
           '</h3>' +
+          (wareSummary
+            ? '<p class="sop-ware-summary"><i class="fa-solid fa-utensils" aria-hidden="true"></i> ' +
+              escapeHtml(wareSummary) +
+              '</p>'
+            : '') +
           '<pre>' +
           escapeHtml(s.body) +
           '</pre>' +
@@ -193,11 +202,23 @@
     if (sop && $('sop-f-category')) {
       $('sop-f-category').value = sop.categoryId;
     }
+    var host = $('sop-service-ware-picker');
+    if (host && window.iterumServiceWarePicker) {
+      if (!window.iterumSuppliesInventory.loadAll().length) {
+        window.iterumSuppliesInventory.seedSamples();
+      }
+      state.sopPicker = window.iterumServiceWarePicker.mount(host, {
+        types: window.iterumSuppliesInventory.SOP_ATTACH_TYPES,
+        serviceWare: sop ? sop.serviceWare : null
+      });
+      host._swPicker = state.sopPicker;
+    }
     $('sop-modal').classList.add('is-open');
   }
 
   function closeModal() {
     state.editingId = null;
+    state.sopPicker = null;
     $('sop-modal').classList.remove('is-open');
   }
 
@@ -205,6 +226,16 @@
     var title = ($('sop-f-title').value || '').trim();
     var body = ($('sop-f-body').value || '').trim();
     var categoryId = $('sop-f-category').value;
+    var serviceWare = state.sopPicker
+      ? state.sopPicker.getValue()
+      : (window.iterumSuppliesInventory?.emptyServiceWare?.() || {
+          paper_goods: [],
+          plateware: [],
+          tableware: [],
+          office_supplies: [],
+          first_aid: [],
+          cleaning_chemicals: []
+        });
     if (!title) {
       toast('Enter a title.', 'error');
       return;
@@ -219,6 +250,7 @@
         existing.title = title;
         existing.body = body;
         existing.categoryId = categoryId;
+        existing.serviceWare = serviceWare;
       }
     } else {
       state.pack.sops.push({
@@ -226,7 +258,8 @@
         categoryId: categoryId,
         title: title,
         body: body,
-        sort: state.pack.sops.length + 1
+        sort: state.pack.sops.length + 1,
+        serviceWare: serviceWare
       });
     }
 

@@ -347,6 +347,7 @@
 
   </style>
   <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
+  <link rel="stylesheet" href="assets/css/menu-launch-checklist.css">
 </head>
   <body class="text-primary bg-secondary tc-revamp-body" style="padding-top: 0;">
 
@@ -510,6 +511,11 @@
             </div>
           </div>
 
+          <!-- Menu launch checklist (E1 guided cycle) -->
+          <div class="card-style" data-dash-roles="chef_leadership,operations_gm,consultant_rd,location_manager,account_admin" data-dash-features="menus">
+            <div id="menu-launch-checklist-dashboard"></div>
+          </div>
+
           <!-- Consultant: deep-work links -->
           <div class="card-style" data-dash-roles="consultant_rd" data-dash-features="recipes,menus">
             <div class="dash-card-head">
@@ -520,7 +526,7 @@
             </div>
             <p class="text-sm mb-4 leading-relaxed" style="color: var(--brand-text-muted);">Open tools for documentation and experimentation.</p>
             <div class="dash-stack">
-              <a href="recipe-developer.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-flask mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Recipe developer</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
+              <a href="dish-creator.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-plus mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Dish Creator</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
               <a href="recipe-library.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-book-open mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Recipe index</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
               <a href="menu-builder.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-utensils mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Menu builder</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
             </div>
@@ -930,6 +936,7 @@
   <script src="assets/js/ops-exception-engine.js"></script>
   <!-- Load existing Dashboard functionality -->
   <script src="assets/js/dashboard-core.js"></script>
+  <script src="assets/js/menu-launch-checklist.js" defer></script>
   
   <!-- Firebase Firestore: user-scoped HACCP (users/{userId}/...) — matches firestore.rules -->
   <script type="module">

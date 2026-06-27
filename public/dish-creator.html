@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dish Creator — Iterum Culinary</title>
+
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    <script src="assets/js/page-protection.js"></script>
+    <script src="assets/js/project-management-system.js" defer></script>
+    <script src="assets/js/unified-nav-header.js" defer></script>
+    <script src="assets/js/unified-project-selector.js" defer></script>
+    <script src="assets/js/workspace-features.js" defer></script>
+    <script src="assets/js/workspace-save-indicator.js" defer></script>
+    <script src="assets/js/workspace-identity.js" defer></script>
+    <script src="assets/js/toast-notifications.js" defer></script>
+    <script src="assets/js/state-persistence-manager.js" defer></script>
+    <script src="assets/js/universal-recipe-manager.js" defer></script>
+    <script src="assets/js/supplies-inventory.js" defer></script>
+    <script src="assets/js/service-ware-picker.js" defer></script>
+    <script src="assets/js/menu-recipe-integration.js" defer></script>
+    <script src="assets/js/menuManager.js" defer></script>
+    <script src="assets/js/menu-manager-enhanced.js" defer></script>
+    <script src="assets/js/quick-dish-creator.js" defer></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
+    <link rel="stylesheet" href="assets/css/service-ware-picker.css">
+    <link rel="stylesheet" href="assets/css/taste-craft-app-sidebar.css">
+    <link rel="stylesheet" href="assets/css/modal-high-contrast.css">
+    <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
+
+    <style>
+        body.dc-page-body {
+            background: hsl(var(--tc-background));
+            font-family: 'Inter', sans-serif;
+            color: hsl(var(--tc-foreground));
+        }
+        .dc-shell {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 24px 20px 48px;
+        }
+        .dc-hero {
+            margin-bottom: 20px;
+        }
+        .dc-hero__eyebrow {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: hsl(var(--tc-muted-foreground));
+            margin: 0 0 6px;
+        }
+        .dc-hero h1 {
+            margin: 0 0 8px;
+            font-size: 1.65rem;
+            font-weight: 700;
+        }
+        .dc-hero p {
+            margin: 0;
+            max-width: 38rem;
+            line-height: 1.55;
+            color: hsl(var(--tc-muted-foreground));
+            font-size: 0.95rem;
+        }
+        .dc-hero__links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .dc-hero__links a {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: hsl(var(--tc-primary));
+            text-decoration: none;
+        }
+        .dc-hero__links a:hover { text-decoration: underline; }
+        .dc-panel {
+            background: hsl(var(--tc-card));
+            border: 1px solid hsl(var(--tc-border));
+            border-radius: 14px;
+            padding: 20px;
+        }
+        #dish-creator-root .creator-section {
+            background: hsl(var(--tc-muted) / 0.35);
+        }
+    </style>
+</head>
+<body class="dc-page-body tc-revamp-body iterum-has-sidebar">
+    <main class="dc-shell main-content-area">
+        <header class="dc-hero">
+            <p class="dc-hero__eyebrow">Develop · Menu &amp; recipes</p>
+            <h1>Dish Creator</h1>
+            <p>
+                Name your dish, add ingredients and method, set a menu price, and save to your recipe library or straight onto the active menu.
+            </p>
+            <div class="dc-hero__links">
+                <a href="recipe-library.html"><i class="fa-solid fa-book" aria-hidden="true"></i> Recipe library</a>
+                <a href="menu-builder.html"><i class="fa-solid fa-utensils" aria-hidden="true"></i> Menu Builder</a>
+                <a href="recipe-developer.html"><i class="fa-solid fa-flask" aria-hidden="true"></i> Full recipe editor</a>
+            </div>
+        </header>
+
+        <div class="dc-panel">
+            <div id="workspace-save-indicator-root" data-workspace-save-indicator aria-label="Active workspace"></div>
+            <div data-workspace-identity hidden></div>
+            <div id="dish-creator-root" aria-label="Dish creator form"></div>
+        </div>
+    </main>
+</body>
+</html>

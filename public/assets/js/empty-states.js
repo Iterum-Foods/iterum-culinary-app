@@ -117,7 +117,7 @@ class EmptyStates {
         {
           label: 'Create Recipe',
           icon: '➕',
-          href: 'recipe-developer.html',
+          href: 'dish-creator.html',
           primary: true
         },
         {
