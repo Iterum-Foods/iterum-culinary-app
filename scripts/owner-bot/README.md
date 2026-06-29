@@ -99,6 +99,42 @@ Suggested integration path:
 3. Iterum **compliance logs + archive export** → RBP compliance section for owner reports  
 4. Run **both bots** in CI with the same `RBP_BUSINESS_PLAN_PATH` and compare `owner_bot_*_results.json`
 
+## Onboarding audit (sign-up → setup → new project)
+
+Walks the **greenfield owner path** and writes issues + UX notes:
+
+```powershell
+npm run serve:test
+npm run owner-bot:onboarding
+```
+
+| Env | Purpose |
+|-----|---------|
+| `OWNER_BOT_SIGNUP=true` | Create a new Firebase account (`+timestamp` email alias) instead of clearing profile |
+| `OWNER_BOT_PROJECT_NAME` | Restaurant name for the create-project step |
+| `ITERUM_BASE_URL` | Prod: `https://iterum-culinary-app.vercel.app` |
+
+Outputs: `output/onboarding_audit.html`, `onboarding_audit.md`, `onboarding_*.png`
+
+## Feature matrix (all modules & pages)
+
+Full map: [`iterum_feature_map.json`](iterum_feature_map.json) — every toggleable module, pillar, pilot default, and page path.
+
+```powershell
+npm run serve:test
+npm run owner-bot:features          # all modules — enables every feature flag first
+npm run owner-bot:features:pilot    # pilot-default modules only (~9 modules)
+npm run owner-bot:all               # onboarding audit + full feature matrix
+```
+
+Outputs: `output/feature_matrix_report.html`, `feature_matrix_report.md`, `feature_*.png`
+
+| Env | Purpose |
+|-----|---------|
+| `ITERUM_FEATURE_MAP` | Custom JSON path |
+| `OWNER_BOT_ALL_FEATURES=false` | Do not force all modules on in operator profile |
+| `OWNER_BOT_FEATURES_ONLY=pilot` | Only `pilotDefault: true` modules |
+
 ## vs Playwright smoke
 
 | Tool | Role |

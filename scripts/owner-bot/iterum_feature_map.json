@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "1.0",
+  "description": "Iterum feature module map — every toggleable module and page path for owner-bot coverage.",
+  "pillars": ["run", "develop", "archive", "organization", "account"],
+  "modules": [
+    {
+      "key": "compliance",
+      "label": "Compliance & HACCP",
+      "pillar": "run",
+      "pilotDefault": true,
+      "paths": [
+        { "path": "/dashboard.html", "label": "Dashboard", "expect": "body" },
+        { "path": "/dashboard.html#haccp", "label": "HACCP log panel" },
+        { "path": "/dashboard.html#temperature", "label": "Temperature log panel" },
+        { "path": "/mobile-compliance.html", "label": "Shift app", "expect": "body" },
+        { "path": "/sop-hub.html", "label": "How-to guides (SOP hub)", "expect": "body" },
+        { "path": "/foh-first-shift.html", "label": "FOH first shift guide" }
+      ]
+    },
+    {
+      "key": "calendar",
+      "label": "Calendar",
+      "pillar": "run",
+      "pilotDefault": false,
+      "paths": [{ "path": "/calendar.html", "label": "Calendar" }]
+    },
+    {
+      "key": "menus",
+      "label": "Menus",
+      "pillar": "develop",
+      "pilotDefault": true,
+      "paths": [
+        { "path": "/menu-builder.html", "label": "Menu Builder" },
+        { "path": "/dish-creator.html", "label": "Dish Creator" }
+      ]
+    },
+    {
+      "key": "recipes",
+      "label": "Recipes",
+      "pillar": "develop",
+      "pilotDefault": true,
+      "paths": [
+        { "path": "/recipe-library.html", "label": "Recipe library" },
+        { "path": "/dish-creator.html", "label": "Dish Creator (recipe entry)" },
+        { "path": "/recipe-developer.html", "label": "Full recipe editor" },
+        { "path": "/recipe-canvas.html", "label": "Recipe canvas" }
+      ]
+    },
+    {
+      "key": "ingredients",
+      "label": "Ingredients",
+      "pillar": "develop",
+      "pilotDefault": true,
+      "paths": [
+        { "path": "/ingredients.html", "label": "Ingredients" },
+        { "path": "/spec-library.html", "label": "Spec library" },
+        { "path": "/ingredient-highlights.html", "label": "Ingredient stories" }
+      ]
+    },
+    {
+      "key": "kitchen",
+      "label": "Kitchen hub",
+      "pillar": "develop",
+      "pilotDefault": true,
+      "paths": [
+        { "path": "/kitchen-management.html", "label": "Kitchen hub" },
+        { "path": "/kitchen-management.html?tab=preplist", "label": "Prep lists" },
+        { "path": "/kitchen-management.html?tab=pdf", "label": "Recipe book PDF" },
+        { "path": "/server-info-sheet.html", "label": "Server info sheet" }
+      ]
+    },
+    {
+      "key": "inventory",
+      "label": "Inventory",
+      "pillar": "develop",
+      "pilotDefault": true,
+      "paths": [
+        { "path": "/inventory.html", "label": "Inventory (food + supplies)" },
+        { "path": "/inventory-variance.html", "label": "Inventory variance" }
+      ]
+    },
+    {
+      "key": "vendors",
+      "label": "Vendors",
+      "pillar": "develop",
+      "pilotDefault": true,
+      "paths": [
+        { "path": "/vendor-management.html", "label": "Vendor management" },
+        { "path": "/vendor-price-comparison.html", "label": "Price compare" }
+      ]
+    },
+    {
+      "key": "production",
+      "label": "Production / reports",
+      "pillar": "develop",
+      "pilotDefault": false,
+      "paths": [{ "path": "/production-planning.html", "label": "Production planning" }]
+    },
+    {
+      "key": "equipment",
+      "label": "Equipment",
+      "pillar": "develop",
+      "pilotDefault": false,
+      "paths": [{ "path": "/equipment-management.html", "label": "Equipment management" }]
+    },
+    {
+      "key": "import_export",
+      "label": "Bulk import",
+      "pillar": "develop",
+      "pilotDefault": false,
+      "paths": [
+        { "path": "/bulk-recipe-import.html", "label": "Recipe import" },
+        { "path": "/bulk-ingredient-import.html", "label": "Ingredient import" }
+      ]
+    },
+    {
+      "key": "photo_studio",
+      "label": "Photo studio",
+      "pillar": "develop",
+      "pilotDefault": false,
+      "paths": [{ "path": "/recipe-photo-studio.html", "label": "Recipe photo studio" }]
+    },
+    {
+      "key": "scaling",
+      "label": "Recipe scaling",
+      "pillar": "develop",
+      "pilotDefault": false,
+      "paths": [{ "path": "/recipe-scaling-tool.html", "label": "Recipe scaling tool" }]
+    },
+    {
+      "key": "backup",
+      "label": "Backup & archive",
+      "pillar": "archive",
+      "pilotDefault": true,
+      "paths": [
+        { "path": "/archive-hub.html", "label": "Archive hub" },
+        { "path": "/data-backup-center.html", "label": "Backup center" }
+      ]
+    },
+    {
+      "key": "data_tools",
+      "label": "Data & audit",
+      "pillar": "archive",
+      "pilotDefault": false,
+      "paths": [
+        { "path": "/audit-log.html", "label": "Audit log" },
+        { "path": "/data-management-dashboard.html", "label": "Data management dashboard" },
+        { "path": "/contact_management.html", "label": "CRM & contacts" },
+        { "path": "/user_management.html", "label": "User admin" }
+      ]
+    },
+    {
+      "key": "projects",
+      "label": "Projects & team",
+      "pillar": "organization",
+      "pilotDefault": true,
+      "paths": [
+        { "path": "/project-hub.html", "label": "Project hub" },
+        { "path": "/project-hub.html#team", "label": "Team tab" },
+        { "path": "/restaurant-group-onboarding.html", "label": "Restaurant group onboarding" }
+      ]
+    },
+    {
+      "key": "account",
+      "label": "Account & setup",
+      "pillar": "account",
+      "pilotDefault": true,
+      "alwaysOn": true,
+      "paths": [
+        { "path": "/user-profile.html", "label": "Profile & settings" },
+        { "path": "/setup.html", "label": "Operator setup" }
+      ]
+    }
+  ]
+}

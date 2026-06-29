@@ -141,6 +141,34 @@ test.describe('Smoke', () => {
     );
   });
 
+  test('dish creator page loads', async ({ page }) => {
+    const res = await page.goto('/dish-creator.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(page.getByRole('heading', { name: /Dish Creator/i })).toBeVisible();
+    await expect(page.locator('#dish-creator-root')).toHaveCount(1);
+  });
+
+  test('inventory supplies and ops tab markup loads', async ({ page }) => {
+    const res = await page.goto('/inventory.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(page.locator('[data-inv-main-tab="supplies"]')).toHaveCount(1);
+    await expect(page.locator('#supplies-tabs-root')).toHaveCount(1);
+    await expect(page.locator('#inv-panel-supplies')).toHaveCount(1);
+  });
+
+  test('sop hub supplies picker markup loads', async ({ page }) => {
+    const res = await page.goto('/sop-hub.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(page.getByRole('heading', { name: /How-to guides/i })).toBeVisible();
+    await expect(page.locator('#sop-service-ware-picker')).toHaveCount(1);
+  });
+
+  test('dashboard menu launch checklist loads', async ({ page }) => {
+    const res = await page.goto('/dashboard.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(page.locator('#menu-launch-checklist-dashboard')).toHaveCount(1);
+  });
+
   test('privacy policy page loads', async ({ page }) => {
     const res = await page.goto('/privacy.html');
     expect(res?.ok()).toBeTruthy();

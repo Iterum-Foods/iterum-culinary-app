@@ -60,10 +60,10 @@
     <aside class="mb-6 rounded-2xl border border-emerald-200/90 bg-white/95 p-4 sm:p-5 text-sm text-ink shadow-md shadow-slate-900/5" aria-label="Getting started path">
       <p class="font-semibold text-moss-dark mb-2">Your first 10 minutes</p>
       <ol class="list-decimal list-inside space-y-1.5 text-slate leading-relaxed">
-        <li>Complete this setup (below), then open the <a class="text-moss-dark font-medium underline hover:text-pine" href="dashboard.html">dashboard</a>.</li>
+        <li>Name your <strong>restaurant workspace</strong> below and complete setup — you land on the <a class="text-moss-dark font-medium underline hover:text-pine" href="dashboard.html">dashboard</a> in your own site (not Master).</li>
         <li>Add <a class="text-moss-dark font-medium underline hover:text-pine" href="vendor-management.html">vendors</a> and any <strong>workspace price overrides</strong> so costing is accurate.</li>
-        <li>Review <a class="text-moss-dark font-medium underline hover:text-pine" href="ingredients.html">ingredients</a> and align names with how you buy.</li>
-        <li>Build or import <a class="text-moss-dark font-medium underline hover:text-pine" href="recipe-library.html">recipes</a> — costing uses the steps above.</li>
+        <li>Start with <a class="text-moss-dark font-medium underline hover:text-pine" href="dish-creator.html">Dish Creator</a> or import <a class="text-moss-dark font-medium underline hover:text-pine" href="recipe-library.html">recipes</a>.</li>
+        <li>Build your <a class="text-moss-dark font-medium underline hover:text-pine" href="menu-builder.html">menu</a> and use the launch checklist on the dashboard.</li>
       </ol>
       <p class="mt-3 text-xs text-slate">Multi-site? Use <a class="text-moss-dark underline hover:text-pine" href="project-hub.html">Project hub</a> for workspaces and teammates.</p>
     </aside>
@@ -203,23 +203,40 @@
         </div>
       </fieldset>
 
-      <fieldset>
-        <legend class="text-sm font-semibold text-ink mb-2 block">Project defaults</legend>
+      <fieldset id="setup-restaurant-fieldset">
+        <legend class="text-sm font-semibold text-ink mb-2 block">Your restaurant</legend>
         <p class="text-sm text-slate mb-4 leading-relaxed">
-          Pick your default active project and pre-seed all standard jobs for each project.
+          Each location is its own workspace — menus, compliance logs, and shift tools stay separate. We create your first restaurant here so you are not stuck on Master.
         </p>
         <div class="space-y-3">
-          <div>
-            <label for="default-project-select" class="block text-sm font-medium text-ink mb-1.5">Default project</label>
-            <select id="default-project-select" class="w-full min-h-[48px] rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-moss">
-              <option value="">Keep current active project</option>
-            </select>
+          <div id="setup-pick-restaurant" class="hidden space-y-3">
+            <div>
+              <label for="default-project-select" class="block text-sm font-medium text-ink mb-1.5">Active workspace</label>
+              <select id="default-project-select" class="w-full min-h-[48px] rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-moss">
+                <option value="">Select a restaurant</option>
+              </select>
+            </div>
+            <label class="flex items-start gap-2.5 cursor-pointer rounded-lg border border-slate-200 px-3 py-2.5 has-[:checked]:border-moss has-[:checked]:bg-emerald-50/40">
+              <input type="checkbox" id="setup-add-restaurant" class="mt-0.5 text-moss focus:ring-moss">
+              <span>
+                <span class="font-medium text-ink">Add another location</span>
+                <span class="text-slate block text-xs">Creates a second restaurant workspace and switches to it.</span>
+              </span>
+            </label>
+          </div>
+          <div id="setup-create-restaurant" class="space-y-3">
+            <div>
+              <label for="setup-restaurant-name" class="block text-sm font-medium text-ink mb-1.5">Restaurant name <span class="text-red-600" aria-hidden="true">*</span></label>
+              <input type="text" id="setup-restaurant-name" autocomplete="organization"
+                     class="w-full min-h-[48px] rounded-xl border border-slate-200 px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-moss"
+                     placeholder="e.g. Northside Bistro, Hot Chix — Cambridge">
+            </div>
           </div>
           <label class="flex items-start gap-2.5 cursor-pointer rounded-lg border border-slate-200 px-3 py-2.5 has-[:checked]:border-moss has-[:checked]:bg-emerald-50/40">
             <input type="checkbox" id="setup-seed-jobs" class="mt-0.5 text-moss focus:ring-moss" checked>
             <span>
-              <span class="font-medium text-ink">Seed standard jobs on projects</span>
-              <span class="text-slate block text-xs">Creates role templates so job assignment is ready on mobile and dashboard.</span>
+              <span class="font-medium text-ink">Seed standard jobs on workspaces</span>
+              <span class="text-slate block text-xs">Role templates for mobile shift assignment and dashboard.</span>
             </span>
           </label>
         </div>
@@ -233,7 +250,7 @@
         </button>
       </div>
       <p class="text-center text-sm text-slate">
-        <button type="button" id="setup-skip" class="text-moss-dark font-medium underline hover:text-pine">Skip — use default kitchen dashboard</button>
+        <button type="button" id="setup-skip" class="text-moss-dark font-medium underline hover:text-pine">Skip — pilot kitchen dashboard</button>
       </p>
     </form>
 
@@ -243,216 +260,10 @@
   </div>
 
   <script src="assets/js/user-role-setup.js"></script>
-  <script>
-    (function () {
-      try {
-        var existing = typeof getOperatorProfile === 'function' ? getOperatorProfile() : null;
-        if (existing && existing.scope) {
-          var s = document.querySelector('input[name="scope"][value="' + existing.scope + '"]');
-          if (s) s.checked = true;
-        }
-        if (existing && existing.roleKey) {
-          var r = document.querySelector('input[name="roleKey"][value="' + existing.roleKey + '"]');
-          if (r) r.checked = true;
-        }
-        if (existing && existing.features) {
-          document.querySelectorAll('.feat-cb').forEach(function (cb) {
-            var k = cb.getAttribute('data-fkey');
-            if (!k) return;
-            if (Object.prototype.hasOwnProperty.call(existing.features, k)) {
-              cb.checked = !!existing.features[k];
-            }
-          });
-        }
-      } catch (e) {}
-
-      var form = document.getElementById('setup-form');
-      var errEl = document.getElementById('setup-error');
-      var submitBtn = document.getElementById('setup-submit');
-
-      function labelForRole(key) {
-        var map = {
-          chef_leadership: 'Executive chef / Kitchen lead',
-          operations_gm: 'GM & operations',
-          purchasing: 'Purchasing & costing',
-          consultant_rd: 'Consultant / R&D',
-          employee_line: 'Shift team (kitchen, FOH, support)'
-        };
-        return map[key] || key;
-      }
-
-      function labelForScope(scope) {
-        return scope === 'restaurant_group' ? 'Restaurant group' : 'Single restaurant';
-      }
-
-      function collectFeatures() {
-        var features = {};
-        document.querySelectorAll('.feat-cb').forEach(function (cb) {
-          var k = cb.getAttribute('data-fkey');
-          if (k) features[k] = cb.checked;
-        });
-        return features;
-      }
-
-      function allFeaturesOn() {
-        var features = {};
-        document.querySelectorAll('.feat-cb').forEach(function (cb) {
-          var k = cb.getAttribute('data-fkey');
-          if (k) features[k] = true;
-        });
-        return features;
-      }
-
-      function getSetupProjects() {
-        if (!window.projectManager || !Array.isArray(window.projectManager.projects)) {
-          return [];
-        }
-        return window.projectManager.projects.filter(function (project) {
-          return project && project.id && project.id !== 'master';
-        });
-      }
-
-      function populateDefaultProjectOptions() {
-        var select = document.getElementById('default-project-select');
-        if (!select) return;
-        var projects = getSetupProjects();
-        var currentProjectId = '';
-        try {
-          currentProjectId =
-            localStorage.getItem('iterum_current_project') ||
-            localStorage.getItem('userCurrentProjectKey') ||
-            '';
-        } catch (e) {}
-        projects.forEach(function (project) {
-          var option = document.createElement('option');
-          option.value = project.id;
-          option.textContent = project.name || project.id;
-          if (currentProjectId && currentProjectId === project.id) {
-            option.selected = true;
-          }
-          select.appendChild(option);
-        });
-      }
-
-      function seedProjectJobs(projectId) {
-        if (!projectId) return;
-        var roleOptions = Array.isArray(window.ITERUM_TEAM_MEMBER_ROLE_OPTIONS)
-          ? window.ITERUM_TEAM_MEMBER_ROLE_OPTIONS
-          : [];
-        if (!roleOptions.length) return;
-        var key = 'iterum_project_jobs_' + projectId;
-        var rows = [];
-        try {
-          var raw = localStorage.getItem(key);
-          rows = raw ? JSON.parse(raw) : [];
-          if (!Array.isArray(rows)) rows = [];
-        } catch (e) {
-          rows = [];
-        }
-        var seen = {};
-        rows.forEach(function (row) {
-          if (row && row.roleKey) {
-            seen[row.roleKey] = true;
-          }
-        });
-        roleOptions.forEach(function (opt) {
-          if (!opt || !opt.value || seen[opt.value]) return;
-          rows.push({
-            id: 'job_' + opt.value,
-            roleKey: opt.value,
-            label: opt.label || opt.value,
-            active: true,
-            source: 'setup_seed',
-            createdAt: new Date().toISOString()
-          });
-        });
-        try {
-          localStorage.setItem(key, JSON.stringify(rows));
-        } catch (e) {
-          console.warn('Could not seed jobs for project', projectId, e);
-        }
-      }
-
-      function applyProjectSetupDefaults() {
-        var defaultProject = (document.getElementById('default-project-select') || {}).value || '';
-        var shouldSeedJobs = !!(document.getElementById('setup-seed-jobs') || {}).checked;
-
-        if (defaultProject && window.projectManager && typeof window.projectManager.setCurrentProject === 'function') {
-          try {
-            window.projectManager.setCurrentProject(defaultProject);
-          } catch (e) {
-            console.warn('Could not set default project through projectManager', e);
-          }
-          try {
-            localStorage.setItem('iterum_current_project', defaultProject);
-            localStorage.setItem('userCurrentProjectKey', defaultProject);
-            localStorage.setItem('active_project', defaultProject);
-            localStorage.setItem('active_project_id', defaultProject);
-          } catch (e) {}
-        }
-
-        if (shouldSeedJobs) {
-          var projects = getSetupProjects();
-          if (
-            defaultProject &&
-            projects.every(function (project) {
-              return project.id !== defaultProject;
-            })
-          ) {
-            projects.push({ id: defaultProject, name: defaultProject });
-          }
-          projects.forEach(function (project) {
-            if (project && project.id) {
-              seedProjectJobs(project.id);
-            }
-          });
-        }
-      }
-
-      function saveAndGo(profile) {
-        if (typeof saveOperatorProfile === 'function') {
-          saveOperatorProfile(profile);
-        }
-        applyProjectSetupDefaults();
-        window.location.href =
-          typeof getPostAuthDestination === 'function'
-            ? getPostAuthDestination()
-            : 'dashboard.html';
-      }
-
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        errEl.classList.add('hidden');
-        var scope = (form.querySelector('input[name="scope"]:checked') || {}).value;
-        var roleKey = (form.querySelector('input[name="roleKey"]:checked') || {}).value;
-        if (!scope || !roleKey) {
-          errEl.textContent = 'Please select both options.';
-          errEl.classList.remove('hidden');
-          return;
-        }
-        submitBtn.disabled = true;
-        saveAndGo({
-          scope: scope,
-          roleKey: roleKey,
-          label: labelForRole(roleKey) + ' — ' + labelForScope(scope),
-          features: collectFeatures()
-        });
-      });
-
-      document.getElementById('setup-skip').addEventListener('click', function () {
-        saveAndGo({
-          scope: 'single_restaurant',
-          roleKey: 'chef_leadership',
-          label: 'Default kitchen dashboard (skipped)',
-          features: allFeaturesOn()
-        });
-      });
-
-      populateDefaultProjectOptions();
-    })();
-  </script>
+  <script src="assets/js/workspace-features.js"></script>
+  <script src="assets/js/project-management-system.js"></script>
+  <script src="assets/js/setup-page.js"></script>
   <script src="assets/js/help-chef-widget.js" defer></script>
-  <script src="assets/js/project-management-system.js" defer></script>
   <script src="assets/js/unified-project-selector.js" defer></script>
   <script src="assets/js/unified-nav-header.js" defer></script>
 </body>

@@ -25,7 +25,32 @@
     data_tools: true
   };
 
+  /** Lean pilot preset for new owners — golden path without full module sprawl. */
+  var PILOT_FEATURES = {
+    menus: true,
+    recipes: true,
+    ingredients: true,
+    kitchen: true,
+    inventory: true,
+    vendors: true,
+    compliance: true,
+    projects: true,
+    backup: true,
+    calendar: false,
+    equipment: false,
+    production: false,
+    import_export: false,
+    photo_studio: false,
+    scaling: false,
+    data_tools: false
+  };
+
   global.ITERUM_DEFAULT_FEATURES = DEFAULT_FEATURES;
+  global.ITERUM_PILOT_FEATURES = PILOT_FEATURES;
+
+  global.iterumGetPilotFeaturePreset = function () {
+    return Object.assign({}, PILOT_FEATURES);
+  };
 
   global.iterumGetFeaturePreferences = function () {
     var out = Object.assign({}, DEFAULT_FEATURES);
