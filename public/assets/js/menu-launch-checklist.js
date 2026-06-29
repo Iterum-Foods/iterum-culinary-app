@@ -40,6 +40,22 @@
       auto: false
     },
     {
+      id: 'ingredients_library',
+      phase: 'develop',
+      label: 'Ingredient library started',
+      hint: 'Add products you buy — feeds recipe and menu costing.',
+      href: 'stock-setup.html',
+      auto: true
+    },
+    {
+      id: 'food_inventory',
+      phase: 'develop',
+      label: 'Opening food counts',
+      hint: 'Record on-hand stock for variance and ordering.',
+      href: 'inventory.html',
+      auto: true
+    },
+    {
       id: 'specs_ready',
       phase: 'develop',
       label: 'Specs and ingredients complete',
@@ -266,6 +282,41 @@
     }
   }
 
+  function customIngredientCount() {
+    if (global.iterumIngredientInventory?.countCustomIngredients) {
+      return global.iterumIngredientInventory.countCustomIngredients();
+    }
+    try {
+      var custom = global.localStorage.getItem('custom_ingredients');
+      if (custom) {
+        var list = JSON.parse(custom);
+        if (Array.isArray(list) && list.length) return list.length;
+      }
+      var legacy = global.localStorage.getItem('ingredients_database');
+      if (!legacy) return 0;
+      var all = JSON.parse(legacy);
+      if (!Array.isArray(all)) return 0;
+      return all.filter(function (ing) {
+        return ing && (ing.isCustom || !/^ing_\d+$/.test(ing.id || ''));
+      }).length;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  function foodInventoryCount() {
+    if (global.iterumIngredientInventory?.getFoodInventoryStats) {
+      return global.iterumIngredientInventory.getFoodInventoryStats().count;
+    }
+    try {
+      var raw = global.localStorage.getItem('inventory_items');
+      var list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list.length : 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
   function autoDone(stepId, ctx) {
     switch (stepId) {
       case 'menu_structure':
@@ -276,6 +327,10 @@
           ctx.stats.missingCost === 0 &&
           ctx.stats.drafts === 0
         );
+      case 'ingredients_library':
+        return ctx.customIngredients > 0;
+      case 'food_inventory':
+        return ctx.foodInventoryCount > 0;
       case 'prep_list':
         return ctx.hasPrepList;
       case 'sops_published':
@@ -297,7 +352,9 @@
       menuPublished: !!(menu && menu.isPublished),
       publishedAt: menu?.publishedAt || null,
       hasPrepList: hasPrepList(projectId),
-      sopCount: sopCount(projectId)
+      sopCount: sopCount(projectId),
+      customIngredients: customIngredientCount(),
+      foodInventoryCount: foodInventoryCount()
     };
   }
 
@@ -315,6 +372,14 @@
         } else if (ctx.stats.drafts) {
           detail = ctx.stats.drafts + ' draft' + (ctx.stats.drafts === 1 ? '' : 's');
         }
+      } else if (step.id === 'ingredients_library' && !done) {
+        detail = ctx.customIngredients
+          ? ctx.customIngredients + ' product(s)'
+          : 'Add via Stock setup';
+      } else if (step.id === 'food_inventory' && !done) {
+        detail = ctx.foodInventoryCount
+          ? ctx.foodInventoryCount + ' count(s)'
+          : 'Add opening stock';
       } else if (step.id === 'sops_published') {
         detail = ctx.sopCount
           ? ctx.sopCount + ' guide' + (ctx.sopCount === 1 ? '' : 's')
@@ -529,7 +594,7 @@
     resolveProjectId: resolveProjectId
   };
 
-  ['projectChanged', 'menuPublishedToShift', 'menuWorkflowUpdated', 'menuLaunchChecklistUpdated'].forEach(
+  ['projectChanged', 'menuPublishedToShift', 'menuWorkflowUpdated', 'menuLaunchChecklistUpdated', 'iterumFoodInventoryUpdated'].forEach(
     function (evt) {
       global.addEventListener(evt, function () {
         refresh();

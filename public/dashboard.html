@@ -511,6 +511,24 @@
             </div>
           </div>
 
+          <!-- Day 0: ingredients & stock -->
+          <div class="card-style" id="pantry-starter-card" data-dash-roles="chef_leadership,operations_gm,purchasing,consultant_rd" data-dash-features="ingredients,inventory" hidden>
+            <div class="dash-card-head">
+              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
+                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-carrot"></i></span>
+                Stock your kitchen
+              </h2>
+            </div>
+            <p class="text-sm mb-4 leading-relaxed" style="color: var(--brand-text-muted);">
+              Add what you buy and opening counts before menu costing — about five minutes.
+            </p>
+            <div class="dash-stack">
+              <a href="stock-setup.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-list-check mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Guided setup (ingredients + counts)</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
+              <a href="ingredients.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-book mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Full ingredient library</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
+              <a href="inventory.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-warehouse mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Inventory counts</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
+            </div>
+          </div>
+
           <!-- Menu launch checklist (E1 guided cycle) -->
           <div class="card-style" data-dash-roles="chef_leadership,operations_gm,consultant_rd,location_manager,account_admin" data-dash-features="menus">
             <div id="menu-launch-checklist-dashboard"></div>
@@ -936,6 +954,9 @@
   <script src="assets/js/ops-exception-engine.js"></script>
   <!-- Load existing Dashboard functionality -->
   <script src="assets/js/dashboard-core.js"></script>
+  <script src="assets/js/inventory-manager.js" defer></script>
+  <script src="assets/js/ingredient-inventory-bridge.js" defer></script>
+  <script src="assets/js/pantry-starter-widget.js" defer></script>
   <script src="assets/js/menu-launch-checklist.js" defer></script>
   
   <!-- Firebase Firestore: user-scoped HACCP (users/{userId}/...) — matches firestore.rules -->

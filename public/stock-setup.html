@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock your kitchen | Iterum</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
+  <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
+</head>
+<body class="min-h-screen bg-[#f0f4f2] text-[#1a2e35] antialiased font-[Inter,system-ui,sans-serif] tc-revamp-body">
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem('session_active') !== 'true' || !localStorage.getItem('current_user')) {
+          window.location.replace('signin.html');
+        }
+      } catch (e) {
+        window.location.replace('signin.html');
+      }
+    })();
+  </script>
+
+  <nav class="border-b border-slate-200/80 bg-white/95 backdrop-blur-sm sticky top-0 z-50">
+    <div class="max-w-2xl mx-auto px-4 py-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#6b8e6f]">
+      <a href="dashboard.html" class="font-medium hover:underline">Dashboard</a>
+      <a href="ingredients.html" class="hover:underline">Full ingredient library</a>
+      <a href="inventory.html" class="hover:underline">Inventory</a>
+    </div>
+  </nav>
+
+  <div class="max-w-2xl mx-auto px-4 py-10">
+    <div class="mb-8">
+      <p class="text-[#6b8e6f] font-semibold text-sm mb-1">Day 0 · Purchasing</p>
+      <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight">Stock your kitchen</h1>
+      <p class="text-[#5a6d75] mt-2 leading-relaxed">
+        Add what you buy, then record opening counts. Recipe costing and inventory variance use this data.
+      </p>
+    </div>
+
+    <div class="flex gap-2 mb-8" role="tablist" aria-label="Steps">
+      <button type="button" id="tab-ingredients" class="flex-1 min-h-[44px] rounded-xl border-2 border-[#6b8e6f] bg-emerald-50/60 font-semibold text-sm" aria-selected="true">1. Ingredients</button>
+      <button type="button" id="tab-counts" class="flex-1 min-h-[44px] rounded-xl border border-slate-200 bg-white font-semibold text-sm text-slate-600" aria-selected="false">2. Opening counts</button>
+    </div>
+
+    <section id="panel-ingredients" class="bg-white rounded-2xl border border-slate-200/90 shadow-lg p-6 sm:p-8 space-y-5">
+      <p class="text-sm text-[#5a6d75]">Start from templates or add your own. You can refine costs later on the <a href="vendor-management.html" class="text-[#6b8e6f] underline">vendor</a> page.</p>
+      <div class="flex flex-wrap gap-2" id="starter-chips"></div>
+      <div id="ingredient-rows" class="space-y-3"></div>
+      <button type="button" id="btn-add-row" class="text-sm font-semibold text-[#6b8e6f] hover:underline">+ Add another ingredient</button>
+      <div class="pt-2 flex gap-3">
+        <button type="button" id="btn-save-ingredients" class="flex-1 min-h-[48px] rounded-xl bg-[#6b8e6f] text-white font-semibold hover:bg-[#5b7c5f]">Save ingredients &amp; continue</button>
+      </div>
+    </section>
+
+    <section id="panel-counts" class="hidden bg-white rounded-2xl border border-slate-200/90 shadow-lg p-6 sm:p-8 space-y-5">
+      <p class="text-sm text-[#5a6d75]">Enter what you have on hand now. Par and reorder are optional.</p>
+      <div id="count-rows" class="space-y-3"></div>
+      <p id="counts-empty" class="hidden text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-4">Add at least one ingredient in step 1 first.</p>
+      <div class="pt-2 flex flex-col sm:flex-row gap-3">
+        <button type="button" id="btn-back" class="min-h-[48px] rounded-xl border border-slate-200 px-4 font-semibold">Back</button>
+        <button type="button" id="btn-save-counts" class="flex-1 min-h-[48px] rounded-xl bg-[#6b8e6f] text-white font-semibold hover:bg-[#5b7c5f]">Save counts &amp; open dashboard</button>
+      </div>
+    </section>
+
+    <p id="stock-error" class="hidden mt-4 text-sm text-red-600 font-medium" role="alert"></p>
+  </div>
+
+  <script src="assets/js/ingredients-manager-enhanced.js"></script>
+  <script src="assets/js/inventory-manager.js"></script>
+  <script src="assets/js/ingredient-inventory-bridge.js"></script>
+  <script src="assets/js/stock-setup-page.js"></script>
+  <script src="assets/js/project-management-system.js" defer></script>
+  <script src="assets/js/unified-nav-header.js" defer></script>
+</body>
+</html>

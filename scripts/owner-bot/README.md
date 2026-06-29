@@ -135,6 +135,16 @@ Outputs: `output/feature_matrix_report.html`, `feature_matrix_report.md`, `featu
 | `OWNER_BOT_ALL_FEATURES=false` | Do not force all modules on in operator profile |
 | `OWNER_BOT_FEATURES_ONLY=pilot` | Only `pilotDefault: true` modules |
 
+## Stock flow (ingredients + inventory)
+
+```powershell
+npm run owner-bot:stock
+```
+
+Walks `stock-setup.html` — add ingredients, opening counts, verify on `inventory.html`.
+
+Outputs: `output/stock_flow_report.html`, `stock_*.png`
+
 ## vs Playwright smoke
 
 | Tool | Role |

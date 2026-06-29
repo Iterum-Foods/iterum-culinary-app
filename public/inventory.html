@@ -157,9 +157,23 @@
             <form id="stock-form" onsubmit="saveStock(event)">
                 <div class="inv-form-group">
                     <label class="inv-form-label" for="stock-ingredient">Ingredient</label>
-                    <select id="stock-ingredient" class="inv-field" required>
+                    <select id="stock-ingredient" class="inv-field">
                         <option value="">Select ingredient…</option>
                     </select>
+                </div>
+                <div id="stock-quick-ingredient" class="inv-form-group" style="padding:12px;background:#f0f9f4;border-radius:8px;border:1px solid #6b8e6f33;">
+                    <p class="text-sm" style="margin:0 0 8px;color:#475569;">Or add a new ingredient inline:</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                        <input type="text" id="stock-new-name" class="inv-field" placeholder="Ingredient name">
+                        <select id="stock-new-unit" class="inv-field">
+                            <option value="lb">lb</option>
+                            <option value="oz">oz</option>
+                            <option value="kg">kg</option>
+                            <option value="g">g</option>
+                            <option value="each">each</option>
+                            <option value="case">case</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="inv-form-group">
                     <label class="inv-form-label" for="stock-quantity">Quantity</label>
@@ -278,6 +292,8 @@
     <script src="assets/js/secure-storage-manager.js"></script>
     
     <script src="assets/js/inventory-manager.js"></script>
+    <script src="assets/js/ingredients-manager-enhanced.js"></script>
+    <script src="assets/js/ingredient-inventory-bridge.js"></script>
     <script src="assets/js/supplies-inventory.js"></script>
     <script src="assets/js/supplies-inventory-ui.js"></script>
     <script src="assets/js/auth_guard.js" defer></script>
@@ -372,38 +388,64 @@
         }
 
         function loadIngredientOptions() {
-            const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
+            const ingredients = window.iterumIngredientInventory
+                ? window.iterumIngredientInventory.listIngredients()
+                : JSON.parse(localStorage.getItem('ingredients_database') || '[]');
             const select = document.getElementById('stock-ingredient');
             
-            select.innerHTML = '<option value="">Select ingredient...</option>' +
-                ingredients.map(ing => `<option value="${ing.id}">${ing.name}</option>`).join('');
+            select.innerHTML = '<option value="">Select ingredient…</option>' +
+                ingredients.map(ing => `<option value="${ing.id}" data-unit="${ing.unit || 'lb'}">${ing.name}</option>`).join('');
+
+            select.onchange = function () {
+                const opt = select.options[select.selectedIndex];
+                const unit = opt && opt.getAttribute('data-unit');
+                if (unit) {
+                    const unitSel = document.getElementById('stock-unit');
+                    if (unitSel) unitSel.value = unit;
+                }
+            };
         }
 
         function saveStock(event) {
             event.preventDefault();
             
-            const ingredientId = document.getElementById('stock-ingredient').value;
+            let ingredientId = document.getElementById('stock-ingredient').value;
+            const newName = (document.getElementById('stock-new-name') || {}).value?.trim() || '';
+            const newUnit = (document.getElementById('stock-new-unit') || {}).value || 'lb';
             const quantity = parseFloat(document.getElementById('stock-quantity').value);
-            const unit = document.getElementById('stock-unit').value;
+            let unit = document.getElementById('stock-unit').value;
             const location = document.getElementById('stock-location').value;
             const parLevel = parseFloat(document.getElementById('stock-par-level').value) || 0;
             const reorderPoint = parseFloat(document.getElementById('stock-reorder-point').value) || 0;
 
-            const ingredients = JSON.parse(localStorage.getItem('ingredients_database') || '[]');
-            const ingredient = ingredients.find(ing => ing.id === ingredientId);
-
-            if (!ingredient) {
-                alert('Please select an ingredient');
+            if (!ingredientId && !newName) {
+                alert('Select an ingredient or enter a new name');
                 return;
             }
 
-            window.inventoryManager.upsertInventoryItem(ingredientId, ingredient.name, quantity, unit, location);
-            
-            if (parLevel > 0 || reorderPoint > 0) {
-                window.inventoryManager.setParLevel(ingredientId, parLevel, reorderPoint, location);
+            if (!window.iterumIngredientInventory) {
+                alert('Ingredient system not ready');
+                return;
+            }
+
+            try {
+                window.iterumIngredientInventory.addFoodStock({
+                    ingredientId: ingredientId || undefined,
+                    ingredientName: newName || undefined,
+                    quantity: quantity,
+                    unit: ingredientId ? unit : newUnit,
+                    location: location,
+                    parLevel: parLevel,
+                    reorderPoint: reorderPoint
+                });
+            } catch (err) {
+                alert(err.message || 'Could not save stock');
+                return;
             }
 
             closeModal('stock-modal');
+            document.getElementById('stock-form').reset();
+            loadIngredientOptions();
             loadInventory();
             updateStats();
         }

@@ -53,6 +53,7 @@
       "pilotDefault": true,
       "paths": [
         { "path": "/ingredients.html", "label": "Ingredients" },
+        { "path": "/stock-setup.html", "label": "Stock setup (ingredients + counts)" },
         { "path": "/spec-library.html", "label": "Spec library" },
         { "path": "/ingredient-highlights.html", "label": "Ingredient stories" }
       ]

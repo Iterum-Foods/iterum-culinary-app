@@ -22,6 +22,7 @@
     "owner-bot:onboarding": "node scripts/owner-bot/owner-bot-onboarding.js",
     "owner-bot:features": "node scripts/owner-bot/owner-bot-features.js",
     "owner-bot:features:pilot": "node -e \"process.env.OWNER_BOT_FEATURES_ONLY='pilot';require('./scripts/owner-bot/owner-bot-features.js')\"",
+    "owner-bot:stock": "node scripts/owner-bot/owner-bot-stock.js",
     "owner-bot:all": "node scripts/owner-bot/owner-bot-onboarding.js && node scripts/owner-bot/owner-bot-features.js",
     "test:profiles": "playwright test tests/e2e/project-profiles.spec.js --project=chromium",
     "test:beverage": "playwright test tests/e2e/beverage-menu.spec.js --project=chromium",
