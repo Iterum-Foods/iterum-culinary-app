@@ -1,5 +1,5 @@
 /**
- * Owner Bot — onboarding audit: sign-up → operator setup → new project.
+ * Owner Bot — onboarding audit: sign-up → setup → restaurant → stock setup.
  *
  * Usage:
  *   npm run serve:test          # terminal 1 (or set ITERUM_BASE_URL to prod)
@@ -8,6 +8,7 @@
  * Modes:
  *   Default — sign in with ITERUM_TEST_EMAIL, clear operator profile, run setup flow.
  *   OWNER_BOT_SIGNUP=true — create a fresh Firebase account (uses +timestamp email alias).
+ *   OWNER_BOT_SKIP_STOCK=true — skip stock-setup phase after onboarding.
  */
 const fs = require('fs');
 const path = require('path');
@@ -21,6 +22,11 @@ const {
   waitForProjectManager,
   escapeHtml
 } = require('./owner-bot-lib');
+const {
+  runStockFlow,
+  verifyInventoryPage,
+  auditPantryDashboard
+} = require('./owner-bot-stock-flow');
 
 loadLocalEnv();
 
@@ -34,6 +40,7 @@ const HEADLESS = process.env.OWNER_BOT_HEADLESS === 'true';
 const TEST_EMAIL = process.env.ITERUM_TEST_EMAIL || '';
 const TEST_PASSWORD = process.env.ITERUM_TEST_PASSWORD || '';
 const USE_SIGNUP = process.env.OWNER_BOT_SIGNUP === 'true';
+const SKIP_STOCK = process.env.OWNER_BOT_SKIP_STOCK === 'true';
 const PROJECT_NAME =
   process.env.OWNER_BOT_PROJECT_NAME ||
   `Bot Bistro ${new Date().toISOString().slice(0, 10)}`;
@@ -601,7 +608,37 @@ async function runOnboardingAudit() {
       await createProjectViaModal(page, report, projectName);
     }
 
-    console.log('\n=== Phase 4: Dashboard check ===\n');
+    if (!SKIP_STOCK) {
+      console.log('\n=== Phase 4: Stock setup (ingredients + inventory) ===\n');
+      const stockOpts = {
+        outputDir: OUTPUT_DIR,
+        screenshot: {
+          ingredients: 'onboarding_05_stock_ingredients.png',
+          counts: 'onboarding_06_stock_counts.png',
+          inventory: 'onboarding_07_inventory.png'
+        },
+        stepPrefix: ''
+      };
+      const stockOk = await runStockFlow(page, BASE_URL, report, stockOpts);
+      if (stockOk) {
+        await verifyInventoryPage(page, BASE_URL, report, stockOpts);
+        await auditPantryDashboard(page, report, {
+          baseUrl: BASE_URL,
+          stepPrefix: ''
+        });
+      } else {
+        report.addIssue(
+          'MAJOR',
+          'Stock setup',
+          'Could not complete stock-setup.html after onboarding.'
+        );
+      }
+    } else {
+      console.log('\n=== Phase 4: Stock setup (skipped) ===\n');
+      report.addStep('Stock setup', '✅', 'Skipped — OWNER_BOT_SKIP_STOCK=true');
+    }
+
+    console.log('\n=== Phase 5: Dashboard check ===\n');
     await auditDashboard(page, report);
 
     if (dialogCount >= 2) {

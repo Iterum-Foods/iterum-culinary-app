@@ -108,9 +108,12 @@ npm run serve:test
 npm run owner-bot:onboarding
 ```
 
+Chains **sign-up → setup → restaurant → stock setup → dashboard** by default.
+
 | Env | Purpose |
 |-----|---------|
 | `OWNER_BOT_SIGNUP=true` | Create a new Firebase account (`+timestamp` email alias) instead of clearing profile |
+| `OWNER_BOT_SKIP_STOCK=true` | Skip stock-setup phase (ingredients + inventory) |
 | `OWNER_BOT_PROJECT_NAME` | Restaurant name for the create-project step |
 | `ITERUM_BASE_URL` | Prod: `https://iterum-culinary-app.vercel.app` |
 
@@ -124,7 +127,7 @@ Full map: [`iterum_feature_map.json`](iterum_feature_map.json) — every togglea
 npm run serve:test
 npm run owner-bot:features          # all modules — enables every feature flag first
 npm run owner-bot:features:pilot    # pilot-default modules only (~9 modules)
-npm run owner-bot:all               # onboarding audit + full feature matrix
+npm run owner-bot:all               # onboarding (incl. stock) + full feature matrix
 ```
 
 Outputs: `output/feature_matrix_report.html`, `feature_matrix_report.md`, `feature_*.png`
