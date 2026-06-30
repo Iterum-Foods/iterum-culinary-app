@@ -130,6 +130,11 @@ test.describe('Smoke', () => {
     await expect(page.locator('h1')).toContainText(
       /Master ingredient library/i
     );
+    await expect(page.locator('#ing-cost-summary-root')).toHaveCount(1);
+    const hasHints = await page.evaluate(
+      () => typeof window.iterumIngredientCostHints === 'object'
+    );
+    expect(hasHints).toBe(true);
   });
 
   test('spec library page loads', async ({ page }) => {

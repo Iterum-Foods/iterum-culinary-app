@@ -1,0 +1,69 @@
+/* Ingredient cost hints — golden path slice 2 */
+.ing-cost-hint {
+  font-size: 0.72rem;
+  line-height: 1.45;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+.ing-cost-hint--compact {
+  padding: 4px 6px;
+  font-size: 0.68rem;
+}
+.ing-cost-hint--missing {
+  border-color: #fcd34d;
+  background: #fffbeb;
+}
+.ing-cost-hint--override {
+  border-color: #6ee7b7;
+  background: #ecfdf5;
+}
+.ing-cost-hint--warn {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+.ing-cost-hint--ok {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+.ing-cost-hint__badge {
+  display: inline-block;
+  font-weight: 700;
+  margin-right: 6px;
+  color: #334155;
+}
+.ing-cost-hint__link {
+  color: #5b9bad;
+  font-weight: 600;
+  text-decoration: underline;
+}
+.ing-cost-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #bfdbfe;
+  background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+  font-size: 0.875rem;
+  color: #334155;
+}
+.ing-cost-summary--ok {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+.ing-cost-summary__title {
+  font-weight: 700;
+  color: #1e293b;
+  margin-right: 6px;
+}
+.ing-cost-summary__cta {
+  font-weight: 600;
+  color: #5b9bad;
+  text-decoration: underline;
+  white-space: nowrap;
+}

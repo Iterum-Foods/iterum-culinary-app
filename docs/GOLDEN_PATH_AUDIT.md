@@ -2,8 +2,8 @@
 
 **Purpose:** Map the **exact files** behind the core customer journey and a **phased task list**.  
 For **design or token changes that must hit every web page**, use [WEB_APP_DESIGN_CHANGE_WORKFLOW.md](./WEB_APP_DESIGN_CHANGE_WORKFLOW.md) after this map.  
-**Slice 1 shipped:** setup copy + links; vendor **workspace price override** UI on `vendor-management.html` (writes `users/{uid}/vendor_prices/*` via `firestore-sync.js`).  
-**Last updated:** 12 May 2026
+**Slice 2 shipped:** ingredient library **cost hints** + workspace override badges (`ingredient-cost-hints.js`); deep link `vendor-management.html?ingredient=…#vendor-pricing-workspace` pre-fills override form.  
+**Last updated:** 19 May 2026
 
 ---
 
@@ -36,6 +36,7 @@ For **design or token changes that must hit every web page**, use [WEB_APP_DESIG
 | Ingredient library page                  | `public/ingredients.html`                                                                                                            |
 | Ingredient data / local + cloud patterns | `public/assets/js/*` (search `ingredients_database`, `custom_ingredients` in [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md)) |
 | Costing consumption of vendor prices     | `public/assets/js/cost-calculator.js` (`applyFirestoreVendorPriceOverrides`)                                                         |
+| **Cost hints + override badges (slice 2)** | `public/assets/js/ingredient-cost-hints.js`, `public/assets/css/ingredient-cost-hints.css`                                          |
 
 ### Recipes
 
@@ -56,10 +57,10 @@ For **design or token changes that must hit every web page**, use [WEB_APP_DESIG
 - [x] Setup: “First 10 minutes” golden path + links to vendors → ingredients → recipes.
 - [x] Vendors: **Workspace price overrides** panel (add / list / delete; workspace vs account default).
 
-### Next — Slice 2 (ingredients)
+### Done — Slice 2 (ingredients)
 
-- [ ] Ingredient page: surface **missing cost** / **override hint** when a `vendor_prices` row exists for the active workspace.
-- [ ] Optional: quick link from ingredient row → vendor hub with ingredient name pre-filled in override form (query param).
+- [x] Ingredient page: surface **missing cost** / **override hint** when a `vendor_prices` row exists for the active workspace.
+- [x] Quick link from ingredient row → vendor hub with ingredient name pre-filled in override form (`?ingredient=` query param).
 
 ### Next — Slice 3 (recipes)
 

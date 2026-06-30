@@ -17,6 +17,42 @@
       .replace(/'/g, '&#039;');
   }
 
+  function ingredientFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return (
+      params.get('ingredient') ||
+      params.get('vp-ing') ||
+      ''
+    ).trim();
+  }
+
+  function applyIngredientUrlPrefill(mount) {
+    const name = ingredientFromUrl();
+    if (!name || !mount) {
+      return;
+    }
+    const ing = mount.querySelector('#vp-ing');
+    if (!ing) {
+      return;
+    }
+    if (!ing.value.trim()) {
+      ing.value = name;
+    }
+    const section = document.getElementById('vendor-pricing-workspace');
+    if (section && typeof section.scrollIntoView === 'function') {
+      try {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (e) {
+        section.scrollIntoView(true);
+      }
+    }
+    try {
+      ing.focus({ preventScroll: true });
+    } catch (e2) {
+      ing.focus();
+    }
+  }
+
   function getFs() {
     return window.firestoreSync;
   }
@@ -420,6 +456,8 @@
         }
       });
     });
+
+    applyIngredientUrlPrefill(mount);
   }
 
   async function loadAndRedraw(mount) {

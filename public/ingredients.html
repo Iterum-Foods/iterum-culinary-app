@@ -18,6 +18,7 @@
     <!-- Canonical stack + legacy polish helpers -->
     <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
     <link rel="stylesheet" href="assets/css/ui-polish.css">
+    <link rel="stylesheet" href="assets/css/ingredient-cost-hints.css">
     <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
     
     
@@ -57,6 +58,8 @@
               <span><strong>Costing:</strong> plate math uses <strong>project price overrides</strong> when you set them per ingredient on a vendor.</span>
               <a href="vendor-management.html#vendor-pricing-workspace">Open vendor price overrides</a>
             </div>
+
+            <div id="ing-cost-summary-root" aria-live="polite"></div>
 
             <!-- Quick Actions -->
             <div style="display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap;">
@@ -341,6 +344,10 @@
             
             // Load ingredients FIRST
             await loadIngredientsDatabase();
+
+            if (window.iterumIngredientCostHints) {
+                await window.iterumIngredientCostHints.refreshOverrides();
+            }
             
             // THEN initialize view mode (which will display the loaded ingredients)
             switchView(currentView);
@@ -580,6 +587,7 @@
             displayIngredients(ingredients);
             updateStats(ingredients);
         }
+        window.loadIngredients = loadIngredients;
         
         function updateStats(ingredients) {
             // Update stats at top of page
@@ -628,6 +636,26 @@
             displayIngredients(ingredients);
         }
 
+        function costCellHtml(item) {
+            if (window.iterumIngredientCostHints) {
+                return window.iterumIngredientCostHints.renderCostCellHtml(item);
+            }
+            const cost = Number(item?.cost) || 0;
+            if (cost > 0) {
+                return '<div style="display:flex;flex-direction:column;gap:4px;"><span style="color:#6B8E6F;font-weight:700;font-size:1rem;">$' +
+                    cost.toFixed(4) + '</span><span style="color:#8A9299;font-size:0.7rem;">per ' +
+                    (item.unit || 'unit') + '</span></div>';
+            }
+            return '<span style="color:#94a3b8;">—</span>';
+        }
+
+        function costHintHtml(ingredient) {
+            if (window.iterumIngredientCostHints) {
+                return window.iterumIngredientCostHints.renderCostHintHtml(ingredient);
+            }
+            return '';
+        }
+
         function displayIngredients(ingredients) {
             // Ensure ingredients is an array
             if (!ingredients || !Array.isArray(ingredients)) {
@@ -636,6 +664,10 @@
             }
             
             console.log(`📊 Displaying ${ingredients.length} ingredients in ${currentView} view`);
+
+            if (window.iterumIngredientCostHints) {
+                window.iterumIngredientCostHints.updateSummaryBanner(ingredients);
+            }
             
             // Show in table view by default, grid view as option
             if (currentView === 'table') {
@@ -825,12 +857,7 @@
                                 ${item.unit || 'g'}
                             </td>
                             <td style="padding: 14px 16px; color: #3E4C54; font-weight: 600;">
-                                ${item.cost > 0 ? `
-                                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                                        <span style="color: #6B8E6F; font-weight: 700; font-size: 1rem;">$${item.cost.toFixed(4)}</span>
-                                        <span style="color: #8A9299; font-size: 0.7rem;">per ${item.unit || 'unit'}</span>
-                                    </div>
-                                ` : '-'}
+                                ${costCellHtml(item)}
                                 ${item.casePricing ? `
                                     <div style="margin-top: 6px; padding: 6px 8px; background: #F5F7F9; border-radius: 6px; border-left: 3px solid #5B9BAD;">
                                         <div style="color: #3E4C54; font-size: 0.7rem; font-weight: 600; margin-bottom: 2px;">📦 Case Pricing:</div>
@@ -911,6 +938,10 @@
                     ${ingredient.productSpecNotes ? `<div style="font-size:0.68rem; color:#475569; margin-top:2px;">${ingredient.productSpecNotes}</div>` : ''}
                 </div>`
                 : '';
+            const costHintBlock = (function () {
+                const hint = costHintHtml(ingredient);
+                return hint ? `<div style="margin-bottom: 12px;">${hint}</div>` : '';
+            })();
 
             card.innerHTML = `
                 <div class="card-header-gradient">
@@ -2515,6 +2546,7 @@
     <script type="module" src="assets/js/firebase-auth.js"></script>
     <script type="module" src="assets/js/firebase-auth-ui.js"></script>
     <script type="module" src="assets/js/firestore-sync.js"></script>
+    <script src="assets/js/ingredient-cost-hints.js"></script>
     
     <!-- Load User Display -->
     <script src="assets/js/header-user-display.js"></script>
