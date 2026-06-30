@@ -48,7 +48,26 @@ test.describe('Smoke', () => {
         await expect(page.getByRole('heading', { level: 1, name: /Archive/i })).toBeVisible();
         await expect(page.locator('#archive-projects-tbody')).toHaveCount(1);
       }
+      if (path === '/menu-builder.html') {
+        await expect(page.locator('#menu-price-sources-root')).toHaveCount(1);
+        const hasPriceSources = await page.evaluate(
+          () => typeof window.iterumRecipePriceSources === 'object'
+        );
+        expect(hasPriceSources).toBe(true);
+      }
     });
+  });
+
+  test('recipe developer loads price sources module', async ({ page }) => {
+    const res = await page.goto('/recipe-developer.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(page.locator('#tc-rd-price-sources')).toHaveCount(1);
+    const hasPriceSources = await page.evaluate(
+      () =>
+        typeof window.iterumRecipePriceSources === 'object' &&
+        typeof window.costCalculator === 'object'
+    );
+    expect(hasPriceSources).toBe(true);
   });
 
   test('project hub team tab deep link', async ({ page }) => {

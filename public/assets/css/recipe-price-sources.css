@@ -1,0 +1,119 @@
+/* Recipe / menu price sources — golden path slice 3 */
+.rp-price-sources {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.35);
+  color: #cbd5e1;
+  font-size: 0.8rem;
+}
+.rp-price-sources--compact {
+  margin-top: 12px;
+  background: rgba(248, 250, 252, 0.06);
+}
+.rp-price-sources__summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rp-price-sources__summary::-webkit-details-marker {
+  display: none;
+}
+.rp-price-sources__title {
+  font-weight: 700;
+  color: #e2e8f0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.rp-price-sources__hint {
+  color: #94a3b8;
+  font-size: 0.72rem;
+}
+.rp-price-sources__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.rp-src-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #475569;
+  background: rgba(30, 41, 59, 0.6);
+  font-size: 0.7rem;
+}
+.rp-src-chip--firestore_vendor_price {
+  border-color: #6ee7b7;
+  background: rgba(6, 78, 59, 0.35);
+  color: #a7f3d0;
+}
+.rp-src-chip--missing {
+  border-color: #fca5a5;
+  background: rgba(127, 29, 29, 0.35);
+  color: #fecaca;
+}
+.rp-price-sources__note {
+  margin: 10px 0 6px;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+.rp-price-sources__warn {
+  margin: 8px 0;
+  color: #fca5a5;
+  font-size: 0.72rem;
+}
+.rp-src-list {
+  margin: 0 0 8px;
+  padding-left: 18px;
+  color: #e2e8f0;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+.rp-src-was {
+  color: #94a3b8;
+}
+.rp-price-sources__link {
+  display: inline-block;
+  margin-top: 6px;
+  color: #6ee7b7;
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-decoration: underline;
+}
+.rp-src-empty,
+.rp-src-compact-line {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+.tc-revamp-body .tc-rd-cost-card .rp-price-sources--compact {
+  margin-top: 14px;
+  border-color: #d1d5db;
+  background: #f8fafc;
+  color: #334155;
+}
+.tc-revamp-body .tc-rd-cost-card .rp-price-sources__title {
+  color: #1e293b;
+}
+.tc-revamp-body .tc-rd-cost-card .rp-src-chip {
+  background: #fff;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+.tc-revamp-body .tc-rd-cost-card .rp-src-chip--firestore_vendor_price {
+  border-color: #6ee7b7;
+  background: #ecfdf5;
+  color: #047857;
+}
+#menu-price-sources-root {
+  margin-top: 16px;
+}

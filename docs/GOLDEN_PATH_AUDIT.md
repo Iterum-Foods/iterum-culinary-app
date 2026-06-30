@@ -2,7 +2,7 @@
 
 **Purpose:** Map the **exact files** behind the core customer journey and a **phased task list**.  
 For **design or token changes that must hit every web page**, use [WEB_APP_DESIGN_CHANGE_WORKFLOW.md](./WEB_APP_DESIGN_CHANGE_WORKFLOW.md) after this map.  
-**Slice 2 shipped:** ingredient library **cost hints** + workspace override badges (`ingredient-cost-hints.js`); deep link `vendor-management.html?ingredient=…#vendor-pricing-workspace` pre-fills override form.  
+**Slice 3 shipped:** recipe + menu **Price sources** panel (`recipe-price-sources.js`); live costing wired in Recipe Developer; override regression script for pilots.  
 **Last updated:** 19 May 2026
 
 ---
@@ -46,6 +46,7 @@ For **design or token changes that must hit every web page**, use [WEB_APP_DESIG
 | Recipe developer / editor | `public/recipe-developer.html`, `public/recipe-canvas.html`                                                  |
 | Menu + costing            | `public/menu-builder.html`, `public/assets/js/menuManager.js`, `public/assets/js/menu-recipe-integration.js` |
 | Shared costing            | `public/assets/js/cost-calculator.js`                                                                        |
+| **Price sources UI (slice 3)** | `public/assets/js/recipe-price-sources.js`, `public/assets/css/recipe-price-sources.css`              |
 
 ---
 
@@ -62,10 +63,10 @@ For **design or token changes that must hit every web page**, use [WEB_APP_DESIG
 - [x] Ingredient page: surface **missing cost** / **override hint** when a `vendor_prices` row exists for the active workspace.
 - [x] Quick link from ingredient row → vendor hub with ingredient name pre-filled in override form (`?ingredient=` query param).
 
-### Next — Slice 3 (recipes)
+### Done — Slice 3 (recipes)
 
-- [ ] Recipe / menu costing UI: short “**Price sources**” tooltip (local vs Firestore override).
-- [ ] Regression test: change override → reopen recipe cost reflects change (manual script for pilots).
+- [x] Recipe / menu costing UI: short “**Price sources**” tooltip (local vs Firestore override).
+- [x] Regression test: change override → reopen recipe cost reflects change ([PILOT_OVERRIDE_COST_REGRESSION.md](./PILOT_OVERRIDE_COST_REGRESSION.md)).
 
 ### Next — Slice 4 (setup hardening)
 

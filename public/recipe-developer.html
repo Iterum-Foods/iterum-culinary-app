@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="assets/css/recipe-developer-enhanced.css">
     <link rel="stylesheet" href="assets/css/recipe-developer-contrast-fix.css">
     <link rel="stylesheet" href="assets/css/recipe-developer-revamp-layout.css">
+    <link rel="stylesheet" href="assets/css/recipe-price-sources.css">
     <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
     
     <!-- Enhanced User Management now handled by Firebase Auth -->
@@ -750,6 +751,7 @@
                         <div class="tc-rd-cost-row"><dt>Cost / portion</dt><dd id="tc-rd-cost-portion">$0.00</dd></div>
                         <div class="tc-rd-cost-row tc-rd-cost-row--accent"><dt>Suggested price (28% FC)</dt><dd id="tc-rd-suggested-price">$0.00</dd></div>
                     </dl>
+                    <div id="tc-rd-price-sources" class="tc-rd-price-sources" aria-live="polite"></div>
                 </div>
                 </aside>
 
@@ -3996,6 +3998,10 @@
     
     <!-- Vendor Price Comparator -->
     <script src="assets/js/vendor-price-comparator.js"></script>
+
+    <!-- Cost calculator + price source labels (golden path slice 3) -->
+    <script src="assets/js/cost-calculator.js"></script>
+    <script src="assets/js/recipe-price-sources.js"></script>
     
     <!-- Integrated Ingredient Selector -->
     <script src="assets/js/ingredient-selector-integrated.js"></script>

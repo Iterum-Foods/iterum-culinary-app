@@ -22,6 +22,9 @@ class CostCalculator {
       window.addEventListener('projectChanged', () => {
         this.loadIngredientPrices();
       });
+      window.addEventListener('firestoreSyncReady', () => {
+        this.loadIngredientPrices();
+      });
     }
     this.loadIngredientPrices();
   }
@@ -80,6 +83,19 @@ class CostCalculator {
 
         // Update or set price
         if (price > 0) {
+          let source = 'ingredient_library';
+          if (
+            ingredient.bestPrice ||
+            (ingredient.vendorPrices && ingredient.vendorPrices.length > 0)
+          ) {
+            source = 'vendor_catalog';
+          } else if (
+            ingredient.casePricing &&
+            ingredient.casePricing.pricePerCase > 0 &&
+            !(ingredient.cost > 0)
+          ) {
+            source = 'case_pricing';
+          }
           this.ingredientPrices[key] = {
             name: ingredient.name,
             price: price,
@@ -87,7 +103,8 @@ class CostCalculator {
             vendor: vendor,
             ingredientId: ingredient.id,
             caseSize: ingredient.casePricing?.caseSize,
-            casePricing: ingredient.casePricing
+            casePricing: ingredient.casePricing,
+            source: source
           };
         }
       });
@@ -110,7 +127,8 @@ class CostCalculator {
                   price: parseFloat(item.price),
                   unit: item.unit || 'lb',
                   vendor: vendor.name,
-                  caseSize: item.caseSize
+                  caseSize: item.caseSize,
+                  source: 'vendor_price_list'
                 };
               }
             }
@@ -152,13 +170,17 @@ class CostCalculator {
       if (!(cost > 0)) {
         return;
       }
+      const prev = this.ingredientPrices[key] || null;
       this.ingredientPrices[key] = {
         name: row.ingredientName || key,
         price: cost,
         unit: row.unit || 'lb',
         vendor: row.vendorName || 'Workspace price',
         ingredientId: row.ingredientId || null,
-        source: 'firestore_vendor_price'
+        source: 'firestore_vendor_price',
+        previousSource: prev?.source || null,
+        previousPrice: prev?.price > 0 ? prev.price : null,
+        previousUnit: prev?.unit || null
       };
     });
   }
@@ -308,7 +330,8 @@ class CostCalculator {
             vendor:
               ingredient.bestPrice.vendor || ingredient.supplier || 'Unknown',
             ingredientId: ingredient.id,
-            casePricing: ingredient.casePricing || null
+            casePricing: ingredient.casePricing || null,
+            source: 'vendor_catalog'
           };
         } else if (ingredient.cost && ingredient.cost > 0) {
           // Phase 1: Use calculated cost per base unit
@@ -318,7 +341,8 @@ class CostCalculator {
             unit: ingredient.unit, // Base unit
             vendor: ingredient.supplier || 'Unknown',
             ingredientId: ingredient.id,
-            casePricing: ingredient.casePricing || null
+            casePricing: ingredient.casePricing || null,
+            source: 'ingredient_library'
           };
         } else if (
           ingredient.casePricing &&
@@ -356,7 +380,8 @@ class CostCalculator {
             unit: ingredient.unit,
             vendor: ingredient.supplier || 'Unknown',
             ingredientId: ingredient.id,
-            casePricing: casePricing
+            casePricing: casePricing,
+            source: 'case_pricing'
           };
         }
       }
@@ -400,8 +425,84 @@ class CostCalculator {
       pricePerUnit: priceData.price,
       priceUnit: priceData.unit,
       vendor: priceData.vendor,
-      casePricing: priceData.casePricing || null
+      casePricing: priceData.casePricing || null,
+      priceSource: priceData.source || 'unknown',
+      previousSource: priceData.previousSource || null,
+      previousPrice: priceData.previousPrice || null,
+      previousUnit: priceData.previousUnit || null
     };
+  }
+
+  /**
+   * Human label for a price source key (used in costing UI).
+   */
+  getPriceSourceLabel(sourceKey) {
+    if (
+      window.iterumRecipePriceSources &&
+      typeof window.iterumRecipePriceSources.getSourceLabel === 'function'
+    ) {
+      return window.iterumRecipePriceSources.getSourceLabel(sourceKey);
+    }
+    const labels = {
+      firestore_vendor_price: 'Workspace override',
+      ingredient_library: 'Ingredient library',
+      vendor_catalog: 'Vendor catalog',
+      vendor_price_list: 'Vendor price list',
+      case_pricing: 'Case pricing',
+      missing: 'Missing price',
+      unknown: 'Unknown'
+    };
+    return labels[sourceKey] || sourceKey || 'Unknown';
+  }
+
+  formatIngredientSourceCell(ing) {
+    if (!ing.priceFound) {
+      return '<span style="color:#ef4444;font-size:11px;">Missing</span>';
+    }
+    const src = ing.priceSource || 'unknown';
+    const label = this.getPriceSourceLabel(src);
+    const isOverride = src === 'firestore_vendor_price';
+    const color = isOverride ? '#6ee7b7' : '#94a3b8';
+    let tip = label;
+    if (ing.vendor) {
+      tip += ' · ' + ing.vendor;
+    }
+    if (isOverride && ing.previousPrice > 0) {
+      tip +=
+        ' (replaces ' +
+        this.getPriceSourceLabel(ing.previousSource || 'ingredient_library') +
+        ' $' +
+        Number(ing.previousPrice).toFixed(4) +
+        '/' +
+        (ing.previousUnit || ing.priceUnit || 'unit') +
+        ')';
+    }
+    let html =
+      '<span style="color:' +
+      color +
+      ';font-size:11px;font-weight:600;" title="' +
+      tip.replace(/"/g, '&quot;') +
+      '">' +
+      label +
+      '</span>';
+    if (isOverride && ing.previousPrice > 0) {
+      html +=
+        '<div style="color:#64748b;font-size:10px;margin-top:2px;">was $' +
+        Number(ing.previousPrice).toFixed(4) +
+        '</div>';
+    }
+    return html;
+  }
+
+  createPriceSourcesSummaryHTML(costData) {
+    if (
+      window.iterumRecipePriceSources &&
+      typeof window.iterumRecipePriceSources.renderPriceSourcesPanel ===
+        'function'
+    ) {
+      return window.iterumRecipePriceSources.renderPriceSourcesPanel(costData);
+    }
+    return '';
   }
 
   /**
@@ -737,6 +838,8 @@ class CostCalculator {
                     </div>
                 </div>
 
+                ${this.createPriceSourcesSummaryHTML(costData)}
+
                 <!-- Pricing Recommendations -->
                 <div>
                     <h4 style="color: #e2e8f0; margin: 0 0 12px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">💡 Recommended Pricing</h4>
@@ -801,6 +904,9 @@ class CostCalculator {
                 <td style="padding: 12px; color: #94a3b8; font-size: 11px; text-align: right;">
                     ${ing.priceFound ? `$${ing.pricePerUnit.toFixed(2)}/${ing.priceUnit}` : 'No price'}
                 </td>
+                <td style="padding: 12px; text-align: right;">
+                    ${this.formatIngredientSourceCell(ing)}
+                </td>
             </tr>
         `
       )
@@ -815,6 +921,7 @@ class CostCalculator {
                             <th style="padding: 12px; color: #e2e8f0; text-align: center; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Quantity</th>
                             <th style="padding: 12px; color: #e2e8f0; text-align: right; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Cost</th>
                             <th style="padding: 12px; color: #e2e8f0; text-align: right; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Unit Price</th>
+                            <th style="padding: 12px; color: #e2e8f0; text-align: right; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Source</th>
                         </tr>
                     </thead>
                     <tbody>
