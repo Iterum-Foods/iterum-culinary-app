@@ -176,6 +176,21 @@ test.describe('Smoke', () => {
     await expect(page.locator('body')).toContainText(/Firebase/i);
   });
 
+  test('stock setup page loads', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('session_active', 'true');
+      localStorage.setItem(
+        'current_user',
+        JSON.stringify({ name: 'Smoke Test', email: 'smoke@test.local' })
+      );
+    });
+    const res = await page.goto('/stock-setup.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(page.getByRole('heading', { name: /stock your kitchen/i })).toBeVisible();
+    await expect(page.locator('#panel-ingredients')).toBeVisible();
+    await expect(page.locator('#ingredient-rows')).toHaveCount(1);
+  });
+
   test('workspace setup page loads', async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem('session_active', 'true');
@@ -190,5 +205,6 @@ test.describe('Smoke', () => {
       page.getByRole('heading', { name: /set up your operator profile/i })
     ).toBeVisible();
     await expect(page.getByText(/first 10 minutes/i)).toBeVisible();
+    await expect(page.locator('#setup-restaurant-name')).toHaveCount(1);
   });
 });

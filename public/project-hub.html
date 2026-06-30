@@ -15,6 +15,7 @@
     <script src="assets/js/sop-pack-seed.js"></script>
     <script src="assets/js/sop-pack-store.js"></script>
     <script src="assets/js/demo-seed-data.js"></script>
+    <script src="assets/js/toast-notifications.js"></script>
     <script src="assets/js/user-data-manager.js" defer></script>
     <script src="assets/js/rbp-provision.js" defer></script>
     <script src="assets/js/rbp-develop-seed.js" defer></script>
@@ -555,6 +556,14 @@
             return d.innerHTML;
         }
 
+        function hubNotify(message, type) {
+            if (typeof window.showToast === 'function') {
+                window.showToast(message, type || 'success');
+            } else {
+                alert(message);
+            }
+        }
+
         const restaurantWorkspaceDefaults = {
             description: 'Restaurant workspace — menus, compliance, and shift operations',
             icon: '🍽️',
@@ -567,13 +576,14 @@
         };
 
         function createRestaurantWorkspace() {
-            const defaultName = 'My restaurant';
-            const projectName = prompt(
-                'New restaurant workspace\n\nEnter a name for this location:',
-                defaultName
-            );
-            if (!projectName) return;
-            createRestaurantProject(projectName.trim());
+            showCreateProjectModal();
+            setTimeout(function () {
+                var nameInput = document.getElementById('new-project-name');
+                if (nameInput && !nameInput.value.trim()) {
+                    nameInput.value = 'My restaurant';
+                    nameInput.select();
+                }
+            }, 80);
         }
 
         function createRestaurantProject(projectName) {
@@ -607,7 +617,7 @@
             });
 
             loadProjects();
-            alert(`✅ Restaurant "${projectName}" created!\n\nOpening workspace...`);
+            hubNotify('Restaurant "' + projectName + '" created — opening workspace…', 'success');
             openProject(project.id);
         }
 
@@ -769,10 +779,15 @@
             // Close modal
             document.querySelector('.modal-overlay').remove();
 
-            // Show success
-            alert(`✅ Project "${name}" created successfully!\n\n${ownerOnly ? '🔒 This is a private project (only you can see it)' : '👥 This project can be shared with your team'}\n\nOpening project...`);
+            hubNotify(
+                'Project "' +
+                    name +
+                    '" created' +
+                    (ownerOnly ? ' (private)' : '') +
+                    ' — opening workspace…',
+                'success'
+            );
 
-            // Open the new project
             openProject(project.id);
         }
 
@@ -934,16 +949,18 @@
                         
                         if (savedProjectId === projectId) {
                             console.log('✅ Project ID saved correctly, redirecting...');
-                            alert('✅ Project activated!\n\nRedirecting to dashboard...');
-                            window.location.href = 'index.html';
+                            hubNotify('Workspace activated — opening dashboard…', 'success');
+                            setTimeout(function () {
+                                window.location.href = 'dashboard.html';
+                            }, 400);
                         } else {
                             console.error('❌ Project ID mismatch! Saved:', savedProjectId, 'Expected:', projectId);
-                            alert('⚠️ Error saving project selection. Please try again.');
+                            hubNotify('Error saving workspace selection. Please try again.', 'error');
                         }
                     }, 200);
                 } else {
                     console.error('❌ Failed to set project as current');
-                    alert('⚠️ Error activating project. Please try again.');
+                    hubNotify('Error activating workspace. Please try again.', 'error');
                 }
             }
         }
