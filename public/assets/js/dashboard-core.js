@@ -760,10 +760,15 @@
         .forEach(task => {
           const item = document.createElement('li');
           item.className = 'task-item';
+          const safeText = this.escapeHtml(task.text);
+          const checkboxId = `task-cb-${task.id}`;
           item.innerHTML = `
-            <input type="checkbox" data-task-id="${task.id}" ${task.done ? 'checked' : ''}>
-            <span class="task-text flex-1 ${task.done ? 'done' : ''}" style="color: var(--brand-text-primary);">${this.escapeHtml(task.text)}</span>
-            <button data-task-id="${task.id}" data-action="delete" class="text-xs px-2 py-1 rounded" style="color: var(--brand-text-muted);">Delete</button>
+            <label class="task-item__check" for="${checkboxId}">
+              <input type="checkbox" id="${checkboxId}" data-task-id="${task.id}" aria-label="Mark complete: ${safeText}" ${task.done ? 'checked' : ''}>
+              <span class="sr-only">Mark complete</span>
+            </label>
+            <span class="task-text flex-1 ${task.done ? 'done' : ''}" style="color: var(--brand-text-primary);">${safeText}</span>
+            <button type="button" data-task-id="${task.id}" data-action="delete" class="dash-control-btn text-xs rounded" aria-label="Delete task: ${safeText}" style="color: var(--brand-text-muted);">Delete</button>
           `;
           this.taskList.appendChild(item);
         });
@@ -853,10 +858,10 @@
           <h3 class="font-semibold" style="color: var(--brand-text-primary);">${this.escapeHtml(idea.title)}</h3>
           ${idea.notes ? `<p class="text-sm" style="color: var(--brand-text-secondary);">${this.escapeHtml(idea.notes)}</p>` : ''}
           <div class="flex gap-2 mt-2">
-            <button data-idea-id="${idea.id}" data-action="toggle" class="text-xs px-3 py-1 rounded" style="background-color: var(--brand-bg-tertiary); color: var(--brand-text-primary);">
+            <button type="button" data-idea-id="${idea.id}" data-action="toggle" class="dash-control-btn text-xs rounded" aria-label="${idea.status === 'done' ? 'Mark active' : 'Mark ready'}: ${this.escapeHtml(idea.title)}" style="background-color: var(--brand-bg-tertiary); color: var(--brand-text-primary);">
               ${idea.status === 'done' ? 'Mark active' : 'Mark ready'}
             </button>
-            <button data-idea-id="${idea.id}" data-action="delete" class="text-xs px-3 py-1 rounded" style="background-color: transparent; color: var(--brand-text-muted); border: 1px solid var(--brand-border-light);">Delete</button>
+            <button type="button" data-idea-id="${idea.id}" data-action="delete" class="dash-control-btn text-xs rounded" aria-label="Delete idea: ${this.escapeHtml(idea.title)}" style="background-color: transparent; color: var(--brand-text-muted); border: 1px solid var(--brand-border-light);">Delete</button>
           </div>
         `;
         this.ideaList.appendChild(card);

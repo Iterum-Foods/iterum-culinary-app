@@ -496,6 +496,12 @@ class UnifiedNavHeader {
       this.navPageActive(slug) +
       '"' +
       feat +
+      ' aria-label="' +
+      label +
+      '"' +
+      ' data-nav-label="' +
+      label +
+      '"' +
       ' title="' +
       label +
       '">' +

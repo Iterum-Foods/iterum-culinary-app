@@ -14,7 +14,10 @@
   top: 0 !important;
   height: 100vh !important;
   z-index: 1000 !important;
-  overflow-y: auto !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box;
 }
 
 /* Legacy top header only — not the left AppSidebar */

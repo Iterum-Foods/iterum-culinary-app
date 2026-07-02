@@ -119,6 +119,24 @@ Chains **sign-up → setup → restaurant → stock setup → dashboard** by def
 
 Outputs: `output/onboarding_audit.html`, `onboarding_audit.md`, `onboarding_*.png`
 
+## Entry funnel UI audit (landing → sign-in → dashboard)
+
+Automated **UI polish** pass: layout overflow, broken assets, console errors, auth routing, dashboard widgets, mobile nav.
+
+```powershell
+npm run owner-bot:entry
+# Prod:
+$env:ITERUM_BASE_URL="https://iterum-culinary-app.vercel.app"
+npm run owner-bot:entry
+```
+
+| Env | Purpose |
+|-----|---------|
+| `OWNER_BOT_ENTRY_FRESH=true` | Clear operator profile before sign-in (first-run routing) |
+| `OWNER_BOT_ENTRY_MOBILE=false` | Skip mobile viewport checks |
+
+Outputs: `output/entry_funnel_audit.html`, `entry_funnel_audit.md`, `entry_*.png`
+
 ## Feature matrix (all modules & pages)
 
 Full map: [`iterum_feature_map.json`](iterum_feature_map.json) — every toggleable module, pillar, pilot default, and page path.

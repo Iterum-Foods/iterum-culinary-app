@@ -104,7 +104,9 @@
       '.iterum-mqn a[aria-current="page"]{background:linear-gradient(145deg,#3b8a5a,#2f7a4a);color:#fff;border-color:#2f7a4a;box-shadow:0 2px 10px rgba(47,122,74,0.28);}' +
       '.iterum-mqn .mqn-icon{font-size:0.85rem;line-height:1;}' +
       '.iterum-mqn .mqn-back{font-weight:700;}' +
-      'body[data-iterum-mqn="on"]{padding-top:48px;}' +
+      'body[data-iterum-mqn="on"]:not(.iterum-has-sidebar){padding-top:48px;}' +
+      'body.iterum-has-sidebar .iterum-mqn{top:var(--iterum-mobile-nav-height,3.25rem);z-index:1040;}' +
+      'body.iterum-has-sidebar[data-iterum-mqn="on"]{padding-top:calc(var(--iterum-mobile-nav-height,3.25rem) + 48px);}' +
       '@media (max-width:720px){.iterum-mqn{display:flex;}}';
     document.head.appendChild(s);
   }

@@ -83,9 +83,9 @@
     .main-content-area {
       background-color: var(--brand-bg-secondary);
       background-image: none;
-      padding-top: 1.25rem;
+      padding-top: 0;
       padding-right: 0;
-      padding-bottom: 3rem;
+      padding-bottom: 0;
       padding-left: 0;
       overflow-y: auto;
       height: 100vh;
@@ -345,6 +345,39 @@
       flex-wrap: wrap;
     }
 
+    .dash-control-btn {
+      min-height: 44px;
+      min-width: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      padding: 0.5rem 0.75rem;
+      box-sizing: border-box;
+    }
+
+    .task-item__check {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      min-width: 44px;
+      min-height: 44px;
+      margin: -0.35rem 0;
+      cursor: pointer;
+    }
+
+    .task-item__check input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin: 0;
+    }
+
+    .main-content-area .card-style a.dash-control-btn,
+    .main-content-area .card-style button.dash-control-btn {
+      line-height: 1.25;
+    }
+
   </style>
   <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
   <link rel="stylesheet" href="assets/css/menu-launch-checklist.css">
@@ -479,9 +512,11 @@
             </p>
             
             <!-- Idea Form -->
-            <form id="idea-form">
-              <input type="text" id="idea-title" placeholder="Idea title" class="w-full text-sm">
-              <textarea id="idea-notes" class="w-full h-28 resize-none text-sm" placeholder="Concept: Deconstructed Beet Wellington. Components: Smoked beet puree, puff pastry shard, foie gras mousse, reduced port wine jus. Theme: Late Autumn Menu."></textarea>
+            <form id="idea-form" aria-label="Capture culinary idea">
+              <label class="sr-only" for="idea-title">Idea title</label>
+              <input type="text" id="idea-title" placeholder="Idea title" class="w-full text-sm" aria-label="Idea title">
+              <label class="sr-only" for="idea-notes">Idea notes</label>
+              <textarea id="idea-notes" class="w-full h-28 resize-none text-sm" placeholder="Concept: Deconstructed Beet Wellington. Components: Smoked beet puree, puff pastry shard, foie gras mousse, reduced port wine jus. Theme: Late Autumn Menu." aria-label="Idea notes"></textarea>
               <div class="idea-actions">
                 <button type="submit" class="btn-secondary flex-1">
                   <i class="fa-solid fa-floppy-disk mr-2"></i>Save Idea
@@ -583,8 +618,9 @@
             </p>
             
             <!-- Task Form -->
-            <form id="task-form">
-              <input type="text" id="task-input" placeholder="Add a task and press Enter" class="text-sm">
+            <form id="task-form" aria-label="Daily tasks">
+              <label class="sr-only" for="task-input">New task</label>
+              <input type="text" id="task-input" placeholder="Add a task and press Enter" class="text-sm" aria-label="New task">
               <button type="submit" class="btn-primary text-sm px-3">Add</button>
             </form>
             
@@ -594,8 +630,8 @@
             
             <!-- Task Actions -->
             <div class="flex gap-2 mt-3">
-              <button id="clear-completed" class="btn-ghost flex-1 text-xs py-1.5">Clear Completed</button>
-              <button id="reset-tasks" class="btn-ghost flex-1 text-xs py-1.5">Reset List</button>
+              <button id="clear-completed" class="btn-ghost dash-control-btn flex-1 text-xs">Clear Completed</button>
+              <button id="reset-tasks" class="btn-ghost dash-control-btn flex-1 text-xs">Reset List</button>
             </div>
           </div>
         </div>
@@ -613,7 +649,7 @@
                 <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-temperature-low"></i></span>
                 Temperature log
               </h2>
-              <button type="button" onclick="tempLogManager.addUnit()" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
+              <button type="button" onclick="tempLogManager.addUnit()" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" aria-label="Add refrigeration unit">
                 <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i>Add unit
               </button>
             </div>
@@ -632,7 +668,7 @@
                 <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-vial-circle-check"></i></span>
                 Sanitizer checks
               </h2>
-              <button type="button" onclick="sanitizerLogManager.addLocation()" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
+              <button type="button" onclick="sanitizerLogManager.addLocation()" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" aria-label="Add sanitizer check station">
                 <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i>Add station
               </button>
             </div>
@@ -651,7 +687,7 @@
                 <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-clipboard-check"></i></span>
                 Health inspection rounds
               </h2>
-              <button type="button" id="btn-add-inspection-area" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
+              <button type="button" id="btn-add-inspection-area" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" aria-label="Add health inspection area">
                 <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i>Add area
               </button>
             </div>
@@ -717,7 +753,7 @@
                   <label class="block font-semibold mb-1" for="health-f-assign">Assigned to (optional)</label>
                   <input id="health-f-assign" type="text" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);" placeholder="Name or role">
                 </div>
-                <label class="flex items-center gap-2 cursor-pointer">
+                <label class="flex items-center gap-2 cursor-pointer" for="health-f-alarm">
                   <input type="checkbox" id="health-f-alarm" checked>
                   <span>Browser reminders at the times above (when this tab has been opened and you allow notifications)</span>
                 </label>
@@ -777,10 +813,10 @@
               <strong>How-to</strong> tab for line staff.
             </p>
             <div class="flex flex-wrap gap-2">
-              <a href="sop-hub.html" class="text-xs py-2 px-2.5 rounded-md shadow-sm text-white hover:opacity-90 transition-opacity" style="background: var(--brand-primary-accent); text-decoration: none;">
+              <a href="sop-hub.html" class="dash-control-btn text-xs rounded-md shadow-sm text-white hover:opacity-90 transition-opacity" style="background: var(--brand-primary-accent); text-decoration: none;">
                 <i class="fa-solid fa-pen-to-square mr-1" aria-hidden="true"></i>Open SOP Hub
               </a>
-              <a href="mobile-compliance.html" target="_blank" rel="noopener" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary); text-decoration: none;">
+              <a href="mobile-compliance.html" target="_blank" rel="noopener" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary); text-decoration: none;">
                 <i class="fa-solid fa-mobile-screen mr-1" aria-hidden="true"></i>Shift app
               </a>
             </div>
@@ -797,10 +833,10 @@
               Drinks captured from the mobile app's Bar tab land here. Review, then <strong>Publish</strong> to push them into the bar pack line staff sees.
             </p>
             <div class="flex flex-wrap gap-2 mb-3">
-              <button type="button" id="bar-drafts-refresh" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
+              <button type="button" id="bar-drafts-refresh" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
                 <i class="fa-solid fa-rotate mr-1" aria-hidden="true"></i>Refresh
               </button>
-              <button type="button" id="bar-drafts-import-wusong" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" title="Import the Wusong sample cocktails as drafts">
+              <button type="button" id="bar-drafts-import-wusong" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" title="Import the Wusong sample cocktails as drafts" aria-label="Import Wusong sample cocktails as drafts">
                 <i class="fa-solid fa-file-import mr-1" aria-hidden="true"></i>Import Wusong sample
               </button>
             </div>
@@ -821,13 +857,13 @@
               Opening, midday, closing, and station stock lists for bartenders. Edits publish to the mobile Bar tab on <strong>Save</strong>.
             </p>
             <div class="flex flex-wrap gap-2 mb-3">
-              <button type="button" id="bar-checklists-refresh" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
+              <button type="button" id="bar-checklists-refresh" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
                 <i class="fa-solid fa-rotate mr-1" aria-hidden="true"></i>Refresh
               </button>
-              <button type="button" id="bar-checklists-import-sample" class="text-xs py-2 px-2.5 rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" title="Replace the current pack with the sample">
+              <button type="button" id="bar-checklists-import-sample" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" title="Replace the current pack with the sample" aria-label="Import sample bar checklists">
                 <i class="fa-solid fa-file-import mr-1" aria-hidden="true"></i>Import sample
               </button>
-              <button type="button" id="bar-checklists-save" class="text-xs py-2 px-2.5 rounded-md shadow-sm text-white hover:opacity-90 transition-opacity" style="background: var(--brand-primary-accent);">
+              <button type="button" id="bar-checklists-save" class="dash-control-btn text-xs rounded-md shadow-sm text-white hover:opacity-90 transition-opacity" style="background: var(--brand-primary-accent);">
                 <i class="fa-solid fa-floppy-disk mr-1" aria-hidden="true"></i>Save &amp; publish
               </button>
             </div>
@@ -1163,7 +1199,8 @@
           div.style.background = 'var(--brand-card-bg)';
           let checks = '';
           items.forEach((label, i) => {
-            checks += `<label class="flex items-start gap-2 text-sm mb-1.5 cursor-pointer"><input type="checkbox" class="insp-cb mt-0.5" data-insp-area="${area.id}" data-insp-idx="${i}"> <span style="color:var(--brand-text-primary)">${escapeHtml(label)}</span></label>`;
+            const checkboxId = `insp-cb-${area.id}-${i}`;
+            checks += `<label class="flex items-start gap-2 text-sm mb-1.5 cursor-pointer" for="${escapeHtml(checkboxId)}"><input type="checkbox" id="${escapeHtml(checkboxId)}" class="insp-cb mt-0.5" aria-label="${escapeHtml(area.name)} — ${escapeHtml(label)}" data-insp-area="${area.id}" data-insp-idx="${i}"> <span style="color:var(--brand-text-primary)">${escapeHtml(label)}</span></label>`;
           });
           if (!checks) {
             checks =
@@ -1189,12 +1226,12 @@
             ${area.assignedTo ? `<div class="text-xs mb-1" style="color: var(--brand-text-muted);"><i class="fa-solid fa-user-tag mr-1"></i>${escapeHtml(area.assignedTo)}</div>` : ''}
             ${timeChips}
             <div class="mt-2 mb-2">${checks}</div>
-            <button type="button" class="btn-primary text-xs w-full py-2 insp-save-btn mb-2" data-area-id="${area.id}">
+            <button type="button" class="btn-primary dash-control-btn text-xs w-full insp-save-btn mb-2" data-area-id="${area.id}" aria-label="Save completed inspection round for ${escapeHtml(area.name)}">
               <i class="fa-solid fa-floppy-disk mr-1"></i>Save completed round (logged today + calendar)
             </button>
             <div class="flex gap-2">
-              <button type="button" class="flex-1 text-xs py-2 rounded-md border insp-edit-btn" style="border-color:var(--brand-border-light);background:var(--brand-bg-primary);" data-area-id="${area.id}"><i class="fa-solid fa-pen mr-1"></i>Edit setup</button>
-              <button type="button" class="flex-1 text-xs py-2 rounded-md border border-red-200 text-red-700 insp-del-btn" style="background:#fff;" data-area-id="${area.id}"><i class="fa-solid fa-trash mr-1"></i>Delete</button>
+              <button type="button" class="dash-control-btn flex-1 text-xs rounded-md border insp-edit-btn" style="border-color:var(--brand-border-light);background:var(--brand-bg-primary);" data-area-id="${area.id}" aria-label="Edit inspection setup for ${escapeHtml(area.name)}"><i class="fa-solid fa-pen mr-1"></i>Edit setup</button>
+              <button type="button" class="dash-control-btn flex-1 text-xs rounded-md border border-red-200 text-red-700 insp-del-btn" style="background:#fff;" data-area-id="${area.id}" aria-label="Delete inspection area ${escapeHtml(area.name)}"><i class="fa-solid fa-trash mr-1"></i>Delete</button>
             </div>`;
           container.appendChild(div);
         });
@@ -1561,8 +1598,8 @@
                 <i class="fa-solid ${statusIcon} w-5 mr-1"></i>
                 ${displayTemp}
               </span>
-              <button title="Record Reading" onclick="recordTemperatureReading(${JSON.stringify(unit.id)}, ${JSON.stringify(unit.name)})" class="text-xs py-1 px-3 rounded-md text-white hover:opacity-90 transition-opacity" style="background-color: var(--brand-secondary-accent);">
-                <i class="fa-solid fa-file-pen"></i> Log
+              <button title="Record Reading" aria-label="Log temperature for ${unit.name}" onclick="recordTemperatureReading(${JSON.stringify(unit.id)}, ${JSON.stringify(unit.name)})" class="dash-control-btn text-xs rounded-md text-white hover:opacity-90 transition-opacity" style="background-color: var(--brand-secondary-accent);">
+                <i class="fa-solid fa-file-pen" aria-hidden="true"></i> Log
               </button>
             </div>
           </li>
@@ -1601,8 +1638,8 @@
                 ${displayPPM}
               </span>
               <span class="text-xs px-2 py-1 rounded-full font-semibold ${hasReading ? (passed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700') : 'bg-gray-100 text-gray-700'}">${statusText}</span>
-              <button title="Record Check" onclick="recordSanitizerCheck(${JSON.stringify(location.id)}, ${JSON.stringify(location.name)})" class="text-xs py-1 px-3 rounded-md text-white hover:opacity-90 transition-opacity" style="background-color: var(--brand-secondary-accent);">
-                <i class="fa-solid fa-vial"></i> Check
+              <button title="Record Check" aria-label="Log sanitizer check for ${location.name}" onclick="recordSanitizerCheck(${JSON.stringify(location.id)}, ${JSON.stringify(location.name)})" class="dash-control-btn text-xs rounded-md text-white hover:opacity-90 transition-opacity" style="background-color: var(--brand-secondary-accent);">
+                <i class="fa-solid fa-vial" aria-hidden="true"></i> Check
               </button>
             </div>
           </li>
@@ -2019,16 +2056,17 @@
           var sourceHtml = d.source
             ? '<span class="text-xs px-2 py-0.5 rounded-full" style="background-color: var(--brand-bg-tertiary); color: var(--brand-text-secondary);">' + escapeHtml(d.source) + '</span>'
             : '';
+          var title = escapeHtml(d.title || 'Untitled drink');
           return '<div class="rounded-md border p-3" style="border-color: var(--brand-border-light); background: var(--brand-bg-primary);">'
             + '<div class="flex justify-between items-start gap-2">'
             + '<div class="flex-1 min-w-0">'
-            + '<div class="flex flex-wrap items-center gap-2"><strong style="color: var(--brand-text-primary);">' + escapeHtml(d.title || 'Untitled drink') + '</strong>' + sourceHtml + '</div>'
+            + '<div class="flex flex-wrap items-center gap-2"><strong style="color: var(--brand-text-primary);">' + title + '</strong>' + sourceHtml + '</div>'
             + build
             + metaHtml
             + '</div>'
             + '<div class="flex flex-col gap-1 shrink-0">'
-            + '<button type="button" data-bar-publish="' + idAttr + '" class="text-xs py-1 px-2 rounded-md text-white" style="background: var(--brand-primary-accent);">Publish</button>'
-            + '<button type="button" data-bar-delete="' + idAttr + '" class="text-xs py-1 px-2 rounded-md border" style="border-color: var(--brand-border-light); background: #ffffff; color: var(--brand-text-secondary);">Delete</button>'
+            + '<button type="button" data-bar-publish="' + idAttr + '" class="dash-control-btn text-xs rounded-md text-white" style="background: var(--brand-primary-accent);" aria-label="Publish drink: ' + title + '">Publish</button>'
+            + '<button type="button" data-bar-delete="' + idAttr + '" class="dash-control-btn text-xs rounded-md border" style="border-color: var(--brand-border-light); background: #ffffff; color: var(--brand-text-secondary);" aria-label="Delete draft: ' + title + '">Delete</button>'
             + '</div>'
             + '</div>'
             + '</div>';

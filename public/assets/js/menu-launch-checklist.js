@@ -438,6 +438,8 @@
         escapeHtml(step.id) +
         '" aria-pressed="' +
         (step.done ? 'true' : 'false') +
+        '" aria-label="' +
+        escapeHtml((step.done ? 'Mark incomplete: ' : 'Mark complete: ') + step.label) +
         '" title="Mark complete">' +
         '<i class="fa-solid ' +
         (step.done ? 'fa-check' : 'fa-plus') +

@@ -20,6 +20,7 @@
     "owner-bot:profiles": "node scripts/owner-bot/owner-bot-profiles.js",
     "owner-bot:beverage": "node scripts/owner-bot/owner-bot-beverage.js",
     "owner-bot:onboarding": "node scripts/owner-bot/owner-bot-onboarding.js",
+    "owner-bot:entry": "node scripts/owner-bot/owner-bot-entry.js",
     "owner-bot:features": "node scripts/owner-bot/owner-bot-features.js",
     "owner-bot:features:pilot": "node -e \"process.env.OWNER_BOT_FEATURES_ONLY='pilot';require('./scripts/owner-bot/owner-bot-features.js')\"",
     "owner-bot:stock": "node scripts/owner-bot/owner-bot-stock.js",

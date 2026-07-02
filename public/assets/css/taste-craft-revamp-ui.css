@@ -328,6 +328,25 @@
 }
 
 /* —— Dashboard —— */
+body.iterum-has-sidebar .main-content-wrapper .main-content-area,
+body.iterum-has-sidebar > .main-content-area {
+  padding: 1rem 1.25rem 3rem;
+}
+
+@media (min-width: 1024px) {
+  body.iterum-has-sidebar .main-content-wrapper .main-content-area > .w-full,
+  body.iterum-has-sidebar > .main-content-area > .w-full {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Workspace name lives in sidebar footer + save indicator */
+body.iterum-has-sidebar .main-content-area #header-project-chip {
+  display: none;
+}
+
 .tc-revamp-body .dash-page-header.tc-page-hero {
   padding: 1.25rem 1.5rem;
   border-radius: var(--tc-radius);

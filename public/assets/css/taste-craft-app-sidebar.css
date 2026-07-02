@@ -8,8 +8,9 @@
   --tc-sidebar-width-icon: 3.25rem;
   width: var(--tc-sidebar-width) !important;
   max-width: var(--tc-sidebar-width) !important;
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
   background: hsl(var(--tc-sidebar-background)) !important;
   background-color: hsl(var(--tc-sidebar-background)) !important;
   background-image: none !important;
@@ -38,8 +39,8 @@ body.iterum-has-sidebar:has(.unified-nav-sidebar.is-collapsed) {
 
 body.iterum-has-sidebar .main-content-wrapper {
   margin-left: var(--iterum-sidebar-offset) !important;
-  width: calc(100vw - var(--iterum-sidebar-offset)) !important;
-  max-width: calc(100vw - var(--iterum-sidebar-offset)) !important;
+  width: auto !important;
+  max-width: none !important;
   min-height: 100vh;
   box-sizing: border-box;
   transition:
@@ -51,9 +52,16 @@ body.iterum-has-sidebar .main-content-wrapper {
 /* Pages that use .main-content-area without a wrapper (fallback) */
 body.iterum-has-sidebar > .main-content-area {
   margin-left: var(--iterum-sidebar-offset) !important;
-  width: calc(100vw - var(--iterum-sidebar-offset)) !important;
-  max-width: calc(100vw - var(--iterum-sidebar-offset)) !important;
+  width: auto !important;
+  max-width: none !important;
   box-sizing: border-box;
+}
+
+/* Wrapped shell — margin lives on wrapper only */
+body.iterum-has-sidebar .main-content-wrapper > .main-content-area {
+  margin-left: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
 }
 
 /* —— Header brand lockup —— */
@@ -118,8 +126,10 @@ body.iterum-has-sidebar > .main-content-area {
 .tc-sidebar-collapse-btn,
 .sidebar-toggle-mobile {
   flex-shrink: 0;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  min-width: 2.25rem;
+  min-height: 2.25rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -187,11 +197,41 @@ body.iterum-has-sidebar > .main-content-area {
 .unified-nav-sidebar.is-collapsed .nav-link,
 .unified-nav-sidebar.is-collapsed .nav-dropdown-btn {
   color: hsl(var(--tc-sidebar-foreground)) !important;
+  position: relative;
 }
 
 .unified-nav-sidebar.is-collapsed .nav-link:hover,
 .unified-nav-sidebar.is-collapsed .nav-dropdown-btn:hover {
   background: hsl(var(--tc-sidebar-accent) / 0.85) !important;
+}
+
+.unified-nav-sidebar.is-collapsed .nav-link::after,
+.unified-nav-sidebar.is-collapsed .nav-dropdown-btn::after {
+  content: attr(data-nav-label);
+  position: absolute;
+  left: calc(100% + 0.75rem);
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  padding: 0.35rem 0.55rem;
+  border-radius: 0.5rem;
+  background: hsl(var(--tc-sidebar-background));
+  color: hsl(var(--tc-sidebar-foreground));
+  border: 1px solid hsl(var(--tc-sidebar-border));
+  box-shadow: 0 10px 24px hsl(180 25% 10% / 0.2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 1200;
+  transition: opacity 0.12s ease;
+}
+
+.unified-nav-sidebar.is-collapsed .nav-link:hover::after,
+.unified-nav-sidebar.is-collapsed .nav-link:focus-visible::after,
+.unified-nav-sidebar.is-collapsed .nav-dropdown-btn:hover::after,
+.unified-nav-sidebar.is-collapsed .nav-dropdown-btn:focus-visible::after {
+  opacity: 1;
 }
 
 .unified-nav-sidebar.is-collapsed .nav-link.active,
@@ -207,18 +247,33 @@ body.iterum-has-sidebar > .main-content-area {
 
 /* —— Nav content —— */
 .unified-nav-sidebar .sidebar-nav {
-  flex: 1;
+  flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 0.5rem 0 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--tc-sidebar-foreground) / 0.28) transparent;
+}
+
+.unified-nav-sidebar .sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.unified-nav-sidebar .sidebar-nav::-webkit-scrollbar-thumb {
+  background: hsl(var(--tc-sidebar-foreground) / 0.22);
+  border-radius: 999px;
+}
+
+.unified-nav-sidebar .sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--tc-sidebar-foreground) / 0.38);
 }
 
 .unified-nav-sidebar .nav-links {
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
-  padding: 0 0.5rem;
+  gap: 0.1875rem;
+  padding: 0 0.625rem;
 }
 
 .unified-nav-sidebar .nav-section-label {
@@ -231,6 +286,12 @@ body.iterum-has-sidebar > .main-content-area {
   margin: 0;
 }
 
+.unified-nav-sidebar .nav-section-label:not(:first-child) {
+  margin-top: 0.35rem;
+  padding-top: 1rem;
+  border-top: 1px solid hsl(var(--tc-sidebar-border) / 0.45);
+}
+
 .unified-nav-sidebar .nav-section-label:first-child {
   padding-top: 0.25rem;
 }
@@ -239,7 +300,8 @@ body.iterum-has-sidebar > .main-content-area {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5625rem 0.75rem;
+  min-height: 2.5rem;
   border-radius: 0.5rem;
   border: 1px solid transparent;
   text-decoration: none;
@@ -249,7 +311,8 @@ body.iterum-has-sidebar > .main-content-area {
   color: hsl(var(--tc-sidebar-foreground));
   transition:
     background 0.15s ease,
-    color 0.15s ease;
+    color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .unified-nav-sidebar .nav-link:hover,
@@ -292,6 +355,7 @@ body.iterum-has-sidebar > .main-content-area {
   text-align: left;
   color: hsl(var(--tc-sidebar-foreground));
   font-weight: 600;
+  min-height: 2.5rem;
 }
 
 .unified-nav-sidebar .nav-dropdown-btn .nav-more-label,
@@ -826,6 +890,11 @@ body.iterum-has-sidebar > .main-content-area {
 
   .unified-nav-sidebar.mobile-open {
     transform: translateX(0);
+  }
+
+  body.iterum-has-sidebar[data-iterum-mqn="on"] .unified-nav-sidebar {
+    top: calc(var(--iterum-mobile-nav-height) + 48px) !important;
+    height: calc(100vh - var(--iterum-mobile-nav-height) - 48px) !important;
   }
 
   body.iterum-has-sidebar .main-content-wrapper,
