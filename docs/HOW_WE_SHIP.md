@@ -88,13 +88,13 @@ Run on **`https://iterum-culinary-app.vercel.app/`** (or your custom domain once
 
 ## Before starting E3 (vendor catalog)
 
-Answer these once so engineering does not build the wrong thing ([P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) — **E3**).
+**Locked 2 Jul 2026** — [E3_DECISION_RECORD.md](./E3_DECISION_RECORD.md):
 
-- **One shared vendor list** for all locations vs **separate lists per venue** — what does the first pilot need?
-- **Prices:** same SKU different price by location — required on day one or “later”?
-- **Who maintains** vendor rows (one buyer vs each chef)?
+- **One shared vendor list per account** (not separate lists per venue).
+- **Per-workspace prices** (`projectId` on `vendor_prices` rows).
+- **Each chef maintains** vendor and price data for their kitchen(s).
 
-No blockers to M1 verification; this only sharpens the **next** epic after M1 human GO.
+Eng sequences **E3** per [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) and [E3_BACKEND_UPGRADE_PLAN.md](./E3_BACKEND_UPGRADE_PLAN.md). Rules must be extended so teammates are not owner-only on `users/.../vendors` and `vendor_prices`.
 
 ---
 

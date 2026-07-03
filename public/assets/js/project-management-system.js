@@ -1465,7 +1465,11 @@ class ProjectManagementSystem {
           };
 
           if (!projectData.name.trim()) {
-            alert('Please enter a project name');
+            if (typeof window.showToast === 'function') {
+              window.showToast('Please enter a project name', 'warning');
+            } else {
+              alert('Please enter a project name');
+            }
             return;
           }
 
@@ -1478,9 +1482,20 @@ class ProjectManagementSystem {
             this.closeProjectModal();
 
             // Show success message
-            alert(`Project "${newProject.name}" created successfully!`);
+            if (typeof window.showToast === 'function') {
+              window.showToast(
+                `Project "${newProject.name}" created successfully!`,
+                'success'
+              );
+            } else {
+              alert(`Project "${newProject.name}" created successfully!`);
+            }
           } else {
-            alert('Failed to create project. Please try again.');
+            if (typeof window.showToast === 'function') {
+              window.showToast('Failed to create project. Please try again.', 'error');
+            } else {
+              alert('Failed to create project. Please try again.');
+            }
           }
         });
       }

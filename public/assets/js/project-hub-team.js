@@ -179,16 +179,45 @@ async function onCopyInviteClick() {
   } catch (e) {
     console.warn('clipboard write failed', e);
   }
-  try {
-    window.prompt('Copy this invite message:', text);
-    if (msg) {
-      msg.textContent = 'Invite message ready to copy.';
-    }
-  } catch (e) {
-    if (msg) {
-      msg.textContent = 'Could not open copy helper. Please copy manually.';
-    }
+  if (msg) {
+    msg.textContent =
+      'Clipboard blocked — select and copy the message below.';
   }
+  showInviteCopyFallback(text);
+}
+
+function showInviteCopyFallback(text) {
+  var existing = document.getElementById('team-invite-copy-modal');
+  if (existing) {
+    existing.remove();
+  }
+  var modal = document.createElement('div');
+  modal.id = 'team-invite-copy-modal';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-labelledby', 'team-invite-copy-title');
+  modal.style.cssText =
+    'position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,0.45);padding:16px;';
+  modal.innerHTML =
+    '<div style="width:min(520px,100%);background:#fff;border-radius:14px;padding:22px;box-shadow:0 20px 50px rgba(15,23,42,0.2);">' +
+    '<h3 id="team-invite-copy-title" style="margin:0 0 10px;font-size:18px;font-weight:700;color:#1e293b;">Copy invite message</h3>' +
+    '<p style="margin:0 0 12px;font-size:14px;color:#64748b;">Select all, then copy (Ctrl+C / Cmd+C).</p>' +
+    '<textarea readonly rows="7" style="width:100%;padding:12px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;line-height:1.45;resize:vertical;"></textarea>' +
+    '<button type="button" style="margin-top:14px;width:100%;padding:11px;border:none;border-radius:8px;font-weight:700;color:#fff;background:var(--brand-btn-primary,linear-gradient(135deg,#6b8e6f 0%,#5b9bad 100%));cursor:pointer;">Done</button>' +
+    '</div>';
+  var textarea = modal.querySelector('textarea');
+  textarea.value = text;
+  modal.querySelector('button').addEventListener('click', function () {
+    modal.remove();
+  });
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) {
+      modal.remove();
+    }
+  });
+  document.body.appendChild(modal);
+  textarea.focus();
+  textarea.select();
 }
 
 function renderMembersTable(rows, projectId) {

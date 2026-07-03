@@ -564,6 +564,123 @@
             }
         }
 
+        function hubConfirm(options) {
+            options = options || {};
+            return new Promise(function (resolve) {
+                var title = options.title || 'Confirm';
+                var message = options.message || '';
+                var confirmLabel = options.confirmLabel || 'Confirm';
+                var cancelLabel = options.cancelLabel || 'Cancel';
+                var danger = !!options.danger;
+
+                var modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.setAttribute('role', 'dialog');
+                modal.setAttribute('aria-modal', 'true');
+                modal.setAttribute('aria-labelledby', 'hub-confirm-title');
+                modal.innerHTML =
+                    '<div class="modal-backdrop" data-hub-dismiss="0"></div>' +
+                    '<div class="modal-content" style="max-width: 480px; background: white; border-radius: 16px; padding: 28px; position: relative; z-index: 10001; box-shadow: 0 20px 50px rgba(15,23,42,0.18);">' +
+                    '<h2 id="hub-confirm-title" style="margin: 0 0 12px; font-size: 20px; font-weight: 700; color: #1e293b;">' +
+                    escapeHtml(title) +
+                    '</h2>' +
+                    '<p style="margin: 0 0 24px; font-size: 15px; line-height: 1.5; color: #475569; white-space: pre-line;">' +
+                    escapeHtml(message) +
+                    '</p>' +
+                    '<div style="display: flex; gap: 12px;">' +
+                    '<button type="button" data-hub-dismiss="0" style="flex: 1; padding: 12px; background: #f1f5f9; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">' +
+                    escapeHtml(cancelLabel) +
+                    '</button>' +
+                    '<button type="button" data-hub-confirm="1" style="flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: white; background: ' +
+                    (danger ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'var(--brand-btn-primary, linear-gradient(135deg, #6b8e6f 0%, #5b9bad 100%))') +
+                    ';">' +
+                    escapeHtml(confirmLabel) +
+                    '</button>' +
+                    '</div></div>';
+
+                modal.style.cssText =
+                    'position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; display: flex; align-items: center; justify-content: center;';
+
+                function close(result) {
+                    modal.remove();
+                    resolve(result);
+                }
+
+                modal.querySelectorAll('[data-hub-dismiss]').forEach(function (el) {
+                    el.addEventListener('click', function () {
+                        close(false);
+                    });
+                });
+                modal.querySelector('[data-hub-confirm]').addEventListener('click', function () {
+                    close(true);
+                });
+
+                document.body.appendChild(modal);
+                modal.querySelector('[data-hub-confirm]').focus();
+            });
+        }
+
+        function showEditProjectModal(projectId) {
+            var project = window.projectManager.projects.find(function (p) {
+                return p.id === projectId;
+            });
+            if (!project) {
+                return;
+            }
+
+            var modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+            modal.setAttribute('aria-labelledby', 'hub-edit-project-title');
+            modal.innerHTML =
+                '<div class="modal-backdrop" data-hub-edit-close="1"></div>' +
+                '<div class="modal-content" style="max-width: 520px; background: white; border-radius: 16px; padding: 32px; position: relative; z-index: 10001;">' +
+                '<button type="button" data-hub-edit-close="1" aria-label="Close" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 24px; cursor: pointer; color: #94a3b8;">✕</button>' +
+                '<h2 id="hub-edit-project-title" style="margin: 0 0 20px; font-size: 24px; font-weight: 700; color: #1e293b;">Edit workspace</h2>' +
+                '<form id="hub-edit-project-form">' +
+                '<label for="hub-edit-project-name" style="display: block; font-weight: 600; margin-bottom: 8px; color: #334155;">Workspace name</label>' +
+                '<input id="hub-edit-project-name" type="text" required maxlength="120" style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; margin-bottom: 20px;" />' +
+                '<div style="display: flex; gap: 12px;">' +
+                '<button type="button" data-hub-edit-close="1" style="flex: 1; padding: 12px; background: #f1f5f9; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Cancel</button>' +
+                '<button type="submit" style="flex: 2; padding: 12px; background: var(--brand-btn-primary, linear-gradient(135deg, #6b8e6f 0%, #5b9bad 100%)); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">Save changes</button>' +
+                '</div></form></div>';
+
+            modal.style.cssText =
+                'position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; display: flex; align-items: center; justify-content: center;';
+
+            function closeModal() {
+                modal.remove();
+            }
+
+            modal.querySelectorAll('[data-hub-edit-close]').forEach(function (el) {
+                el.addEventListener('click', closeModal);
+            });
+
+            var nameInput = modal.querySelector('#hub-edit-project-name');
+            nameInput.value = project.name || '';
+
+            modal.querySelector('#hub-edit-project-form').addEventListener('submit', function (event) {
+                event.preventDefault();
+                var newName = nameInput.value.trim();
+                if (!newName) {
+                    hubNotify('Please enter a workspace name', 'warning');
+                    nameInput.focus();
+                    return;
+                }
+                if (newName !== project.name) {
+                    window.projectManager.updateProject(projectId, { name: newName });
+                    loadProjects();
+                    hubNotify('Workspace renamed to "' + newName + '"', 'success');
+                }
+                closeModal();
+            });
+
+            document.body.appendChild(modal);
+            nameInput.focus();
+            nameInput.select();
+        }
+
         const restaurantWorkspaceDefaults = {
             description: 'Restaurant workspace — menus, compliance, and shift operations',
             icon: '🍽️',
@@ -588,7 +705,7 @@
 
         function createRestaurantProject(projectName) {
             if (!window.projectManager) {
-                alert('Project manager not available');
+                hubNotify('Project manager not available', 'error');
                 return;
             }
 
@@ -726,12 +843,12 @@
             const ownerOnly = document.getElementById('project-owner-only').checked;
 
             if (!name) {
-                alert('Please enter a project name');
+                hubNotify('Please enter a project name', 'warning');
                 return;
             }
 
             if (!window.projectManager) {
-                alert('Project manager not available');
+                hubNotify('Project manager not available', 'error');
                 return;
             }
 
@@ -966,45 +1083,48 @@
         }
 
         function editProject(projectId) {
-            const project = window.projectManager.projects.find(p => p.id === projectId);
-            if (!project) return;
-
-            const newName = prompt('Edit project name:', project.name);
-            if (newName && newName !== project.name) {
-                window.projectManager.updateProject(projectId, { name: newName });
-                loadProjects();
-            }
+            showEditProjectModal(projectId);
         }
 
-        function archiveProject(projectId) {
+        async function archiveProject(projectId) {
             const project = window.projectManager.projects.find(p => p.id === projectId);
             if (!project) return;
 
             if (project.isArchived) {
-                // Restore
                 window.projectManager.updateProject(projectId, { isArchived: false });
-                alert('✅ Project restored!');
+                hubNotify('Project restored', 'success');
             } else {
-                // Archive
-                if (confirm(`Archive "${project.name}"?\n\nYou can restore it later.`)) {
-                    window.projectManager.updateProject(projectId, { isArchived: true });
-                    alert('📦 Project archived');
+                const ok = await hubConfirm({
+                    title: 'Archive workspace?',
+                    message:
+                        'Archive "' +
+                        project.name +
+                        '"?\n\nYou can restore it later from this hub.',
+                    confirmLabel: 'Archive',
+                    danger: true
+                });
+                if (!ok) {
+                    return;
                 }
+                window.projectManager.updateProject(projectId, { isArchived: true });
+                hubNotify('Project archived', 'info');
             }
-            
+
             loadProjects();
         }
 
-        function installSampleProjectData() {
+        async function installSampleProjectData() {
             if (typeof applyIterumDemoSeed !== 'function') {
-                alert('Sample data script not loaded. Refresh the page and try again.');
+                hubNotify('Sample data script not loaded. Refresh the page and try again.', 'error');
                 return;
             }
-            if (
-                !confirm(
-                    'Install sample recipes, menus, vendors, logs, and SOP guides into "Sample Restaurant"?\n\nSafe to run again — existing sample IDs are updated in place.'
-                )
-            ) {
+            const ok = await hubConfirm({
+                title: 'Install sample restaurant',
+                message:
+                    'Install sample recipes, menus, vendors, logs, and SOP guides into "Sample Restaurant"?\n\nSafe to run again — existing sample IDs are updated in place.',
+                confirmLabel: 'Install sample'
+            });
+            if (!ok) {
                 return;
             }
             var statusEl = document.getElementById('sample-project-status');
@@ -1012,9 +1132,9 @@
             if (!r || !r.ok) {
                 var err = (r && r.error) || 'unknown';
                 if (err === 'not_signed_in') {
-                    alert('Sign in first, then install sample data.');
+                    hubNotify('Sign in first, then install sample data.', 'warning');
                 } else {
-                    alert('Could not install sample data: ' + err);
+                    hubNotify('Could not install sample data: ' + err, 'error');
                 }
                 if (statusEl) {
                     statusEl.textContent = '';
@@ -1056,7 +1176,7 @@
             if (statusEl) {
                 statusEl.textContent = msg;
             }
-            alert('✅ ' + msg);
+            hubNotify(msg, 'success');
         }
 
         document.getElementById('btn-install-sample-project')?.addEventListener('click', installSampleProjectData);
@@ -1082,23 +1202,26 @@
             var statusEl = document.getElementById('rbp-import-status');
             if (typeof window.iterumProvisionHotchixBoston !== 'function') {
                 if (!silent) {
-                    alert('Import script not loaded. Refresh the page and try again.');
+                    hubNotify('Import script not loaded. Refresh the page and try again.', 'error');
                 }
                 setRbpProvisionSignal('error', 'script_missing');
                 return null;
             }
             if (!window.projectManager) {
                 if (!silent) {
-                    alert('Project system not ready. Refresh and try again.');
+                    hubNotify('Project system not ready. Refresh and try again.', 'error');
                 }
                 setRbpProvisionSignal('error', 'project_manager_missing');
                 return null;
             }
             if (
                 !silent &&
-                !confirm(
-                    'Import Hot Chix Boston workspace, recipes, and launch menu into this browser?\n\nSafe to run again — existing Hot Chix IDs are updated in place.'
-                )
+                !(await hubConfirm({
+                    title: 'Import Hot Chix Boston',
+                    message:
+                        'Import Hot Chix Boston workspace, recipes, and launch menu into this browser?\n\nSafe to run again — existing Hot Chix IDs are updated in place.',
+                    confirmLabel: 'Import'
+                }))
             ) {
                 setRbpProvisionSignal('cancelled', 'user_cancelled');
                 return null;
@@ -1124,7 +1247,7 @@
                 loadProjects();
                 setRbpProvisionSignal('ok', result.projectId);
                 if (!silent) {
-                    alert('✅ ' + msg);
+                    hubNotify(msg, 'success');
                 }
                 return result;
             } catch (err) {
@@ -1135,10 +1258,10 @@
                 setRbpProvisionSignal('error', code);
                 if (code === 'not_signed_in') {
                     if (!silent) {
-                        alert('Sign in first, then import Hot Chix Boston.');
+                        hubNotify('Sign in first, then import Hot Chix Boston.', 'warning');
                     }
                 } else if (!silent) {
-                    alert('Could not import: ' + code);
+                    hubNotify('Could not import: ' + code, 'error');
                 }
                 return null;
             }
@@ -1168,7 +1291,7 @@
                 if (!window.projectManager) {
                     console.error('Project manager not available');
                     if (!autoImport && !autoDevelop) {
-                        alert('Project system not ready. Please refresh the page.');
+                        hubNotify('Project system not ready. Please refresh the page.', 'error');
                     }
                     setRbpProvisionSignal('error', 'project_manager_missing');
                     setRbpDevelopSignal('error', 'project_manager_missing');

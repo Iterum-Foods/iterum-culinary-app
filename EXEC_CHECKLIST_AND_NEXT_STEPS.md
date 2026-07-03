@@ -17,9 +17,9 @@
 
 **After M1 GO — E3 (vendor catalog)**
 
-- [ ] Answer **E3 prep** in [HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md) (shared list vs per-venue, price overrides, owner role).
-- [ ] Eng sequences **E3** in [P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md).
-- [ ] File map + golden-path tasks: [GOLDEN_PATH_AUDIT.md](./docs/GOLDEN_PATH_AUDIT.md).
+- [x] Answer **E3 prep** — [E3_DECISION_RECORD.md](./docs/E3_DECISION_RECORD.md) (**2 Jul 2026**: one list/account, per-workspace prices, each chef maintains)
+- [ ] Eng sequences **E3** in [P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md) (rules delegation + E3c UI)
+- [ ] File map + golden-path tasks: [GOLDEN_PATH_AUDIT.md](./docs/GOLDEN_PATH_AUDIT.md)
 
 **Market readiness (testing + UI)** — [MARKET_READINESS_SPRINT.md](./docs/MARKET_READINESS_SPRINT.md)
 
@@ -46,6 +46,8 @@
 <a id="leadership-log-ceo-cto"></a>
 
 _Use this section for short, dated notes that do not belong in a checkbox row._
+
+**2026-07-02 — E3 vendor policy locked (CEO):** One **shared vendor list per account**; **per-workspace (`projectId`) prices**; **each chef** maintains catalog/prices for their kitchen(s). Recorded in [E3_DECISION_RECORD.md](./docs/E3_DECISION_RECORD.md). **CTO next:** extend `firestore.rules` so project members (`chef_leadership`, `purchasing`) can read/write workspace-scoped `vendor_prices` (not owner-only); then E3c override UI.
 
 **2026-03-29 — Quick wins (parallel to M1 human checks):** Project chip sync extended to **`kitchen-project-chip`** and **`menu-project-chip`** via [unified-nav-header.js](./public/assets/js/unified-nav-header.js); runbook expanded — [HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md) (custom domain, 5-minute pilot demo, E3 prep questions).
 
