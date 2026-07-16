@@ -560,16 +560,9 @@ body.iterum-has-sidebar .main-content-area #header-project-chip {
 }
 
 .tc-revamp-body .menu-hero::after {
-  background: radial-gradient(
-      circle at 90% 0%,
-      hsl(var(--tc-accent) / 0.12),
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 0% 100%,
-      hsl(var(--tc-primary) / 0.08),
-      transparent 45%
-    ) !important;
+  background:
+    radial-gradient(circle at 90% 0%, hsl(var(--tc-accent) / 0.12), transparent 50%),
+    radial-gradient(circle at 0% 100%, hsl(var(--tc-primary) / 0.08), transparent 45%) !important;
 }
 
 .tc-revamp-body .menu-hero h1 {
@@ -923,7 +916,9 @@ body.iterum-has-sidebar .main-content-area #header-project-chip {
   text-decoration: none;
   white-space: nowrap;
   margin-left: auto;
-  transition: color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+  transition:
+    color 0.2s ease-in-out,
+    opacity 0.2s ease-in-out;
 }
 
 .iterum-workspace-banner__link:hover {
@@ -940,12 +935,6 @@ body.iterum-has-sidebar .main-content-area #header-project-chip {
   color: hsl(var(--tc-foreground));
   font-size: 0.75rem;
   line-height: 1.4;
-}
-  font-size: 0.8125rem;
-  line-height: 1.45;
-  color: hsl(var(--tc-foreground));
-  background: hsl(var(--tc-warning) / 0.15);
-  border: 1px solid hsl(var(--tc-warning) / 0.35);
 }
 
 @keyframes iterum-ws-pulse {

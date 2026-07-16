@@ -40,9 +40,7 @@
   function vendorOverrideUrl(ingredientName) {
     const q = encodeURIComponent(String(ingredientName || '').trim());
     return (
-      'vendor-management.html?ingredient=' +
-      q +
-      '#vendor-pricing-workspace'
+      'vendor-management.html?ingredient=' + q + '#vendor-pricing-workspace'
     );
   }
 
@@ -52,8 +50,14 @@
   function analyzeCostStatus(ingredient) {
     const cost = Number(ingredient?.cost) || 0;
     const override = lookupOverride(ingredient);
-    if (!override || override.unitCost == null || Number.isNaN(Number(override.unitCost))) {
-      return cost > 0 ? { status: 'has_cost', cost, override: null } : { status: 'missing', cost: 0, override: null };
+    if (
+      !override ||
+      override.unitCost == null ||
+      Number.isNaN(Number(override.unitCost))
+    ) {
+      return cost > 0
+        ? { status: 'has_cost', cost, override: null }
+        : { status: 'missing', cost: 0, override: null };
     }
     const oCost = Number(override.unitCost);
     if (cost <= 0) {
@@ -171,7 +175,9 @@
           : '<span style="color:#94a3b8;">—</span>';
 
     const hint = renderCostHintHtml(ingredient, { compact: true });
-    return main + (hint ? '<div style="margin-top:6px;">' + hint + '</div>' : '');
+    return (
+      main + (hint ? '<div style="margin-top:6px;">' + hint + '</div>' : '')
+    );
   }
 
   function summarizeIngredients(ingredients) {
@@ -208,12 +214,16 @@
     }
     if (s.overrideOnly) {
       parts.push(
-        '<strong>' + s.overrideOnly + '</strong> costing from workspace overrides only'
+        '<strong>' +
+          s.overrideOnly +
+          '</strong> costing from workspace overrides only'
       );
     }
     if (s.overrideDiff) {
       parts.push(
-        '<strong>' + s.overrideDiff + '</strong> where override differs from library'
+        '<strong>' +
+          s.overrideDiff +
+          '</strong> where override differs from library'
       );
     }
     if (!parts.length) {
@@ -241,7 +251,11 @@
 
   async function refreshOverrides() {
     const sync = global.firestoreSync;
-    if (sync && sync.initialized && typeof sync.refreshVendorPricesFromFirestore === 'function') {
+    if (
+      sync &&
+      sync.initialized &&
+      typeof sync.refreshVendorPricesFromFirestore === 'function'
+    ) {
       try {
         await sync.refreshVendorPricesFromFirestore();
       } catch (e) {

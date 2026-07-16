@@ -1,7 +1,11 @@
 /**
  * Bootstrap and verify HACCP temp + sanitizer logs scoped to a restaurant project.
  */
-import { initializeApp, getApp, getApps } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+import {
+  initializeApp,
+  getApp,
+  getApps
+} from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
 import {
   getAuth,
   onAuthStateChanged
@@ -93,14 +97,20 @@ function activateProject(projectId) {
 
 function unitMatchesProject(unit, projectId, label) {
   if (unit.projectId === projectId) return true;
-  if (label && unit.name && unit.name.toLowerCase().includes(label.toLowerCase())) {
+  if (
+    label &&
+    unit.name &&
+    unit.name.toLowerCase().includes(label.toLowerCase())
+  ) {
     return true;
   }
   return false;
 }
 
 async function listCollection(db, uid, sub) {
-  const snap = await getDocs(query(collection(db, 'users', uid, sub), limit(200)));
+  const snap = await getDocs(
+    query(collection(db, 'users', uid, sub), limit(200))
+  );
   const rows = [];
   snap.forEach(d => rows.push({ id: d.id, ...d.data() }));
   return rows;
@@ -128,8 +138,12 @@ export async function bootstrapRestaurantCompliance(opts = {}) {
   const existingUnits = await listCollection(db, uid, REF_UNITS);
   const existingSan = await listCollection(db, uid, SAN_LOCS);
 
-  let units = existingUnits.filter(u => unitMatchesProject(u, projectId, label));
-  let locations = existingSan.filter(u => unitMatchesProject(u, projectId, label));
+  let units = existingUnits.filter(u =>
+    unitMatchesProject(u, projectId, label)
+  );
+  let locations = existingSan.filter(u =>
+    unitMatchesProject(u, projectId, label)
+  );
 
   const created = { units: 0, locations: 0 };
 
@@ -255,9 +269,9 @@ export async function verifyRestaurantCompliance(projectId) {
 
   tempsSnap.forEach(d => {
     const data = d.data() || {};
-    const day = data.dateKey || (data.timestamp?.toDate
-      ? localDayKey(data.timestamp.toDate())
-      : '');
+    const day =
+      data.dateKey ||
+      (data.timestamp?.toDate ? localDayKey(data.timestamp.toDate()) : '');
     if (day !== today) return;
     tempsToday.push(data);
     if (data.projectId === projectId) {
@@ -269,9 +283,9 @@ export async function verifyRestaurantCompliance(projectId) {
 
   sanSnap.forEach(d => {
     const data = d.data() || {};
-    const day = data.dateKey || (data.timestamp?.toDate
-      ? localDayKey(data.timestamp.toDate())
-      : '');
+    const day =
+      data.dateKey ||
+      (data.timestamp?.toDate ? localDayKey(data.timestamp.toDate()) : '');
     if (day !== today) return;
     sansToday.push(data);
     if (data.projectId === projectId) {
@@ -324,7 +338,10 @@ async function runComplianceFromUrl() {
     let project = null;
     const projectIdParam = params.get('projectId');
     if (projectIdParam) {
-      project = { id: projectIdParam, name: params.get('projectName') || 'Restaurant' };
+      project = {
+        id: projectIdParam,
+        name: params.get('projectName') || 'Restaurant'
+      };
     } else {
       project = findRestaurantProject(params.get('restaurant') || 'Hot Chix');
     }

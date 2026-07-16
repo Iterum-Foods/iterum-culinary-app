@@ -21,8 +21,16 @@
 
   function statusLabel(item) {
     var st = global.iterumSuppliesInventory.stockStatus(item);
-    if (st === 'out') return { text: 'Out of stock', cls: 'tc-status-pill tc-status-pill--critical' };
-    if (st === 'low') return { text: 'Low stock', cls: 'tc-status-pill tc-status-pill--warning' };
+    if (st === 'out')
+      return {
+        text: 'Out of stock',
+        cls: 'tc-status-pill tc-status-pill--critical'
+      };
+    if (st === 'low')
+      return {
+        text: 'Low stock',
+        cls: 'tc-status-pill tc-status-pill--warning'
+      };
     return { text: 'Good', cls: 'tc-status-pill tc-status-pill--ok' };
   }
 
@@ -46,7 +54,11 @@
         var st = statusLabel(item);
         return (
           '<tr class="' +
-          (st.text === 'Low stock' ? 'is-low' : st.text === 'Out of stock' ? 'is-out' : '') +
+          (st.text === 'Low stock'
+            ? 'is-low'
+            : st.text === 'Out of stock'
+              ? 'is-out'
+              : '') +
           '">' +
           '<td class="inv-name">' +
           escapeHtml(item.name) +
@@ -117,7 +129,9 @@
     $('sup-f-sku').value = item ? item.sku : '';
     $('sup-f-qty').value = item ? item.quantity : 0;
     $('sup-f-unit').value = item ? item.unit : 'each';
-    $('sup-f-location').value = item ? item.location : meta?.defaultLocation || '';
+    $('sup-f-location').value = item
+      ? item.location
+      : meta?.defaultLocation || '';
     $('sup-f-par').value = item ? item.parLevel : '';
     $('sup-f-reorder').value = item ? item.reorderPoint : '';
     $('sup-f-cost').value = item ? item.cost : '';

@@ -164,33 +164,37 @@
     html += '</div>';
     host.innerHTML = html;
 
-    host.querySelectorAll('input[name="sop-job-tag"]').forEach(function (input) {
-      input.addEventListener('change', function () {
-        if (input.value === ALL && input.checked) {
-          host.querySelectorAll('input[name="sop-job-tag"]').forEach(function (el) {
-            if (el.value !== ALL) {
-              el.checked = false;
+    host
+      .querySelectorAll('input[name="sop-job-tag"]')
+      .forEach(function (input) {
+        input.addEventListener('change', function () {
+          if (input.value === ALL && input.checked) {
+            host
+              .querySelectorAll('input[name="sop-job-tag"]')
+              .forEach(function (el) {
+                if (el.value !== ALL) {
+                  el.checked = false;
+                }
+              });
+            return;
+          }
+          if (input.value !== ALL && input.checked) {
+            var allBox = host.querySelector('input[value="' + ALL + '"]');
+            if (allBox) {
+              allBox.checked = false;
             }
-          });
-          return;
-        }
-        if (input.value !== ALL && input.checked) {
-          var allBox = host.querySelector('input[value="' + ALL + '"]');
-          if (allBox) {
-            allBox.checked = false;
           }
-        }
-        var anyRole = host.querySelector(
-          'input[name="sop-job-tag"]:checked:not([value="' + ALL + '"])'
-        );
-        if (!anyRole) {
-          var all = host.querySelector('input[value="' + ALL + '"]');
-          if (all) {
-            all.checked = true;
+          var anyRole = host.querySelector(
+            'input[name="sop-job-tag"]:checked:not([value="' + ALL + '"])'
+          );
+          if (!anyRole) {
+            var all = host.querySelector('input[value="' + ALL + '"]');
+            if (all) {
+              all.checked = true;
+            }
           }
-        }
+        });
       });
-    });
   }
 
   function readJobTagCheckboxes(host) {
@@ -202,11 +206,13 @@
       return [ALL];
     }
     var tags = [];
-    host.querySelectorAll('input[name="sop-job-tag"]:checked').forEach(function (el) {
-      if (el.value && el.value !== ALL) {
-        tags.push(el.value);
-      }
-    });
+    host
+      .querySelectorAll('input[name="sop-job-tag"]:checked')
+      .forEach(function (el) {
+        if (el.value && el.value !== ALL) {
+          tags.push(el.value);
+        }
+      });
     return tags.length ? tags : [ALL];
   }
 
@@ -215,9 +221,10 @@
       { value: 'all', label: 'All guides' },
       {
         value: 'my',
-        label: positionKey && positionKey !== ALL
-          ? 'My job — ' + jobTagLabel(positionKey)
-          : 'My job'
+        label:
+          positionKey && positionKey !== ALL
+            ? 'My job — ' + jobTagLabel(positionKey)
+            : 'My job'
       }
     ];
     jobOptions().forEach(function (o) {

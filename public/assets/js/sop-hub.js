@@ -64,7 +64,11 @@
       state.defaultPositionKey = 'all';
       return;
     }
-    state.defaultPositionKey = await api.getDefaultPositionKey(getDb(), uid, pid);
+    state.defaultPositionKey = await api.getDefaultPositionKey(
+      getDb(),
+      uid,
+      pid
+    );
   }
 
   function renderJobFilter() {
@@ -102,7 +106,10 @@
     var pid = getProjectId();
     if (!pid) {
       setStatus('Select a workspace in the sidebar first.', true);
-      state.pack = window.iterumSopPack?.emptyPack?.() || { categories: [], sops: [] };
+      state.pack = window.iterumSopPack?.emptyPack?.() || {
+        categories: [],
+        sops: []
+      };
       render();
       return;
     }
@@ -116,7 +123,8 @@
     } catch (e) {
       console.error(e);
       setStatus('Could not load SOP pack.', true);
-      state.pack = window.iterumSopPack.loadLocal(pid) || window.iterumSopPack.emptyPack();
+      state.pack =
+        window.iterumSopPack.loadLocal(pid) || window.iterumSopPack.emptyPack();
       await refreshDefaultPosition();
     }
     render();
@@ -130,8 +138,14 @@
     }
     setStatus('Publishing to Shift…');
     try {
-      state.pack = await window.iterumSopPack.savePack(getDb(), pid, state.pack);
-      setStatus(`Published ${state.pack.sops.length} guide(s) to mobile How-to tab.`);
+      state.pack = await window.iterumSopPack.savePack(
+        getDb(),
+        pid,
+        state.pack
+      );
+      setStatus(
+        `Published ${state.pack.sops.length} guide(s) to mobile How-to tab.`
+      );
       toast('SOPs published to Shift app', 'success');
     } catch (e) {
       console.error(e);
@@ -190,7 +204,10 @@
 
     el.innerHTML = sops
       .map(function (s) {
-        var catName = window.iterumSopPack.categoryName(state.pack, s.categoryId);
+        var catName = window.iterumSopPack.categoryName(
+          state.pack,
+          s.categoryId
+        );
         var wareSummary = window.iterumServiceWarePicker
           ? window.iterumServiceWarePicker.formatSummary(s.serviceWare)
           : '';
@@ -286,14 +303,14 @@
     var categoryId = $('sop-f-category').value;
     var serviceWare = state.sopPicker
       ? state.sopPicker.getValue()
-      : (window.iterumSuppliesInventory?.emptyServiceWare?.() || {
+      : window.iterumSuppliesInventory?.emptyServiceWare?.() || {
           paper_goods: [],
           plateware: [],
           tableware: [],
           office_supplies: [],
           first_aid: [],
           cleaning_chemicals: []
-        });
+        };
     if (!title) {
       toast('Enter a title.', 'error');
       return;

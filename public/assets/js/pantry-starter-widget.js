@@ -16,7 +16,10 @@
     } else {
       card.removeAttribute('hidden');
     }
-    if (global.iterumMenuLaunchChecklist && global.iterumMenuLaunchChecklist.refresh) {
+    if (
+      global.iterumMenuLaunchChecklist &&
+      global.iterumMenuLaunchChecklist.refresh
+    ) {
       global.iterumMenuLaunchChecklist.refresh();
     }
   }

@@ -6,7 +6,7 @@
     'prep-recipe',
     'prep',
     'bar-prep',
-    'kitchen-prep',
+    'kitchen-prep'
   ]);
 
   function getContainer() {
@@ -68,7 +68,7 @@
       name: `ingredient_${index}`,
       defaultValue: preset.quantity ?? preset.amount ?? 1,
       defaultUnit,
-      ingredient: ingredient?.isPrepRecipe ? null : ingredient,
+      ingredient: ingredient?.isPrepRecipe ? null : ingredient
     });
     container.appendChild(qtyBlock);
   }
@@ -78,10 +78,18 @@
     const isPrep = kind === 'prep-recipe' || data.isPrepRecipe;
 
     const idInput = document.getElementById(`ingredient-select-${index}-id`);
-    const nameInput = document.getElementById(`ingredient-select-${index}-name`);
-    const kindInput = document.getElementById(`ingredient-select-${index}-kind`);
-    const searchInput = document.getElementById(`ingredient-select-${index}-input`);
-    const baseUnit = document.getElementById(`ingredient-select-${index}-base-unit`);
+    const nameInput = document.getElementById(
+      `ingredient-select-${index}-name`
+    );
+    const kindInput = document.getElementById(
+      `ingredient-select-${index}-kind`
+    );
+    const searchInput = document.getElementById(
+      `ingredient-select-${index}-input`
+    );
+    const baseUnit = document.getElementById(
+      `ingredient-select-${index}-base-unit`
+    );
 
     let id = data.id || data.ingredientId || data.recipeId || '';
     const name = data.name || '';
@@ -110,8 +118,12 @@
 
     updateQuantityUnitSelector(index, pseudo || null, data);
 
-    const qtyInput = document.getElementById(`ingredient-qty-unit-${index}-qty`);
-    const unitSelect = document.getElementById(`ingredient-qty-unit-${index}-unit`);
+    const qtyInput = document.getElementById(
+      `ingredient-qty-unit-${index}-qty`
+    );
+    const unitSelect = document.getElementById(
+      `ingredient-qty-unit-${index}-unit`
+    );
     const qty = data.quantity ?? data.amount;
     if (qtyInput && qty != null && qty !== '') qtyInput.value = qty;
     if (unitSelect && data.unit) unitSelect.value = data.unit;
@@ -157,9 +169,12 @@
           rowEl.dataset.ingredientKind = ingredient.isPrepRecipe
             ? 'prep-recipe'
             : 'ingredient';
-          rowEl.classList.toggle('is-prep-ingredient', !!ingredient.isPrepRecipe);
+          rowEl.classList.toggle(
+            'is-prep-ingredient',
+            !!ingredient.isPrepRecipe
+          );
           updateQuantityUnitSelector(index, ingredient);
-        },
+        }
       });
       selectWrap.appendChild(selector);
     } else {
@@ -243,64 +258,80 @@
 
   function collectIngredients() {
     const ingredients = [];
-    document.querySelectorAll('#ingredients-container .ingredient-row').forEach(row => {
-      const index = row.dataset.ingredientIndex;
-      const kind =
-        row.dataset.ingredientKind ||
-        document.getElementById(`ingredient-select-${index}-kind`)?.value ||
-        'ingredient';
+    document
+      .querySelectorAll('#ingredients-container .ingredient-row')
+      .forEach(row => {
+        const index = row.dataset.ingredientIndex;
+        const kind =
+          row.dataset.ingredientKind ||
+          document.getElementById(`ingredient-select-${index}-kind`)?.value ||
+          'ingredient';
 
-      const hiddenId = document.getElementById(`ingredient-select-${index}-id`);
-      const hiddenName = document.getElementById(`ingredient-select-${index}-name`);
-      const fallbackSelect = row.querySelector('.ingredient-select');
-      const qtyInput = document.getElementById(`ingredient-qty-unit-${index}-qty`);
-      const unitSelect = document.getElementById(`ingredient-qty-unit-${index}-unit`);
-      const notesInput = row.querySelector('.ingredient-notes');
-      const wasteInput = row.querySelector('.ingredient-waste');
+        const hiddenId = document.getElementById(
+          `ingredient-select-${index}-id`
+        );
+        const hiddenName = document.getElementById(
+          `ingredient-select-${index}-name`
+        );
+        const fallbackSelect = row.querySelector('.ingredient-select');
+        const qtyInput = document.getElementById(
+          `ingredient-qty-unit-${index}-qty`
+        );
+        const unitSelect = document.getElementById(
+          `ingredient-qty-unit-${index}-unit`
+        );
+        const notesInput = row.querySelector('.ingredient-notes');
+        const wasteInput = row.querySelector('.ingredient-waste');
 
-      let id = hiddenId?.value?.trim() || '';
-      let name = hiddenName?.value?.trim() || '';
+        let id = hiddenId?.value?.trim() || '';
+        let name = hiddenName?.value?.trim() || '';
 
-      if (!id && fallbackSelect?.value) {
-        id = fallbackSelect.value;
-        name =
-          fallbackSelect.options[fallbackSelect.selectedIndex]?.text?.trim() || name;
-      }
+        if (!id && fallbackSelect?.value) {
+          id = fallbackSelect.value;
+          name =
+            fallbackSelect.options[
+              fallbackSelect.selectedIndex
+            ]?.text?.trim() || name;
+        }
 
-      if (!id && !name) return;
+        if (!id && !name) return;
 
-      const quantity = qtyInput?.value?.trim() || '';
-      const unit = unitSelect?.value || '';
-      const wastePercentage = wasteInput ? parseFloat(wasteInput.value) || 0 : 0;
-      const isPrep = kind === 'prep-recipe' || id.startsWith('prep:');
+        const quantity = qtyInput?.value?.trim() || '';
+        const unit = unitSelect?.value || '';
+        const wastePercentage = wasteInput
+          ? parseFloat(wasteInput.value) || 0
+          : 0;
+        const isPrep = kind === 'prep-recipe' || id.startsWith('prep:');
 
-      const entry = {
-        type: isPrep ? 'prep-recipe' : 'ingredient',
-        id: isPrep ? id.replace(/^prep:/, '') : id,
-        name,
-        quantity,
-        amount: quantity,
-        unit,
-        wastePercentage,
-        trimPercentage: wastePercentage,
-        waste: wastePercentage,
-        notes: notesInput?.value?.trim() || '',
-      };
+        const entry = {
+          type: isPrep ? 'prep-recipe' : 'ingredient',
+          id: isPrep ? id.replace(/^prep:/, '') : id,
+          name,
+          quantity,
+          amount: quantity,
+          unit,
+          wastePercentage,
+          trimPercentage: wastePercentage,
+          waste: wastePercentage,
+          notes: notesInput?.value?.trim() || ''
+        };
 
-      if (isPrep) {
-        entry.recipeId = entry.id;
-        entry.isPrepRecipe = true;
-      }
+        if (isPrep) {
+          entry.recipeId = entry.id;
+          entry.isPrepRecipe = true;
+        }
 
-      ingredients.push(entry);
-    });
+        ingredients.push(entry);
+      });
     return ingredients;
   }
 
   function loadPrepRecipesForPicker() {
     let all = [];
     if (window.userDataManager) {
-      all = window.userDataManager.loadData('recipes', { filterByProject: false });
+      all = window.userDataManager.loadData('recipes', {
+        filterByProject: false
+      });
     } else if (window.universalRecipeManager) {
       all = window.universalRecipeManager.getAllRecipes();
     } else {
@@ -378,27 +409,29 @@
       el.addEventListener('click', close);
     });
 
-    modal.querySelector('#tc-rd-prep-confirm')?.addEventListener('click', () => {
-      const select = modal.querySelector('#tc-rd-prep-recipe-select');
-      const recipe = prepRecipes.find(r => r.id === select?.value);
-      if (!recipe) return;
+    modal
+      .querySelector('#tc-rd-prep-confirm')
+      ?.addEventListener('click', () => {
+        const select = modal.querySelector('#tc-rd-prep-recipe-select');
+        const recipe = prepRecipes.find(r => r.id === select?.value);
+        if (!recipe) return;
 
-      const qty = modal.querySelector('#tc-rd-prep-qty')?.value || '1';
-      const unit = modal.querySelector('#tc-rd-prep-unit')?.value || 'oz';
-      const title = recipe.title || recipe.name || 'Prep recipe';
+        const qty = modal.querySelector('#tc-rd-prep-qty')?.value || '1';
+        const unit = modal.querySelector('#tc-rd-prep-unit')?.value || 'oz';
+        const title = recipe.title || recipe.name || 'Prep recipe';
 
-      addIngredientRow({
-        type: 'prep-recipe',
-        isPrepRecipe: true,
-        id: `prep:${recipe.id}`,
-        recipeId: recipe.id,
-        name: title,
-        quantity: qty,
-        unit,
-        notes: 'Prep recipe',
+        addIngredientRow({
+          type: 'prep-recipe',
+          isPrepRecipe: true,
+          id: `prep:${recipe.id}`,
+          recipeId: recipe.id,
+          name: title,
+          quantity: qty,
+          unit,
+          notes: 'Prep recipe'
+        });
+        close();
       });
-      close();
-    });
   }
 
   function removeIngredientRow(button) {
@@ -435,7 +468,7 @@
     reset: resetIngredientsContainer,
     addPrepRecipe: openAddPrepRecipeIngredient,
     removeRow: removeIngredientRow,
-    reindexRows,
+    reindexRows
   };
 
   function bootIngredientRows() {

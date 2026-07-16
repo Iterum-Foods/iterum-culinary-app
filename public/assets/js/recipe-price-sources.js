@@ -53,9 +53,7 @@
     const counts = {};
     const lines = [];
     list.forEach(function (ing) {
-      const key = ing.priceFound
-        ? ing.priceSource || 'unknown'
-        : 'missing';
+      const key = ing.priceFound ? ing.priceSource || 'unknown' : 'missing';
       counts[key] = (counts[key] || 0) + 1;
       if (key === 'firestore_vendor_price') {
         lines.push({
@@ -113,7 +111,9 @@
                 ' <span class="rp-src-was">(was $' +
                 Number(row.previousPrice).toFixed(4) +
                 ' from ' +
-                escapeHtml(getSourceLabel(row.previousSource || 'ingredient_library')) +
+                escapeHtml(
+                  getSourceLabel(row.previousSource || 'ingredient_library')
+                ) +
                 ')</span>';
             }
             return (
@@ -164,7 +164,10 @@
 
   async function refreshVendorPrices() {
     const fs = global.firestoreSync;
-    if (fs?.initialized && typeof fs.refreshVendorPricesFromFirestore === 'function') {
+    if (
+      fs?.initialized &&
+      typeof fs.refreshVendorPricesFromFirestore === 'function'
+    ) {
       try {
         await fs.refreshVendorPricesFromFirestore();
       } catch (e) {
@@ -263,7 +266,9 @@
     }
     const items = global.enhancedMenuManager?.menuItems || [];
     const recipes = [];
-    const allRecipes = JSON.parse(global.localStorage.getItem('recipes') || '[]');
+    const allRecipes = JSON.parse(
+      global.localStorage.getItem('recipes') || '[]'
+    );
 
     items.forEach(function (item) {
       if (!item.recipeId) {
@@ -292,7 +297,9 @@
         );
       }
       if (costData.missingPrices) {
-        merged.missingPrices = merged.missingPrices.concat(costData.missingPrices);
+        merged.missingPrices = merged.missingPrices.concat(
+          costData.missingPrices
+        );
       }
     });
 

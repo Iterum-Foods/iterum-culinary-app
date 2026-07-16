@@ -56,12 +56,14 @@ class IngredientSelectorIntegrated {
       'prep-recipe',
       'prep',
       'bar-prep',
-      'kitchen-prep',
+      'kitchen-prep'
     ]);
     let all = [];
 
     if (window.userDataManager) {
-      all = window.userDataManager.loadData('recipes', { filterByProject: false });
+      all = window.userDataManager.loadData('recipes', {
+        filterByProject: false
+      });
     } else if (window.universalRecipeManager) {
       all = window.universalRecipeManager.getAllRecipes();
     } else {
@@ -88,7 +90,7 @@ class IngredientSelectorIntegrated {
         category: 'Prep recipe',
         unit: r.defaultUnit || r.yieldUnit || 'oz',
         isPrepRecipe: true,
-        bestPrice: null,
+        bestPrice: null
       }));
 
     console.log(
@@ -325,7 +327,8 @@ class IngredientSelectorIntegrated {
     // Update hidden fields
     hiddenId.value = ingredient.id;
     hiddenName.value = ingredient.name;
-    hiddenUnit.value = ingredient.unit || ingredient.default_unit || (isPrep ? 'oz' : 'g');
+    hiddenUnit.value =
+      ingredient.unit || ingredient.default_unit || (isPrep ? 'oz' : 'g');
     if (hiddenKind) {
       hiddenKind.value = isPrep ? 'prep-recipe' : 'ingredient';
     }

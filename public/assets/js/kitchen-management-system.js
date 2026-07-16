@@ -66,7 +66,10 @@ class KitchenManagementSystem {
       }
       if (!allRecipes.length && window.universalRecipeManager?.getAllRecipes) {
         allRecipes = window.universalRecipeManager.getAllRecipes();
-      } else if (!allRecipes.length && window.universalRecipeManager?.getRecipeLibrary) {
+      } else if (
+        !allRecipes.length &&
+        window.universalRecipeManager?.getRecipeLibrary
+      ) {
         allRecipes = window.universalRecipeManager.getRecipeLibrary();
       } else if (!allRecipes.length) {
         allRecipes = JSON.parse(localStorage.getItem('recipes') || '[]');

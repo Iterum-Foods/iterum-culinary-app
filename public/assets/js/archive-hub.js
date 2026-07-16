@@ -86,7 +86,9 @@
         menu: parseJson(inv.menuKey, null),
         menuRecipeLinks: parseJson('menu_recipe_links', {}),
         activeProjectKeys: {
-          iterum_current_project: localStorage.getItem('iterum_current_project'),
+          iterum_current_project: localStorage.getItem(
+            'iterum_current_project'
+          ),
           active_project: localStorage.getItem('active_project')
         }
       },
@@ -153,9 +155,14 @@
         if (!pid) return;
         const bundle = buildProjectExport(pid);
         const safeName = (bundle.project.name || pid).replace(/[^\w\-]+/g, '_');
-        downloadJson(`iterum-archive_${safeName}_${pid.slice(0, 8)}.json`, bundle);
+        downloadJson(
+          `iterum-archive_${safeName}_${pid.slice(0, 8)}.json`,
+          bundle
+        );
         if (typeof window.showSuccess === 'function') {
-          window.showSuccess(`Exported archive bundle for ${bundle.project.name}`);
+          window.showSuccess(
+            `Exported archive bundle for ${bundle.project.name}`
+          );
         }
       });
     });

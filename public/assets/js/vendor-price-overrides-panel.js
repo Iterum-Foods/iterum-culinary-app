@@ -19,11 +19,7 @@
 
   function ingredientFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    return (
-      params.get('ingredient') ||
-      params.get('vp-ing') ||
-      ''
-    ).trim();
+    return (params.get('ingredient') || params.get('vp-ing') || '').trim();
   }
 
   function applyIngredientUrlPrefill(mount) {

@@ -28,9 +28,11 @@ test.describe('Smoke', () => {
         await expect(page.locator('body')).toContainText(
           /Operations exceptions/i
         );
-        await expect(page.locator('[data-workspace-save-indicator]')).toHaveCount(1);
+        await expect(
+          page.locator('[data-workspace-save-indicator]')
+        ).toHaveCount(1);
         await expect(page.locator('.iterum-workspace-banner')).toContainText(
-          /Saving to workspace/i
+          /Workspace/i
         );
       }
       if (path === '/equipment-management.html') {
@@ -45,7 +47,9 @@ test.describe('Smoke', () => {
         await expect(page.locator('#mobile-workspace-context')).toHaveCount(1);
       }
       if (path === '/archive-hub.html') {
-        await expect(page.getByRole('heading', { level: 1, name: /Archive/i })).toBeVisible();
+        await expect(
+          page.getByRole('heading', { level: 1, name: /Archive/i })
+        ).toBeVisible();
         await expect(page.locator('#archive-projects-tbody')).toHaveCount(1);
       }
       if (path === '/menu-builder.html') {
@@ -74,7 +78,9 @@ test.describe('Smoke', () => {
     await page.goto('/project-hub.html#team');
     await expect(page.locator('#hub-tab-team')).toBeVisible();
     await expect(page.locator('#hub-tab-workspaces')).toBeHidden();
-    await expect(page.getByRole('heading', { name: /Team management/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /Team management/i })
+    ).toBeVisible();
   });
 
   test('sign-in page loads', async ({ page }) => {
@@ -121,7 +127,9 @@ test.describe('Smoke', () => {
     const res = await page.goto('/dashboard.html#checklist-opening');
     expect(res?.ok()).toBeTruthy();
     await expect(
-      page.locator('.checklist-modal h3', { hasText: /Daily Opening Checklist/i })
+      page.locator('.checklist-modal h3', {
+        hasText: /Daily Opening Checklist/i
+      })
     ).toBeVisible();
   });
 
@@ -168,7 +176,9 @@ test.describe('Smoke', () => {
   test('dish creator page loads', async ({ page }) => {
     const res = await page.goto('/dish-creator.html');
     expect(res?.ok()).toBeTruthy();
-    await expect(page.getByRole('heading', { name: /Dish Creator/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /Dish Creator/i })
+    ).toBeVisible();
     await expect(page.locator('#dish-creator-root')).toHaveCount(1);
   });
 
@@ -183,20 +193,26 @@ test.describe('Smoke', () => {
   test('sop hub supplies picker markup loads', async ({ page }) => {
     const res = await page.goto('/sop-hub.html');
     expect(res?.ok()).toBeTruthy();
-    await expect(page.getByRole('heading', { name: /How-to guides/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /How-to guides/i })
+    ).toBeVisible();
     await expect(page.locator('#sop-service-ware-picker')).toHaveCount(1);
   });
 
   test('dashboard menu launch checklist loads', async ({ page }) => {
     const res = await page.goto('/dashboard.html');
     expect(res?.ok()).toBeTruthy();
-    await expect(page.locator('#menu-launch-checklist-dashboard')).toHaveCount(1);
+    await expect(page.locator('#menu-launch-checklist-dashboard')).toHaveCount(
+      1
+    );
   });
 
   test('privacy policy page loads', async ({ page }) => {
     const res = await page.goto('/privacy.html');
     expect(res?.ok()).toBeTruthy();
-    await expect(page.getByRole('heading', { name: /privacy policy/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /privacy policy/i })
+    ).toBeVisible();
     await expect(page.locator('body')).toContainText(/Firebase/i);
   });
 
@@ -210,7 +226,9 @@ test.describe('Smoke', () => {
     });
     const res = await page.goto('/stock-setup.html');
     expect(res?.ok()).toBeTruthy();
-    await expect(page.getByRole('heading', { name: /stock your kitchen/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /stock your kitchen/i })
+    ).toBeVisible();
     await expect(page.locator('#panel-ingredients')).toBeVisible();
     await expect(page.locator('#ingredient-rows')).toHaveCount(1);
   });

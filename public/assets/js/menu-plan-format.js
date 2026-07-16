@@ -29,12 +29,7 @@
       'Dessert',
       'Wine Pairing Notes'
     ],
-    'club-snacks': [
-      'Snacks',
-      'Small Plates',
-      'Larger Plates',
-      'Beverages'
-    ],
+    'club-snacks': ['Snacks', 'Small Plates', 'Larger Plates', 'Beverages'],
     'fast-casual': ['Mains', 'Sides', 'Desserts', 'Beverages'],
     cocktails: [
       'Signature Cocktails',
@@ -189,11 +184,9 @@
       raw.category ||
       menu?.sections?.[0]?.name ||
       'Main Courses';
-    const mealPeriods =
-      raw.mealPeriods ||
+    const mealPeriods = raw.mealPeriods ||
       raw.availability?.mealPeriods ||
-      menu?.service?.mealPeriods ||
-      ['dinner'];
+      menu?.service?.mealPeriods || ['dinner'];
 
     return {
       id:
@@ -204,7 +197,12 @@
       section: sectionName,
       category: sectionName,
       price: Number(raw.price) || 0,
-      foodCost: raw.foodCost != null ? Number(raw.foodCost) : raw.cogs != null ? Number(raw.cogs) : null,
+      foodCost:
+        raw.foodCost != null
+          ? Number(raw.foodCost)
+          : raw.cogs != null
+            ? Number(raw.cogs)
+            : null,
       targetFoodCostPercent:
         raw.targetFoodCostPercent != null
           ? Number(raw.targetFoodCostPercent)
@@ -213,9 +211,8 @@
       recipeStatus: raw.recipeId ? 'linked' : raw.recipeStatus || 'stub',
       mealPeriods,
       availability: raw.availability || {
-        daysAvailable: raw.days || menu?.service?.days?.length
-          ? menu.service.days
-          : ['all'],
+        daysAvailable:
+          raw.days || menu?.service?.days?.length ? menu.service.days : ['all'],
         mealPeriods
       },
       status: raw.status || 'draft',
@@ -379,8 +376,7 @@
   }
 
   function fillCategorySelects(selectIds, categories, fallback) {
-    const list =
-      categories?.length ? categories : fallback || ['Main Courses'];
+    const list = categories?.length ? categories : fallback || ['Main Courses'];
     (selectIds || []).forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;

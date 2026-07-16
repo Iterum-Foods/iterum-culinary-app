@@ -146,7 +146,7 @@
     if (pm?.currentProject?.id && pm.currentProject.id !== 'master') {
       return pm.currentProject.id;
     }
-  var uid =
+    var uid =
       global.authManager?.currentUser?.userId ||
       global.authManager?.currentUser?.id ||
       '';
@@ -370,7 +370,8 @@
         if (ctx.stats.missingCost) {
           detail = ctx.stats.missingCost + ' missing cost';
         } else if (ctx.stats.drafts) {
-          detail = ctx.stats.drafts + ' draft' + (ctx.stats.drafts === 1 ? '' : 's');
+          detail =
+            ctx.stats.drafts + ' draft' + (ctx.stats.drafts === 1 ? '' : 's');
         }
       } else if (step.id === 'ingredients_library' && !done) {
         detail = ctx.customIngredients
@@ -386,7 +387,8 @@
           : 'Publish from SOP Hub';
       } else if (step.id === 'publish_shift' && done && ctx.publishedAt) {
         try {
-          detail = 'Published ' + new Date(ctx.publishedAt).toLocaleDateString();
+          detail =
+            'Published ' + new Date(ctx.publishedAt).toLocaleDateString();
         } catch (e) {
           detail = 'Published';
         }
@@ -439,7 +441,9 @@
         '" aria-pressed="' +
         (step.done ? 'true' : 'false') +
         '" aria-label="' +
-        escapeHtml((step.done ? 'Mark incomplete: ' : 'Mark complete: ') + step.label) +
+        escapeHtml(
+          (step.done ? 'Mark incomplete: ' : 'Mark complete: ') + step.label
+        ) +
         '" title="Mark complete">' +
         '<i class="fa-solid ' +
         (step.done ? 'fa-check' : 'fa-plus') +
@@ -484,9 +488,11 @@
           escapeHtml(PHASE_LABELS[phase]) +
           '</h4>' +
           '<ul class="mlc-list">' +
-          phaseSteps.map(function (s) {
-            return renderStepRow(s, variant);
-          }).join('') +
+          phaseSteps
+            .map(function (s) {
+              return renderStepRow(s, variant);
+            })
+            .join('') +
           '</ul></div>'
         );
       })
@@ -569,9 +575,11 @@
     }
 
     var projectId = resolveProjectId();
-    var steps = projectId ? evaluate(projectId) : STEPS.map(function (s) {
-      return Object.assign({}, s, { done: false, detail: '' });
-    });
+    var steps = projectId
+      ? evaluate(projectId)
+      : STEPS.map(function (s) {
+          return Object.assign({}, s, { done: false, detail: '' });
+        });
     container.innerHTML = renderHtml(steps, entry.variant, projectId);
     bindContainer(container, projectId);
     return entry;
@@ -596,13 +604,17 @@
     resolveProjectId: resolveProjectId
   };
 
-  ['projectChanged', 'menuPublishedToShift', 'menuWorkflowUpdated', 'menuLaunchChecklistUpdated', 'iterumFoodInventoryUpdated'].forEach(
-    function (evt) {
-      global.addEventListener(evt, function () {
-        refresh();
-      });
-    }
-  );
+  [
+    'projectChanged',
+    'menuPublishedToShift',
+    'menuWorkflowUpdated',
+    'menuLaunchChecklistUpdated',
+    'iterumFoodInventoryUpdated'
+  ].forEach(function (evt) {
+    global.addEventListener(evt, function () {
+      refresh();
+    });
+  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {

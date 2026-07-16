@@ -103,7 +103,10 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
   white-space: nowrap;
 }
 
@@ -163,7 +166,9 @@
   cursor: pointer;
   background: transparent;
   color: hsl(var(--tc-muted-foreground));
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .mb-workflow-step.is-active {
@@ -429,7 +434,9 @@
   color: hsl(var(--tc-foreground));
   font-size: 0.875rem;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .mb-view-toggle button + button {
@@ -602,7 +609,9 @@
   border-radius: 0.5rem;
   background: hsl(var(--tc-background));
   padding: 0.75rem;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .mb-item-card:hover {
@@ -784,7 +793,9 @@
   color: hsl(var(--tc-muted-foreground));
   background: transparent;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
 .mb-add-lane-btn:hover {

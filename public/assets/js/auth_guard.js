@@ -211,7 +211,8 @@
           await window.authManager.signInWithEmail(email, password);
 
           // Show success
-          successDiv.textContent = 'Sign-in successful. Reloading your workspace…';
+          successDiv.textContent =
+            'Sign-in successful. Reloading your workspace…';
           successDiv.style.display = 'block';
 
           // Reload page after short delay

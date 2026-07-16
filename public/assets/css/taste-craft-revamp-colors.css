@@ -95,7 +95,10 @@
   border: 1px solid hsl(var(--tc-sidebar-border) / 0.75) !important;
 }
 
-.tc-revamp-body .unified-nav-sidebar .tc-sidebar-account-wrap .nav-user-menu-btn[aria-expanded='true'] {
+.tc-revamp-body
+  .unified-nav-sidebar
+  .tc-sidebar-account-wrap
+  .nav-user-menu-btn[aria-expanded='true'] {
   background: hsl(var(--tc-sidebar-accent)) !important;
   color: hsl(var(--tc-sidebar-accent-foreground)) !important;
 }

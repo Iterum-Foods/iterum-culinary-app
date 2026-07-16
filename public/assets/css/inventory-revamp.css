@@ -132,11 +132,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: hsl(var(--tc-primary-foreground));
-  background: linear-gradient(
-    135deg,
-    hsl(var(--tc-primary)) 0%,
-    hsl(var(--tc-primary-glow)) 100%
-  );
+  background: linear-gradient(135deg, hsl(var(--tc-primary)) 0%, hsl(var(--tc-primary-glow)) 100%);
   white-space: nowrap;
 }
 

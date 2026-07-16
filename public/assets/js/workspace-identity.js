@@ -10,7 +10,8 @@
       personaLabel: 'Owner / operator',
       pillar: 'run',
       pillarLabel: 'Run the shift',
-      tagline: 'Compliance, logs, and backups sized for your restaurant—not enterprise IT.',
+      tagline:
+        'Compliance, logs, and backups sized for your restaurant—not enterprise IT.',
       actions: [
         { href: 'dashboard.html#temperature', label: 'Temperature log' },
         { href: 'mobile-compliance.html', label: 'Shift app' },
@@ -22,7 +23,8 @@
       personaLabel: 'Chef launching',
       pillar: 'develop',
       pillarLabel: 'Develop',
-      tagline: 'Cost the menu, publish recipes, and open with one organized workspace.',
+      tagline:
+        'Cost the menu, publish recipes, and open with one organized workspace.',
       actions: [
         { href: 'recipe-library.html', label: 'Recipe library' },
         { href: 'menu-builder.html', label: 'Menu builder' },
@@ -58,7 +60,8 @@
       personaLabel: 'R&D lab',
       pillar: 'develop',
       pillarLabel: 'Develop',
-      tagline: 'Version ideas, test batches, and promote winners to the library.',
+      tagline:
+        'Version ideas, test batches, and promote winners to the library.',
       actions: [
         { href: 'recipe-developer.html', label: 'Recipe developer' },
         { href: 'recipe-library.html', label: 'Library' },
@@ -82,7 +85,8 @@
       personaLabel: 'Demo workspace',
       pillar: 'run',
       pillarLabel: 'Run the shift',
-      tagline: 'Explore sample recipes, menus, and compliance logs in a safe sandbox.',
+      tagline:
+        'Explore sample recipes, menus, and compliance logs in a safe sandbox.',
       actions: [
         { href: 'dashboard.html', label: 'Dashboard' },
         { href: 'menu-builder.html', label: 'Sample menus' },
@@ -94,7 +98,8 @@
       personaLabel: 'Workspace',
       pillar: 'develop',
       pillarLabel: 'Develop',
-      tagline: 'Recipes and menus organized per project—pick a pillar to start.',
+      tagline:
+        'Recipes and menus organized per project—pick a pillar to start.',
       actions: [
         { href: 'recipe-library.html', label: 'Recipes' },
         { href: 'dashboard.html', label: 'Dashboard' },
@@ -198,7 +203,9 @@
   }
 
   function mountAll() {
-    document.querySelectorAll('[data-workspace-identity]').forEach(renderIdentity);
+    document
+      .querySelectorAll('[data-workspace-identity]')
+      .forEach(renderIdentity);
   }
 
   function iterumResolveWorkspaceProfile(project) {

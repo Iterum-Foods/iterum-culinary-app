@@ -114,8 +114,7 @@ class SyncStatusIndicator {
     if (!name || name === 'Master Project') {
       return '';
     }
-    const short =
-      name.length > 18 ? `${name.slice(0, 16)}…` : name;
+    const short = name.length > 18 ? `${name.slice(0, 16)}…` : name;
     return ` · ${short}`;
   }
 

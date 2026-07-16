@@ -112,7 +112,9 @@ small {
 
 /* ==================== Buttons - High Contrast ==================== */
 .btn,
-button:not(.nav-link):not(.header-nav-item):not(.nav-dropdown-btn):not(.nav-user-menu-btn):not(.tc-sidebar-collapse-btn):not(.tc-project-select__trigger):not(.tc-project-option) {
+button:not(.nav-link):not(.header-nav-item):not(.nav-dropdown-btn):not(.nav-user-menu-btn):not(
+    .tc-sidebar-collapse-btn
+  ):not(.tc-project-select__trigger):not(.tc-project-option) {
   font-weight: 600 !important;
   border-radius: 10px;
   padding: 12px 24px;

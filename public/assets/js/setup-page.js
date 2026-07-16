@@ -27,19 +27,28 @@
   }
 
   function labelForScope(scope) {
-    return scope === 'restaurant_group' ? 'Restaurant group' : 'Single restaurant';
+    return scope === 'restaurant_group'
+      ? 'Restaurant group'
+      : 'Single restaurant';
   }
 
   function isRealRestaurantProject(project) {
     if (!project || !project.id) return false;
-    if (project.id === 'master' || project.isMaster || project.type === 'master') {
+    if (
+      project.id === 'master' ||
+      project.isMaster ||
+      project.type === 'master'
+    ) {
       return false;
     }
     return true;
   }
 
   function getSetupProjects() {
-    if (!window.projectManager || !Array.isArray(window.projectManager.projects)) {
+    if (
+      !window.projectManager ||
+      !Array.isArray(window.projectManager.projects)
+    ) {
       return [];
     }
     return window.projectManager.projects.filter(isRealRestaurantProject);
@@ -150,7 +159,10 @@
     var hasExisting = projects.length > 0;
 
     if (createBlock) {
-      createBlock.classList.toggle('hidden', hasExisting && !(addAnotherCb && addAnotherCb.checked));
+      createBlock.classList.toggle(
+        'hidden',
+        hasExisting && !(addAnotherCb && addAnotherCb.checked)
+      );
     }
     if (pickBlock) {
       pickBlock.classList.toggle('hidden', !hasExisting);

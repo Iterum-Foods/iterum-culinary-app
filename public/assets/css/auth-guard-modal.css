@@ -16,12 +16,9 @@
   --ag-border: 35 22% 86%;
   --ag-input: 35 22% 88%;
   --ag-radius: 0.875rem;
-  --ag-shadow-card:
-    0 1px 0 hsl(35 22% 86% / 0.6),
-    0 8px 24px -12px hsl(180 25% 11% / 0.08);
+  --ag-shadow-card: 0 1px 0 hsl(35 22% 86% / 0.6), 0 8px 24px -12px hsl(180 25% 11% / 0.08);
   --ag-shadow-elevated:
-    0 24px 64px -16px hsl(180 25% 11% / 0.28),
-    0 8px 24px -8px hsl(180 25% 11% / 0.12);
+    0 24px 64px -16px hsl(180 25% 11% / 0.28), 0 8px 24px -8px hsl(180 25% 11% / 0.12);
 }
 
 @keyframes ag-fade-in {
@@ -78,11 +75,7 @@
 .ag-modal-header {
   padding: 1.75rem 1.75rem 1.35rem;
   text-align: center;
-  background: linear-gradient(
-    160deg,
-    hsl(var(--ag-primary)) 0%,
-    hsl(var(--ag-primary-glow)) 100%
-  );
+  background: linear-gradient(160deg, hsl(var(--ag-primary)) 0%, hsl(var(--ag-primary-glow)) 100%);
   border-radius: calc(var(--ag-radius) + 4px) calc(var(--ag-radius) + 4px) 0 0;
   color: hsl(var(--ag-background));
 }
@@ -195,11 +188,7 @@
 }
 
 .ag-btn-primary {
-  background: linear-gradient(
-    135deg,
-    hsl(var(--ag-accent)) 0%,
-    hsl(18 80% 50%) 100%
-  );
+  background: linear-gradient(135deg, hsl(var(--ag-accent)) 0%, hsl(18 80% 50%) 100%);
   color: hsl(var(--ag-background));
   box-shadow: 0 4px 14px hsl(var(--ag-accent) / 0.28);
 }

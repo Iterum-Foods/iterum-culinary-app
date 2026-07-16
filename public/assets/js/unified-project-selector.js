@@ -400,11 +400,7 @@ class UnifiedProjectSelector {
       const root = document.querySelector('.tc-project-select');
       const dropdown = document.getElementById('project-dropdown');
 
-      if (
-        root &&
-        dropdown &&
-        !root.contains(e.target)
-      ) {
+      if (root && dropdown && !root.contains(e.target)) {
         this.closeDropdown();
       }
     });

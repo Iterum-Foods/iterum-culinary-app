@@ -1254,9 +1254,14 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
     }
     if (!serviceWare || typeof serviceWare !== 'object') return '';
     const bits = [];
-    const types =
-      window.iterumSuppliesInventory?.TYPE_ORDER ||
-      ['paper_goods', 'plateware', 'tableware', 'office_supplies', 'first_aid', 'cleaning_chemicals'];
+    const types = window.iterumSuppliesInventory?.TYPE_ORDER || [
+      'paper_goods',
+      'plateware',
+      'tableware',
+      'office_supplies',
+      'first_aid',
+      'cleaning_chemicals'
+    ];
     types.forEach(type => {
       (serviceWare[type] || []).forEach(row => {
         if (row && row.name) {
@@ -1297,18 +1302,16 @@ ${SAFETY_PREP_BLOCK_END}`.trim();
       parts.push(
         `<section class="mc-sop-category"><h3 class="mc-section-title mc-sop-category__title">${escapeHtml((cat.icon ? cat.icon + ' ' : '') + (cat.name || 'Guides'))}</h3><div class="mc-stack-gap">` +
           list
-            .map(
-              (s, i) => {
-                const ware = formatServiceWareSummary(s.serviceWare);
-                return (
-                  `<article class="mc-card mc-stack-gap"><strong>${escapeHtml(s.title || `Guide ${i + 1}`)}</strong>` +
-                  (ware
-                    ? `<p class="mc-hint" style="margin:0;"><i class="fa-solid fa-utensils" aria-hidden="true"></i> ${escapeHtml(ware)}</p>`
-                    : '') +
-                  `<div class="mc-note-body mc-note-body-sm">${escapeHtml(s.body || '')}</div></article>`
-                );
-              }
-            )
+            .map((s, i) => {
+              const ware = formatServiceWareSummary(s.serviceWare);
+              return (
+                `<article class="mc-card mc-stack-gap"><strong>${escapeHtml(s.title || `Guide ${i + 1}`)}</strong>` +
+                (ware
+                  ? `<p class="mc-hint" style="margin:0;"><i class="fa-solid fa-utensils" aria-hidden="true"></i> ${escapeHtml(ware)}</p>`
+                  : '') +
+                `<div class="mc-note-body mc-note-body-sm">${escapeHtml(s.body || '')}</div></article>`
+              );
+            })
             .join('') +
           '</div></section>'
       );

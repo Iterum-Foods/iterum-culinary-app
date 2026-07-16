@@ -29,33 +29,21 @@
   --tc-ring: 182 38% 20%;
   --tc-radius: 0.875rem;
 
-  --tc-gradient-warm: linear-gradient(
-    135deg,
-    hsl(40 50% 96%) 0%,
-    hsl(28 60% 94%) 100%
-  );
+  --tc-gradient-warm: linear-gradient(135deg, hsl(40 50% 96%) 0%, hsl(28 60% 94%) 100%);
   --tc-gradient-primary: linear-gradient(
     135deg,
     hsl(var(--tc-primary)) 0%,
     hsl(var(--tc-primary-glow)) 100%
   );
-  --tc-gradient-accent: linear-gradient(
-    135deg,
-    hsl(28 85% 55%) 0%,
-    hsl(18 80% 50%) 100%
-  );
+  --tc-gradient-accent: linear-gradient(135deg, hsl(28 85% 55%) 0%, hsl(18 80% 50%) 100%);
   --tc-gradient-hero: radial-gradient(
     ellipse at top right,
     hsl(28 70% 92%) 0%,
     hsl(40 33% 97%) 60%
   );
 
-  --tc-shadow-card:
-    0 1px 0 hsl(35 22% 86% / 0.6),
-    0 8px 24px -12px hsl(180 25% 11% / 0.08);
-  --tc-shadow-elevated:
-    0 4px 12px hsl(180 25% 11% / 0.06),
-    0 2px 4px hsl(180 25% 11% / 0.04);
+  --tc-shadow-card: 0 1px 0 hsl(35 22% 86% / 0.6), 0 8px 24px -12px hsl(180 25% 11% / 0.08);
+  --tc-shadow-elevated: 0 4px 12px hsl(180 25% 11% / 0.06), 0 2px 4px hsl(180 25% 11% / 0.04);
   --tc-shadow-glow: 0 8px 32px hsl(28 85% 55% / 0.18);
 
   --tc-sidebar-background: 182 42% 10%;

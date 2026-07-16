@@ -227,37 +227,44 @@
       return;
     }
     var saved = 0;
-    document.querySelectorAll('#count-rows [data-ing-id]').forEach(function (row) {
-      var id = row.getAttribute('data-ing-id');
-      var qty = parseFloat((row.querySelector('.cnt-qty') || {}).value);
-      if (!id || !Number.isFinite(qty)) return;
-      var par = parseFloat((row.querySelector('.cnt-par') || {}).value);
-      var reorder = parseFloat((row.querySelector('.cnt-reorder') || {}).value);
-      var loc = (row.querySelector('.cnt-loc') || {}).value || 'Main Kitchen';
-      var ing = sessionIngredients.find(function (i) {
-        return i.id === id;
-      });
-      try {
-        bridge.addFoodStock({
-          ingredientId: id,
-          ingredientName: ing ? ing.name : id,
-          quantity: qty,
-          unit: ing ? ing.unit : 'lb',
-          location: loc,
-          parLevel: Number.isFinite(par) ? par : 0,
-          reorderPoint: Number.isFinite(reorder) ? reorder : 0
+    document
+      .querySelectorAll('#count-rows [data-ing-id]')
+      .forEach(function (row) {
+        var id = row.getAttribute('data-ing-id');
+        var qty = parseFloat((row.querySelector('.cnt-qty') || {}).value);
+        if (!id || !Number.isFinite(qty)) return;
+        var par = parseFloat((row.querySelector('.cnt-par') || {}).value);
+        var reorder = parseFloat(
+          (row.querySelector('.cnt-reorder') || {}).value
+        );
+        var loc = (row.querySelector('.cnt-loc') || {}).value || 'Main Kitchen';
+        var ing = sessionIngredients.find(function (i) {
+          return i.id === id;
         });
-        saved += 1;
-      } catch (e) {
-        console.warn(e);
-      }
-    });
+        try {
+          bridge.addFoodStock({
+            ingredientId: id,
+            ingredientName: ing ? ing.name : id,
+            quantity: qty,
+            unit: ing ? ing.unit : 'lb',
+            location: loc,
+            parLevel: Number.isFinite(par) ? par : 0,
+            reorderPoint: Number.isFinite(reorder) ? reorder : 0
+          });
+          saved += 1;
+        } catch (e) {
+          console.warn(e);
+        }
+      });
     if (!saved) {
       showError('Enter at least one opening count.');
       return;
     }
     try {
-      localStorage.setItem('iterum_pantry_setup_done', new Date().toISOString());
+      localStorage.setItem(
+        'iterum_pantry_setup_done',
+        new Date().toISOString()
+      );
     } catch (e) {
       void e;
     }
@@ -285,7 +292,10 @@
     $('btn-add-row').addEventListener('click', function () {
       addIngredientRow({});
     });
-    $('btn-save-ingredients').addEventListener('click', saveIngredientsAndContinue);
+    $('btn-save-ingredients').addEventListener(
+      'click',
+      saveIngredientsAndContinue
+    );
     $('btn-save-counts').addEventListener('click', saveCountsAndFinish);
     $('btn-back').addEventListener('click', function () {
       showPanel(1);
@@ -302,7 +312,10 @@
       }
     });
 
-    if (window.iterumIngredientInventory && window.iterumIngredientInventory.isPantryReady()) {
+    if (
+      window.iterumIngredientInventory &&
+      window.iterumIngredientInventory.isPantryReady()
+    ) {
       var note = document.createElement('p');
       note.className = 'text-sm text-[#5a6d75] mb-4';
       note.innerHTML =

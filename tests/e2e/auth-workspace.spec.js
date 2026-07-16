@@ -36,7 +36,7 @@ test.describe('Authenticated workspace (optional)', () => {
       1
     );
     await expect(page.locator('.iterum-workspace-banner')).toContainText(
-      /Saving to workspace/i
+      /Workspace/i
     );
   });
 

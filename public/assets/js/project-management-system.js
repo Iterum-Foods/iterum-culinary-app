@@ -1492,7 +1492,10 @@ class ProjectManagementSystem {
             }
           } else {
             if (typeof window.showToast === 'function') {
-              window.showToast('Failed to create project. Please try again.', 'error');
+              window.showToast(
+                'Failed to create project. Please try again.',
+                'error'
+              );
             } else {
               alert('Failed to create project. Please try again.');
             }

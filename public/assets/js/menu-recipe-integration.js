@@ -94,11 +94,14 @@ class MenuRecipeIntegration {
       const meta = menuItem.beverageMeta || {};
       const kind = menuItem.beverageKind || 'cocktail';
       baseStub.category = 'beverage';
-      baseStub.recipe_type = menuItem.recipeType || (kind === 'wine' || kind === 'beer' ? 'beverage' : 'bar');
+      baseStub.recipe_type =
+        menuItem.recipeType ||
+        (kind === 'wine' || kind === 'beer' ? 'beverage' : 'bar');
       baseStub.type = baseStub.recipe_type;
       baseStub.prepStation = menuItem.prepStation || 'Bar';
       baseStub.targetFoodCostPercent =
-        menuItem.targetFoodCost || (kind === 'wine' ? 25 : kind === 'beer' ? 22 : 18);
+        menuItem.targetFoodCost ||
+        (kind === 'wine' ? 25 : kind === 'beer' ? 22 : 18);
 
       if (meta.glass) baseStub.glass = meta.glass;
       if (meta.method) baseStub.method = meta.method;
@@ -141,7 +144,10 @@ class MenuRecipeIntegration {
         }));
       } else if (meta.method) {
         baseStub.instructions = [
-          { step: 1, text: `${meta.method}${meta.glass ? ` · ${meta.glass}` : ''}` }
+          {
+            step: 1,
+            text: `${meta.method}${meta.glass ? ` · ${meta.glass}` : ''}`
+          }
         ];
       }
 

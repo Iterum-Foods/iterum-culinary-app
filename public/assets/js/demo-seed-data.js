@@ -1529,7 +1529,10 @@
     setActiveProjectKeys(uid, DEMO_PROJECT_ID, demoName);
 
     var sopCount = 0;
-    if (global.iterumSopPack && typeof global.iterumSopPack.seedSampleLocal === 'function') {
+    if (
+      global.iterumSopPack &&
+      typeof global.iterumSopPack.seedSampleLocal === 'function'
+    ) {
       var seededPack = global.iterumSopPack.seedSampleLocal(DEMO_PROJECT_ID);
       sopCount = seededPack && seededPack.sops ? seededPack.sops.length : 0;
     } else if (global.ITERUM_SOP_SAMPLE) {

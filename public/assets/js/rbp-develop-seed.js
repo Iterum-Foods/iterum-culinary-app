@@ -76,7 +76,9 @@
 
   function mergeById(existing, incoming) {
     const map = new Map((existing || []).map(row => [row.id, row]));
-    incoming.forEach(row => map.set(row.id, { ...(map.get(row.id) || {}), ...row }));
+    incoming.forEach(row =>
+      map.set(row.id, { ...(map.get(row.id) || {}), ...row })
+    );
     return Array.from(map.values());
   }
 
@@ -156,7 +158,10 @@
     if (window.universalRecipeManager?.saveRecipeLibrary) {
       const library = window.universalRecipeManager.getRecipeLibrary();
       window.universalRecipeManager.saveRecipeLibrary(
-        mergeById(library, recipes.filter(r => r.projectId === project.id))
+        mergeById(
+          library,
+          recipes.filter(r => r.projectId === project.id)
+        )
       );
     }
 
@@ -173,7 +178,10 @@
         return { ...item, projectedCovers: covers, prepStation: 'Hot Line' };
       });
       menuPayload.updatedAt = new Date().toISOString();
-      localStorage.setItem(`menu_data_${project.id}`, JSON.stringify(menuPayload));
+      localStorage.setItem(
+        `menu_data_${project.id}`,
+        JSON.stringify(menuPayload)
+      );
     }
 
     document.documentElement.setAttribute('data-rbp-develop-done', 'ok');

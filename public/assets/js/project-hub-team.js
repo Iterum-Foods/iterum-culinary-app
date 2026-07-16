@@ -180,8 +180,7 @@ async function onCopyInviteClick() {
     console.warn('clipboard write failed', e);
   }
   if (msg) {
-    msg.textContent =
-      'Clipboard blocked — select and copy the message below.';
+    msg.textContent = 'Clipboard blocked — select and copy the message below.';
   }
   showInviteCopyFallback(text);
 }
@@ -256,7 +255,8 @@ function renderMembersTable(rows, projectId) {
     const tdUid = document.createElement('td');
     tdUid.className = 'team-uid-cell';
     tdUid.title = uid;
-    tdUid.textContent = uid.length > 18 ? `${uid.slice(0, 10)}…${uid.slice(-6)}` : uid;
+    tdUid.textContent =
+      uid.length > 18 ? `${uid.slice(0, 10)}…${uid.slice(-6)}` : uid;
 
     const tdEmail = document.createElement('td');
     tdEmail.textContent = row.email || '—';
@@ -282,7 +282,8 @@ function renderMembersTable(rows, projectId) {
     removeBtn.type = 'button';
     removeBtn.className = 'team-btn-ghost';
     removeBtn.textContent = 'Remove';
-    removeBtn.title = uid === me ? 'You cannot remove yourself here' : 'Remove from project';
+    removeBtn.title =
+      uid === me ? 'You cannot remove yourself here' : 'Remove from project';
     if (uid === me) {
       removeBtn.disabled = true;
     } else {
@@ -437,8 +438,7 @@ async function onAddTeamMemberClick() {
       email
     });
     if (msg) {
-      msg.textContent =
-        `Added as ${roleLabel(role)}. They should sign in on the shift app and pick this workspace.`;
+      msg.textContent = `Added as ${roleLabel(role)}. They should sign in on the shift app and pick this workspace.`;
     }
     const uidInput = document.getElementById('team-target-uid');
     if (uidInput) {
@@ -509,7 +509,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (window.authManager?.onAuthStateChanged) {
     window.authManager.onAuthStateChanged(() => {
       updateTeamPanelAuthState();
-      if (getFirebaseUid() && !document.getElementById('hub-tab-team')?.hidden) {
+      if (
+        getFirebaseUid() &&
+        !document.getElementById('hub-tab-team')?.hidden
+      ) {
         void refreshMembersList();
       }
     });

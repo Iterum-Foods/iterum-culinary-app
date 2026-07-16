@@ -93,7 +93,10 @@
     var t = raw.type || type;
     if (!TYPES[t]) return null;
     return {
-      id: String(raw.id || 'sup_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)),
+      id: String(
+        raw.id ||
+          'sup_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7)
+      ),
       projectId: raw.projectId || resolveProjectId(),
       type: t,
       name: String(raw.name || 'Unnamed item').trim(),
@@ -114,31 +117,236 @@
   function sampleItems(projectId) {
     var pid = projectId || 'default';
     return [
-      { type: 'paper_goods', name: 'Guest napkins (dinner)', unit: 'case', quantity: 4, parLevel: 2, reorderPoint: 2, location: 'Dry Storage' },
-      { type: 'paper_goods', name: 'Thermal receipt rolls', unit: 'case', quantity: 6, parLevel: 3, reorderPoint: 2, location: 'FOH Storage' },
-      { type: 'paper_goods', name: 'Parchment sheets (full pan)', unit: 'box', quantity: 8, parLevel: 4, reorderPoint: 3, location: 'Dry Storage' },
-      { type: 'paper_goods', name: 'Carry-out bags (medium)', unit: 'case', quantity: 3, parLevel: 2, reorderPoint: 1, location: 'FOH Storage' },
-      { type: 'plateware', name: '10″ dinner plate', unit: 'each', quantity: 120, parLevel: 80, reorderPoint: 60, location: 'FOH Storage', description: 'White coupe rim' },
-      { type: 'plateware', name: '8″ salad plate', unit: 'each', quantity: 80, parLevel: 60, reorderPoint: 40, location: 'FOH Storage' },
-      { type: 'plateware', name: 'Pasta bowl', unit: 'each', quantity: 48, parLevel: 36, reorderPoint: 24, location: 'FOH Storage' },
-      { type: 'plateware', name: 'Coupe cocktail glass', unit: 'each', quantity: 72, parLevel: 48, reorderPoint: 36, location: 'Bar Storage' },
-      { type: 'tableware', name: 'Dinner fork', unit: 'each', quantity: 150, parLevel: 100, reorderPoint: 75, location: 'FOH Storage' },
-      { type: 'tableware', name: 'Dinner knife', unit: 'each', quantity: 150, parLevel: 100, reorderPoint: 75, location: 'FOH Storage' },
-      { type: 'tableware', name: 'Soup spoon', unit: 'each', quantity: 80, parLevel: 60, reorderPoint: 40, location: 'FOH Storage' },
-      { type: 'tableware', name: 'Water glass', unit: 'each', quantity: 100, parLevel: 72, reorderPoint: 48, location: 'FOH Storage' },
-      { type: 'office_supplies', name: 'Printer paper (letter)', unit: 'ream', quantity: 6, parLevel: 4, reorderPoint: 2, location: 'Office', description: '20 lb white' },
-      { type: 'office_supplies', name: 'Ballpoint pens', unit: 'box', quantity: 3, parLevel: 2, reorderPoint: 1, location: 'Office' },
-      { type: 'office_supplies', name: 'Employee time cards / log sheets', unit: 'pad', quantity: 4, parLevel: 2, reorderPoint: 1, location: 'Office' },
-      { type: 'office_supplies', name: 'Staples & tape refills', unit: 'pack', quantity: 2, parLevel: 1, reorderPoint: 1, location: 'Office' },
-      { type: 'first_aid', name: 'Adhesive bandages (assorted)', unit: 'box', quantity: 2, parLevel: 1, reorderPoint: 1, location: 'Office / BOH' },
-      { type: 'first_aid', name: 'Burn gel packets', unit: 'each', quantity: 12, parLevel: 6, reorderPoint: 4, location: 'Kitchen office' },
-      { type: 'first_aid', name: 'Nitrile exam gloves (first aid kit)', unit: 'box', quantity: 2, parLevel: 1, reorderPoint: 1, location: 'Office / BOH' },
-      { type: 'first_aid', name: 'First aid kit — wall mount (refill)', unit: 'kit', quantity: 1, parLevel: 1, reorderPoint: 1, location: 'FOH', description: 'Check expiry monthly' },
-      { type: 'cleaning_chemicals', name: 'Quat sanitizer concentrate', unit: 'gallon', quantity: 2, parLevel: 1, reorderPoint: 1, location: 'Janitor closet', description: 'Food-contact sanitizer — follow dilution chart' },
-      { type: 'cleaning_chemicals', name: 'Degreaser (grill / flat top)', unit: 'gallon', quantity: 2, parLevel: 1, reorderPoint: 1, location: 'Kitchen chemical shelf' },
-      { type: 'cleaning_chemicals', name: 'Glass cleaner', unit: 'bottle', quantity: 4, parLevel: 2, reorderPoint: 2, location: 'Janitor closet' },
-      { type: 'cleaning_chemicals', name: 'Floor cleaner (neutral pH)', unit: 'gallon', quantity: 2, parLevel: 1, reorderPoint: 1, location: 'Janitor closet' },
-      { type: 'cleaning_chemicals', name: 'Oven cleaner (caustic)', unit: 'can', quantity: 3, parLevel: 2, reorderPoint: 1, location: 'Kitchen chemical shelf', description: 'PPE required — see safety SOP' }
+      {
+        type: 'paper_goods',
+        name: 'Guest napkins (dinner)',
+        unit: 'case',
+        quantity: 4,
+        parLevel: 2,
+        reorderPoint: 2,
+        location: 'Dry Storage'
+      },
+      {
+        type: 'paper_goods',
+        name: 'Thermal receipt rolls',
+        unit: 'case',
+        quantity: 6,
+        parLevel: 3,
+        reorderPoint: 2,
+        location: 'FOH Storage'
+      },
+      {
+        type: 'paper_goods',
+        name: 'Parchment sheets (full pan)',
+        unit: 'box',
+        quantity: 8,
+        parLevel: 4,
+        reorderPoint: 3,
+        location: 'Dry Storage'
+      },
+      {
+        type: 'paper_goods',
+        name: 'Carry-out bags (medium)',
+        unit: 'case',
+        quantity: 3,
+        parLevel: 2,
+        reorderPoint: 1,
+        location: 'FOH Storage'
+      },
+      {
+        type: 'plateware',
+        name: '10″ dinner plate',
+        unit: 'each',
+        quantity: 120,
+        parLevel: 80,
+        reorderPoint: 60,
+        location: 'FOH Storage',
+        description: 'White coupe rim'
+      },
+      {
+        type: 'plateware',
+        name: '8″ salad plate',
+        unit: 'each',
+        quantity: 80,
+        parLevel: 60,
+        reorderPoint: 40,
+        location: 'FOH Storage'
+      },
+      {
+        type: 'plateware',
+        name: 'Pasta bowl',
+        unit: 'each',
+        quantity: 48,
+        parLevel: 36,
+        reorderPoint: 24,
+        location: 'FOH Storage'
+      },
+      {
+        type: 'plateware',
+        name: 'Coupe cocktail glass',
+        unit: 'each',
+        quantity: 72,
+        parLevel: 48,
+        reorderPoint: 36,
+        location: 'Bar Storage'
+      },
+      {
+        type: 'tableware',
+        name: 'Dinner fork',
+        unit: 'each',
+        quantity: 150,
+        parLevel: 100,
+        reorderPoint: 75,
+        location: 'FOH Storage'
+      },
+      {
+        type: 'tableware',
+        name: 'Dinner knife',
+        unit: 'each',
+        quantity: 150,
+        parLevel: 100,
+        reorderPoint: 75,
+        location: 'FOH Storage'
+      },
+      {
+        type: 'tableware',
+        name: 'Soup spoon',
+        unit: 'each',
+        quantity: 80,
+        parLevel: 60,
+        reorderPoint: 40,
+        location: 'FOH Storage'
+      },
+      {
+        type: 'tableware',
+        name: 'Water glass',
+        unit: 'each',
+        quantity: 100,
+        parLevel: 72,
+        reorderPoint: 48,
+        location: 'FOH Storage'
+      },
+      {
+        type: 'office_supplies',
+        name: 'Printer paper (letter)',
+        unit: 'ream',
+        quantity: 6,
+        parLevel: 4,
+        reorderPoint: 2,
+        location: 'Office',
+        description: '20 lb white'
+      },
+      {
+        type: 'office_supplies',
+        name: 'Ballpoint pens',
+        unit: 'box',
+        quantity: 3,
+        parLevel: 2,
+        reorderPoint: 1,
+        location: 'Office'
+      },
+      {
+        type: 'office_supplies',
+        name: 'Employee time cards / log sheets',
+        unit: 'pad',
+        quantity: 4,
+        parLevel: 2,
+        reorderPoint: 1,
+        location: 'Office'
+      },
+      {
+        type: 'office_supplies',
+        name: 'Staples & tape refills',
+        unit: 'pack',
+        quantity: 2,
+        parLevel: 1,
+        reorderPoint: 1,
+        location: 'Office'
+      },
+      {
+        type: 'first_aid',
+        name: 'Adhesive bandages (assorted)',
+        unit: 'box',
+        quantity: 2,
+        parLevel: 1,
+        reorderPoint: 1,
+        location: 'Office / BOH'
+      },
+      {
+        type: 'first_aid',
+        name: 'Burn gel packets',
+        unit: 'each',
+        quantity: 12,
+        parLevel: 6,
+        reorderPoint: 4,
+        location: 'Kitchen office'
+      },
+      {
+        type: 'first_aid',
+        name: 'Nitrile exam gloves (first aid kit)',
+        unit: 'box',
+        quantity: 2,
+        parLevel: 1,
+        reorderPoint: 1,
+        location: 'Office / BOH'
+      },
+      {
+        type: 'first_aid',
+        name: 'First aid kit — wall mount (refill)',
+        unit: 'kit',
+        quantity: 1,
+        parLevel: 1,
+        reorderPoint: 1,
+        location: 'FOH',
+        description: 'Check expiry monthly'
+      },
+      {
+        type: 'cleaning_chemicals',
+        name: 'Quat sanitizer concentrate',
+        unit: 'gallon',
+        quantity: 2,
+        parLevel: 1,
+        reorderPoint: 1,
+        location: 'Janitor closet',
+        description: 'Food-contact sanitizer — follow dilution chart'
+      },
+      {
+        type: 'cleaning_chemicals',
+        name: 'Degreaser (grill / flat top)',
+        unit: 'gallon',
+        quantity: 2,
+        parLevel: 1,
+        reorderPoint: 1,
+        location: 'Kitchen chemical shelf'
+      },
+      {
+        type: 'cleaning_chemicals',
+        name: 'Glass cleaner',
+        unit: 'bottle',
+        quantity: 4,
+        parLevel: 2,
+        reorderPoint: 2,
+        location: 'Janitor closet'
+      },
+      {
+        type: 'cleaning_chemicals',
+        name: 'Floor cleaner (neutral pH)',
+        unit: 'gallon',
+        quantity: 2,
+        parLevel: 1,
+        reorderPoint: 1,
+        location: 'Janitor closet'
+      },
+      {
+        type: 'cleaning_chemicals',
+        name: 'Oven cleaner (caustic)',
+        unit: 'can',
+        quantity: 3,
+        parLevel: 2,
+        reorderPoint: 1,
+        location: 'Kitchen chemical shelf',
+        description: 'PPE required — see safety SOP'
+      }
     ].map(function (row) {
       return normalizeItem(Object.assign({ projectId: pid }, row));
     });
@@ -164,7 +372,9 @@
     var pid = projectId || resolveProjectId();
     localStorage.setItem(storageKey(pid), JSON.stringify(items));
     global.dispatchEvent(
-      new CustomEvent('suppliesInventoryUpdated', { detail: { projectId: pid } })
+      new CustomEvent('suppliesInventoryUpdated', {
+        detail: { projectId: pid }
+      })
     );
   }
 
@@ -175,9 +385,11 @@
   }
 
   function getById(id, projectId) {
-    return loadAll(projectId).find(function (item) {
-      return item.id === id;
-    }) || null;
+    return (
+      loadAll(projectId).find(function (item) {
+        return item.id === id;
+      }) || null
+    );
   }
 
   function upsert(data, projectId) {
@@ -237,11 +449,20 @@
     var samples = sampleItems(pid);
     var added = false;
     TYPE_ORDER.forEach(function (type) {
-      if (items.some(function (i) { return i.type === type; })) return;
-      samples.filter(function (s) { return s.type === type; }).forEach(function (s) {
-        items.push(s);
-        added = true;
-      });
+      if (
+        items.some(function (i) {
+          return i.type === type;
+        })
+      )
+        return;
+      samples
+        .filter(function (s) {
+          return s.type === type;
+        })
+        .forEach(function (s) {
+          items.push(s);
+          added = true;
+        });
     });
     if (added) saveAll(pid, items);
     return items;
@@ -257,7 +478,8 @@
 
   function stockStatus(item) {
     if (!item || item.quantity <= 0) return 'out';
-    if (item.reorderPoint > 0 && item.quantity <= item.reorderPoint) return 'low';
+    if (item.reorderPoint > 0 && item.quantity <= item.reorderPoint)
+      return 'low';
     return 'good';
   }
 

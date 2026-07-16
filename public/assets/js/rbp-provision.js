@@ -152,7 +152,10 @@
       items: menuRows,
       updatedAt: now
     };
-    localStorage.setItem(`menu_data_${project.id}`, JSON.stringify(menuPayload));
+    localStorage.setItem(
+      `menu_data_${project.id}`,
+      JSON.stringify(menuPayload)
+    );
 
     const menusKey = `menus_${uid}`;
     const menusList = JSON.parse(localStorage.getItem(menusKey) || '[]');

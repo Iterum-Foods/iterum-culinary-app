@@ -185,9 +185,7 @@ class UnifiedNavHeader {
   }
 
   ensureCanonicalStyles() {
-    if (
-      document.querySelector('link[href*="iterum-canonical-app.css"]')
-    ) {
+    if (document.querySelector('link[href*="iterum-canonical-app.css"]')) {
       return;
     }
     const link = document.createElement('link');
@@ -210,7 +208,10 @@ class UnifiedNavHeader {
       document.head.appendChild(s);
     };
     load('assets/js/project-management-system.js', () => window.projectManager);
-    load('assets/js/unified-project-selector.js', () => window.unifiedProjectSelector);
+    load(
+      'assets/js/unified-project-selector.js',
+      () => window.unifiedProjectSelector
+    );
   }
 
   unwrapMainContent() {
@@ -251,7 +252,10 @@ class UnifiedNavHeader {
     this.ensureAppShell();
 
     const sidebar = document.querySelector('.unified-nav-sidebar');
-    if (sidebar && sidebar.getAttribute('data-nav-version') === ITERUM_NAV_VERSION) {
+    if (
+      sidebar &&
+      sidebar.getAttribute('data-nav-version') === ITERUM_NAV_VERSION
+    ) {
       this.ensureMainContentWrapper();
       this.injectStyles();
       this.ensureMobileNavShell();
@@ -736,10 +740,7 @@ class UnifiedNavHeader {
       const collapsed = !sidebar.classList.contains('is-collapsed');
       apply(collapsed);
       try {
-        localStorage.setItem(
-          'iterum_sidebar_collapsed',
-          collapsed ? '1' : '0'
-        );
+        localStorage.setItem('iterum_sidebar_collapsed', collapsed ? '1' : '0');
       } catch (e) {
         void e;
       }
@@ -775,10 +776,7 @@ class UnifiedNavHeader {
         btn.innerHTML = open
           ? '<i class="fa-solid fa-xmark" aria-hidden="true"></i>'
           : '<i class="fa-solid fa-bars" aria-hidden="true"></i>';
-        btn.setAttribute(
-          'aria-label',
-          open ? 'Close menu' : 'Open menu'
-        );
+        btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
       }
     });
   }

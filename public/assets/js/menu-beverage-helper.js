@@ -44,7 +44,9 @@
   };
 
   function getActiveMenu() {
-    return window.currentSelectedMenu || window.enhancedMenuManager?.currentMenu;
+    return (
+      window.currentSelectedMenu || window.enhancedMenuManager?.currentMenu
+    );
   }
 
   function isBeverageMenuActive(menu) {
@@ -57,7 +59,9 @@
     const m = menu || getActiveMenu();
     if (m?.categories?.length) return m.categories;
     if (m?.sections?.length) {
-      return m.sections.map(s => (typeof s === 'string' ? s : s.name)).filter(Boolean);
+      return m.sections
+        .map(s => (typeof s === 'string' ? s : s.name))
+        .filter(Boolean);
     }
     const type = m?.menuType || m?.menu_type || 'cocktails';
     return window.MenuPlanFormat?.previewSectionsForType(type) || [];
@@ -196,10 +200,7 @@
     }
     if (field.type === 'select') {
       const opts = (field.options || [])
-        .map(
-          o =>
-            `<option value="${o}">${o}</option>`
-        )
+        .map(o => `<option value="${o}">${o}</option>`)
         .join('');
       return `
         <div class="form-group">
@@ -256,7 +257,11 @@
           type: 'select',
           options: ['Shake', 'Stir', 'Build', 'Blend', 'Throw']
         },
-        { id: 'garnish', label: 'Garnish', placeholder: 'Lime wheel, expressed oils…' },
+        {
+          id: 'garnish',
+          label: 'Garnish',
+          placeholder: 'Lime wheel, expressed oils…'
+        },
         {
           id: 'description',
           label: 'Guest-facing line (optional)',
@@ -457,7 +462,9 @@
       const pick =
         preferredSection ||
         cfg.defaultSection ||
-        sections.find(s => s.toLowerCase().includes(kind === 'wine' ? 'white' : kind)) ||
+        sections.find(s =>
+          s.toLowerCase().includes(kind === 'wine' ? 'white' : kind)
+        ) ||
         sections[0];
       if (pick && [...sectionEl.options].some(o => o.value === pick)) {
         sectionEl.value = pick;

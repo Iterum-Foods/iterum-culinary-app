@@ -85,7 +85,8 @@
     if (!el || !global.iterumSuppliesInventory) return null;
 
     var types = typeOrder(options);
-    var projectId = options.projectId || global.iterumSuppliesInventory.resolveProjectId();
+    var projectId =
+      options.projectId || global.iterumSuppliesInventory.resolveProjectId();
     var selections = flattenServiceWare(
       options.selections || options.serviceWare || {},
       types
@@ -166,15 +167,21 @@
         '<button type="button" class="sw-picker__seed tc-btn tc-btn-outline tc-btn-sm">Load sample supplies</button>' +
         '</div>';
 
-      el.querySelector('.sw-picker__seed')?.addEventListener('click', function () {
-        global.iterumSuppliesInventory.seedSamples(projectId, true);
-        render();
-        if (typeof options.onChange === 'function') options.onChange(getValue());
-      });
+      el.querySelector('.sw-picker__seed')?.addEventListener(
+        'click',
+        function () {
+          global.iterumSuppliesInventory.seedSamples(projectId, true);
+          render();
+          if (typeof options.onChange === 'function')
+            options.onChange(getValue());
+        }
+      );
 
       el.querySelectorAll('.sw-picker__cb').forEach(function (cb) {
         cb.addEventListener('change', function () {
-          var qty = el.querySelector('[data-sw-qty-for="' + cb.dataset.swId + '"]');
+          var qty = el.querySelector(
+            '[data-sw-qty-for="' + cb.dataset.swId + '"]'
+          );
           if (qty) {
             qty.disabled = !cb.checked;
             if (!cb.checked) qty.value = '1';
@@ -191,7 +198,9 @@
     function syncSelections() {
       selections = [];
       el.querySelectorAll('.sw-picker__cb:checked').forEach(function (cb) {
-        var qtyEl = el.querySelector('[data-sw-qty-for="' + cb.dataset.swId + '"]');
+        var qtyEl = el.querySelector(
+          '[data-sw-qty-for="' + cb.dataset.swId + '"]'
+        );
         selections.push({
           id: cb.dataset.swId,
           type: cb.dataset.swType,

@@ -85,9 +85,9 @@
 
   function getMenuCategories(menu, items) {
     if (menu?.categories?.length) {
-      return menu.categories.map(c =>
-        typeof c === 'string' ? c : c.name || c.title || ''
-      ).filter(Boolean);
+      return menu.categories
+        .map(c => (typeof c === 'string' ? c : c.name || c.title || ''))
+        .filter(Boolean);
     }
     const fromItems = [...new Set(items.map(i => i.category).filter(Boolean))];
     return fromItems.length ? fromItems : [...DEFAULT_CATEGORIES];
@@ -96,9 +96,10 @@
   function itemCost(item) {
     if (item.cost != null && item.cost !== '') return Number(item.cost);
     if (item.recipeId && window.foodCostingWorkflow) {
-      const costData = window.foodCostingWorkflow.getRecipeCostFromRecipeBuilder(
-        item.recipeId
-      );
+      const costData =
+        window.foodCostingWorkflow.getRecipeCostFromRecipeBuilder(
+          item.recipeId
+        );
       if (costData) {
         return parseFloat(
           costData.costPerYieldUnit || costData.costPerServing || 0
@@ -116,10 +117,19 @@
 
   function menuService(menu) {
     const type = menu?.menuType || menu?.menu_type;
-    if (type && window.MenuPlanFormat?.beverageMenuLabel && window.MenuPlanFormat.isBeverageMenuType(type)) {
+    if (
+      type &&
+      window.MenuPlanFormat?.beverageMenuLabel &&
+      window.MenuPlanFormat.isBeverageMenuType(type)
+    ) {
       return window.MenuPlanFormat.beverageMenuLabel(type);
     }
-    return menu?.service?.mealPeriods?.join(' · ') || menu?.menuType || menu?.menu_type || 'Menu';
+    return (
+      menu?.service?.mealPeriods?.join(' · ') ||
+      menu?.menuType ||
+      menu?.menu_type ||
+      'Menu'
+    );
   }
 
   function formatUpdated(menu) {
@@ -208,7 +218,8 @@
     if (window.enhancedMenuManager) {
       window.enhancedMenuManager.currentMenu = menu;
       window.enhancedMenuManager.menuItems = menu.items || [];
-      const projectId = window.enhancedMenuManager.getCurrentProjectId?.() || 'master';
+      const projectId =
+        window.enhancedMenuManager.getCurrentProjectId?.() || 'master';
       localStorage.setItem(
         `menu_data_${projectId}`,
         JSON.stringify({ menu, items: menu.items || [] })
@@ -281,7 +292,8 @@
       return;
     }
 
-    if (!confirm(`Remove "${item.name || 'this item'}" from this menu?`)) return;
+    if (!confirm(`Remove "${item.name || 'this item'}" from this menu?`))
+      return;
 
     items.splice(itemIndex, 1);
     persistActiveMenuItems(items);
@@ -367,8 +379,19 @@
                   <div class="mb-item-row__name">${escapeHtml(item.name)} ${statusPillHtml(itemStatus(item))}</div>
                   <p class="mb-item-row__desc">${escapeHtml(item.description || '')}</p>
                   <div class="mb-item-badges">
-                    ${dietary.slice(0, 3).map(d => `<span class="mb-badge">${escapeHtml(d)}</span>`).join('')}
-                    ${allergens.slice(0, 3).map(a => `<span class="mb-badge mb-badge--outline">${escapeHtml(a)}</span>`).join('')}
+                    ${dietary
+                      .slice(0, 3)
+                      .map(
+                        d => `<span class="mb-badge">${escapeHtml(d)}</span>`
+                      )
+                      .join('')}
+                    ${allergens
+                      .slice(0, 3)
+                      .map(
+                        a =>
+                          `<span class="mb-badge mb-badge--outline">${escapeHtml(a)}</span>`
+                      )
+                      .join('')}
                   </div>
                 </div>
                 <div>
@@ -412,8 +435,17 @@
               <span class="mb-item-card__margin ${marginClass(margin)}">${Math.round(margin * 100)}% margin</span>
             </div>
             <div class="mb-item-badges mt-2">
-              ${dietary.slice(0, 2).map(d => `<span class="mb-badge">${escapeHtml(d)}</span>`).join('')}
-              ${allergens.slice(0, 2).map(a => `<span class="mb-badge mb-badge--outline">${escapeHtml(a)}</span>`).join('')}
+              ${dietary
+                .slice(0, 2)
+                .map(d => `<span class="mb-badge">${escapeHtml(d)}</span>`)
+                .join('')}
+              ${allergens
+                .slice(0, 2)
+                .map(
+                  a =>
+                    `<span class="mb-badge mb-badge--outline">${escapeHtml(a)}</span>`
+                )
+                .join('')}
             </div>
             <div class="mt-2 flex justify-end gap-1">${renderItemActions(menu, idx)}</div>
           </article>`;
@@ -445,9 +477,12 @@
           <p class="mb-meta__desc">Create a menu to start building your service.</p>
           <button type="button" class="tc-btn tc-btn-accent mt-4" id="mb-empty-create">Create menu</button>
         </div>`;
-      document.getElementById('mb-empty-create')?.addEventListener('click', () => {
-        if (typeof window.openCreateMenuModal === 'function') window.openCreateMenuModal();
-      });
+      document
+        .getElementById('mb-empty-create')
+        ?.addEventListener('click', () => {
+          if (typeof window.openCreateMenuModal === 'function')
+            window.openCreateMenuModal();
+        });
       return;
     }
 
@@ -462,7 +497,9 @@
           <p class="mb-meta__desc">Try clearing search or add a new ${window.MenuBeverageHelper?.isBeverageMenuActive(menu) ? 'drink' : 'dish'}.</p>
           <button type="button" class="tc-btn tc-btn-accent mt-4" id="mb-empty-add">Add ${window.MenuBeverageHelper?.isBeverageMenuActive(menu) ? 'drink' : 'menu item'}</button>
         </div>`;
-      document.getElementById('mb-empty-add')?.addEventListener('click', () => openAddItem());
+      document
+        .getElementById('mb-empty-add')
+        ?.addEventListener('click', () => openAddItem());
       return;
     }
 
@@ -525,9 +562,12 @@
       metaEl.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i> ${escapeHtml(menuService(menu))} · updated ${formatUpdated(menu)}`;
     }
 
-    const costLabel = document.querySelector('#mb-stat-food-cost')?.previousElementSibling;
+    const costLabel =
+      document.querySelector('#mb-stat-food-cost')?.previousElementSibling;
     if (costLabel && menu) {
-      costLabel.innerHTML = window.MenuBeverageHelper?.isBeverageMenuActive(menu)
+      costLabel.innerHTML = window.MenuBeverageHelper?.isBeverageMenuActive(
+        menu
+      )
         ? '<i class="fa-solid fa-percent" aria-hidden="true"></i> Pour cost'
         : '<i class="fa-solid fa-percent" aria-hidden="true"></i> Food cost';
     }
@@ -579,33 +619,47 @@
     root.dataset.mbBound = '1';
 
     document.getElementById('mb-btn-import')?.addEventListener('click', () => {
-      if (typeof window.showImportModal === 'function') window.showImportModal();
+      if (typeof window.showImportModal === 'function')
+        window.showImportModal();
     });
     document.getElementById('mb-btn-preview')?.addEventListener('click', () => {
       showToast('Preview opened in new tab', 'success');
     });
-    document.getElementById('mb-btn-publish')?.addEventListener('click', async () => {
-      if (window.enhancedMenuManager?.publishMenuToShift) {
-        await window.enhancedMenuManager.publishMenuToShift();
-      } else {
-        showToast('Menu manager not ready — refresh and try again.', 'error');
-      }
-    });
-    document.getElementById('mb-btn-new-menu')?.addEventListener('click', () => {
-      if (typeof window.openCreateMenuModal === 'function') window.openCreateMenuModal();
-    });
-    document.getElementById('mb-btn-new-dish')?.addEventListener('click', () => {
-      openAddItem(state.defaultCategory);
-    });
-    document.getElementById('mb-btn-add-item')?.addEventListener('click', () => openAddItem(state.defaultCategory));
+    document
+      .getElementById('mb-btn-publish')
+      ?.addEventListener('click', async () => {
+        if (window.enhancedMenuManager?.publishMenuToShift) {
+          await window.enhancedMenuManager.publishMenuToShift();
+        } else {
+          showToast('Menu manager not ready — refresh and try again.', 'error');
+        }
+      });
+    document
+      .getElementById('mb-btn-new-menu')
+      ?.addEventListener('click', () => {
+        if (typeof window.openCreateMenuModal === 'function')
+          window.openCreateMenuModal();
+      });
+    document
+      .getElementById('mb-btn-new-dish')
+      ?.addEventListener('click', () => {
+        openAddItem(state.defaultCategory);
+      });
+    document
+      .getElementById('mb-btn-add-item')
+      ?.addEventListener('click', () => openAddItem(state.defaultCategory));
 
-    document.getElementById('mb-beverage-quick-bar')?.addEventListener('click', e => {
-      const btn = e.target.closest('[data-bev-quick]');
-      if (!btn) return;
-      if (window.MenuBeverageHelper?.openQuickAdd) {
-        window.MenuBeverageHelper.openQuickAdd({ kind: btn.dataset.bevQuick });
-      }
-    });
+    document
+      .getElementById('mb-beverage-quick-bar')
+      ?.addEventListener('click', e => {
+        const btn = e.target.closest('[data-bev-quick]');
+        if (!btn) return;
+        if (window.MenuBeverageHelper?.openQuickAdd) {
+          window.MenuBeverageHelper.openQuickAdd({
+            kind: btn.dataset.bevQuick
+          });
+        }
+      });
     document.getElementById('mb-btn-filters')?.addEventListener('click', () => {
       showToast('Filters coming soon', 'info');
     });
@@ -643,7 +697,9 @@
             : state.stage === 'publish'
               ? 'mb-revamp-ai'
               : 'mb-revamp-items';
-        document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document
+          .getElementById(targetId)
+          ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         renderWorkflow();
         return;
       }

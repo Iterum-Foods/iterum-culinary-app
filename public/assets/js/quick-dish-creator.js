@@ -52,7 +52,11 @@ class QuickDishCreator {
     if (lower.includes('main')) return 'main';
     if (lower.includes('side')) return 'side';
     if (lower.includes('dessert')) return 'dessert';
-    if (lower.includes('bev') || lower.includes('cocktail') || lower.includes('bar')) {
+    if (
+      lower.includes('bev') ||
+      lower.includes('cocktail') ||
+      lower.includes('bar')
+    ) {
       return 'beverage';
     }
     if (lower.includes('prep')) return 'prep-recipe';
@@ -83,7 +87,8 @@ class QuickDishCreator {
   showCreator(dishData = null, options = {}) {
     this.mode = options.mode || 'modal';
     this.returnTo = options.returnTo || null;
-    this.defaultCategory = this.mapMenuCategoryToDish(options.category) || options.category || '';
+    this.defaultCategory =
+      this.mapMenuCategoryToDish(options.category) || options.category || '';
 
     this.currentDish = dishData || {
       name: '',
@@ -658,7 +663,11 @@ class QuickDishCreator {
     }
 
     const host = document.getElementById('dish-service-ware-picker');
-    if (host && window.iterumServiceWarePicker && window.iterumSuppliesInventory) {
+    if (
+      host &&
+      window.iterumServiceWarePicker &&
+      window.iterumSuppliesInventory
+    ) {
       if (!window.iterumSuppliesInventory.loadAll().length) {
         window.iterumSuppliesInventory.seedSamples();
       }
@@ -1186,7 +1195,10 @@ class QuickDishCreator {
       return;
     }
 
-    this.notify('Menu manager not available — recipe saved to library only.', 'error');
+    this.notify(
+      'Menu manager not available — recipe saved to library only.',
+      'error'
+    );
     this.afterSaveNavigate();
   }
 

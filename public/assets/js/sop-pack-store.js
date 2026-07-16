@@ -35,9 +35,14 @@
   }
 
   function normalizeServiceWare(raw) {
-    var types =
-      global.iterumSuppliesInventory?.TYPE_ORDER ||
-      ['paper_goods', 'plateware', 'tableware', 'office_supplies', 'first_aid', 'cleaning_chemicals'];
+    var types = global.iterumSuppliesInventory?.TYPE_ORDER || [
+      'paper_goods',
+      'plateware',
+      'tableware',
+      'office_supplies',
+      'first_aid',
+      'cleaning_chemicals'
+    ];
     var out = {};
     types.forEach(function (type) {
       out[type] = [];
@@ -68,7 +73,11 @@
       pack.categories = raw.categories
         .map(function (c, i) {
           if (typeof c === 'string') {
-            return { id: c.toLowerCase().replace(/\s+/g, '_'), name: c, sort: i + 1 };
+            return {
+              id: c.toLowerCase().replace(/\s+/g, '_'),
+              name: c,
+              sort: i + 1
+            };
           }
           return {
             id: String(c.id || 'cat_' + i),

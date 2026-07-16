@@ -149,11 +149,7 @@
 
 .tc-revamp-body .tc-rd-type-btn.is-active {
   border-color: hsl(var(--tc-primary) / 0.45);
-  background: linear-gradient(
-    135deg,
-    hsl(var(--tc-accent-soft)) 0%,
-    hsl(var(--tc-card)) 100%
-  );
+  background: linear-gradient(135deg, hsl(var(--tc-accent-soft)) 0%, hsl(var(--tc-card)) 100%);
   box-shadow: var(--tc-shadow-card);
 }
 
@@ -483,7 +479,11 @@
 }
 
 .tc-revamp-body .tc-rd-notebook-body .ingredient-row .quantity-unit-container,
-.tc-revamp-body .tc-rd-notebook-body .ingredient-row .quantity-unit-container .quantity-unit-selector {
+.tc-revamp-body
+  .tc-rd-notebook-body
+  .ingredient-row
+  .quantity-unit-container
+  .quantity-unit-selector {
   display: contents;
 }
 
@@ -666,5 +666,4 @@
   .tc-revamp-body .tc-rd-rail .recipe-ideas-sidebar {
     max-height: none;
   }
-
 }

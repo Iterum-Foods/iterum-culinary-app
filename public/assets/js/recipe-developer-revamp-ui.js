@@ -6,7 +6,7 @@
     'bar-prep': { label: 'Bar prep', category: 'prep-recipe' },
     bar: { label: 'Bar', category: 'beverage' },
     'kitchen-prep': { label: 'Kitchen prep', category: 'prep-recipe' },
-    'kitchen-dish': { label: 'Kitchen dish', category: 'main-course' },
+    'kitchen-dish': { label: 'Kitchen dish', category: 'main-course' }
   };
 
   function syncToolbarTitle() {
@@ -41,20 +41,25 @@
 
   function wireTypeButtons() {
     document.querySelectorAll('.tc-rd-type-btn').forEach(btn => {
-      btn.addEventListener('click', () => setActiveType(btn.dataset.recipeType || 'kitchen-dish'));
+      btn.addEventListener('click', () =>
+        setActiveType(btn.dataset.recipeType || 'kitchen-dish')
+      );
     });
     setActiveType(inferTypeFromCategory());
   }
 
   function wireProgressSteps() {
-    document.querySelectorAll('.tc-rd-step-bar .progress-step').forEach(step => {
-      step.style.cursor = 'pointer';
-      step.addEventListener('click', () => {
-        const key = step.dataset.step;
-        const target = document.querySelector('[data-section="' + key + '"]');
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document
+      .querySelectorAll('.tc-rd-step-bar .progress-step')
+      .forEach(step => {
+        step.style.cursor = 'pointer';
+        step.addEventListener('click', () => {
+          const key = step.dataset.step;
+          const target = document.querySelector('[data-section="' + key + '"]');
+          if (target)
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
       });
-    });
   }
 
   function init() {
