@@ -90,6 +90,29 @@ class FirestoreSync {
     return 'local-testing';
   }
 
+  /**
+   * E3 — Account catalog owner uid for shared vendors / vendor_prices.
+   * Prefer the active workspace project's firebaseUid (account owner), else signed-in user.
+   */
+  resolveCatalogOwnerUserId(explicitUserId) {
+    if (explicitUserId) {
+      return this.resolveUserId(explicitUserId);
+    }
+    const project =
+      window.projectManager?.currentProject ||
+      window.unifiedProjectSelector?.currentProject ||
+      null;
+    if (project && typeof project === 'object') {
+      for (const key of ['firebaseUid', 'ownerId', 'ownerUid']) {
+        const v = project[key];
+        if (v && this.looksLikeFirebaseUid(v)) {
+          return this.normalizeId(String(v).trim());
+        }
+      }
+    }
+    return this.resolveUserId();
+  }
+
   resolveProjectId(explicitProjectId) {
     if (explicitProjectId) {
       return this.normalizeId(explicitProjectId, 'master');
@@ -1102,13 +1125,13 @@ class FirestoreSync {
   }
 
   /**
-   * E3 — Push vendor list to users/{uid}/vendors/* (rules: isOwner(uid)).
+   * E3 — Push vendor list to users/{catalogOwner}/vendors/* (shared account catalog).
    */
   async syncVendorsToFirestore(vendors) {
     if (!this.initialized || !Array.isArray(vendors)) {
       return { ok: false, reason: 'not_ready' };
     }
-    const uid = this.resolveUserId();
+    const uid = this.resolveCatalogOwnerUserId();
     if (!uid || uid === 'local-testing') {
       return { ok: false, reason: 'no_user' };
     }
@@ -1135,13 +1158,13 @@ class FirestoreSync {
   }
 
   /**
-   * E3 — Load all vendors from users/{uid}/vendors/*.
+   * E3 — Load all vendors from users/{catalogOwner}/vendors/*.
    */
   async fetchVendorsFromFirestore(explicitUserId) {
     if (!this.initialized) {
       return [];
     }
-    const uid = explicitUserId || this.resolveUserId();
+    const uid = explicitUserId || this.resolveCatalogOwnerUserId();
     if (!uid || uid === 'local-testing') {
       return [];
     }
@@ -1193,25 +1216,27 @@ class FirestoreSync {
 
   /**
    * E3c — Upsert one price override row (project-specific or account default when projectId null/empty).
+   * Workspace rows write to users/{catalogOwner}/vendor_prices and projects/{projectId}/vendor_prices.
    */
   async syncVendorPriceRowToFirestore(row) {
     if (!this.initialized || !row || typeof row !== 'object') {
       return { ok: false, reason: 'not_ready' };
     }
-    const uid = this.resolveUserId();
+    const uid = this.resolveCatalogOwnerUserId();
     if (!uid || uid === 'local-testing') {
       return { ok: false, reason: 'no_user' };
     }
     const docId =
       row.iterumVendorPriceDocId || this.vendorPriceFirestoreDocId(row);
+    const projectId =
+      row.projectId != null && String(row.projectId).trim() !== ''
+        ? String(row.projectId)
+        : null;
     const base = this.sanitizeForFirestore(
       {
         vendorDocId:
           String(row.vendorDocId || row.iterumVendorDocId || '').trim() || null,
-        projectId:
-          row.projectId != null && String(row.projectId).trim() !== ''
-            ? String(row.projectId)
-            : null,
+        projectId,
         ingredientId:
           row.ingredientId != null && String(row.ingredientId).trim() !== ''
             ? row.ingredientId
@@ -1233,6 +1258,19 @@ class FirestoreSync {
       const userRef = doc(this.db, 'users', uid);
       const pRef = doc(collection(userRef, 'vendor_prices'), docId);
       await setDoc(pRef, payload, { merge: true });
+      if (projectId) {
+        try {
+          const projRef = doc(this.db, 'projects', projectId);
+          const projPriceRef = doc(collection(projRef, 'vendor_prices'), docId);
+          await setDoc(projPriceRef, payload, { merge: true });
+        } catch (projErr) {
+          console.warn(
+            'Project vendor_prices mirror skipped:',
+            docId,
+            projErr.message
+          );
+        }
+      }
       await this.refreshVendorPricesFromFirestore();
       return { ok: true, docId, userId: uid };
     } catch (error) {
@@ -1248,18 +1286,38 @@ class FirestoreSync {
   /**
    * E3c — Remove one vendor price override by Firestore document id.
    */
-  async deleteVendorPriceFromFirestore(docId) {
+  async deleteVendorPriceFromFirestore(docId, explicitProjectId) {
     if (!this.initialized || !docId || String(docId).trim() === '') {
       return { ok: false, reason: 'bad_args' };
     }
-    const uid = this.resolveUserId();
+    const uid = this.resolveCatalogOwnerUserId();
     if (!uid || uid === 'local-testing') {
       return { ok: false, reason: 'no_user' };
     }
+    const projectId =
+      explicitProjectId != null && String(explicitProjectId).trim() !== ''
+        ? String(explicitProjectId).trim()
+        : this.resolveProjectId();
     try {
       const userRef = doc(this.db, 'users', uid);
       const pRef = doc(collection(userRef, 'vendor_prices'), String(docId));
       await deleteDoc(pRef);
+      if (projectId && projectId !== 'master') {
+        try {
+          const projRef = doc(this.db, 'projects', projectId);
+          const projPriceRef = doc(
+            collection(projRef, 'vendor_prices'),
+            String(docId)
+          );
+          await deleteDoc(projPriceRef);
+        } catch (projErr) {
+          console.warn(
+            'Project vendor_prices delete skipped:',
+            docId,
+            projErr.message
+          );
+        }
+      }
       await this.refreshVendorPricesFromFirestore();
       return { ok: true };
     } catch (error) {
@@ -1269,32 +1327,54 @@ class FirestoreSync {
   }
 
   /**
-   * E3c — Load all vendor price rows for the current resolved user.
+   * E3c — Load vendor price rows for the catalog owner (+ active project mirror).
    */
   async fetchVendorPricesFromFirestore(explicitUserId) {
     if (!this.initialized) {
       return [];
     }
-    const uid = explicitUserId || this.resolveUserId();
+    const uid = explicitUserId || this.resolveCatalogOwnerUserId();
     if (!uid || uid === 'local-testing') {
       return [];
     }
+    const byId = new Map();
     try {
       const userRef = doc(this.db, 'users', uid);
       const col = collection(userRef, 'vendor_prices');
       const snap = await getDocs(col);
-      const out = [];
       snap.forEach(d => {
         const data = d.data();
         const row = this.deserializeTimestamps(data);
         row.iterumVendorPriceDocId = d.id;
-        out.push(row);
+        byId.set(d.id, row);
       });
-      return out;
     } catch (error) {
       console.error('Error fetching vendor_prices from Firestore:', error);
-      return [];
     }
+    const projectId = this.resolveProjectId();
+    if (projectId && projectId !== 'master') {
+      try {
+        const projRef = doc(this.db, 'projects', projectId);
+        const col = collection(projRef, 'vendor_prices');
+        const snap = await getDocs(col);
+        snap.forEach(d => {
+          const data = d.data();
+          const row = this.deserializeTimestamps(data);
+          row.iterumVendorPriceDocId = d.id;
+          if (!row.projectId) {
+            row.projectId = projectId;
+          }
+          byId.set(d.id, row);
+        });
+      } catch (projErr) {
+        console.warn(
+          'Project vendor_prices fetch skipped:',
+          projectId,
+          projErr.message
+        );
+      }
+    }
+    return Array.from(byId.values());
   }
 
   async refreshVendorPricesFromFirestore(explicitUserId) {

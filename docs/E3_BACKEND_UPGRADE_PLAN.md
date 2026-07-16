@@ -49,19 +49,19 @@ Iterum has **no Cloud Functions** today. Backend = **Firebase** (Auth, Firestore
 
 ### Phase 0 — Gate (do not skip)
 
-- [ ] M1 human GO — [M1_COO_PROD_VERIFICATION.md](./M1_COO_PROD_VERIFICATION.md)
-- [ ] Confirm **Deploy Firebase** green after any rules change
-- [ ] Lock E3 leadership answers above in this doc or a one-line note in EXEC checklist
+- [x] M1 human GO — CEO **16 Jul 2026** ([M1_COO_PROD_VERIFICATION.md](./M1_COO_PROD_VERIFICATION.md); COO prod walkthrough still recommended)
+- [ ] Confirm **Deploy Firebase** green after E3 rules change
+- [x] Lock E3 leadership answers — [E3_DECISION_RECORD.md](./E3_DECISION_RECORD.md)
 
 ### Phase 1 — Rules & indexes hardening (~1 eng-week)
 
 **Goal:** Catalog paths are safe in prod before more UI.
 
-1. Audit `firestore.rules` for `users/{uid}/vendors` and `vendor_prices` — confirm `account_admin` / delegated access if pilot has non-owner buyers.
-2. Add composite indexes if new queries (e.g. `vendor_prices` filtered by `projectId` + `ingredientId`).
-3. Deploy via **Deploy Firebase**; run `npm run test:smoke:prod` + `owner-bot:onboarding` on prod.
+1. [x] Audit / extend `firestore.rules` for `users/{uid}/vendor_prices` — delegated maintainer roles + `projects/{id}/vendor_prices` mirror
+2. [ ] Add composite indexes if new queries require them
+3. [ ] Deploy via **Deploy Firebase**; run `npm run test:smoke:prod` + `owner-bot:onboarding` on prod
 
-**Files:** `firestore.rules`, `firestore.indexes.json`, [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md)
+**Files:** `firestore.rules`, `firestore.indexes.json`, [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md), `firestore-sync.js`, `project-data-access.js`
 
 ### Phase 2 — Data-access contract (~1 eng-week)
 

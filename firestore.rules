@@ -177,6 +177,56 @@ service cloud.firestore {
       return canAccessProjectDoc(projectId) && !isFieldStaffMember(projectId);
     }
 
+    // E3 — chef / purchasing / account admin may maintain shared catalog prices
+    function isVendorCatalogMaintainer(projectId) {
+      return isProjectMember(projectId)
+        && (
+          projectMemberRole(projectId) == 'chef_leadership'
+          || projectMemberRole(projectId) == 'purchasing'
+          || projectMemberRole(projectId) == 'account_admin'
+        );
+    }
+
+    // True when projects/{projectId} is owned by users/{accountUserId}
+    function projectBelongsToAccountOwner(projectId, accountUserId) {
+      return exists(/databases/$(database)/documents/projects/$(projectId))
+        && (
+          projectDocData(projectId).firebaseUid == accountUserId
+          || projectDocData(projectId).ownerId == accountUserId
+        );
+    }
+
+    function vendorPriceProjectId(data) {
+      return data.keys().hasAny(['projectId'])
+        && data.projectId is string
+        && data.projectId.size() > 0
+        ? data.projectId
+        : null;
+    }
+
+    function canReadVendorPriceRow(accountUserId, data) {
+      return isOwner(accountUserId)
+        || userProfileEmailMatches(accountUserId)
+        || (
+          vendorPriceProjectId(data) != null
+          && isProjectMember(vendorPriceProjectId(data))
+          && projectBelongsToAccountOwner(vendorPriceProjectId(data), accountUserId)
+        );
+    }
+
+    function canWriteVendorPriceRow(accountUserId, data) {
+      return isValidSize()
+        && (
+          isOwner(accountUserId)
+          || userProfileEmailMatches(accountUserId)
+          || (
+            vendorPriceProjectId(data) != null
+            && isVendorCatalogMaintainer(vendorPriceProjectId(data))
+            && projectBelongsToAccountOwner(vendorPriceProjectId(data), accountUserId)
+          )
+        );
+    }
+
     // ============================================
     // USER PROFILES
     // ============================================
@@ -235,16 +285,26 @@ service cloud.firestore {
         allow write: if isOwner(userId) && isValidSize();
       }
       
-      // Vendors sub-collection
+      // Vendors sub-collection (account catalog under owner uid)
       match /vendors/{vendorId} {
-        allow read: if isOwner(userId);
-        allow write: if isOwner(userId) && isValidSize();
+        allow read: if isOwner(userId) || userProfileEmailMatches(userId);
+        allow write: if (isOwner(userId) || userProfileEmailMatches(userId))
+          && isValidSize();
       }
 
-      // Per-project / account-default ingredient unit costs (E3c; keyed vendor + project + ingredient)
+      // Per-workspace ingredient unit costs (E3c) — chefs maintain via projectId
       match /vendor_prices/{priceId} {
-        allow read: if isOwner(userId);
-        allow write: if isOwner(userId) && isValidSize();
+        allow read: if canReadVendorPriceRow(userId, resource.data);
+        allow create: if canWriteVendorPriceRow(userId, request.resource.data);
+        allow update: if canWriteVendorPriceRow(userId, request.resource.data)
+          && canReadVendorPriceRow(userId, resource.data);
+        allow delete: if isOwner(userId)
+          || userProfileEmailMatches(userId)
+          || (
+            vendorPriceProjectId(resource.data) != null
+            && isVendorCatalogMaintainer(vendorPriceProjectId(resource.data))
+            && projectBelongsToAccountOwner(vendorPriceProjectId(resource.data), userId)
+          );
       }
       
       // Inventory sub-collection
@@ -344,6 +404,18 @@ service cloud.firestore {
 
       match /checklists/{checklistId} {
         allow read, write: if canAccessProjectDoc(projectId) && isValidSize();
+      }
+
+      // E3c — workspace-scoped vendor unit costs (member maintainers; mirrors users/.../vendor_prices)
+      match /vendor_prices/{priceId} {
+        allow read: if canAccessProjectDoc(projectId);
+        allow create, update: if isVendorCatalogMaintainer(projectId)
+          && isValidSize()
+          && request.resource.data.keys().hasAny(['projectId'])
+          && request.resource.data.projectId == projectId;
+        allow delete: if isVendorCatalogMaintainer(projectId)
+          || isProjectOwnerOnly(projectId)
+          || isAccountAdminMember(projectId);
       }
 
       // Shift-app posts: visible on dashboard "Daily restaurant notes" feed (same day / project)

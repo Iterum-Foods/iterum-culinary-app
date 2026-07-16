@@ -282,6 +282,10 @@
 
     mount.innerHTML = `
       <div class="vp-panel text-sm text-slate-800">
+        <p class="text-slate-600 mb-3 text-sm leading-relaxed">
+          One vendor list for your group; each kitchen sets its own delivered prices.
+          <strong>This price applies to:</strong> the active workspace unless you choose account default.
+        </p>
         <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
           <p class="text-slate-600">
             <span class="font-semibold text-slate-800">Active workspace:</span>

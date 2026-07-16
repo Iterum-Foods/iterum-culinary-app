@@ -79,9 +79,9 @@ External decks: segment on **`projectId`** (workspace), not “location ID” �
 
 | Role | Status |
 |------|--------|
-| **CEO** | **Locked** 2 Jul 2026 — one list per account; per-workspace prices; each chef maintains. |
-| **CTO** | Pending — rules shape (`users/...` vs `projects/.../vendor_prices`) |
-| **COO** | Pending — pilot training one-pager uses wording above |
+| **CEO** | **Locked** 2 Jul 2026 — one list per account; per-workspace prices; each chef maintains. **M1 closed 16 Jul 2026** — proceed E3. |
+| **CTO** | **Chosen 16 Jul 2026:** keep `users/{accountOwnerUid}/vendor_prices` + mirror `projects/{projectId}/vendor_prices`; delegated write for `chef_leadership` / `purchasing` / `account_admin` when `projectId` matches membership. Catalog path remains `users/{accountOwnerUid}/vendors` (owner/email). **Blocked on:** Deploy Firebase green after rules push. |
+| **COO** | Pending — pilot training one-pager uses wording above; optional M1 prod walkthrough for hygiene |
 
 ---
 

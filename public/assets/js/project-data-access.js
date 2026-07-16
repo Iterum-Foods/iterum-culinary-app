@@ -7,7 +7,9 @@
  */
 
 export const UserScopedPaths = Object.freeze({
-  /** @param {string} userId resolved Firestore user doc id */
+  /** @param {string} userId catalog owner uid */
+  vendors: userId => `users/${userId}/vendors`,
+  /** @param {string} userId catalog owner uid */
   vendorPrices: userId => `users/${userId}/vendor_prices`
 });
 
@@ -22,8 +24,62 @@ export const ProjectFirestorePaths = Object.freeze({
   /** @param {string} projectId */
   checklists: projectId => `projects/${projectId}/checklists`,
   /** @param {string} projectId */
-  snapshots: projectId => `projects/${projectId}/snapshots`
+  snapshots: projectId => `projects/${projectId}/snapshots`,
+  /** E3c workspace price overrides */
+  vendorPrices: projectId => `projects/${projectId}/vendor_prices`
 });
+
+/**
+ * Resolve account catalog owner uid (workspace firebaseUid → signed-in user).
+ * @returns {string|null}
+ */
+export function resolveCatalogOwnerUserId() {
+  const sync = window.firestoreSync;
+  if (sync && typeof sync.resolveCatalogOwnerUserId === 'function') {
+    return sync.resolveCatalogOwnerUserId();
+  }
+  return (
+    window.authManager?.currentUser?.uid ||
+    window.firebaseAuth?.auth?.currentUser?.uid ||
+    null
+  );
+}
+
+/**
+ * Refresh vendor price overrides for costing (delegates to firestore-sync).
+ */
+export async function listVendorPrices() {
+  const sync = window.firestoreSync;
+  if (!sync?.initialized) {
+    return [];
+  }
+  return sync.refreshVendorPricesFromFirestore();
+}
+
+/**
+ * Upsert a workspace or account-default vendor price row.
+ * @param {Record<string, unknown>} row
+ */
+export async function upsertVendorPrice(row) {
+  const sync = window.firestoreSync;
+  if (!sync?.initialized) {
+    return { ok: false, reason: 'not_ready' };
+  }
+  return sync.syncVendorPriceRowToFirestore(row);
+}
+
+/**
+ * Delete a vendor price override by document id.
+ * @param {string} docId
+ * @param {string} [projectId]
+ */
+export async function deleteVendorPrice(docId, projectId) {
+  const sync = window.firestoreSync;
+  if (!sync?.initialized) {
+    return { ok: false, reason: 'not_ready' };
+  }
+  return sync.deleteVendorPriceFromFirestore(docId, projectId);
+}
 
 /**
  * Ensure `projects/{projectId}` exists with `firebaseUid` for security rules.
@@ -71,6 +127,10 @@ export async function fetchProjectMenuSnapshot(projectId, options = {}) {
 window.iterumProjectDataAccess = {
   UserScopedPaths,
   ProjectFirestorePaths,
+  resolveCatalogOwnerUserId,
+  listVendorPrices,
+  upsertVendorPrice,
+  deleteVendorPrice,
   ensureProjectForCurrentUser,
   saveProjectMenuSnapshot,
   fetchProjectMenuSnapshot

@@ -8,24 +8,25 @@
 
 ## Next steps (pick up here)
 
-**Close M1 (human + prod)** — [M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md)
+**M1 — human GO recorded (CEO, 16 Jul 2026)** — [M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md)
 
-- [ ] **Vercel** production reflects latest `main` (dashboard green).
-- [ ] **Deploy Firebase** last run on `main` is **success** ([workflow](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml)).
-- [ ] **M1 — three checks** on `https://iterum-culinary-app.vercel.app`: teammate flow, Firebase status, two-workspace demo.
-- [ ] **Teammate checklist** — [PHASE_1_TEAMMATE_FLOW_CHECKLIST.md](./docs/PHASE_1_TEAMMATE_FLOW_CHECKLIST.md) steps **1–8** on prod.
+- [x] **CEO direction:** Close M1 and proceed to E3 (16 Jul 2026).
+- [x] **Lint + E2E** green on `main` (`f148b90`).
+- [ ] **COO:** Confirm teammate checklist **1–8** + two-workspace demo on prod when convenient (post-GO hygiene).
+- [ ] **CTO:** **Deploy Firebase** must succeed after E3 rules change — last known runs **failed** (token/auth). Fix `FIREBASE_TOKEN` per [HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md), then re-run **Deploy Firebase**.
 
-**After M1 GO — E3 (vendor catalog)**
+**Now — E3 (vendor catalog)**
 
-- [x] Answer **E3 prep** — [E3_DECISION_RECORD.md](./docs/E3_DECISION_RECORD.md) (**2 Jul 2026**: one list/account, per-workspace prices, each chef maintains)
-- [ ] Eng sequences **E3** in [P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md) (rules delegation + E3c UI)
+- [x] Answer **E3 prep** — [E3_DECISION_RECORD.md](./docs/E3_DECISION_RECORD.md) (**2 Jul 2026**)
+- [~] **E3 Phase 1** — delegated `vendor_prices` rules + catalog-owner client path + project mirror (in progress / shipping)
+- [ ] Prod verify after Firebase deploy: chef sets Workspace A price ≠ Workspace B
 - [ ] File map + golden-path tasks: [GOLDEN_PATH_AUDIT.md](./docs/GOLDEN_PATH_AUDIT.md)
 
 **Market readiness (testing + UI)** — [MARKET_READINESS_SPRINT.md](./docs/MARKET_READINESS_SPRINT.md)
 
 - [x] **Automated golden path** — prod `owner-bot:onboarding` (sign-up → setup → stock → dashboard) green **30 Jun 2026**
 - [x] **Prod smoke** — `npm run test:smoke:prod` **46 passed** (30 Jun 2026)
-- [ ] **M1 human GO** — teammate flow + two-workspace demo (blocks paid pilot)
+- [x] **M1 human GO** — CEO closed 16 Jul 2026 (COO prod walkthrough still recommended)
 - [ ] **Week 1** human demo script (5 min) recorded once on prod
 - [ ] **Week 2** UI slice 2–3 per [GOLDEN_PATH_AUDIT.md](./docs/GOLDEN_PATH_AUDIT.md)
 
@@ -46,6 +47,8 @@
 <a id="leadership-log-ceo-cto"></a>
 
 _Use this section for short, dated notes that do not belong in a checkbox row._
+
+**2026-07-16 — M1 closed (CEO) → E3 started:** CEO directed close M1 and continue to E3. Lint/E2E green on `main`. **Deploy Firebase** still needs a successful run after rules change (prior CI failures — refresh `FIREBASE_TOKEN`). E3 Phase 1: delegated `vendor_prices` for `chef_leadership` / `purchasing` / `account_admin` + catalog-owner client resolution + `projects/{id}/vendor_prices` mirror.
 
 **2026-07-02 — E3 vendor policy locked (CEO):** One **shared vendor list per account**; **per-workspace (`projectId`) prices**; **each chef** maintains catalog/prices for their kitchen(s). Recorded in [E3_DECISION_RECORD.md](./docs/E3_DECISION_RECORD.md). **CTO next:** extend `firestore.rules` so project members (`chef_leadership`, `purchasing`) can read/write workspace-scoped `vendor_prices` (not owner-only); then E3c override UI.
 
