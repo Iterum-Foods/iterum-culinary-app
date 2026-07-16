@@ -273,7 +273,7 @@
     if (badge) {
       if (p || (global.iterumMembership && global.iterumMembership.roleKey)) {
         badge.textContent = ROLE_BADGE_LABELS[role] || 'Workspace';
-        badge.style.display = 'inline-block';
+        badge.style.display = 'inline-flex';
       } else {
         badge.style.display = 'none';
       }

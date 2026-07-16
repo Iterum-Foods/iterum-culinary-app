@@ -2,7 +2,7 @@
  * SOP / how-to pack — Firestore + local cache.
  *
  * Path:  projects/{pid}/snapshots/employee_line_pack
- * Shape: { schemaVersion, categories: [], sops: [{ id, categoryId, title, body, sort }] }
+ * Shape: { schemaVersion, categories: [], sops: [{ id, categoryId, title, body, sort, jobTags? }] }
  *
  * Mobile Shift app reads this doc in the How-to tab (mobile-line-employee.js).
  */
@@ -101,7 +101,14 @@
           title: String(s.title || 'Untitled guide'),
           body: String(s.body || ''),
           sort: s.sort != null ? s.sort : i + 1,
-          serviceWare: normalizeServiceWare(s.serviceWare)
+          serviceWare: normalizeServiceWare(s.serviceWare),
+          jobTags:
+            global.iterumSopJobTags &&
+            typeof global.iterumSopJobTags.normalizeJobTags === 'function'
+              ? global.iterumSopJobTags.normalizeJobTags(s.jobTags)
+              : Array.isArray(s.jobTags) && s.jobTags.length
+                ? s.jobTags.map(String)
+                : ['all']
         };
       });
 

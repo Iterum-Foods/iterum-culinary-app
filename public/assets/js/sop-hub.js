@@ -7,6 +7,8 @@
   var state = {
     pack: null,
     activeCategory: 'all',
+    activeJobFilter: 'my',
+    defaultPositionKey: 'all',
     editingId: null,
     sopPicker: null
   };
@@ -42,6 +44,60 @@
     return window.firestoreSync?.db || window.firebaseDb || null;
   }
 
+  function getAuthUid() {
+    return (
+      window.authManager?.currentUser?.uid ||
+      window.firebaseAuth?.currentUser?.uid ||
+      null
+    );
+  }
+
+  function jobTagsApi() {
+    return window.iterumSopJobTags || null;
+  }
+
+  async function refreshDefaultPosition() {
+    var api = jobTagsApi();
+    var pid = getProjectId();
+    var uid = getAuthUid();
+    if (!api) {
+      state.defaultPositionKey = 'all';
+      return;
+    }
+    state.defaultPositionKey = await api.getDefaultPositionKey(getDb(), uid, pid);
+  }
+
+  function renderJobFilter() {
+    var sel = $('sop-job-filter');
+    var api = jobTagsApi();
+    if (!sel || !api) return;
+    var current = state.activeJobFilter || 'my';
+    sel.innerHTML = api
+      .buildJobFilterOptions(state.defaultPositionKey)
+      .map(function (opt) {
+        return (
+          '<option value="' +
+          opt.value +
+          '">' +
+          escapeHtml(opt.label) +
+          '</option>'
+        );
+      })
+      .join('');
+    if (sel.querySelector('option[value="' + current + '"]')) {
+      sel.value = current;
+    } else {
+      sel.value = 'my';
+      state.activeJobFilter = 'my';
+    }
+  }
+
+  function currentSortKey() {
+    var api = jobTagsApi();
+    if (!api) return 'all';
+    return api.resolveSortKey(state.activeJobFilter, state.defaultPositionKey);
+  }
+
   async function loadPack() {
     var pid = getProjectId();
     if (!pid) {
@@ -53,6 +109,7 @@
     setStatus('Loading…');
     try {
       state.pack = await window.iterumSopPack.loadPack(getDb(), pid);
+      await refreshDefaultPosition();
       setStatus(
         `${state.pack.sops.length} guide(s) · ${state.pack.categories.length} categories · workspace ${pid}`
       );
@@ -60,6 +117,7 @@
       console.error(e);
       setStatus('Could not load SOP pack.', true);
       state.pack = window.iterumSopPack.loadLocal(pid) || window.iterumSopPack.emptyPack();
+      await refreshDefaultPosition();
     }
     render();
   }

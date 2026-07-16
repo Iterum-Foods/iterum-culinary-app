@@ -85,27 +85,26 @@
       }
     }
 
-    let cloudLabel = 'Local browser only';
+    let cloudLabel = 'Local only';
     let cloudState = 'local';
 
     if (!online) {
-      cloudLabel = 'Offline — changes queue until back online';
+      cloudLabel = 'Offline';
       cloudState = 'offline';
     } else if (!signedIn) {
-      cloudLabel = 'Sign in to sync menus & team data to the cloud';
+      cloudLabel = 'Sign in to sync';
       cloudState = 'local';
     } else if (!fsReady) {
-      cloudLabel = 'Cloud connecting…';
+      cloudLabel = 'Connecting…';
       cloudState = 'pending';
     } else if (isSyncing) {
-      cloudLabel = 'Syncing to cloud…';
+      cloudLabel = 'Syncing…';
       cloudState = 'syncing';
     } else if (queueLength > 0) {
-      cloudLabel = `Saving to cloud (${queueLength} pending)`;
+      cloudLabel = `Saving (${queueLength})`;
       cloudState = 'pending';
     } else {
-      cloudLabel =
-        'Cloud sync on — menus & checklists use this workspace in Firestore';
+      cloudLabel = 'Synced';
       cloudState = 'ok';
     }
 
@@ -168,9 +167,9 @@
     host.innerHTML = `
       <div class="iterum-workspace-banner" data-state="${state}" role="status" aria-live="polite">
         <div class="iterum-workspace-banner__main">
-          <span class="iterum-workspace-banner__icon" aria-hidden="true"><i class="fa-solid fa-folder-tree"></i></span>
+          <span class="iterum-workspace-banner__icon" aria-hidden="true"><i class="fa-solid fa-cloud"></i></span>
           <div class="iterum-workspace-banner__text">
-            <span class="iterum-workspace-banner__label">Saving to workspace</span>
+            <span class="iterum-workspace-banner__label">Workspace</span>
             <strong class="iterum-workspace-banner__name">${escapeHtml(project.name)}</strong>
             ${idLine}
           </div>
@@ -179,7 +178,7 @@
           <span class="iterum-workspace-banner__dot" aria-hidden="true"></span>
           <span class="iterum-workspace-banner__cloud-text">${escapeHtml(cloud.cloudLabel)}</span>
         </div>
-        <a class="iterum-workspace-banner__link" href="project-hub.html">Manage workspaces</a>
+        <a class="iterum-workspace-banner__link" href="project-hub.html">Manage</a>
       </div>
       ${warnHtml}
     `;

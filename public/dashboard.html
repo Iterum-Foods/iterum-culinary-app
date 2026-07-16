@@ -238,32 +238,33 @@
       outline-offset: 2px;
     }
     header.dash-page-header {
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
     }
     .dash-card-head {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
       gap: 0.75rem;
-      margin-bottom: 0.65rem;
+      margin-bottom: 0.75rem;
     }
     .dash-card-icon {
       width: 2.25rem;
       height: 2.25rem;
-      border-radius: var(--radius-md);
+      border-radius: 0.625rem;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
       background: hsl(var(--tc-accent-soft));
       color: hsl(var(--tc-accent));
+      border: none;
     }
     .dash-list-well {
-      border-radius: var(--radius-md);
-      background: var(--brand-bg-secondary);
-      border: 1px solid var(--brand-border-light);
-      padding: 0.35rem;
+      border-radius: calc(var(--tc-radius) - 2px);
+      background: hsl(var(--tc-muted) / 0.55);
+      border: 1px solid hsl(var(--tc-border) / 0.45);
+      padding: 0.4rem;
       max-height: 15rem;
       overflow-y: auto;
     }
@@ -397,25 +398,27 @@
       </div>
       
       <!-- Header -->
-      <header class="dash-page-header tc-page-hero mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-        <div class="flex-1 min-w-0">
-          <div class="flex flex-wrap items-center gap-2 mb-2">
-            <h1 id="dash-header-title" class="tc-page-hero__title text-2xl sm:text-3xl font-semibold tracking-tight">Kitchen &amp; R&amp;D board</h1>
-            <span id="dash-role-badge" class="text-xs font-semibold px-2.5 py-1 rounded-md border" style="display:none;border-color: var(--brand-border-light); background: var(--brand-bg-primary); color: var(--brand-text-secondary);" title="Your workspace role"></span>
-          </div>
-          <p id="dash-header-subtitle" class="tc-page-hero__desc text-sm mb-3 max-w-2xl leading-relaxed">Today’s priorities, ideas, and compliance checks in one calm view.</p>
-          <div class="flex items-center gap-3 flex-wrap">
-            <div id="dash-scope-chip" class="text-xs font-semibold px-3 py-1.5 rounded-full border" style="display:none;background-color: var(--brand-bg-tertiary); color: var(--brand-text-secondary); border-color: var(--brand-border-light);" title="From workspace setup"></div>
-            <div id="header-project-chip" class="text-xs font-semibold px-3 py-1.5 rounded-full border" style="background-color: var(--brand-bg-primary); color: var(--brand-text-secondary); border-color: var(--brand-border-light);">Project: Master Project</div>
-            <div class="date-picker">
-              <label for="dashboard-date" class="text-xs font-medium block mb-1" style="color: var(--brand-text-secondary);">Working date</label>
-              <input type="date" id="dashboard-date" class="text-sm py-2 px-3 rounded-md border" style="margin-top: 0; border-color: var(--brand-border-light); background: var(--brand-card-bg); color: var(--brand-text-primary);">
+      <header class="dash-page-header tc-page-hero mb-5">
+        <div class="dash-header-layout">
+          <div class="dash-header-copy">
+            <div class="dash-header-title-row">
+              <h1 id="dash-header-title" class="tc-page-hero__title dash-header-title">Kitchen &amp; R&amp;D board</h1>
+              <span id="dash-role-badge" class="dash-role-badge" style="display:none;" title="Your workspace role"></span>
+            </div>
+            <p id="dash-header-subtitle" class="tc-page-hero__desc dash-header-subtitle">Today’s priorities, ideas, and compliance checks in one calm view.</p>
+            <div class="dash-header-meta">
+              <div id="dash-scope-chip" class="dash-meta-chip" style="display:none;" title="From workspace setup"></div>
+              <div id="header-project-chip" class="dash-meta-chip">Project: Master Project</div>
+              <div class="dash-date-field">
+                <label for="dashboard-date">Working date</label>
+                <input type="date" id="dashboard-date" class="dash-date-input">
+              </div>
             </div>
           </div>
+          <button type="button" id="dash-header-primary-cta" class="tc-btn tc-btn-accent dash-header-cta">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>New experiment
+          </button>
         </div>
-        <button type="button" id="dash-header-primary-cta" class="tc-btn tc-btn-accent py-2.5 px-4 text-sm whitespace-nowrap shrink-0 self-start">
-          <i class="fa-solid fa-plus mr-2" aria-hidden="true"></i>New experiment
-        </button>
       </header>
 
       <div id="workspace-save-indicator-root" data-workspace-save-indicator aria-label="Active workspace and cloud save status"></div>

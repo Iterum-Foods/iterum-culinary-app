@@ -51,9 +51,10 @@
 
 .tc-revamp-body .unified-nav-sidebar .nav-section-label {
   background: transparent !important;
-  color: hsl(var(--tc-sidebar-muted)) !important;
+  color: hsl(var(--tc-sidebar-foreground) / 0.48) !important;
   font-weight: 700 !important;
-  letter-spacing: 0.14em !important;
+  letter-spacing: 0.12em !important;
+  font-size: 0.625rem !important;
 }
 
 .tc-revamp-body .unified-nav-sidebar .nav-link,
@@ -62,18 +63,30 @@
 .tc-revamp-body .unified-nav-sidebar .nav-link-label,
 .tc-revamp-body .unified-nav-sidebar .nav-more-label {
   color: hsl(var(--tc-sidebar-foreground)) !important;
-  background-color: transparent !important;
   font-weight: 500 !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar a.nav-link:not(.active),
+.tc-revamp-body .unified-nav-sidebar button.nav-link:not(.nav-dropdown-btn):not(.active) {
+  background-color: transparent !important;
 }
 
 .tc-revamp-body .unified-nav-sidebar .nav-link:hover,
 .tc-revamp-body .unified-nav-sidebar .nav-link:focus,
+.tc-revamp-body .unified-nav-sidebar .nav-link:focus-visible,
 .tc-revamp-body .unified-nav-sidebar .nav-dropdown-btn:hover,
 .tc-revamp-body .unified-nav-sidebar .nav-dropdown-btn:focus,
 .tc-revamp-body .unified-nav-sidebar .nav-user-menu-btn:hover,
 .tc-revamp-body .unified-nav-sidebar .nav-user-menu-btn:focus {
-  background: hsl(var(--tc-sidebar-accent)) !important;
+  background: hsl(var(--tc-sidebar-accent) / 0.55) !important;
   color: hsl(var(--tc-sidebar-foreground)) !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .nav-link.active {
+  background: hsl(var(--tc-sidebar-accent) / 0.72) !important;
+  border-left: 3px solid hsl(var(--tc-accent)) !important;
+  box-shadow: none !important;
+  font-weight: 600 !important;
 }
 
 .tc-revamp-body .unified-nav-sidebar .tc-sidebar-account-wrap .nav-user-menu-btn {
@@ -103,9 +116,10 @@
   color: hsl(var(--tc-foreground)) !important;
 }
 
-/* Cards — no moss hover ring */
-.tc-revamp-body [class*='card']:hover {
-  border-color: hsl(var(--tc-accent) / 0.35) !important;
+/* Cards — soft hover only (avoid loud moss rings) */
+.tc-revamp-body .tc-card:hover,
+.tc-revamp-body .card-style:hover {
+  border-color: hsl(var(--tc-border) / 0.85) !important;
 }
 
 /* Menu builder inline stepper remnants */

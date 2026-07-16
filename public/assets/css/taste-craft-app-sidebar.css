@@ -75,10 +75,12 @@ body.iterum-has-sidebar .main-content-wrapper > .main-content-area {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  padding: 1rem 0.875rem;
+  gap: 0.625rem;
+  padding: 1.125rem 0.875rem;
+  min-height: 4.25rem;
   border-bottom: 1px solid hsl(var(--tc-sidebar-border));
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .tc-sidebar-brand {
@@ -139,12 +141,16 @@ body.iterum-has-sidebar .main-content-wrapper > .main-content-area {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 0.5rem;
   background: transparent;
   color: hsl(var(--tc-sidebar-foreground) / 0.75);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  align-self: center;
+  transition:
+    background 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out;
 }
 
 .tc-sidebar-collapse-btn:hover,
@@ -251,8 +257,9 @@ body.iterum-has-sidebar .main-content-wrapper > .main-content-area {
 
 .unified-nav-sidebar.is-collapsed .nav-link.active,
 .unified-nav-sidebar.is-collapsed .nav-dropdown-btn.active {
-  background: hsl(var(--tc-sidebar-accent)) !important;
-  box-shadow: inset 3px 0 0 hsl(var(--tc-accent));
+  background: hsl(var(--tc-sidebar-accent) / 0.85) !important;
+  border-left: 3px solid hsl(var(--tc-accent)) !important;
+  box-shadow: none !important;
 }
 
 .unified-nav-sidebar.is-collapsed .nav-link.active .nav-link-fa,
@@ -287,28 +294,30 @@ body.iterum-has-sidebar .main-content-wrapper > .main-content-area {
 .unified-nav-sidebar .nav-links {
   display: flex;
   flex-direction: column;
-  gap: 0.1875rem;
-  padding: 0 0.625rem;
+  gap: 0.3125rem;
+  padding: 0.25rem 0.625rem 0.5rem;
 }
 
 .unified-nav-sidebar .nav-section-label {
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: hsl(var(--tc-sidebar-muted, var(--tc-sidebar-foreground) / 0.78));
-  padding: 0.875rem 0.75rem 0.375rem;
+  letter-spacing: 0.12em;
+  color: hsl(var(--tc-sidebar-foreground) / 0.48);
+  padding: 0.35rem 0.75rem 0.4rem;
   margin: 0;
+  line-height: 1.2;
 }
 
 .unified-nav-sidebar .nav-section-label:not(:first-child) {
-  margin-top: 0.35rem;
-  padding-top: 1rem;
-  border-top: 1px solid hsl(var(--tc-sidebar-border) / 0.45);
+  margin-top: 0.85rem;
+  padding-top: 0.95rem;
+  border-top: 1px solid hsl(var(--tc-sidebar-border) / 0.4);
 }
 
 .unified-nav-sidebar .nav-section-label:first-child {
-  padding-top: 0.25rem;
+  margin-top: 0.15rem;
+  padding-top: 0.35rem;
 }
 
 .unified-nav-sidebar .nav-link {
@@ -316,31 +325,34 @@ body.iterum-has-sidebar .main-content-wrapper > .main-content-area {
   align-items: center;
   gap: 0.625rem;
   padding: 0.5625rem 0.75rem;
-  min-height: 2.5rem;
+  min-height: 2.55rem;
   border-radius: 0.5rem;
   border: 1px solid transparent;
+  border-left: 3px solid transparent;
   text-decoration: none;
   font-size: 0.9375rem;
   font-weight: 500;
   line-height: 1.35;
   color: hsl(var(--tc-sidebar-foreground));
   transition:
-    background 0.15s ease,
-    color 0.15s ease,
-    border-color 0.15s ease;
+    background 0.2s ease-in-out,
+    color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
 }
 
 .unified-nav-sidebar .nav-link:hover,
 .unified-nav-sidebar .nav-link:focus-visible {
-  background: hsl(var(--tc-sidebar-accent) / 0.6);
+  background: hsl(var(--tc-sidebar-accent) / 0.55);
   color: hsl(var(--tc-sidebar-foreground));
 }
 
 .unified-nav-sidebar .nav-link.active {
-  background: hsl(var(--tc-sidebar-accent)) !important;
+  background: hsl(var(--tc-sidebar-accent) / 0.72) !important;
   color: hsl(var(--tc-sidebar-accent-foreground)) !important;
   font-weight: 600;
-  box-shadow: inset 3px 0 0 hsl(var(--tc-accent)) !important;
+  border-left-color: hsl(var(--tc-accent)) !important;
+  box-shadow: none !important;
 }
 
 .unified-nav-sidebar .nav-link-fa {
@@ -369,6 +381,7 @@ body.iterum-has-sidebar .main-content-wrapper > .main-content-area {
   background-color: hsl(var(--tc-sidebar-accent) / 0.55) !important;
   background-image: none !important;
   border: 1px solid hsl(var(--tc-sidebar-border)) !important;
+  border-left: 3px solid transparent !important;
   border-radius: 0.5rem !important;
   box-shadow: none !important;
   font: inherit;
@@ -381,6 +394,10 @@ body.iterum-has-sidebar .main-content-wrapper > .main-content-area {
   align-items: center;
   gap: 0.625rem;
   letter-spacing: 0.01em;
+  transition:
+    background 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    color 0.2s ease-in-out;
 }
 
 .unified-nav-sidebar .nav-user-menu-btn {
@@ -1055,19 +1072,24 @@ body.iterum-has-sidebar .main-content-wrapper > .main-content-area {
 .unified-nav-sidebar .nav-section-label {
   background: transparent !important;
   background-color: transparent !important;
-  color: hsl(var(--tc-sidebar-muted, 40 25% 78%)) !important;
+  color: hsl(var(--tc-sidebar-foreground) / 0.48) !important;
   border: none !important;
+  border-top: none !important;
   box-shadow: none !important;
-  padding: 0.875rem 0.75rem 0.375rem !important;
   font-weight: 700 !important;
-  font-size: 0.6875rem !important;
+  font-size: 0.625rem !important;
+  letter-spacing: 0.12em !important;
+}
+
+.unified-nav-sidebar .nav-section-label:not(:first-child) {
+  border-top: 1px solid hsl(var(--tc-sidebar-border) / 0.4) !important;
 }
 
 .unified-nav-sidebar .nav-link:hover,
 .unified-nav-sidebar .nav-link:focus-visible,
 .unified-nav-sidebar .nav-user-menu-btn:hover,
 .unified-nav-sidebar .nav-user-menu-btn:focus-visible {
-  background: hsl(var(--tc-sidebar-accent) / 0.6) !important;
+  background: hsl(var(--tc-sidebar-accent) / 0.55) !important;
   color: hsl(var(--tc-sidebar-foreground)) !important;
 }
 
@@ -1078,11 +1100,18 @@ body.iterum-has-sidebar .main-content-wrapper > .main-content-area {
   border-color: hsl(var(--tc-sidebar-border)) !important;
 }
 
-.unified-nav-sidebar .nav-link.active,
+.unified-nav-sidebar .nav-link.active {
+  background: hsl(var(--tc-sidebar-accent) / 0.72) !important;
+  color: hsl(var(--tc-sidebar-accent-foreground, var(--tc-sidebar-foreground))) !important;
+  border-left: 3px solid hsl(var(--tc-accent)) !important;
+  box-shadow: none !important;
+}
+
 .unified-nav-sidebar .nav-dropdown-btn.active,
 .unified-nav-sidebar .nav-dropdown-btn[aria-expanded='true'] {
-  background: hsl(var(--tc-sidebar-accent)) !important;
+  background: hsl(var(--tc-sidebar-accent) / 0.85) !important;
   color: hsl(var(--tc-sidebar-accent-foreground, var(--tc-sidebar-foreground))) !important;
+  border-left: 3px solid hsl(var(--tc-accent)) !important;
 }
 
 .unified-nav-sidebar .nav-dropdown-btn[aria-expanded='true'] .nav-more-label,
