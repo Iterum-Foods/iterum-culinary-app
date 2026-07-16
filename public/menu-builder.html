@@ -26,6 +26,18 @@
     <link rel="stylesheet" href="assets/css/recipe-price-sources.css">
     <link rel="stylesheet" href="assets/css/menu-launch-checklist.css">
     <link rel="icon" type="image/x-icon" href="assets/icons/iterum.ico">
+
+    <!-- Menu import parsers (needed before Import & Parse) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+      if (typeof pdfjsLib !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="assets/js/smart-menu-parser.js"></script>
     
     <!-- Force page visibility -->
     <style>
@@ -1620,8 +1632,8 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="menu-file" class="form-label">Select Menu File</label>
-                            <input type="file" id="menu-file" class="form-input" accept=".txt,.csv,.xlsx,.xls,.pdf,.doc,.docx">
-                            <small class="form-help">Supported formats: TXT, CSV, Excel (.xlsx, .xls), PDF, DOC, DOCX</small>
+                            <input type="file" id="menu-file" class="form-input" accept=".txt,.csv,.xlsx,.xls,.pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                            <small class="form-help">Best: <strong>PDF</strong> (text/searchable) or <strong>Word .docx</strong>. Also Excel, CSV, TXT. Legacy .doc — save as .docx first.</small>
                         </div>
                         <div id="menu-file-dropzone">
                             <div class="dropzone-icon">📄</div>
@@ -1637,7 +1649,7 @@
                                 <option value="xlsx">Excel (.xlsx)</option>
                                 <option value="xls">Excel (.xls)</option>
                                 <option value="pdf">PDF</option>
-                                <option value="doc">Word Document</option>
+                                <option value="doc">Word (.docx)</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -3330,57 +3342,125 @@
         // Import functions
         function showImportModal() {
             console.log('Showing import modal');
-            document.getElementById('file-import-modal').style.display = 'flex';
+            const modal = document.getElementById('file-import-modal');
+            if (!modal) {
+                alert('Import dialog not found. Please refresh the page.');
+                return;
+            }
+            modal.style.display = 'flex';
+            modal.style.zIndex = '10050';
         }
 
         function showTextInputModal() {
             console.log('Showing text input modal');
-            document.getElementById('text-input-modal').style.display = 'flex';
+            const modal = document.getElementById('text-input-modal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+            modal.style.zIndex = '10050';
         }
 
         function showURLImportModal() {
             console.log('Showing URL import modal');
-            document.getElementById('url-import-modal').style.display = 'flex';
+            const modal = document.getElementById('url-import-modal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+            modal.style.zIndex = '10050';
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+            const el = document.getElementById(modalId);
+            if (el) el.style.display = 'none';
+        }
+
+        function waitForLib(checkFn, label, timeoutMs) {
+            return new Promise(function (resolve, reject) {
+                const start = Date.now();
+                (function tick() {
+                    if (checkFn()) return resolve();
+                    if (Date.now() - start > (timeoutMs || 8000)) {
+                        return reject(new Error(label + ' failed to load. Refresh and try again.'));
+                    }
+                    setTimeout(tick, 100);
+                })();
+            });
+        }
+
+        function parseMenuTextRobust(text, options) {
+            let items = parseStructuredText(text, options || {});
+            if ((!items || !items.length) && text && text.trim().length > 20) {
+                items = parseFreeformText(text, Object.assign({}, options, { autoCategorize: true }));
+            }
+            if ((!items || !items.length) && text && text.trim().length > 20) {
+                items = parseSimpleText(text, Object.assign({}, options, { autoCategorize: true }));
+            }
+            return items || [];
+        }
+
+        function finishTextImport(text, options, sourceLabel) {
+            const trimmed = (text || '').trim();
+            if (!trimmed) {
+                hideImportLoading();
+                alert('No text could be extracted from this file.' + (sourceLabel ? '\n\nSource: ' + sourceLabel : '') + '\n\nIf this is a scanned PDF, export a searchable PDF or paste text manually.');
+                return;
+            }
+            const parsedItems = parseMenuTextRobust(trimmed, options);
+            console.log('📥 Import parsed', parsedItems.length, 'items from', sourceLabel || 'file');
+            if (!parsedItems.length) {
+                window.__lastImportExtractedText = trimmed;
+                hideImportLoading();
+                if (confirm('Extracted text but could not detect dishes.\n\nOpen Paste Text with the extracted content so you can clean it up?')) {
+                    const ta = document.getElementById('menu-text');
+                    if (ta) ta.value = trimmed.slice(0, 50000);
+                    closeModal('file-import-modal');
+                    showTextInputModal();
+                } else {
+                    showImportResults([]);
+                }
+                return;
+            }
+            showImportResults(parsedItems, sourceLabel ? { name: sourceLabel, description: 'Imported from file' } : null);
         }
 
         // File Import Processing
         function processFileImport() {
             const fileInput = document.getElementById('menu-file');
-            const file = fileInput.files[0];
+            const file = fileInput && fileInput.files[0];
             
             if (!file) {
-                alert('Please select a file to import.');
+                alert('Please select a PDF, Word (.docx), Excel, CSV, or text file to import.');
                 return;
             }
 
-            const format = document.getElementById('file-format').value;
-            const autoCategorize = document.getElementById('auto-categorize').checked;
-            const extractPrices = document.getElementById('extract-prices').checked;
-            const detectDescriptions = document.getElementById('detect-descriptions').checked;
+            const format = (document.getElementById('file-format') || {}).value || 'auto';
+            const autoCategorize = document.getElementById('auto-categorize')?.checked !== false;
+            const extractPrices = document.getElementById('extract-prices')?.checked !== false;
+            const detectDescriptions = !!document.getElementById('detect-descriptions')?.checked;
+            const options = { autoCategorize, extractPrices, detectDescriptions };
 
-            // Show loading state
+            const name = (file.name || '').toLowerCase();
             let fileType = '';
-            if (file.name.endsWith('.pdf')) fileType = 'pdf';
-            else if (file.name.endsWith('.docx')) fileType = 'docx';
-            showImportLoading(fileType);
+            if (format === 'pdf' || name.endsWith('.pdf')) fileType = 'pdf';
+            else if (format === 'doc' || name.endsWith('.docx') || name.endsWith('.doc')) fileType = 'docx';
+            else if (format === 'xlsx' || format === 'xls' || name.endsWith('.xlsx') || name.endsWith('.xls')) fileType = 'xlsx';
+            else if (format === 'csv' || name.endsWith('.csv')) fileType = 'csv';
+            else if (format === 'txt' || name.endsWith('.txt')) fileType = 'txt';
+            else if (name.endsWith('.pdf')) fileType = 'pdf';
+            else if (name.endsWith('.docx') || name.endsWith('.doc')) fileType = 'docx';
 
-            // Process file based on type
-            if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-                processTextFile(file, { autoCategorize, extractPrices, detectDescriptions });
-            } else if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
-                processCSVFile(file, { autoCategorize, extractPrices, detectDescriptions });
-            } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-                processExcelFile(file, { autoCategorize, extractPrices, detectDescriptions });
-            } else if (file.name.endsWith('.pdf')) {
-                processPDFFile(file, { autoCategorize, extractPrices, detectDescriptions });
-            } else if (file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
-                processWordFile(file, { autoCategorize, extractPrices, detectDescriptions });
+            showImportLoading(fileType === 'docx' ? 'docx' : fileType);
+
+            if (fileType === 'txt' || file.type === 'text/plain') {
+                processTextFile(file, options);
+            } else if (fileType === 'csv' || file.type === 'text/csv') {
+                processCSVFile(file, options);
+            } else if (fileType === 'xlsx') {
+                processExcelFile(file, options);
+            } else if (fileType === 'pdf' || name.endsWith('.pdf')) {
+                processPDFFile(file, options);
+            } else if (fileType === 'docx' || name.endsWith('.doc') || name.endsWith('.docx')) {
+                processWordFile(file, options);
             } else {
-                alert('Unsupported file format. Please use TXT, CSV, Excel (.xlsx, .xls), PDF, or Word documents.');
+                alert('Unsupported file format. Please use PDF, Word (.docx), Excel (.xlsx/.xls), CSV, or TXT.');
                 hideImportLoading();
             }
         }
@@ -3400,18 +3480,11 @@
 
             closeModal('text-input-modal');
             showImportLoading();
-
-            // Parse text based on format
-            let parsedItems = [];
-            if (format === 'structured') {
-                parsedItems = parseStructuredText(textInput, { autoCategorize, extractPrices, detectDescriptions });
-            } else if (format === 'simple') {
-                parsedItems = parseSimpleText(textInput, { autoCategorize, extractPrices, detectDescriptions });
-            } else {
-                parsedItems = parseFreeformText(textInput, { autoCategorize, extractPrices, detectDescriptions });
-            }
-
-            showImportResults(parsedItems);
+            finishTextImport(textInput, {
+                autoCategorize,
+                extractPrices,
+                detectDescriptions
+            }, 'Paste Text');
         }
 
         // URL Import Processing
@@ -3446,9 +3519,11 @@
         function processTextFile(file, options) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                const content = e.target.result;
-                const parsedItems = parseStructuredText(content, options);
-                showImportResults(parsedItems);
+                finishTextImport(e.target.result, options, file.name);
+            };
+            reader.onerror = function () {
+                hideImportLoading();
+                alert('Could not read that text file.');
             };
             reader.readAsText(file);
         }
@@ -3458,178 +3533,158 @@
             reader.onload = function(e) {
                 const content = e.target.result;
                 const parsedItems = parseCSVContent(content, options);
-                showImportResults(parsedItems);
+                if (!parsedItems.length) {
+                    finishTextImport(content, options, file.name);
+                    return;
+                }
+                showImportResults(parsedItems, { name: file.name, description: 'Imported from CSV' });
+            };
+            reader.onerror = function () {
+                hideImportLoading();
+                alert('Could not read that CSV file.');
             };
             reader.readAsText(file);
         }
 
         function processExcelFile(file, options) {
-            // Check if XLSX library is loaded
-            if (typeof XLSX === 'undefined') {
-                hideImportLoading();
-                alert('Excel parser not loaded. Please refresh the page and try again.');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    
-                    // Get first sheet
-                    const sheetName = workbook.SheetNames[0];
-                    const sheet = workbook.Sheets[sheetName];
-                    
-                    // Convert to JSON with headers
-                    const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-                    
-                    if (!rawData || rawData.length === 0) {
-                        hideImportLoading();
-                        alert('Excel sheet appears to be empty.');
-                        return;
-                    }
-
-                    // Parse Excel data similar to CSV
-                    const parsedItems = parseExcelContent(rawData, options);
+            waitForLib(function () { return typeof XLSX !== 'undefined'; }, 'Excel parser')
+                .then(function () {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(data, { type: 'array' });
+                            const sheetName = workbook.SheetNames[0];
+                            const sheet = workbook.Sheets[sheetName];
+                            const rawData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                            if (!rawData || rawData.length === 0) {
+                                hideImportLoading();
+                                alert('Excel sheet appears to be empty.');
+                                return;
+                            }
+                            const parsedItems = parseExcelContent(rawData, options);
+                            if (!parsedItems.length) {
+                                const asText = rawData.map(function (row) {
+                                    return (Array.isArray(row) ? row : []).join('\t');
+                                }).join('\n');
+                                finishTextImport(asText, options, file.name);
+                                return;
+                            }
+                            showImportResults(parsedItems, { name: file.name, description: 'Imported from Excel' });
+                        } catch (error) {
+                            console.error('Excel parse error:', error);
+                            hideImportLoading();
+                            alert('Unable to parse Excel file: ' + error.message + '\n\nTry saving as CSV, PDF, or DOCX instead.');
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                })
+                .catch(function (err) {
                     hideImportLoading();
-                    showImportResults(parsedItems);
-                } catch (error) {
-                    console.error('Excel parse error:', error);
-                    hideImportLoading();
-                    alert('Unable to parse Excel file: ' + error.message + '\n\nTry saving as CSV and importing that instead.');
-                }
-            };
-            reader.readAsArrayBuffer(file);
+                    alert(err.message);
+                });
         }
 
         function processPDFFile(file, options) {
             console.log('🔄 Starting PDF processing for file:', file.name);
-            
-            // Check if PDF.js is loaded
-            if (typeof pdfjsLib === 'undefined') {
-                console.error('❌ PDF.js library not loaded!');
-                hideImportLoading();
-                alert('PDF.js library failed to load. Please refresh the page and try again.');
-                return;
-            }
-            
-            // Use PDF.js to extract text from PDF files
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const arrayBuffer = e.target.result;
-                
-                console.log('📦 PDF file read, size:', arrayBuffer.byteLength, 'bytes');
-                
-                // Set up PDF.js worker
-                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-                
-                // Load the PDF document
-                pdfjsLib.getDocument({ data: arrayBuffer }).promise.then(function(pdf) {
-                    let fullText = '';
-                    let pagePromises = [];
-                    
-                    console.log(`📄 PDF loaded: ${pdf.numPages} page(s)`);
-                    
-                    // Extract text from each page
-                    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                        pagePromises.push(
-                            pdf.getPage(pageNum).then(function(page) {
-                                return page.getTextContent().then(function(textContent) {
-                                    let pageText = '';
-                                    let lastY = null;
-                                    
-                                    // Try to preserve line structure
-                                    for (let item of textContent.items) {
-                                        const currentY = item.transform[5]; // Y coordinate
-                                        
-                                        // If Y changed significantly, add newline
-                                        if (lastY !== null && Math.abs(currentY - lastY) > 5) {
-                                            pageText += '\n';
-                                        } else if (lastY === null) {
-                                            // First item
-                                        } else {
-                                            // Same line, add space
-                                            pageText += ' ';
-                                        }
-                                        
-                                        pageText += item.str;
-                                        lastY = currentY;
-                                    }
-                                    
-                                    console.log(`📄 Page ${pageNum} extracted: ${pageText.length} characters`);
-                                    return pageText;
-                                });
-                            })
-                        );
-                    }
-                    
-                    // Wait for all pages to be processed
-                    Promise.all(pagePromises).then(function(pageTexts) {
-                        fullText = pageTexts.join('\n\n');
-                        
-                        console.log(`📄 Total extracted text: ${fullText.length} characters`);
-                        console.log('📄 First 500 chars:', fullText.substring(0, 500));
-                        
-                        // Parse the extracted text
-                        const parsedItems = parseStructuredText(fullText, options);
-                        console.log(`✅ Parsed ${parsedItems.length} items from PDF`);
-                        showImportResults(parsedItems);
-                    });
-                    
-                }).catch(function(error) {
-                    console.error('Error processing PDF:', error);
+
+            waitForLib(function () { return typeof pdfjsLib !== 'undefined'; }, 'PDF.js')
+                .then(function () {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const arrayBuffer = e.target.result;
+                        console.log('📦 PDF file read, size:', arrayBuffer.byteLength, 'bytes');
+
+                        pdfjsLib.GlobalWorkerOptions.workerSrc =
+                            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+                        pdfjsLib.getDocument({ data: arrayBuffer }).promise.then(function(pdf) {
+                            console.log('📄 PDF loaded: ' + pdf.numPages + ' page(s)');
+                            const pagePromises = [];
+                            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                                pagePromises.push(
+                                    pdf.getPage(pageNum).then(function(page) {
+                                        return page.getTextContent().then(function(textContent) {
+                                            let pageText = '';
+                                            let lastY = null;
+                                            for (let i = 0; i < textContent.items.length; i++) {
+                                                const item = textContent.items[i];
+                                                const currentY = item.transform[5];
+                                                if (lastY !== null && Math.abs(currentY - lastY) > 5) {
+                                                    pageText += '\n';
+                                                } else if (lastY !== null && pageText && !pageText.endsWith('\n') && !pageText.endsWith(' ')) {
+                                                    pageText += ' ';
+                                                }
+                                                pageText += item.str;
+                                                lastY = currentY;
+                                            }
+                                            return pageText.trim();
+                                        });
+                                    })
+                                );
+                            }
+
+                            return Promise.all(pagePromises).then(function(pageTexts) {
+                                const fullText = pageTexts.filter(Boolean).join('\n\n');
+                                console.log('📄 Total extracted text: ' + fullText.length + ' characters');
+                                finishTextImport(fullText, options, file.name);
+                            });
+                        }).catch(function(error) {
+                            console.error('Error processing PDF:', error);
+                            hideImportLoading();
+                            let errorMessage = 'Error processing PDF file. ';
+                            if (error.name === 'PasswordException') {
+                                errorMessage += 'This PDF is password protected. Remove the password and try again.';
+                            } else if (error.name === 'InvalidPDFException') {
+                                errorMessage += 'This file is not a valid PDF or may be corrupted.';
+                            } else {
+                                errorMessage += 'Please ensure the file is not corrupted, or try DOCX / paste text.';
+                            }
+                            alert(errorMessage);
+                        });
+                    };
+                    reader.onerror = function () {
+                        hideImportLoading();
+                        alert('Could not read that PDF file.');
+                    };
+                    reader.readAsArrayBuffer(file);
+                })
+                .catch(function (err) {
                     hideImportLoading();
-                    
-                    let errorMessage = 'Error processing PDF file. ';
-                    if (error.name === 'PasswordException') {
-                        errorMessage += 'This PDF is password protected. Please remove the password and try again.';
-                    } else if (error.name === 'InvalidPDFException') {
-                        errorMessage += 'This file is not a valid PDF or may be corrupted.';
-                    } else if (error.name === 'MissingPDFException') {
-                        errorMessage += 'The PDF file could not be loaded.';
-                    } else {
-                        errorMessage += 'Please ensure the file is not corrupted and try again.';
-                    }
-                    
-                    alert(errorMessage);
+                    alert(err.message);
                 });
-            };
-            reader.readAsArrayBuffer(file);
         }
 
         function processWordFile(file, options) {
-            if (file.name.endsWith('.docx')) {
-                // Use mammoth.js for DOCX processing
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const arrayBuffer = e.target.result;
-                    
-                    // Extract text using mammoth.js
-                    mammoth.extractRawText({ arrayBuffer })
-                        .then(function(result) {
-                            const text = result.value;
-                            
-                            if (text.trim()) {
-                                // Parse the extracted text
-                                const parsedItems = parseStructuredText(text, options);
-                                showImportResults(parsedItems);
-                            } else {
-                                hideImportLoading();
-                                alert('No text could be extracted from this Word document. The file may be empty or contain only images.\n\nPlease try:\n1. Copy text to clipboard and use "Paste Text"\n2. Save as PDF and use PDF import\n3. Save as plain text (.txt)');
-                            }
-                        })
-                        .catch(function(error) {
-                            console.error('Error processing Word document:', error);
+            const name = (file.name || '').toLowerCase();
+            if (name.endsWith('.docx')) {
+                waitForLib(function () { return typeof mammoth !== 'undefined'; }, 'Word document parser (mammoth)')
+                    .then(function () {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            mammoth.extractRawText({ arrayBuffer: e.target.result })
+                                .then(function(result) {
+                                    finishTextImport(result.value || '', options, file.name);
+                                })
+                                .catch(function(error) {
+                                    console.error('Error processing Word document:', error);
+                                    hideImportLoading();
+                                    alert('Error processing Word document. Try saving as PDF or pasting text.');
+                                });
+                        };
+                        reader.onerror = function () {
                             hideImportLoading();
-                            alert('Error processing Word document. Please try:\n\n1. Converting to PDF\n2. Copying text to clipboard\n3. Saving as plain text');
-                        });
-                };
-                reader.readAsArrayBuffer(file);
+                            alert('Could not read that Word file.');
+                        };
+                        reader.readAsArrayBuffer(file);
+                    })
+                    .catch(function (err) {
+                        hideImportLoading();
+                        alert(err.message);
+                    });
             } else {
-                // For .doc files, suggest conversion
                 hideImportLoading();
-                alert('Legacy .doc files are not supported. Please:\n\n1. Convert to .docx format\n2. Save as PDF\n3. Save as plain text\n4. Copy text and use "Paste Text" option');
+                alert('Legacy .doc files are not supported.\n\nPlease:\n1. Save as .docx in Word\n2. Export as PDF\n3. Or copy text and use Paste Text');
             }
         }
 
@@ -3941,6 +3996,9 @@
         function showImportLoading(fileType = '') {
             const summary = document.getElementById('import-summary');
             const preview = document.getElementById('import-preview');
+            const itemsList = document.getElementById('import-items-list');
+            const fileModal = document.getElementById('file-import-modal');
+            if (fileModal) fileModal.style.display = 'none';
             
             let loadingText = 'Processing your import...';
             if (fileType === 'pdf') {
@@ -3949,19 +4007,31 @@
                 loadingText = 'Processing Word document...';
             }
             
-            summary.innerHTML = `
+            if (summary) {
+                summary.innerHTML = `
                 <div class="import-loading">
                     <div class="spinner"></div>
                     <p>${loadingText}</p>
                 </div>
             `;
-            preview.innerHTML = '';
+            }
+            if (preview && !itemsList) preview.innerHTML = '';
+            if (itemsList) itemsList.innerHTML = '<p style="color:#64748b;padding:12px;">Extracting text and detecting dishes…</p>';
             
-            document.getElementById('import-results-modal').style.display = 'flex';
+            const resultsModal = document.getElementById('import-results-modal');
+            if (resultsModal) {
+                resultsModal.style.display = 'flex';
+                resultsModal.style.zIndex = '10050';
+            }
         }
 
         function hideImportLoading() {
-            // This is handled by showImportResults
+            const resultsModal = document.getElementById('import-results-modal');
+            if (resultsModal) resultsModal.style.display = 'none';
+            const summary = document.getElementById('import-summary');
+            if (summary) summary.innerHTML = '';
+            const itemsList = document.getElementById('import-items-list');
+            if (itemsList) itemsList.innerHTML = '';
         }
 
         function showImportResults(items, menuInfo = null) {
@@ -3975,29 +4045,37 @@
             // Fallback to old behavior
             const summary = document.getElementById('import-summary');
             const preview = document.getElementById('import-preview');
+            const resultsModal = document.getElementById('import-results-modal');
+            const fileModal = document.getElementById('file-import-modal');
+            if (fileModal) fileModal.style.display = 'none';
             
             // Update summary
             summary.innerHTML = `
                 <h4>Import Summary</h4>
                 <p><strong>${items.length}</strong> items imported successfully</p>
-                <p><strong>Categories found:</strong> ${[...new Set(items.map(item => item.category))].join(', ')}</p>
-                <p><strong>Price range:</strong> $${Math.min(...items.map(item => item.price || 0)).toFixed(2)} - $${Math.max(...items.map(item => item.price || 0)).toFixed(2)}</p>
+                <p><strong>Categories found:</strong> ${[...new Set(items.map(item => item.category))].join(', ') || '—'}</p>
             `;
             
             // Update preview
-            preview.innerHTML = items.map(item => `
+            preview.innerHTML = items.length
+                ? items.map(item => `
                 <div class="import-item">
                     <div>
                         <div class="import-item-name">${item.name}</div>
                         <div class="import-item-category">${item.category}</div>
                         ${item.description ? `<div class="import-item-description">${item.description}</div>` : ''}
                     </div>
-                    <div class="import-item-price">${item.price ? `$${item.price.toFixed(2)}` : 'No price'}</div>
+                    <div class="import-item-price">${item.price ? `$${Number(item.price).toFixed(2)}` : 'No price'}</div>
                 </div>
-            `).join('');
+            `).join('')
+                : '<p>No dishes detected. Try Paste Text or a searchable PDF / .docx.</p>';
             
             // Store items for later use
             window.importedItems = items;
+            if (resultsModal) {
+                resultsModal.style.display = 'flex';
+                resultsModal.style.zIndex = '10050';
+            }
         }
 
         async function applyImportResults() {
@@ -4068,21 +4146,49 @@
             const dz = document.getElementById('menu-file-dropzone');
             const input = document.getElementById('menu-file');
             if (!dz || !input) return;
-            
-            // Make dropzone clickable to open file picker
+
+            function assignFiles(fileList) {
+                if (!fileList || !fileList.length) return;
+                try {
+                    const dt = new DataTransfer();
+                    dt.items.add(fileList[0]);
+                    input.files = dt.files;
+                } catch (e) {
+                    console.warn('Could not assign dropped file to input', e);
+                }
+                const nameEl = dz.querySelector('.dropzone-text');
+                if (nameEl && fileList[0]) {
+                    nameEl.textContent = fileList[0].name;
+                }
+                const sub = dz.querySelector('.dropzone-subtext');
+                if (sub) {
+                    sub.textContent = 'Ready — click Import & Parse';
+                }
+            }
+
             dz.style.cursor = 'pointer';
-            dz.addEventListener('click', () => {
+            dz.addEventListener('click', function () {
                 input.click();
             });
-            
-            // Drag and drop handlers
-            ['dragenter','dragover'].forEach(evt => dz.addEventListener(evt, e => { e.preventDefault(); dz.style.background = '#f1f5f9'; }));
-            ['dragleave','drop'].forEach(evt => dz.addEventListener(evt, e => { e.preventDefault(); dz.style.background = 'transparent'; }));
-            dz.addEventListener('drop', e => {
-                const files = e.dataTransfer.files;
-                if (files && files[0]) {
-                    input.files = files;
-                }
+            input.addEventListener('change', function () {
+                if (input.files && input.files[0]) assignFiles(input.files);
+            });
+
+            ['dragenter', 'dragover'].forEach(function (evt) {
+                dz.addEventListener(evt, function (e) {
+                    e.preventDefault();
+                    dz.classList.add('drag-over');
+                });
+            });
+            ['dragleave', 'drop'].forEach(function (evt) {
+                dz.addEventListener(evt, function (e) {
+                    e.preventDefault();
+                    dz.classList.remove('drag-over');
+                });
+            });
+            dz.addEventListener('drop', function (e) {
+                const files = e.dataTransfer && e.dataTransfer.files;
+                if (files && files[0]) assignFiles(files);
             });
         });
 
@@ -4652,17 +4758,7 @@
       };
     </script>
     
-    <!-- Load XLSX library for Excel parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
-    <!-- Load PDF.js for PDF parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    
-    <!-- Load Mammoth.js for Word document parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-    
-    <!-- Load Smart Menu Parser -->
-    <script defer src="assets/js/smart-menu-parser.js"></script>
+    <!-- XLSX / PDF.js / Mammoth / SmartMenuParser loaded in <head> for Import -->
     
     <!-- Load Menu Items Database FIRST (before menu manager) -->
     <script src="assets/js/menu-items-database.js"></script>

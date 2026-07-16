@@ -1,11 +1,19 @@
-/**
- * Enhanced PDF Upload UI for Menu Builder
- * Makes the PDF upload process smooth, intuitive, and professional
- */
+/* File / results import modals above sidebar (z-index 1000–1200) */
+#file-import-modal,
+#text-input-modal,
+#url-import-modal,
+#import-results-modal {
+  z-index: 10050 !important;
+}
 
-/* ==========================================
-   ENHANCED FILE UPLOAD DROPZONE
-   ========================================== */
+/* Alignment only — do not force display:none here (JS toggles inline display) */
+#file-import-modal.modal,
+#text-input-modal.modal,
+#url-import-modal.modal,
+#import-results-modal.modal {
+  align-items: center;
+  justify-content: center;
+}
 
 #menu-file-dropzone {
   border: 3px dashed var(--border-light) !important;

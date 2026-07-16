@@ -13,7 +13,7 @@ class EnhancedMenuImport {
    * Show import results with recipe linking options
    */
   showImportResults(items, menuInfo = null) {
-    this.importedItems = items;
+    this.importedItems = Array.isArray(items) ? items : [];
     this.menuInfo = menuInfo;
 
     const modal = document.getElementById('import-results-modal');
@@ -21,17 +21,23 @@ class EnhancedMenuImport {
       return;
     }
 
+    const fileModal = document.getElementById('file-import-modal');
+    if (fileModal) {
+      fileModal.style.display = 'none';
+    }
+
     // Show menu info if available
     this.displayMenuInfo(menuInfo);
 
     // Show summary
-    this.displaySummary(items);
+    this.displaySummary(this.importedItems);
 
-    // Show items with recipe linking
-    this.displayItems(items);
+    // Show items with recipe linking (or empty-state guidance)
+    this.displayItems(this.importedItems);
 
-    // Show modal
-    modal.style.display = 'block';
+    // Must be flex — modal CSS centers via flexbox (block leaves it looking broken)
+    modal.style.display = 'flex';
+    modal.style.zIndex = '10050';
   }
 
   /**
@@ -114,6 +120,19 @@ class EnhancedMenuImport {
       return;
     }
 
+    if (!items || !items.length) {
+      container.innerHTML = `
+            <div style="padding: 20px; border: 1px dashed #cbd5e1; border-radius: 12px; background: #f8fafc;">
+                <p style="margin: 0 0 8px; font-weight: 700; color: #0f172a;">No dishes detected</p>
+                <p style="margin: 0; color: #475569; font-size: 0.95rem; line-height: 1.5;">
+                    PDF/Word text was extracted, but items were not recognized. Try a clearer text menu,
+                    an Excel/CSV with Name and Price columns, or paste text via <strong>Paste Text</strong>.
+                    Scanned/image-only PDFs need OCR first (export searchable PDF from your scanner).
+                </p>
+            </div>`;
+      return;
+    }
+
     // Load existing menu items from database for mapping
     const existingItems = window.menuItemsDatabase
       ? window.menuItemsDatabase.getAllItems()
@@ -121,9 +140,9 @@ class EnhancedMenuImport {
 
     container.innerHTML = items
       .map((item, index) => {
-        // Initialize mapping state if not set
+        // Default to Create New so Apply works without clicking every row
         if (!item.mappingType) {
-          item.mappingType = null; // 'existing' or 'new'
+          item.mappingType = 'new';
           item.mappedToItemId = null;
         }
 

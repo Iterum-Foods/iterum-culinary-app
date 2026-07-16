@@ -236,8 +236,8 @@ p {
    UNIVERSAL BUTTON STYLES
    ============================================ */
 .btn,
-button[class*='btn'],
-[role='button'] {
+button[class*='btn']:not(.nav-dropdown-btn):not(.nav-user-menu-btn):not(.nav-link):not(.tc-sidebar-collapse-btn):not(.tc-project-select__trigger):not(.tc-project-option):not(.sidebar-toggle-mobile),
+[role='button']:not(.nav-link) {
   padding: 14px 24px;
   border-radius: 999px;
   font-weight: var(--font-weight-semibold);

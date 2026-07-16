@@ -4,7 +4,7 @@
  */
 
 /** Bump when sidebar HTML or menu structure changes (forces rebuild on cached pages). */
-const ITERUM_NAV_VERSION = '2026-06-19-inventory-ingredients-nav-v1';
+const ITERUM_NAV_VERSION = '2026-07-15-launch-sidebar-v1';
 
 class UnifiedNavHeader {
   constructor() {
@@ -131,6 +131,7 @@ class UnifiedNavHeader {
   }
 
   moreMenuActiveClass() {
+    // Only pages that live under More tools (not primary rail)
     const inMore = [
       'highlights',
       'server',
@@ -139,8 +140,7 @@ class UnifiedNavHeader {
       'equipment',
       'kitchen',
       'canvas',
-      'vendors',
-      'ingredients',
+      'developer',
       'import_recipe',
       'import_ing',
       'rgo',
@@ -259,6 +259,13 @@ class UnifiedNavHeader {
       this.setupSidebarCollapse();
       this.setupMobileToggle();
       this.setupMobileNavLinkClose();
+      if (sidebar.dataset.iterumDropdownsBound !== '1') {
+        this.setupDropdownHover();
+        this.setupDropdownClickToggle();
+        this.setupSignOutLink();
+        this.openMoreToolsIfActive();
+        sidebar.dataset.iterumDropdownsBound = '1';
+      }
       return;
     }
 
@@ -299,10 +306,34 @@ class UnifiedNavHeader {
     this.setupDropdownHover();
     this.setupDropdownClickToggle();
     this.setupSignOutLink();
+    this.openMoreToolsIfActive();
     this.setupMobileToggle();
     this.setupMobileNavLinkClose();
     this.ensureUserRoleSetup();
     this.initNavContextBar();
+    const sidebar = document.querySelector('.unified-nav-sidebar');
+    if (sidebar) {
+      sidebar.dataset.iterumDropdownsBound = '1';
+    }
+  }
+
+  /** Keep More tools open when the current page lives under it. */
+  openMoreToolsIfActive() {
+    if (!this.moreMenuActiveClass()) {
+      return;
+    }
+    const btn = document.getElementById('nav-more-toggle');
+    const panel = document.getElementById('nav-more-panel');
+    if (!btn || !panel) {
+      return;
+    }
+    panel.classList.add('show');
+    btn.setAttribute('aria-expanded', 'true');
+    try {
+      btn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    } catch (e) {
+      void e;
+    }
   }
 
   syncSidebarCollapseFromStorage() {
@@ -462,27 +493,53 @@ class UnifiedNavHeader {
   }
 
   setupDropdownHover() {
-    // Add delay for dropdown hover to stay open when moving to it
-    const dropdowns = document.querySelectorAll('.nav-dropdown');
+    const sidebar = document.querySelector('.unified-nav-sidebar');
+    if (!sidebar) return;
 
-    dropdowns.forEach(dropdown => {
+    // Touch / coarse pointers: click-only (hover open fights accordion + drawer)
+    const canHover =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (!canHover) {
+      return;
+    }
+
+    sidebar.querySelectorAll('.nav-dropdown').forEach(dropdown => {
       let hoverTimeout;
+      const btn = dropdown.querySelector(
+        '.nav-dropdown-btn, .nav-user-menu-btn'
+      );
+      const content = dropdown.querySelector('.nav-dropdown-content');
+      const isMoreTools = Boolean(
+        btn && btn.classList.contains('nav-dropdown-btn')
+      );
 
       dropdown.addEventListener('mouseenter', () => {
+        // Expanded rail: More tools is click accordion only (less flicker)
+        if (isMoreTools && !sidebar.classList.contains('is-collapsed')) {
+          return;
+        }
         clearTimeout(hoverTimeout);
-        const content = dropdown.querySelector('.nav-dropdown-content');
         if (content) {
           content.classList.add('show');
+        }
+        if (btn) {
+          btn.setAttribute('aria-expanded', 'true');
         }
       });
 
       dropdown.addEventListener('mouseleave', () => {
+        if (isMoreTools && !sidebar.classList.contains('is-collapsed')) {
+          return;
+        }
         hoverTimeout = setTimeout(() => {
-          const content = dropdown.querySelector('.nav-dropdown-content');
           if (content) {
             content.classList.remove('show');
           }
-        }, 300); // 300ms delay before closing
+          if (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+          }
+        }, 280);
       });
     });
   }
@@ -570,6 +627,7 @@ class UnifiedNavHeader {
                     ${this.navLink('menu-builder.html', 'menu', 'fa-solid fa-utensils', 'Menu Builder', 'menus')}
                     ${this.navLink('ingredients.html', 'ingredients', 'fa-solid fa-carrot', 'Ingredients', 'ingredients')}
                     ${this.navLink('inventory.html', 'inventory', 'fa-solid fa-warehouse', 'Inventory', 'inventory')}
+                    ${this.navLink('vendor-management.html', 'vendors', 'fa-solid fa-truck-field', 'Vendors', 'vendors')}
                     ${this.navLink('production-planning.html', 'reports', 'fa-solid fa-chart-line', 'Reports', 'production')}
 
                     <div class="nav-section-label">Archive</div>
@@ -578,8 +636,8 @@ class UnifiedNavHeader {
                     ${this.navLink('audit-log.html', 'audit', 'fa-solid fa-scroll', 'Audit log', 'data_tools')}
 
                     <div class="nav-dropdown">
-                        <button type="button" class="nav-link nav-dropdown-btn ${moreActive}" aria-expanded="false" aria-haspopup="true" aria-controls="nav-more-panel" id="nav-more-toggle">
-                            <i class="fa-solid fa-ellipsis nav-link-fa" aria-hidden="true"></i><span class="nav-link-label nav-more-label">More</span>
+                        <button type="button" class="nav-link nav-dropdown-btn ${moreActive}" aria-expanded="false" aria-haspopup="true" aria-controls="nav-more-panel" id="nav-more-toggle" aria-label="More tools" data-nav-label="More tools">
+                            <i class="fa-solid fa-ellipsis nav-link-fa" aria-hidden="true"></i><span class="nav-link-label nav-more-label">More tools</span><i class="fa-solid fa-chevron-down nav-more-chevron" aria-hidden="true"></i>
                         </button>
                         <div class="nav-dropdown-content" id="nav-more-panel" aria-labelledby="nav-more-toggle">
                             <div class="nav-dropdown-category">Kitchen tools</div>
@@ -592,7 +650,6 @@ class UnifiedNavHeader {
                             <a href="spec-library.html" class="${p('spec_library')}" data-iterum-feature="ingredients"><i class="fa-solid fa-file-lines fa-fw nav-dd-icon" aria-hidden="true"></i>Spec library</a>
                             <a href="vendor-price-comparison.html" class="${p('vendorprice')}" data-iterum-feature="vendors"><i class="fa-solid fa-scale-balanced fa-fw nav-dd-icon" aria-hidden="true"></i>Price compare</a>
                             <a href="equipment-management.html" class="${p('equipment')}" data-iterum-feature="equipment"><i class="fa-solid fa-screwdriver-wrench fa-fw nav-dd-icon" aria-hidden="true"></i>Equipment</a>
-                            <a href="vendor-management.html" class="${p('vendors')}" data-iterum-feature="vendors"><i class="fa-solid fa-truck-field fa-fw nav-dd-icon" aria-hidden="true"></i>Vendors</a>
                             <a href="recipe-developer.html" class="${p('developer')}" data-iterum-feature="recipes"><i class="fa-solid fa-flask fa-fw nav-dd-icon" aria-hidden="true"></i>Full recipe editor</a>
                             <a href="recipe-canvas.html" class="${p('canvas')}" data-iterum-feature="recipes"><i class="fa-solid fa-pen-ruler fa-fw nav-dd-icon" aria-hidden="true"></i>Recipe canvas</a>
                             <a href="kitchen-management.html" class="${p('kitchen')}" data-iterum-feature="kitchen"><i class="fa-solid fa-fire-burner fa-fw nav-dd-icon" aria-hidden="true"></i>Kitchen hub</a>

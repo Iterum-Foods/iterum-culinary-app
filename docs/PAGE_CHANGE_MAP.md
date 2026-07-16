@@ -6,8 +6,8 @@ Use this when updating **navigation**, **project/restaurant context**, **auth ga
 
 | Type | Behavior | Representative files |
 |------|----------|------------------------|
-| **A — Unified sidebar** | `unified-nav-header.js` injects `.unified-nav-sidebar` + wraps body in `.main-content-wrapper`. **Locations** dropdown loads via dynamic `restaurant-location-sidebar.js` from the header injector. | Most app tools (see table). |
-| **B — Custom notebook shell** | `data-no-unified-nav="true"` **or** URL path contains `dashboard` → unified nav **skips** inject. Page ships its own `<aside>` + layout. **Must manually** add shared controls (e.g. `restaurant-location-sidebar.js` + markup). | `dashboard.html` |
+| **A — Unified sidebar** | `unified-nav-header.js` injects `.unified-nav-sidebar` + wraps body in `.main-content-wrapper`. Skips only when `body[data-no-unified-nav="true"]`. **Locations** dropdown loads via dynamic `restaurant-location-sidebar.js`. | Most app tools including `dashboard.html` (same inject; no separate notebook rail). |
+| **B — Opt-out shell** | Explicit `data-no-unified-nav="true"` — page ships its own layout. **Must manually** add shared controls if needed. | Rare embeds / special shells |
 | **C — App page, minimal / late PM** | Unified nav runs; `project-management-system.js` may be missing or loaded only at bottom of body. Project APIs may be undefined on first paint. | `equipment-management.html`, some hub pages |
 | **D — Entry / marketing** | No unified nav; own IA. | `index.html`, `signin.html`, `landing.html`, `setup.html`, … |
 | **E — Utility / test** | Not part of product shell. | `test*.html`, `simple-test.html` |
@@ -16,7 +16,7 @@ Use this when updating **navigation**, **project/restaurant context**, **auth ga
 
 | Change | Primary touchpoints | Verify on |
 |--------|---------------------|-----------|
-| **Left nav links / labels** | `unified-nav-header.js` (`getSidebarHTML`), `dashboard.html` (desktop + mobile nav), optionally `notebook-sidebar-template.js` (template only — currently unused by HTML) | One Type **A** page + `dashboard.html` |
+| **Left nav links / labels** | `unified-nav-header.js` (`getSidebarHTML` + bump `ITERUM_NAV_VERSION`), `taste-craft-app-sidebar.css` | One Type **A** page (e.g. `dashboard.html`, `menu-builder.html`) |
 | **Restaurant group / location scope** | `project-management-system.js`, `restaurant-location-sidebar.js`, `unified-nav-header.js` (sidebar HTML + script inject) | Type **A** page + `dashboard.html` |
 | **Project list / current project storage** | `project-management-system.js`, `unified-project-selector.js` | Any page with project chip + `project-hub.html` |
 | **Global header / brand** | `header-universal.css`, `unified-nav-header.js`, per-page `header-user-display` if used | `dashboard.html` + one unified page |
@@ -26,7 +26,7 @@ Use this when updating **navigation**, **project/restaurant context**, **auth ga
 
 ## Per-page inventory
 
-Legend: **UN** = loads `unified-nav-header.js` (injection attempted), **SKIP** = unified nav skipped (`data-no-unified-nav` or dashboard path), **PM** = `project-management-system.js`, **UPS** = `unified-project-selector.js`, **RL** = `restaurant-location-sidebar.js` (explicit include or injected with UN).
+Legend: **UN** = loads `unified-nav-header.js` (injection attempted), **SKIP** = unified nav skipped (`data-no-unified-nav="true"`), **PM** = `project-management-system.js`, **UPS** = `unified-project-selector.js`, **RL** = `restaurant-location-sidebar.js` (explicit include or injected with UN).
 
 | Page | UN | Shell | PM | UPS | RL | Notes |
 |------|----|-------|----|-----|-----|-------|
@@ -34,7 +34,7 @@ Legend: **UN** = loads `unified-nav-header.js` (injection attempted), **SKIP** =
 | `bulk-ingredient-import.html` | ✓ | A | | ✓ | inject | |
 | `bulk-recipe-import.html` | ✓ | A | | ✓ | inject | |
 | `calendar.html` | ✓ | A | ✓ | ✓ | inject | |
-| `dashboard.html` | ✓* | B | ✓ | ✓ | **explicit** | `data-no-unified-nav="true"` — no inject; custom sidebar + mobile drawer |
+| `dashboard.html` | ✓ | A | ✓ | ✓ | inject | Unified sidebar (same as other app pages); optional local mobile strip suppressed when unified mobile shell is on |
 | `data-backup-center.html` | ✓ | A | | ✓ | inject | |
 | `signin.html` | | D | | | | Entry |
 | `data-management-dashboard.html` | ✓ | A | | ✓ | inject | PM not in head; add if page needs `projectManager` |
@@ -73,8 +73,6 @@ Legend: **UN** = loads `unified-nav-header.js` (injection attempted), **SKIP** =
 | `test-simple.html` | | E | | | | |
 | `test-site.html` | | E | | | | |
 
-\* `dashboard.html` includes `unified-nav-header js` but injection is **skipped**; script still loads for shared types/helpers if any.
-
 ## Shared modules (edit once, many consumers)
 
 | File | Role |
@@ -93,13 +91,13 @@ Legend: **UN** = loads `unified-nav-header.js` (injection attempted), **SKIP** =
 1. Add `unified-nav-header.js` + `header-universal.css` (match siblings).
 2. If project-aware: add `project-management-system.js` (before first use) + `unified-project-selector.js` if others use it.
 3. Body: leave room for inject (no duplicate fixed sidebars unless intentional).
-4. If **not** using unified inject: set `data-no-unified-nav="true"` and copy **dashboard** pattern for nav + **RL** markup/script.
+4. If **not** using unified inject: set `data-no-unified-nav="true"` and ship your own layout + shared controls.
 
 ### Change sidebar footer (project chip, locations, user block)
 
-1. Edit `unified-nav-header.js` → `getSidebarHTML()`.
-2. Edit `dashboard.html` (desktop sidebar + `dash-mobile-drawer`).
-3. Run smoke: one Type **A** page + `dashboard.html`.
+1. Edit `unified-nav-header.js` → `getSidebarHTML()` and bump `ITERUM_NAV_VERSION`.
+2. Adjust `taste-craft-app-sidebar.css` if layout/visuals change.
+3. Run smoke: `dashboard.html` + one deep tool (e.g. `menu-builder.html`) + mobile width for the drawer.
 
 ---
 

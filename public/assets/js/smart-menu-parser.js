@@ -215,6 +215,11 @@ class SmartMenuParser {
    * Detect if a line is a category header
    */
   detectCategoryHeader(line) {
+    // Priced lines are dishes, never section headers
+    if (this.extractPrice(line).price != null) {
+      return null;
+    }
+
     // Try pattern matching
     for (const pattern of this.categoryPatterns) {
       const match = line.match(pattern);
@@ -230,7 +235,7 @@ class SmartMenuParser {
       }
     }
 
-    // Check for known categories without pattern
+    // Check for known categories without pattern (exact / near-exact only)
     const cleanLine = line
       .toLowerCase()
       .replace(/[^\w\s]/g, '')
@@ -249,10 +254,13 @@ class SmartMenuParser {
     const clean = text
       .toLowerCase()
       .replace(/[^\w\s]/g, '')
-      .trim();
-    return this.knownCategories.some(
-      cat => clean === cat || clean.includes(cat) || cat.includes(clean)
-    );
+      .trim()
+      .replace(/\s+/g, ' ');
+    if (!clean) {
+      return false;
+    }
+    // Exact match only — "beef tenderloin" must NOT match category "beef"
+    return this.knownCategories.some(cat => clean === cat);
   }
 
   /**
