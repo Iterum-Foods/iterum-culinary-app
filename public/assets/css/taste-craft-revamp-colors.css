@@ -51,8 +51,8 @@
 
 .tc-revamp-body .unified-nav-sidebar .nav-section-label {
   background: transparent !important;
-  color: hsl(var(--tc-sidebar-foreground) / 0.48) !important;
-  font-weight: 700 !important;
+  color: hsl(215 16% 72%) !important;
+  font-weight: 600 !important;
   letter-spacing: 0.12em !important;
   font-size: 0.625rem !important;
 }
@@ -62,12 +62,14 @@
 .tc-revamp-body .unified-nav-sidebar .nav-user-menu-btn,
 .tc-revamp-body .unified-nav-sidebar .nav-link-label,
 .tc-revamp-body .unified-nav-sidebar .nav-more-label {
-  color: hsl(var(--tc-sidebar-foreground)) !important;
+  color: hsl(215 20% 82%) !important;
   font-weight: 500 !important;
 }
 
 .tc-revamp-body .unified-nav-sidebar a.nav-link:not(.active),
-.tc-revamp-body .unified-nav-sidebar button.nav-link:not(.nav-dropdown-btn):not(.active) {
+.tc-revamp-body
+  .unified-nav-sidebar
+  button.nav-link:not(.nav-dropdown-btn):not(.active) {
   background-color: transparent !important;
 }
 
@@ -78,15 +80,21 @@
 .tc-revamp-body .unified-nav-sidebar .nav-dropdown-btn:focus,
 .tc-revamp-body .unified-nav-sidebar .nav-user-menu-btn:hover,
 .tc-revamp-body .unified-nav-sidebar .nav-user-menu-btn:focus {
-  background: hsl(var(--tc-sidebar-accent) / 0.55) !important;
-  color: hsl(var(--tc-sidebar-foreground)) !important;
+  background: hsl(182 28% 18% / 0.9) !important;
+  color: hsl(0 0% 100%) !important;
 }
 
 .tc-revamp-body .unified-nav-sidebar .nav-link.active {
-  background: hsl(var(--tc-sidebar-accent) / 0.72) !important;
-  border-left: 3px solid hsl(var(--tc-accent)) !important;
+  background: hsl(215 28% 17%) !important;
+  color: hsl(0 0% 100%) !important;
+  border-left: 3px solid hsl(160 84% 42%) !important;
   box-shadow: none !important;
   font-weight: 600 !important;
+}
+
+.tc-revamp-body .unified-nav-sidebar .nav-link.active .nav-link-label,
+.tc-revamp-body .unified-nav-sidebar .nav-link.active .nav-link-fa {
+  color: hsl(0 0% 100%) !important;
 }
 
 .tc-revamp-body .unified-nav-sidebar .tc-sidebar-account-wrap .nav-user-menu-btn {
