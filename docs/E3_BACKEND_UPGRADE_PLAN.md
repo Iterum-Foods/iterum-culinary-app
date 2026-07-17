@@ -151,12 +151,13 @@ Add **only** when client + rules cannot safely do the job:
 
 ## Next engineering ticket (suggested)
 
-**Title:** E3c — Vendor price override editor (project hub of vendor management)  
+**Title:** E3 prod gate — Deploy Firebase + A≠B verify  
+**Doc:** [E3_PROD_VERIFY.md](./E3_PROD_VERIFY.md)  
 **Acceptance:**
 
-- Signed-in buyer can set `vendor_prices` row with `projectId` + ingredient + unit cost
-- Menu costing reflects new price without full page reload
-- Rules deploy green; prod smoke passes
+- `FIREBASE_TOKEN` refreshed; Deploy Firebase **green** on `main`
+- Workspace A unit cost ≠ Workspace B for same ingredient on prod
+- `npm run test:smoke:prod` green
 
 ---
 
