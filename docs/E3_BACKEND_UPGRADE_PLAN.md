@@ -3,7 +3,7 @@
 **Purpose:** Concrete sequence to upgrade Iterum’s backend from **local-first + rules** to **shared vendor catalog + per-workspace pricing** without a traditional app server.  
 **Prerequisites:** M1 human GO on prod · P0 rules deployed · [SOURCE_OF_TRUTH.md](./SOURCE_OF_TRUTH.md) current.  
 **Companions:** [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) · [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md) · [HOW_WE_SHIP.md](./HOW_WE_SHIP.md)  
-**Last updated:** 2 July 2026
+**Last updated:** 17 July 2026
 
 ---
 
@@ -40,8 +40,8 @@ Iterum has **no Cloud Functions** today. Backend = **Firebase** (Auth, Firestore
 |-------|--------|-------|
 | **E3a** vendors sync | Partial | `users/{uid}/vendors` — `firestore-sync.js` + `vendorManager.js` |
 | **E3b** legacy import | Partial | `iterum_vendors` merge in vendorManager |
-| **E3c** price overrides | Partial | `users/{uid}/vendor_prices` + rules; **no product UI** for overrides yet |
-| **E3d** costing integration | Partial | `cost-calculator.js` applies overrides; ingredient library hints (slice 2) shipped |
+| **E3c** price overrides | **UI shipped** | Panel on `vendor-management.html` via `vendor-price-overrides-panel.js` → `project-data-access`; dual-write user + project paths |
+| **E3d** costing integration | Partial | `cost-calculator.js` applies overrides; ingredient / recipe price sources shipped |
 
 ---
 
@@ -50,7 +50,7 @@ Iterum has **no Cloud Functions** today. Backend = **Firebase** (Auth, Firestore
 ### Phase 0 — Gate (do not skip)
 
 - [x] M1 human GO — CEO **16 Jul 2026** ([M1_COO_PROD_VERIFICATION.md](./M1_COO_PROD_VERIFICATION.md); COO prod walkthrough still recommended)
-- [ ] Confirm **Deploy Firebase** green after E3 rules change
+- [ ] Confirm **Deploy Firebase** green after E3 rules change — [E3_PROD_VERIFY.md](./E3_PROD_VERIFY.md) Gate 0
 - [x] Lock E3 leadership answers — [E3_DECISION_RECORD.md](./E3_DECISION_RECORD.md)
 
 ### Phase 1 — Rules & indexes hardening (~1 eng-week)
@@ -58,8 +58,8 @@ Iterum has **no Cloud Functions** today. Backend = **Firebase** (Auth, Firestore
 **Goal:** Catalog paths are safe in prod before more UI.
 
 1. [x] Audit / extend `firestore.rules` for `users/{uid}/vendor_prices` — delegated maintainer roles + `projects/{id}/vendor_prices` mirror
-2. [ ] Add composite indexes if new queries require them
-3. [ ] Deploy via **Deploy Firebase**; run `npm run test:smoke:prod` + `owner-bot:onboarding` on prod
+2. [x] Composite indexes — none new required for current price doc-id model (revisit if query patterns change)
+3. [ ] Deploy via **Deploy Firebase**; run `npm run test:smoke:prod` + Gate 1 A≠B on [E3_PROD_VERIFY.md](./E3_PROD_VERIFY.md)
 
 **Files:** `firestore.rules`, `firestore.indexes.json`, [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md), `firestore-sync.js`, `project-data-access.js`
 
@@ -67,24 +67,21 @@ Iterum has **no Cloud Functions** today. Backend = **Firebase** (Auth, Firestore
 
 **Goal:** One front door for vendor writes — no scattered Firestore calls.
 
-1. Extend [project-data-access.js](../public/assets/js/project-data-access.js) with:
-   - `VendorFirestorePaths` (vendors + vendor_prices)
-   - `listVendorPrices(projectId)`, `upsertVendorPrice(row)`, `deleteVendorPrice(id)`
-2. Route all vendor price CRUD through these helpers from UI and `firestore-sync.js`.
-3. Document resolution order in [SOURCE_OF_TRUTH.md](./SOURCE_OF_TRUTH.md):
-   - `projectId` override → `projectId: null` account default → local ingredient price → flag as missing
+1. [x] Extend [project-data-access.js](../public/assets/js/project-data-access.js) with `VendorFirestorePaths`, `listVendorPrices(projectId?)`, `upsertVendorPrice`, `deleteVendorPrice`
+2. [x] Route vendor price CRUD from overrides panel through these helpers (`vendor-management.html` loads the module)
+3. [x] Resolution order documented in decision record + panel copy: `projectId` override → account default → local
 
 ### Phase 3 — Product UI: vendor price overrides (~1.5–2 eng-weeks)
 
 **Goal:** Buyers edit overrides without Firebase Console.
 
-| Surface | Change |
-|---------|--------|
-| `vendor-management.html` | Panel: “Workspace price for this ingredient” when a project is active |
-| `ingredients.html` | Link to override editor (hints already show override exists — slice 2) |
-| `menu-builder` | Price sources panel already shows sources (slice 3) — wire live override edits |
+| Surface | Change | Status |
+|---------|--------|--------|
+| `vendor-management.html` | Panel: workspace / account override | **Done** |
+| `ingredients.html` | Link to override editor | **Done** (slice 2) |
+| `menu-builder` / recipes | Price sources panel | **Done** (slice 3) |
 
-**Done when:** COO can set a different unit cost for Workspace B vs A on the same vendor SKU in under 2 minutes on prod.
+**Done when:** COO can set a different unit cost for Workspace B vs A on the same vendor SKU in under 2 minutes on prod — [E3_PROD_VERIFY.md](./E3_PROD_VERIFY.md) Gate 1 (blocked on Phase 0 deploy).
 
 ### Phase 4 — Costing completeness (~1 eng-week)
 

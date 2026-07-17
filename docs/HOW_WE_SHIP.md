@@ -26,6 +26,8 @@
 
 Repo secret required: **`FIREBASE_TOKEN`** (from `npx firebase-tools login:ci`).
 
+**17 Jul 2026:** Local `firebase-tools` reported **credentials no longer valid**. Before CI can deploy E3 rules, regenerate the token (`login:ci`) and update the GitHub secret — then **Run workflow** on Deploy Firebase. Full steps: [E3_PROD_VERIFY.md](./E3_PROD_VERIFY.md) Gate 0.
+
 ---
 
 ## If **Deploy Firebase** fails in CI

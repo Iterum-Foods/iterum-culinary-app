@@ -37,7 +37,7 @@
 | 5 | Admin | Select **Project** (`#team-project-select`) = target workspace. Paste **Firebase User UID** (`#team-target-uid`). Choose **Role** (`#team-member-role`) e.g. Line / crew. Click **Add to project** (`#team-add-member-btn`). | `#team-access-msg` shows success (e.g. saved / they should sign in…). |
 | 6 | Line tester | Refresh `mobile-compliance.html` (or sign out/in). Open **Workspace** dropdown. | Expected project **name** or **id** appears (not only “No shared projects yet”). |
 | 7 | Line tester | Select that workspace; complete one harmless action (e.g. open a tab, or add a test fridge if policy allows). | No persistent **permission denied**; status line not stuck on Firestore index error. |
-| 8 | Admin (optional) | Open `{base}/dashboard.html` → confirm **Saving to workspace** banner matches the same project (sidebar selector + `#workspace-save-indicator-root`). | Same logical `projectId` as chosen in hub. |
+| 8 | Admin (optional) | Open `{base}/dashboard.html` → confirm **Workspace** banner / sidebar selector matches the same project (`#workspace-save-indicator-root`). | Same logical `projectId` as chosen in hub. |
 
 ---
 

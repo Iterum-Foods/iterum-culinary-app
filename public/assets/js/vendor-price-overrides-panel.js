@@ -1,6 +1,6 @@
 /**
  * Vendor management — workspace / account price overrides (E3c UI).
- * Uses users/{uid}/vendor_prices via window.firestoreSync.
+ * Prefers window.iterumProjectDataAccess; falls back to window.firestoreSync.
  */
 (function () {
   'use strict';
@@ -51,6 +51,46 @@
 
   function getFs() {
     return window.firestoreSync;
+  }
+
+  function getPda() {
+    return window.iterumProjectDataAccess || null;
+  }
+
+  async function listPrices(projectId) {
+    const pda = getPda();
+    if (pda && typeof pda.listVendorPrices === 'function') {
+      return pda.listVendorPrices(projectId);
+    }
+    const fs = getFs();
+    if (fs && typeof fs.refreshVendorPricesFromFirestore === 'function') {
+      return fs.refreshVendorPricesFromFirestore();
+    }
+    return [];
+  }
+
+  async function upsertPrice(row) {
+    const pda = getPda();
+    if (pda && typeof pda.upsertVendorPrice === 'function') {
+      return pda.upsertVendorPrice(row);
+    }
+    const fs = getFs();
+    if (fs && typeof fs.syncVendorPriceRowToFirestore === 'function') {
+      return fs.syncVendorPriceRowToFirestore(row);
+    }
+    return { ok: false, reason: 'not_ready' };
+  }
+
+  async function deletePrice(docId, projectId) {
+    const pda = getPda();
+    if (pda && typeof pda.deleteVendorPrice === 'function') {
+      return pda.deleteVendorPrice(docId, projectId);
+    }
+    const fs = getFs();
+    if (fs && typeof fs.deleteVendorPriceFromFirestore === 'function') {
+      return fs.deleteVendorPriceFromFirestore(docId, projectId);
+    }
+    return { ok: false, reason: 'not_ready' };
   }
 
   function currentProjectId() {
@@ -285,6 +325,7 @@
         <p class="text-slate-600 mb-3 text-sm leading-relaxed">
           One vendor list for your group; each kitchen sets its own delivered prices.
           <strong>This price applies to:</strong> the active workspace unless you choose account default.
+          To set <strong>Workspace A ≠ Workspace B</strong>: save a workspace-only price here, switch workspace in the sidebar, then save a different unit cost for the same ingredient.
         </p>
         <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
           <p class="text-slate-600">
@@ -422,13 +463,13 @@
       if (existingId) {
         row.iterumVendorPriceDocId = existingId;
       }
-      const res = await f.syncVendorPriceRowToFirestore(row);
+      const res = await upsertPrice(row);
       if (res && res.ok) {
         statusEl.textContent = existingId
           ? 'Updated. Recipe costing will use the new values.'
           : 'Saved. Recipe costing will pick this up for the active workspace.';
         clearEdit(mount);
-        await f.refreshVendorPricesFromFirestore();
+        await listPrices(currentProjectId());
         redraw(mount);
       } else {
         statusEl.textContent =
@@ -446,7 +487,7 @@
           return;
         }
         statusEl.textContent = 'Removing…';
-        const res = await getFs().deleteVendorPriceFromFirestore(docId);
+        const res = await deletePrice(docId, currentProjectId() || undefined);
         if (res && res.ok) {
           statusEl.textContent = 'Removed.';
           redraw(mount);
@@ -464,7 +505,7 @@
     const fs = getFs();
     if (fs && fs.initialized) {
       try {
-        await fs.refreshVendorPricesFromFirestore();
+        await listPrices(currentProjectId());
       } catch (e) {
         /* ignore */
       }

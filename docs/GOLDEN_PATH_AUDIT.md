@@ -71,12 +71,13 @@ For **design or token changes that must hit every web page**, use [WEB_APP_DESIG
 ### Next — Slice 4 (setup hardening)
 
 - [ ] Optional: redirect new users without `iterum_current_project` to `project-hub.html` once before deep links.
-- [ ] Align copy: “Workspace” = Firestore `projectId` everywhere in golden path.
+- [x] Align copy: “Workspace” = Firestore `projectId` in teammate checklist + vendor override panel (A≠B instructions).
 
 ---
 
 ## Related docs
 
 - [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) — E3 vendor / price model
+- [E3_PROD_VERIFY.md](./E3_PROD_VERIFY.md) — prod A≠B + Deploy Firebase gate
 - [HOW_WE_SHIP.md](./HOW_WE_SHIP.md) — E3 prep questions
 - [DATA_ACCESS_INVENTORY.md](./DATA_ACCESS_INVENTORY.md) — paths and keys

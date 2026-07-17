@@ -29,6 +29,13 @@ export const ProjectFirestorePaths = Object.freeze({
   vendorPrices: projectId => `projects/${projectId}/vendor_prices`
 });
 
+/** Alias for E3 plan naming — vendors + vendor_prices path builders. */
+export const VendorFirestorePaths = Object.freeze({
+  vendors: UserScopedPaths.vendors,
+  vendorPrices: UserScopedPaths.vendorPrices,
+  projectVendorPrices: ProjectFirestorePaths.vendorPrices
+});
+
 /**
  * Resolve account catalog owner uid (workspace firebaseUid → signed-in user).
  * @returns {string|null}
@@ -47,13 +54,35 @@ export function resolveCatalogOwnerUserId() {
 
 /**
  * Refresh vendor price overrides for costing (delegates to firestore-sync).
+ * @param {string} [projectId] when set, return only that workspace + account defaults
  */
-export async function listVendorPrices() {
+export async function listVendorPrices(projectId) {
   const sync = window.firestoreSync;
   if (!sync?.initialized) {
     return [];
   }
-  return sync.refreshVendorPricesFromFirestore();
+  const rows = (await sync.refreshVendorPricesFromFirestore()) || [];
+  const pid =
+    projectId !== undefined &&
+    projectId !== null &&
+    String(projectId).trim() !== ''
+      ? String(projectId).trim()
+      : '';
+  if (!pid) {
+    return rows;
+  }
+  return rows.filter(r => {
+    if (!r || typeof r !== 'object') {
+      return false;
+    }
+    const rpid =
+      r.projectId !== undefined &&
+      r.projectId !== null &&
+      String(r.projectId).trim() !== ''
+        ? String(r.projectId).trim()
+        : null;
+    return rpid === pid || rpid === null;
+  });
 }
 
 /**
@@ -127,6 +156,7 @@ export async function fetchProjectMenuSnapshot(projectId, options = {}) {
 window.iterumProjectDataAccess = {
   UserScopedPaths,
   ProjectFirestorePaths,
+  VendorFirestorePaths,
   resolveCatalogOwnerUserId,
   listVendorPrices,
   upsertVendorPrice,

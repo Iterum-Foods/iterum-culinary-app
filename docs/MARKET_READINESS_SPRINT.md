@@ -2,7 +2,7 @@
 
 **Purpose:** Close the gap between **pilot-ready trust** (P0 done) and **first paying / structured pilot** with a repeatable test bar and a short UI polish queue.  
 **Companion:** [EXEC_CHECKLIST_AND_NEXT_STEPS.md](../EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [PILOT_APP_COMPLETION_MASTER.md](./PILOT_APP_COMPLETION_MASTER.md) · [QA_FEATURE_TEST_WORKFLOW.md](./QA_FEATURE_TEST_WORKFLOW.md)  
-**Last updated:** 30 June 2026
+**Last updated:** 17 July 2026
 
 ---
 
@@ -23,13 +23,14 @@
 
 | Gate | Owner | Status | Doc |
 |------|-------|--------|-----|
-| **M1 human GO** | COO | Open | [M1_COO_PROD_VERIFICATION.md](./M1_COO_PROD_VERIFICATION.md) |
-| Teammate flow (admin adds line user) | COO + Eng | Open | [PHASE_1_TEAMMATE_FLOW_CHECKLIST.md](./PHASE_1_TEAMMATE_FLOW_CHECKLIST.md) |
+| **M1 human GO** | CEO | **Closed 16 Jul 2026** | [M1_COO_PROD_VERIFICATION.md](./M1_COO_PROD_VERIFICATION.md) |
+| Teammate flow (admin adds line user) | COO + Eng | Open (post-GO hygiene) | [PHASE_1_TEAMMATE_FLOW_CHECKLIST.md](./PHASE_1_TEAMMATE_FLOW_CHECKLIST.md) |
 | Two-workspace demo on prod | COO | Open | M1 doc |
+| E3 A≠B prices on prod | CTO + COO | **Blocked on Deploy Firebase** | [E3_PROD_VERIFY.md](./E3_PROD_VERIFY.md) |
 | Pilot customer named | COO / Sales | Open | EXEC checklist P1 |
 | Auth E2E in CI | Eng | Open | E5 in [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) |
 
-**CEO call:** You can run **demos and design partners** on the golden path today; **paid pilot contracts** should wait for **M1 GO** + one real teammate walkthrough.
+**CEO call:** Demos and design partners can run on the golden path; **paid pilot contracts** should wait for COO teammate walkthrough + E3 prod Gate 1 after rules deploy.
 
 ---
 
@@ -56,12 +57,13 @@ Priority = anything a **new owner** hits in the first session. Defer “More” 
 |---|---------|---------|--------|
 | P0 | Inline restaurant on setup | `setup-page.js` | **Done** |
 | P0 | Stock setup golden path | `stock-setup.html` | **Done** |
-| P0 | Project hub: toast not `alert()` on create/activate | `project-hub.html` | **This sprint** |
-| P0 | Quick-create restaurant uses modal not `prompt()` | `project-hub.html` | **This sprint** |
-| P1 | Ingredient row: hint when vendor override exists | `ingredients.html` | [GOLDEN_PATH_AUDIT](./GOLDEN_PATH_AUDIT.md) slice 2 |
-| P1 | Menu costing “price sources” tooltip | `menu-builder` / costing | Slice 3 |
+| P0 | Project hub: toast not `alert()` on create/activate | `project-hub.html` | **Done** |
+| P0 | Quick-create restaurant uses modal not `prompt()` | `project-hub.html` | **Done** |
+| P1 | Ingredient row: hint when vendor override exists | `ingredients.html` | **Done** (slice 2) |
+| P1 | Menu costing “price sources” tooltip | `menu-builder` / costing | **Done** (slice 3) |
 | P1 | Day-0 dashboard: pantry card + checklist order | `dashboard.html` | **Done** |
-| P2 | Replace remaining `alert()` on project hub (import/sample) | `project-hub.html` | Backlog |
+| P1 | Kitchen contrast (sidebar + dashboard) | revamp CSS + `dashboard.html` | **Done** (17 Jul 2026) |
+| P2 | Replace remaining `alert()` on project hub (import/sample) | `project-hub.html` | Backlog (toasts preferred; alert only if toast missing) |
 | P2 | `inventory_items` per-`projectId` scoping | `inventory-manager.js` | E2 — after pilot feedback |
 
 ---
@@ -87,12 +89,19 @@ Optional full matrix: `npm run owner-bot:all` (onboarding + all 41 pages).
 
 ## Pilot demo script (5 minutes)
 
-1. **Sign up** → setup: name restaurant, chef role, continue.  
-2. **Stock your kitchen** — add 3 ingredients, opening counts.  
-3. **Dashboard** — menu launch checklist visible; pantry card hidden.  
-4. **Dish Creator** — one dish with 2 ingredients.  
-5. **Menu Builder** — add dish to menu; show launch checklist progress.  
-6. **Shift app** (optional) — publish menu / open mobile-compliance.
+**Record once on prod** (Loom / phone). Checkboxes for the operator:
+
+| # | Beat | Click path | Say |
+|---|------|------------|-----|
+| 1 | Sign up / sign in | `signin.html` → `setup.html` | “New kitchen in under a minute.” |
+| 2 | Name the restaurant | setup: restaurant + chef role | “This becomes your workspace.” |
+| 3 | Stock the kitchen | `stock-setup.html` — 3 ingredients + counts | “Costing needs real items first.” |
+| 4 | Dashboard | `dashboard.html` — checklist + idea pad | “Shift board for today.” |
+| 5 | Dish | Dish Creator — 2 ingredients | “Recipes stay portable.” |
+| 6 | Menu | Menu Builder — add dish; show checklist progress | “Menu + cost in one place.” |
+| 7 | Optional Shift | `mobile-compliance.html` | “Line tools on the phone.” |
+
+**Pass:** One continuous take ≤5 min without Console or Firebase Console. File link in leadership chat; tick EXEC Week 1 demo row.
 
 ---
 

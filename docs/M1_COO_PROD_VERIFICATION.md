@@ -3,15 +3,17 @@
 **Purpose:** Close the **human + prod** gate for milestone **M1** after engineering landed **`2e28c70`** (`projectId` alignment).  
 **Persona:** [LEADERSHIP_ROLE_ASSIGNMENTS.md](../LEADERSHIP_ROLE_ASSIGNMENTS.md#coo-agent) — use `@iterum-persona-coo` or paste the COO agent block first.  
 **Context:** [M1_CTO_AGENT_DELEGATION.md](./M1_CTO_AGENT_DELEGATION.md) · [M1_PROJECTID_AUDIT.md](./M1_PROJECTID_AUDIT.md)  
-**Last updated:** 2026-03-29  
+**Last updated:** 2026-07-17  
 
 ### At a glance (prod: `https://iterum-culinary-app.vercel.app`)
 
 | # | Check | Pass? |
 |---|--------|-------|
 | 1 | [Teammate flow](./PHASE_1_TEAMMATE_FLOW_CHECKLIST.md) steps **1–8** | ☐ |
-| 2 | [Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml) **green** since last rules change | ☐ |
+| 2 | [Deploy Firebase](https://github.com/Iterum-Foods/iterum-culinary-app/actions/workflows/firebase-deploy.yml) **green** since last rules change | ☐ — see [E3_PROD_VERIFY.md](./E3_PROD_VERIFY.md) Gate 0 |
 | 3 | Two-workspace demo (menu-builder + Shift) — no stuck **permission-denied** / index errors | ☐ |
+
+**CEO note (16 Jul 2026):** M1 **engineering + CEO GO** closed; rows above remain **COO hygiene** on prod (still run them). After Check 2 is green, also run [E3_PROD_VERIFY.md](./E3_PROD_VERIFY.md) Gate 1 (A≠B prices).
 
 ---
 

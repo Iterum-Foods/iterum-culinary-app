@@ -2,7 +2,7 @@
 
 **Purpose:** Single page for leadership to track launch readiness and foundation work.  
 **Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](./NEXT_STEPS_LEADERSHIP.md) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) · [docs/CEO_TEAM_TASK_LIST_TO_MARKET.md](./docs/CEO_TEAM_TASK_LIST_TO_MARKET.md) (delegated CEO task list) · [docs/PILOT_APP_COMPLETION_MASTER.md](./docs/PILOT_APP_COMPLETION_MASTER.md) (completion definition + backlog) · [docs/P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md) (E1–E5) · [docs/M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md) (M1 human gate) · [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) · [docs/HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md) · [docs/SOURCE_OF_TRUTH.md](./docs/SOURCE_OF_TRUTH.md) · [docs/workflows/](./docs/workflows/) (e.g. sign-in UI redesign)  
-**Last updated:** 30 June 2026
+**Last updated:** 17 July 2026
 
 ---
 
@@ -12,23 +12,23 @@
 
 - [x] **CEO direction:** Close M1 and proceed to E3 (16 Jul 2026).
 - [x] **Lint + E2E** green on `main` (`f148b90`).
-- [ ] **COO:** Confirm teammate checklist **1–8** + two-workspace demo on prod when convenient (post-GO hygiene).
-- [ ] **CTO:** **Deploy Firebase** must succeed after E3 rules change — last known runs **failed** (token/auth). Fix `FIREBASE_TOKEN` per [HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md), then re-run **Deploy Firebase**.
+- [ ] **COO:** Confirm teammate checklist **1–8** + two-workspace demo on prod when convenient (post-GO hygiene) — packet: [M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md).
+- [ ] **CTO:** **Deploy Firebase** green after E3 rules — **blocked 17 Jul 2026:** local Firebase CLI auth expired; regenerate `FIREBASE_TOKEN` via `login:ci` then re-run workflow ([E3_PROD_VERIFY.md](./docs/E3_PROD_VERIFY.md) Gate 0 · [HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md)).
 
 **Now — E3 (vendor catalog)**
 
 - [x] Answer **E3 prep** — [E3_DECISION_RECORD.md](./docs/E3_DECISION_RECORD.md) (**2 Jul 2026**)
-- [~] **E3 Phase 1** — delegated `vendor_prices` rules + catalog-owner client path + project mirror (in progress / shipping)
-- [ ] Prod verify after Firebase deploy: chef sets Workspace A price ≠ Workspace B
-- [ ] File map + golden-path tasks: [GOLDEN_PATH_AUDIT.md](./docs/GOLDEN_PATH_AUDIT.md)
+- [x] **E3 Phase 1 (client + rules in repo)** — delegated `vendor_prices` + catalog-owner path + project mirror + panel via `project-data-access` (`d67c06d` + follow-ups)
+- [ ] **Prod:** Deploy Firebase green, then Gate 1 A≠B on [E3_PROD_VERIFY.md](./docs/E3_PROD_VERIFY.md)
+- [x] File map + golden-path tasks: [GOLDEN_PATH_AUDIT.md](./docs/GOLDEN_PATH_AUDIT.md) (slices 1–3 done; slice 4 optional)
 
 **Market readiness (testing + UI)** — [MARKET_READINESS_SPRINT.md](./docs/MARKET_READINESS_SPRINT.md)
 
 - [x] **Automated golden path** — prod `owner-bot:onboarding` (sign-up → setup → stock → dashboard) green **30 Jun 2026**
 - [x] **Prod smoke** — `npm run test:smoke:prod` **46 passed** (30 Jun 2026)
 - [x] **M1 human GO** — CEO closed 16 Jul 2026 (COO prod walkthrough still recommended)
-- [ ] **Week 1** human demo script (5 min) recorded once on prod
-- [ ] **Week 2** UI slice 2–3 per [GOLDEN_PATH_AUDIT.md](./docs/GOLDEN_PATH_AUDIT.md)
+- [ ] **Week 1** human demo script (5 min) recorded once on prod — script in [MARKET_READINESS_SPRINT.md](./docs/MARKET_READINESS_SPRINT.md#pilot-demo-script-5-minutes)
+- [x] **Week 2** UI P0 (project hub toast/modal) — done; golden-path slices 1–3 done
 
 **Owner Bot (pilot walkthrough)**
 
@@ -47,6 +47,8 @@
 <a id="leadership-log-ceo-cto"></a>
 
 _Use this section for short, dated notes that do not belong in a checkbox row._
+
+**2026-07-17 — E3 verify packet + kitchen contrast:** High-contrast dashboard/sidebar shipped (`9751530`). Vendor overrides panel routes through `project-data-access`. **Deploy Firebase still blocked** on expired CI/local Firebase auth — use [E3_PROD_VERIFY.md](./docs/E3_PROD_VERIFY.md). COO hygiene (teammate 1–8 + two-workspace) still open post–M1 GO.
 
 **2026-07-16 — M1 closed (CEO) → E3 started:** CEO directed close M1 and continue to E3. Lint/E2E green on `main`. **Deploy Firebase** still needs a successful run after rules change (prior CI failures — refresh `FIREBASE_TOKEN`). E3 Phase 1: delegated `vendor_prices` for `chef_leadership` / `purchasing` / `account_admin` + catalog-owner client resolution + `projects/{id}/vendor_prices` mirror.
 
