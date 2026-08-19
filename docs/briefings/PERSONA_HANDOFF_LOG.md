@@ -5,6 +5,34 @@
 
 ---
 
+## 2026-08-19 — Bar purchasing shipped; launch = first web pilots (not stores)
+
+### Summary
+
+- On `main` (`84b1cbe`): PDF/CSV/Excel price lists → vendor catalog; order guides; Bar program hub + Common Craft seed.
+- Launch assessment: **pilot-ready trust** is the bar. Remaining blockers are **Deploy Firebase** (token), **COO prod hygiene**, then **one named partner**.
+- Tracking: [`docs/LAUNCH_CHECKLIST_NOW.md`](../LAUNCH_CHECKLIST_NOW.md). Sendable offer: [`docs/PILOT_ONE_PAGER.md`](../PILOT_ONE_PAGER.md).
+
+### For CTO / engineering
+
+- Confirm Vercel prod has `/bar-ops.html`, `/price-list-upload.html`, `/order-guides.html`.
+- Unblock `FIREBASE_TOKEN` / Deploy Firebase; then E3 Gate 1 (A≠B prices).
+- PDF parse is best-effort; do not treat as ERP inventory.
+
+### For COO / QA
+
+- M1 teammate 1–8 + two-workspace demo still open on prod.
+- Walk a real CSV (preferred) through price list → order guide before promising it to a partner.
+- Record 5-min prod demo once L1 is green.
+
+### For CEO / product
+
+- Sell golden path only: recipes/menus, Shift, vendors/order guides, optional bar pack.
+- Explicit non-goals in the one-pager: POS, EDI, SSO, store apps.
+- Due 2 Sep: name first founding partner.
+
+---
+
 ## 2026-05-11 — ID quick reference (21+ / 18+) at top of Hub + Bar tabs (shipped)
 
 ### Summary

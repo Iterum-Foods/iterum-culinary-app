@@ -2,11 +2,20 @@
 
 **Purpose:** Single page for leadership to track launch readiness and foundation work.  
 **Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](./NEXT_STEPS_LEADERSHIP.md) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) · [docs/CEO_TEAM_TASK_LIST_TO_MARKET.md](./docs/CEO_TEAM_TASK_LIST_TO_MARKET.md) (delegated CEO task list) · [docs/PILOT_APP_COMPLETION_MASTER.md](./docs/PILOT_APP_COMPLETION_MASTER.md) (completion definition + backlog) · [docs/P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md) (E1–E5) · [docs/M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md) (M1 human gate) · [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) · [docs/HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md) · [docs/SOURCE_OF_TRUTH.md](./docs/SOURCE_OF_TRUTH.md) · [docs/workflows/](./docs/workflows/) (e.g. sign-in UI redesign)  
-**Last updated:** 17 July 2026
+**Last updated:** 19 August 2026  
+**Launch sequence (owners + dates):** [docs/LAUNCH_CHECKLIST_NOW.md](./docs/LAUNCH_CHECKLIST_NOW.md) · partner one-pager: [docs/PILOT_ONE_PAGER.md](./docs/PILOT_ONE_PAGER.md)
 
 ---
 
 ## Next steps (pick up here)
+
+**Now — pilot launch gates (19 Aug 2026)** — [LAUNCH_CHECKLIST_NOW.md](./docs/LAUNCH_CHECKLIST_NOW.md)
+
+- [x] **Eng:** Bar program + price-list upload + order guides on `main` (`84b1cbe`, 19 Aug 2026).
+- [ ] **Eng:** Confirm Vercel prod serves `/bar-ops.html`, `/price-list-upload.html`, `/order-guides.html` (L1, due 20 Aug).
+- [ ] **CTO:** **Deploy Firebase** green — still the E3 blocker; regenerate `FIREBASE_TOKEN` (L2, due 22 Aug) — [E3_PROD_VERIFY.md](./docs/E3_PROD_VERIFY.md).
+- [ ] **COO:** Teammate checklist **1–8** + two-workspace demo on prod (L3, due 26 Aug) — [M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md).
+- [ ] **CEO/COO:** Name first founding partner + send [PILOT_ONE_PAGER.md](./docs/PILOT_ONE_PAGER.md) (L5, due 2 Sep).
 
 **M1 — human GO recorded (CEO, 16 Jul 2026)** — [M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md)
 
@@ -47,6 +56,8 @@
 <a id="leadership-log-ceo-cto"></a>
 
 _Use this section for short, dated notes that do not belong in a checkbox row._
+
+**2026-08-19 — Bar purchasing on `main` + launch pack:** Shipped price-list upload (PDF/CSV/Excel → vendor catalog), order guides (par / below-par / print), and Bar program hub with Common Craft seed (`84b1cbe`). **Launch is still pilot-first:** next blockers are Vercel confirm (L1), Firebase token / Deploy Firebase (L2), COO teammate + two-workspace (L3), then a named partner (L5). Tracking: [LAUNCH_CHECKLIST_NOW.md](./docs/LAUNCH_CHECKLIST_NOW.md). Do not promise POS, EDI, or store apps in founding-partner SOWs.
 
 **2026-07-17 — E3 verify packet + kitchen contrast:** High-contrast dashboard/sidebar shipped (`9751530`). Vendor overrides panel routes through `project-data-access`. **Deploy Firebase still blocked** on expired CI/local Firebase auth — use [E3_PROD_VERIFY.md](./docs/E3_PROD_VERIFY.md). COO hygiene (teammate 1–8 + two-workspace) still open post–M1 GO.
 

@@ -1,17 +1,17 @@
 # Leadership next steps & meeting agenda
 
 **Purpose:** One page for CEO + CTO (and ops sponsor) to run a short sync and lock the sequence for the next month.  
-**Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [EXEC_CHECKLIST_AND_NEXT_STEPS.md](./EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) (phased completion) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) (team tasks & `@` tags)  
-**Suggested cadence:** 30 minutes weekly until P0 sign-off; then biweekly through P1 framing.
+**Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [EXEC_CHECKLIST_AND_NEXT_STEPS.md](./EXEC_CHECKLIST_AND_NEXT_STEPS.md) · [docs/LAUNCH_CHECKLIST_NOW.md](./docs/LAUNCH_CHECKLIST_NOW.md) (19 Aug 2026 gates) · [docs/PILOT_ONE_PAGER.md](./docs/PILOT_ONE_PAGER.md) · [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) (phased completion) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) (team tasks & `@` tags)  
+**Suggested cadence:** 30 minutes weekly on **L1–L5** until first founding partner is live; then biweekly.
 
 ---
 
 ## Meeting goals (use as agenda)
 
-1. **Close P0 deploy:** Firestore + Storage rules live in production; smoke tests pass; exec sign-off recorded (see checklist P0 table).  
-2. **Unblock data contract:** Confirm no reliance on unsafe patterns (e.g. listing all projects); extend `project-data-access` pattern or document exceptions.  
-3. **Lock commercial focus:** ICP for the next 90 days (multi-unit vs single venue vs consultant) so “restaurant vs project” and onboarding match reality.  
-4. **Queue P1 without scope creep:** Acceptance criteria for “one manager, multiple restaurants, shared vendors, comparable pricing” before engineering estimates.
+1. **L1–L4 this week:** Vercel has bar/purchasing pages; Deploy Firebase green; COO teammate + two-workspace; E3 A≠B if token is live.  
+2. **Founding partner:** Who are we sending [PILOT_ONE_PAGER.md](./docs/PILOT_ONE_PAGER.md) to, and by 2 Sep?  
+3. **Scope lock:** Golden path only — recipes/menus, Shift, vendors/order guides, optional bar pack. No POS/SSO/stores in the SOW.  
+4. **Papercut:** One thing that blocked last week’s demo.
 
 ---
 
@@ -29,9 +29,11 @@
 
 | When | Focus | Done means |
 |------|--------|------------|
-| **Week 1** | Deploy rules; prod smoke (sign-in, menu sync, photos); exec sign-off on P0 | Checklist P0 security rows closed |
-| **Week 2–3** | Data-access pattern to checklists *or* recipe snapshots; one-pager on source of truth | Fewer forked sync paths; documented contract |
-| **Week 4** | Lock ICP + acceptance criteria; P1 epic queued | Product can brief eng with testable criteria |
+| **19–22 Aug** | L1 Vercel confirm; L2 Firebase token + Deploy Firebase | Prod URLs live; CI deploy green |
+| **23–26 Aug** | L3 COO teammate 1–8 + two-workspace | M1 hygiene GO on Vercel |
+| **27 Aug** | L4 E3 A≠B prices | Pilot can trust workspace costing |
+| **by 2 Sep** | L5 named partner + one-pager | Written 2–4 week founding-partner terms |
+| **by 5 Sep** | L6 5-min prod demo | Recording for sales/setup |
 
 ---
 

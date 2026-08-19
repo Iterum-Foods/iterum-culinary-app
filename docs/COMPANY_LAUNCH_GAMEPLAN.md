@@ -1,12 +1,14 @@
 # Company launch gameplan
 
 **Purpose:** Single orchestration doc for **building the product**, **shipping reliably**, and **launching**—including a **chef / local restaurateur** motion for fast feedback with people you can reach in person.  
-**Last updated:** 2026-05-04
+**Last updated:** 2026-08-19
 
 **Canonical references (do not duplicate here):**
 
 | Topic | Doc |
 |--------|-----|
+| **This month’s launch gates (owners + dates)** | [LAUNCH_CHECKLIST_NOW.md](./LAUNCH_CHECKLIST_NOW.md) |
+| **Founding partner one-pager (sendable)** | [PILOT_ONE_PAGER.md](./PILOT_ONE_PAGER.md) |
 | 90-day ICP lock (multi-unit primary, consultant secondary) | [ICP_DECISION_RECORD.md](./ICP_DECISION_RECORD.md) |
 | Engineering epic order + sizing | [P1_EPIC_BREAKDOWN.md](./P1_EPIC_BREAKDOWN.md) |
 | CEO phase checklist (web, mobile stores, GTM) | [CEO_TEAM_TASK_LIST_TO_MARKET.md](./CEO_TEAM_TASK_LIST_TO_MARKET.md) |
