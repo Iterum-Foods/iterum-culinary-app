@@ -249,4 +249,36 @@ test.describe('Smoke', () => {
     await expect(page.getByText(/first 10 minutes/i)).toBeVisible();
     await expect(page.locator('#setup-restaurant-name')).toHaveCount(1);
   });
+
+  test('price list upload page loads', async ({ page }) => {
+    const res = await page.goto('/price-list-upload.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(
+      page.getByRole('heading', { name: /upload a vendor price list/i })
+    ).toBeVisible();
+    await expect(page.locator('#pl-drop')).toHaveCount(1);
+    await expect(page.locator('#pl-commit')).toHaveCount(1);
+  });
+
+  test('order guides page loads', async ({ page }) => {
+    const res = await page.goto('/order-guides.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(
+      page.getByRole('heading', { name: /order guides/i })
+    ).toBeVisible();
+    await expect(page.locator('#og-vendor')).toHaveCount(1);
+    await expect(page.locator('#og-tbody')).toHaveCount(1);
+  });
+
+  test('bar program page loads', async ({ page }) => {
+    const res = await page.goto('/bar-ops.html');
+    expect(res?.ok()).toBeTruthy();
+    await expect(
+      page.getByRole('heading', { name: /bar program/i })
+    ).toBeVisible();
+    await expect(page.locator('#bo-import')).toHaveCount(1);
+    await expect(page.getByRole('button', { name: /service standards/i })).toHaveCount(
+      1
+    );
+  });
 });

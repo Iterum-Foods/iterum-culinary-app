@@ -242,11 +242,44 @@
     return map;
   }
 
+  function mergePack(base, incoming) {
+    var pack = normalizePack(base);
+    var add = normalizePack(incoming);
+    var catIds = new Set(
+      pack.categories.map(function (c) {
+        return c.id;
+      })
+    );
+    add.categories.forEach(function (c) {
+      if (!catIds.has(c.id)) {
+        pack.categories.push(c);
+        catIds.add(c.id);
+      }
+    });
+    var sopIds = new Map();
+    pack.sops.forEach(function (s, i) {
+      sopIds.set(s.id, i);
+    });
+    add.sops.forEach(function (s) {
+      if (sopIds.has(s.id)) {
+        pack.sops[sopIds.get(s.id)] = Object.assign(
+          {},
+          pack.sops[sopIds.get(s.id)],
+          s
+        );
+      } else {
+        pack.sops.push(s);
+      }
+    });
+    return normalizePack(pack);
+  }
+
   global.iterumSopPack = {
     PACK_DOC: PACK_DOC,
     SCHEMA_VERSION: SCHEMA_VERSION,
     emptyPack: emptyPack,
     normalizePack: normalizePack,
+    mergePack: mergePack,
     loadPack: loadPack,
     savePack: savePack,
     importSample: importSample,

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bar program — Iterum Culinary</title>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    <script type="module" src="assets/js/firebase-auth.js"></script>
+    <script type="module" src="assets/js/firestore-sync.js"></script>
+    <script src="assets/js/project-management-system.js" defer></script>
+    <script src="assets/js/unified-nav-header.js" defer></script>
+    <script src="assets/js/unified-project-selector.js" defer></script>
+    <script src="assets/js/toast-notifications.js" defer></script>
+    <script src="assets/js/vendorManager.js" defer></script>
+    <script src="assets/js/sop-pack-seed.js" defer></script>
+    <script src="assets/js/sop-pack-store.js" defer></script>
+    <script src="assets/js/bar-checklists-seed.js" defer></script>
+    <script src="assets/js/bar-checklist-store.js" defer></script>
+    <script src="assets/js/wusong-drink-seed.js" defer></script>
+    <script src="assets/js/bar-drink-drafts.js" defer></script>
+    <script src="assets/js/iterum-ops-util.js" defer></script>
+    <script src="assets/js/vendor-price-list-parser.js" defer></script>
+    <script src="assets/js/vendor-catalog-store.js" defer></script>
+    <script src="assets/js/bar-inventory-store.js" defer></script>
+    <script src="assets/js/order-guide-store.js" defer></script>
+    <script src="assets/js/bar-program-seed.js" defer></script>
+    <script src="assets/js/bar-ops-hub.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
+    <link rel="stylesheet" href="assets/css/bar-purchasing.css">
+</head>
+<body class="bg-gray-50 min-h-screen tc-revamp-body" data-iterum-breadcrumb="Bar|Program">
+    <main class="bp-wrap">
+        <header class="bp-hero">
+            <h1>Bar program</h1>
+            <p>Service standards, cocktail specs, well inventory, and ordering in one place. Import the Common Craft workbook pack, then keep pars live and push below-par lines to an order guide.</p>
+        </header>
+
+        <nav class="bp-tabs" aria-label="Bar program sections">
+            <button type="button" class="bp-tab is-active" data-tab="program">Program</button>
+            <button type="button" class="bp-tab" data-tab="standards">Service standards</button>
+            <button type="button" class="bp-tab" data-tab="recipes">Bar recipes</button>
+            <button type="button" class="bp-tab" data-tab="inventory">Inventory</button>
+        </nav>
+
+        <p id="bo-status" class="bp-status" style="margin-bottom:12px"></p>
+
+        <section data-bo-panel="program" class="bp-panel">
+            <h2 style="margin:0 0 8px;font-size:1.1rem">One-click seed</h2>
+            <p class="bp-muted">Loads FOH/BOH directives into How-to guides, signature cocktails as bar drafts, station par checklist, liquor pars, and vendor SKUs (MS Walker, Martignetti, Burke, and others named in the book).</p>
+            <div class="bp-toolbar">
+                <button type="button" id="bo-import" class="bp-btn bp-btn-primary">Import Common Craft pack</button>
+                <a class="bp-btn" href="sop-hub.html" style="text-decoration:none">Edit in SOP Hub</a>
+                <a class="bp-btn" href="dashboard.html" style="text-decoration:none">Publish drinks</a>
+                <a class="bp-btn" href="price-list-upload.html" style="text-decoration:none">Upload a price PDF</a>
+            </div>
+            <div class="bp-grid bp-grid-3" style="margin-top:16px">
+                <div class="bp-card">
+                    <h3>1. Standards</h3>
+                    <p class="bp-muted">Greet in 30 seconds, water above 50%, polish protocol, tasting, labeling, pass control.</p>
+                </div>
+                <div class="bp-card">
+                    <h3>2. Recipes</h3>
+                    <p class="bp-muted">Structured builds with glass, method, garnish, and allergens — same format the Shift Bar tab already reads.</p>
+                </div>
+                <div class="bp-card">
+                    <h3>3. Stock &amp; order</h3>
+                    <p class="bp-muted">Pars and on-hand on this page. Below par becomes a vendor order guide you can print.</p>
+                </div>
+            </div>
+        </section>
+
+        <section data-bo-panel="standards" hidden>
+            <div id="bo-standards" class="bp-grid"></div>
+            <p class="bp-muted" style="margin-top:12px">After import, publish from <a href="sop-hub.html">SOP Hub</a> so the Shift How-to tab updates.</p>
+        </section>
+
+        <section data-bo-panel="recipes" hidden>
+            <div id="bo-drinks" class="bp-grid bp-grid-2"></div>
+            <p class="bp-muted" style="margin-top:12px">Import writes these as in-progress drafts. Open the dashboard <strong>Bar drink drafts</strong> card to publish to the phone Bar tab.</p>
+        </section>
+
+        <section data-bo-panel="inventory" hidden class="bp-panel">
+            <div class="bp-toolbar">
+                <button type="button" id="bo-add-inv" class="bp-btn">Add line</button>
+                <button type="button" id="bo-save-inv" class="bp-btn bp-btn-primary">Save inventory</button>
+                <button type="button" id="bo-order-low" class="bp-btn">Below par → order guide</button>
+                <span id="bo-inv-summary" class="bp-muted"></span>
+            </div>
+            <div class="bp-table-wrap">
+                <table class="bp-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>Location</th>
+                            <th>Par</th>
+                            <th>On hand</th>
+                            <th>Vendor</th>
+                            <th>Unit cost</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bo-inv-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <script defer src="assets/js/auth_guard.js"></script>
+</body>
+</html>

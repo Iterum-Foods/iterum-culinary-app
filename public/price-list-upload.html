@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload price list — Iterum Culinary</title>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    <script type="module" src="assets/js/firebase-auth.js"></script>
+    <script type="module" src="assets/js/firestore-sync.js"></script>
+    <script src="assets/js/project-management-system.js" defer></script>
+    <script src="assets/js/unified-nav-header.js" defer></script>
+    <script src="assets/js/unified-project-selector.js" defer></script>
+    <script src="assets/js/toast-notifications.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+      if (typeof pdfjsLib !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      }
+    </script>
+    <script src="assets/js/vendorManager.js" defer></script>
+    <script src="assets/js/iterum-ops-util.js" defer></script>
+    <script src="assets/js/vendor-price-list-parser.js" defer></script>
+    <script src="assets/js/vendor-catalog-store.js" defer></script>
+    <script src="assets/js/price-list-upload.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
+    <link rel="stylesheet" href="assets/css/bar-purchasing.css">
+</head>
+<body class="bg-gray-50 min-h-screen tc-revamp-body" data-iterum-breadcrumb="Purchasing|Price list">
+    <main class="bp-wrap">
+        <header class="bp-hero">
+            <h1>Upload a vendor price list</h1>
+            <p>Drop a distributor PDF, CSV, or Excel sheet. Review the SKUs, attach them to a vendor, then build order guides and recipes from that catalog.</p>
+        </header>
+
+        <section class="bp-panel">
+            <div id="pl-drop" class="bp-drop" role="button" tabindex="0">
+                <strong>Drop PDF / CSV / Excel here</strong>
+                <p class="bp-muted" style="margin:8px 0 0">or click to choose a file. Columns like Item, SKU, Pack, Cost, Vendor parse automatically. PDF text is best-effort — edit the table before saving.</p>
+            </div>
+            <input id="pl-file" type="file" accept=".pdf,.csv,.txt,.xlsx,.xls,application/pdf" hidden>
+            <p id="pl-status" class="bp-status" style="margin-top:12px"></p>
+        </section>
+
+        <section class="bp-panel">
+            <div class="bp-grid bp-grid-3">
+                <label>Existing vendor
+                    <select id="pl-vendor" class="bp-field"></select>
+                </label>
+                <label>Or new vendor name
+                    <input id="pl-vendor-name" class="bp-field" placeholder="MS Walker, Martignetti…">
+                </label>
+                <label>If SKU already exists
+                    <select id="pl-mode" class="bp-field">
+                        <option value="merge">Update matching SKUs</option>
+                        <option value="append">Always add as new</option>
+                        <option value="replace">Replace this vendor’s catalog</option>
+                    </select>
+                </label>
+            </div>
+            <div class="bp-toolbar" style="margin-top:12px">
+                <label><input id="pl-ingredients" type="checkbox" checked> Create / update ingredients</label>
+                <label><input id="pl-prices" type="checkbox" checked> Write workspace prices</label>
+                <label><input id="pl-recipes" type="checkbox"> Create recipe stubs</label>
+            </div>
+            <div class="bp-toolbar">
+                <button type="button" id="pl-commit" class="bp-btn bp-btn-primary">Save to vendor</button>
+                <button type="button" id="pl-clear" class="bp-btn">Clear table</button>
+                <span id="pl-count" class="bp-muted">0 items</span>
+            </div>
+            <div class="bp-linkrow">
+                <a href="vendor-management.html">Vendor hub</a>
+                <a href="order-guides.html">Build order guide</a>
+                <a href="recipe-library.html">Recipe library</a>
+                <a href="bar-ops.html">Bar program</a>
+            </div>
+        </section>
+
+        <section class="bp-panel">
+            <div class="bp-table-wrap">
+                <table class="bp-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>SKU</th>
+                            <th>Pack</th>
+                            <th>Unit cost</th>
+                            <th>Category</th>
+                            <th>Unit</th>
+                            <th>Par</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pl-tbody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <script defer src="assets/js/auth_guard.js"></script>
+</body>
+</html>

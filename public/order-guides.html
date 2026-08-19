@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order guides — Iterum Culinary</title>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth-manager.js"></script>
+    <script type="module" src="assets/js/firebase-auth.js"></script>
+    <script type="module" src="assets/js/firestore-sync.js"></script>
+    <script src="assets/js/project-management-system.js" defer></script>
+    <script src="assets/js/unified-nav-header.js" defer></script>
+    <script src="assets/js/unified-project-selector.js" defer></script>
+    <script src="assets/js/toast-notifications.js" defer></script>
+    <script src="assets/js/vendorManager.js" defer></script>
+    <script src="assets/js/iterum-ops-util.js" defer></script>
+    <script src="assets/js/vendor-price-list-parser.js" defer></script>
+    <script src="assets/js/vendor-catalog-store.js" defer></script>
+    <script src="assets/js/bar-inventory-store.js" defer></script>
+    <script src="assets/js/order-guide-store.js" defer></script>
+    <script src="assets/js/order-guides-page.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="assets/css/iterum-canonical-app.css">
+    <link rel="stylesheet" href="assets/css/bar-purchasing.css">
+</head>
+<body class="bg-gray-50 min-h-screen tc-revamp-body" data-iterum-breadcrumb="Purchasing|Order guides">
+    <main class="bp-wrap">
+        <header class="bp-hero">
+            <h1>Order guides</h1>
+            <p>Pull SKUs from a vendor catalog, set par and on-hand (bar inventory fills these when names match), then print a buy list or turn selected items into recipe stubs.</p>
+        </header>
+
+        <section class="bp-panel">
+            <div class="bp-grid bp-grid-3">
+                <label>Vendor
+                    <select id="og-vendor" class="bp-field"></select>
+                </label>
+                <label>Guide name
+                    <input id="og-name" class="bp-field" placeholder="MS Walker — Tuesday">
+                </label>
+                <label style="display:flex;align-items:flex-end;gap:8px">
+                    <input id="og-below" type="checkbox"> Show below-par only
+                </label>
+            </div>
+            <div class="bp-toolbar" style="margin-top:12px">
+                <button type="button" id="og-reload" class="bp-btn">Load catalog</button>
+                <button type="button" id="og-save" class="bp-btn bp-btn-primary">Save guide</button>
+                <button type="button" id="og-print" class="bp-btn">Print buy list</button>
+                <button type="button" id="og-recipes" class="bp-btn">Create recipes from lines</button>
+                <span id="og-totals" class="bp-muted"></span>
+            </div>
+            <p id="og-status" class="bp-status"></p>
+            <div class="bp-linkrow">
+                <a href="price-list-upload.html">Upload price list</a>
+                <a href="vendor-management.html">Vendors</a>
+                <a href="bar-ops.html">Bar inventory</a>
+            </div>
+        </section>
+
+        <section class="bp-panel">
+            <div class="bp-table-wrap">
+                <table class="bp-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Par</th>
+                            <th>On hand</th>
+                            <th>Order</th>
+                            <th>Unit cost</th>
+                            <th>Pack</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="og-tbody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="bp-panel">
+            <h2 style="margin:0 0 12px;font-size:1.05rem">Saved guides</h2>
+            <div id="og-saved" class="bp-grid bp-grid-2"></div>
+        </section>
+    </main>
+    <script defer src="assets/js/auth_guard.js"></script>
+</body>
+</html>

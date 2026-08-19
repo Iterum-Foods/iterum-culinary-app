@@ -84,6 +84,15 @@ class UnifiedNavHeader {
     if (path.includes('sop-hub')) {
       return 'sop_hub';
     }
+    if (path.includes('bar-ops')) {
+      return 'bar_ops';
+    }
+    if (path.includes('price-list-upload')) {
+      return 'pricelist';
+    }
+    if (path.includes('order-guides')) {
+      return 'orderguides';
+    }
     if (path.includes('kitchen-management')) {
       return 'kitchen';
     }
@@ -137,6 +146,7 @@ class UnifiedNavHeader {
       'server',
       'spec_library',
       'vendorprice',
+      'pricelist',
       'equipment',
       'kitchen',
       'canvas',
@@ -624,6 +634,7 @@ class UnifiedNavHeader {
                     ${this.navLink('calendar.html', 'calendar', 'fa-solid fa-calendar-days', 'Calendar', 'calendar')}
                     ${this.navLink('mobile-compliance.html', 'shift', 'fa-solid fa-mobile-screen', 'Shift app', 'compliance')}
                     ${this.navLink('sop-hub.html', 'sop_hub', 'fa-solid fa-book-open', 'How-to guides', 'compliance')}
+                    ${this.navLink('bar-ops.html', 'bar_ops', 'fa-solid fa-martini-glass-citrus', 'Bar program', 'compliance')}
 
                     <div class="nav-section-label">Develop</div>
                     ${this.navLink('recipe-library.html', 'recipes', 'fa-solid fa-book', 'Recipes', 'recipes')}
@@ -632,6 +643,7 @@ class UnifiedNavHeader {
                     ${this.navLink('ingredients.html', 'ingredients', 'fa-solid fa-carrot', 'Ingredients', 'ingredients')}
                     ${this.navLink('inventory.html', 'inventory', 'fa-solid fa-warehouse', 'Inventory', 'inventory')}
                     ${this.navLink('vendor-management.html', 'vendors', 'fa-solid fa-truck-field', 'Vendors', 'vendors')}
+                    ${this.navLink('order-guides.html', 'orderguides', 'fa-solid fa-clipboard-list', 'Order guides', 'vendors')}
                     ${this.navLink('production-planning.html', 'reports', 'fa-solid fa-chart-line', 'Reports', 'production')}
 
                     <div class="nav-section-label">Archive</div>
@@ -652,6 +664,7 @@ class UnifiedNavHeader {
                             <hr>
                             <div class="nav-dropdown-category">Operations</div>
                             <a href="spec-library.html" class="${p('spec_library')}" data-iterum-feature="ingredients"><i class="fa-solid fa-file-lines fa-fw nav-dd-icon" aria-hidden="true"></i>Spec library</a>
+                            <a href="price-list-upload.html" class="${p('pricelist')}" data-iterum-feature="vendors"><i class="fa-solid fa-file-arrow-up fa-fw nav-dd-icon" aria-hidden="true"></i>Upload price list</a>
                             <a href="vendor-price-comparison.html" class="${p('vendorprice')}" data-iterum-feature="vendors"><i class="fa-solid fa-scale-balanced fa-fw nav-dd-icon" aria-hidden="true"></i>Price compare</a>
                             <a href="equipment-management.html" class="${p('equipment')}" data-iterum-feature="equipment"><i class="fa-solid fa-screwdriver-wrench fa-fw nav-dd-icon" aria-hidden="true"></i>Equipment</a>
                             <a href="recipe-developer.html" class="${p('developer')}" data-iterum-feature="recipes"><i class="fa-solid fa-flask fa-fw nav-dd-icon" aria-hidden="true"></i>Full recipe editor</a>
