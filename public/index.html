@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iterum Culinary — Recipes, compliance &amp; your data</title>
     <meta name="description" content="Stay compliant without enterprise pricing. Organize recipes and menus for launch. Export and archive your work—you own your data. Built for small restaurants, chefs, and cooks.">
+    <link rel="canonical" href="https://iterum-culinary-app.vercel.app/">
+    <meta property="og:site_name" content="Iterum Foods">
+    <meta property="og:title" content="Iterum Culinary — Kitchen OS">
+    <meta property="og:description" content="Recipes, menus, compliance, and archives for professional kitchens. Part of Iterum Foods.">
+    <meta property="og:url" content="https://iterum-culinary-app.vercel.app/">
+    <meta name="application-name" content="Iterum Culinary">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -14,16 +20,17 @@
     
     <!-- UNIFIED HEADER - MUST LOAD LAST TO OVERRIDE OTHER STYLES -->
     <link rel="stylesheet" href="assets/css/header-universal.css">
+    <link rel="stylesheet" href="assets/css/landing-taste-craft.css">
     
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --primary-light: #60a5fa;
-            --hero-blue-deep: #0f172a;
-            --hero-blue-mid: #1e3a8a;
-            --hero-blue-glow: #1d4ed8;
-            --accent: #d97706;
+            --primary: #2a5558;
+            --primary-dark: #1e3f42;
+            --primary-light: #4a7c80;
+            --hero-blue-deep: #142e31;
+            --hero-blue-mid: #2a5558;
+            --hero-blue-glow: #c96a2b;
+            --accent: #e07a2f;
             --gray-50: #f9fafb;
             --gray-100: #f3f4f6;
             --gray-200: #e5e7eb;
@@ -42,24 +49,21 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background:
-                radial-gradient(circle at 12% 18%, rgba(79, 70, 229, 0.18), transparent 52%),
-                radial-gradient(circle at 88% 8%, rgba(96, 165, 250, 0.18), transparent 48%),
-                linear-gradient(135deg, #f4f5f7 0%, #f7f8fb 100%);
-            color: #1f2937;
+            background: hsl(40 33% 97%);
+            color: #1a2e35;
             line-height: 1.7;
             overflow-x: hidden;
             font-weight: 500;
         }
 
         p {
-            color: #334155;
+            color: #3a4f52;
             max-width: 68ch;
         }
 
         ul {
             margin: 0 0 1.25rem 1.5rem;
-            color: #334155;
+            color: #3a4f52;
             line-height: 1.7;
         }
 
@@ -68,14 +72,14 @@
         }
 
         a {
-            color: #2563eb;
+            color: #2a5558;
             text-decoration: none;
             transition: color 0.2s ease;
         }
 
         a:hover,
         a:focus {
-            color: #1d4ed8;
+            color: #c96a2b;
         }
 
         .mono-heading {
@@ -153,8 +157,8 @@
             gap: 10px;
             padding: 8px 18px;
             border-radius: 999px;
-            background: rgba(59, 130, 246, 0.12);
-            color: #2563eb;
+            background: rgba(224, 122, 47, 0.12);
+            color: #b45309;
             font-weight: 600;
             font-size: 0.85rem;
             letter-spacing: 0.1em;
@@ -325,7 +329,7 @@
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #38bdf8, #6366f1);
+            background: linear-gradient(135deg, #e07a2f, #2a5558);
         }
 
         .process-grid {
@@ -351,7 +355,7 @@
             width: 42px;
             height: 42px;
             border-radius: 12px;
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            background: linear-gradient(135deg, #2a5558, #c96a2b);
             color: #fff;
             margin-bottom: 18px;
             font-size: 1.05rem;
@@ -523,7 +527,7 @@
             content: '✓';
             position: absolute;
             left: 0;
-            color: #2563eb;
+            color: #e07a2f;
             font-weight: 700;
         }
 
@@ -559,11 +563,11 @@
             gap: 0.35rem;
             font-weight: 600;
             font-size: 0.9375rem;
-            color: #1d4ed8;
+            color: #2a5558;
         }
 
         .hero-link-explore:hover {
-            color: #1e40af;
+            color: #c96a2b;
         }
 
         .landing-auth-hero .hero-right {
@@ -1125,19 +1129,83 @@
                 font-size: 2rem;
             }
         }
+
+        /* Company ↔ app connection chrome */
+        .company-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding: 0.65rem 1.25rem;
+            background: #0f2a2c;
+            color: #f7f3eb;
+            font-size: 0.8125rem;
+        }
+        .company-topbar a {
+            color: #f7f3eb;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .company-topbar a:hover,
+        .company-topbar a:focus {
+            color: #f0a05a;
+        }
+        .company-topbar__brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: 0.02em;
+        }
+        .company-topbar__muted {
+            opacity: 0.72;
+            font-weight: 500;
+        }
+        .landing-site-footer {
+            padding: 1.75rem 1.25rem 2.25rem;
+            background: #0f2a2c;
+            color: #d8e2e3;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        .landing-site-footer a {
+            color: #f0a05a;
+            font-weight: 600;
+        }
+        .landing-site-footer a:hover {
+            color: #ffc089;
+        }
+        .landing-site-footer p {
+            margin: 0.35rem auto;
+            max-width: 40rem;
+            color: #b8c6c8;
+        }
     </style>
 </head>
 <body>
+    <div class="company-topbar" role="navigation" aria-label="Iterum Foods">
+        <a class="company-topbar__brand" href="https://iterumfoods.xyz/" rel="noopener">
+            Iterum Foods
+            <span class="company-topbar__muted">· Culinary OS</span>
+        </a>
+        <a href="https://iterumfoods.xyz/#platforms" rel="noopener">All platforms →</a>
+    </div>
+
     <!-- Hero: single card, clear auth path (see launch-nordic / brand-kit overrides scoped under .landing-auth-hero) -->
     <section class="hero landing-auth-hero" aria-label="Sign in to Iterum">
         <div class="hero-shell">
             <!-- Left: value prop (no competing primary CTAs) -->
             <div class="hero-left">
-                <div class="mono-heading hero-eyebrow">Develop · Run the shift · Archive</div>
+                <div class="mono-heading hero-eyebrow">Iterum Foods · Culinary OS</div>
                 <h1>Kitchen ops and recipes—without enterprise pricing.</h1>
                 <p class="description">
                     Built for small restaurants, chefs launching a menu, and cooks saving recipes for their career.
                     Stay compliant, keep menus organized, and <strong>own your data</strong> with backups and exports you control.
+                </p>
+                <p class="description" style="font-size: 0.95rem; margin-top: 0.75rem;">
+                    Part of
+                    <a href="https://iterumfoods.xyz/" style="font-weight: 600;" rel="noopener">Iterum Foods</a>
+                    — restaurant technology built by chefs.
                 </p>
                 <p class="description" style="font-size: 0.95rem; margin-top: 0.75rem;">
                     <a href="mobile-compliance.html" style="font-weight: 600;">Free line log</a>
@@ -1443,6 +1511,22 @@
             </div>
         </div>
     </section>
+
+    <footer class="landing-site-footer">
+        <p>
+            <strong style="color:#f7f3eb;">Iterum Culinary</strong> is the kitchen OS product from
+            <a href="https://iterumfoods.xyz/" rel="noopener">Iterum Foods</a>.
+        </p>
+        <p>
+            <a href="https://iterumfoods.xyz/#platforms" rel="noopener">Company platforms</a>
+            ·
+            <a href="https://iterumfoods.xyz/#founder" rel="noopener">About the founder</a>
+            ·
+            <a href="mailto:hello@iterumfoods.xyz">hello@iterumfoods.xyz</a>
+            ·
+            <a href="privacy.html">Privacy</a>
+        </p>
+    </footer>
 
     <!-- Load Firebase Scripts -->
     <script src="assets/js/firebase-config.js"></script>
@@ -1936,7 +2020,7 @@
                             • No credit card required
                         </div>
 
-                        <button type="submit" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 12px;">
+                        <button type="submit" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #e07a2f 0%, #c96a2b 100%); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 12px;">
                             <span id="trial-submit-text">🚀 Start My Free Trial</span>
                             <div id="trial-spinner" class="loading-spinner" style="display: none; margin: 0 auto;"></div>
                         </button>

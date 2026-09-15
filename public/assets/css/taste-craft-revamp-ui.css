@@ -7,37 +7,54 @@
 .tc-page-hero {
   background: var(--tc-gradient-hero);
   border-bottom: 1px solid hsl(var(--tc-border));
+  position: relative;
+}
+
+.tc-page-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 50% 80% at 100% 0%,
+    hsl(var(--tc-accent) / 0.08),
+    transparent 60%
+  );
+  pointer-events: none;
 }
 
 .tc-page-hero__inner {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 2rem 1.5rem;
+  gap: 1.25rem;
+  padding: 2.25rem 1.5rem 2rem;
   max-width: 1400px;
   margin: 0 auto;
 }
 
 @media (min-width: 768px) {
   .tc-page-hero__inner {
-    padding: 2rem 2.5rem;
+    padding: 2.5rem 2.5rem 2.15rem;
   }
 }
 
 .tc-page-hero__title {
   margin: 0;
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.85rem, 4vw, 2.4rem);
   font-weight: 600;
   color: hsl(var(--tc-foreground));
+  letter-spacing: -0.02em;
 }
 
 .tc-page-hero__desc {
-  margin: 0.5rem 0 0;
+  margin: 0.65rem 0 0;
   max-width: 42rem;
-  font-size: 0.9375rem;
-  line-height: 1.5;
+  font-size: 0.975rem;
+  line-height: 1.6;
   color: hsl(var(--tc-muted-foreground));
 }
 

@@ -172,6 +172,7 @@
                         <p class="ag-footer-note">Don&apos;t have an account?</p>
                         <a href="index.html?tab=signup" class="ag-link">Sign up for free</a>
                         <a href="index.html" class="ag-link ag-link-muted">Go to full login page</a>
+                        <a href="https://iterumfoods.xyz/" class="ag-link ag-link-muted" rel="noopener">Iterum Foods home</a>
                     </div>
                 </div>
             </div>

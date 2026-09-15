@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In | Iterum Foods</title>
+    <title>Sign In | Iterum Culinary · Iterum Foods</title>
+    <meta name="description" content="Sign in to Iterum Culinary — recipes, menus, and kitchen ops. Part of Iterum Foods (iterumfoods.xyz).">
+    <link rel="canonical" href="https://iterum-culinary-app.vercel.app/signin.html">
+    <meta property="og:site_name" content="Iterum Foods">
+    <meta property="og:title" content="Sign In | Iterum Culinary">
+    <meta property="og:url" content="https://iterum-culinary-app.vercel.app/signin.html">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,6 +18,7 @@
     
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/signin-taste-craft.css">
     
     <!-- GSAP for animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -164,7 +170,11 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center lg:p-6 text-iterum-ink antialiased">
+<body class="min-h-screen flex items-center justify-center lg:p-6 text-iterum-ink antialiased signin-with-company-bar">
+    <div class="company-signin-bar" role="navigation" aria-label="Iterum Foods">
+        <a href="https://iterumfoods.xyz/" rel="noopener">Iterum Foods · Culinary OS</a>
+        <a href="https://iterumfoods.xyz/#platforms" rel="noopener">All platforms →</a>
+    </div>
 
     <div class="w-full max-w-[1100px] h-full lg:min-h-[680px] lg:h-[800px] bg-white lg:rounded-2xl overflow-hidden flex flex-col lg:flex-row border border-slate-200/90 shadow-lg">
         
@@ -172,11 +182,13 @@
         <div class="hidden lg:flex lg:w-[44%] brand-gradient p-10 xl:p-12 flex-col justify-between text-white relative">
             <div class="z-10">
                 <div class="flex items-center gap-2 mb-10">
-                    <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="3"/>
-                        <path d="M20 10V30M10 20H30" stroke="currentColor" stroke-width="3"/>
-                    </svg>
-                    <span class="text-lg font-semibold tracking-wide">Iterum</span>
+                    <a href="https://iterumfoods.xyz/" class="flex items-center gap-2 text-white hover:opacity-90" rel="noopener">
+                        <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="3"/>
+                            <path d="M20 10V30M10 20H30" stroke="currentColor" stroke-width="3"/>
+                        </svg>
+                        <span class="text-lg font-semibold tracking-wide">Iterum Foods</span>
+                    </a>
                 </div>
                 
                 <h2 class="text-3xl xl:text-[2rem] font-semibold leading-snug mb-5 tracking-tight text-white">
@@ -197,7 +209,10 @@
                     <p class="text-sm leading-snug">Your workspace, your data—sign in to continue.</p>
                 </div>
                 <div class="pt-6">
-                    <p class="text-[11px] font-medium text-white/40">Iterum Culinary</p>
+                    <p class="text-[11px] font-medium text-white/40">
+                        Iterum Culinary ·
+                        <a href="https://iterumfoods.xyz/" class="text-white/70 underline underline-offset-2 hover:text-white" rel="noopener">iterumfoods.xyz</a>
+                    </p>
                 </div>
             </div>
         </div>
@@ -207,16 +222,18 @@
             <div class="max-w-[18.5rem] sm:max-w-md mx-auto w-full">
                 <!-- Mobile Logo -->
                 <div class="lg:hidden flex items-center gap-2 mb-7 text-iterum-moss-dark">
-                    <svg width="26" height="26" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-                        <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="3"/>
-                        <path d="M20 10V30M10 20H30" stroke="currentColor" stroke-width="3"/>
-                    </svg>
-                    <span class="text-lg font-semibold tracking-wide text-iterum-ink">Iterum</span>
+                    <a href="https://iterumfoods.xyz/" class="flex items-center gap-2" rel="noopener">
+                        <svg width="26" height="26" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+                            <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="3"/>
+                            <path d="M20 10V30M10 20H30" stroke="currentColor" stroke-width="3"/>
+                        </svg>
+                        <span class="text-lg font-semibold tracking-wide text-iterum-ink">Iterum Foods</span>
+                    </a>
                 </div>
 
                 <div class="mb-7 sm:mb-8">
-                    <h1 class="text-[1.75rem] sm:text-[2.125rem] font-semibold leading-snug text-iterum-ink mb-3">Sign in to Iterum</h1>
-                    <p class="text-base sm:text-[1.0625rem] text-iterum-slate leading-relaxed">Use your work email and password.</p>
+                    <h1 class="text-[1.75rem] sm:text-[2.125rem] font-semibold leading-snug text-iterum-ink mb-3">Sign in to Iterum Culinary</h1>
+                    <p class="text-base sm:text-[1.0625rem] text-iterum-slate leading-relaxed">Use your work email and password. Part of <a href="https://iterumfoods.xyz/" class="text-iterum-moss-dark font-semibold underline underline-offset-2" rel="noopener">Iterum Foods</a>.</p>
                 </div>
 
                 <div id="auth-bootstrap-error" class="error-message" role="alert" aria-live="assertive"></div>

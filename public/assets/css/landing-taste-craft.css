@@ -1,0 +1,329 @@
+/**
+ * Landing + sign-in — Taste Craft warmth (cream / teal / orange).
+ * Softens terse blue/slate chrome; load after page-local styles.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --tc-background: 40 33% 97%;
+  --tc-foreground: 180 25% 11%;
+  --tc-card: 40 40% 99%;
+  --tc-primary: 182 38% 20%;
+  --tc-primary-glow: 182 32% 32%;
+  --tc-muted: 38 25% 93%;
+  --tc-muted-foreground: 180 12% 38%;
+  --tc-accent: 28 85% 55%;
+  --tc-accent-soft: 28 80% 94%;
+  --tc-border: 35 22% 86%;
+  --tc-radius: 0.875rem;
+  --tc-gradient-hero: radial-gradient(
+    ellipse at top right,
+    hsl(28 70% 92%) 0%,
+    hsl(40 33% 97%) 55%,
+    hsl(182 28% 94%) 100%
+  );
+  --tc-gradient-primary: linear-gradient(
+    135deg,
+    hsl(var(--tc-primary)) 0%,
+    hsl(var(--tc-primary-glow)) 100%
+  );
+  --tc-gradient-accent: linear-gradient(
+    135deg,
+    hsl(28 85% 55%) 0%,
+    hsl(18 80% 50%) 100%
+  );
+}
+
+/* —— Company strip —— */
+.company-topbar {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--tc-primary)) 0%,
+    hsl(var(--tc-primary-glow)) 100%
+  ) !important;
+  color: hsl(var(--tc-background)) !important;
+  border-bottom: 1px solid hsl(182 30% 16% / 0.35);
+  padding: 0.75rem 1.5rem !important;
+}
+
+.company-topbar a {
+  color: hsl(var(--tc-background)) !important;
+}
+
+.company-topbar a:hover,
+.company-topbar a:focus {
+  color: hsl(28 90% 78%) !important;
+}
+
+.company-topbar__muted {
+  opacity: 0.78 !important;
+  font-weight: 500 !important;
+}
+
+/* —— Landing body atmosphere —— */
+body {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  background: var(--tc-gradient-hero) !important;
+  color: hsl(var(--tc-foreground)) !important;
+}
+
+.landing-auth-hero.hero {
+  background: transparent !important;
+  min-height: calc(100vh - 2.75rem) !important;
+  padding: clamp(1.25rem, 4vw, 2.5rem) !important;
+}
+
+.landing-auth-hero.hero::before {
+  display: block !important;
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 20%, hsl(28 75% 88% / 0.55), transparent 60%),
+    radial-gradient(ellipse 50% 45% at 90% 10%, hsl(182 35% 88% / 0.5), transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-shell {
+  max-width: 1120px !important;
+  background: hsl(var(--tc-card)) !important;
+  border: 1px solid hsl(var(--tc-border) / 0.85) !important;
+  border-radius: 1.25rem !important;
+  box-shadow:
+    0 1px 0 hsl(35 22% 86% / 0.7),
+    0 28px 64px -20px hsl(180 25% 11% / 0.18) !important;
+  overflow: hidden;
+}
+
+.landing-auth-hero .hero-left {
+  background:
+    linear-gradient(165deg, hsl(40 45% 98%) 0%, hsl(38 35% 94%) 48%, hsl(182 22% 95%) 100%) !important;
+  padding: clamp(2rem, 4.5vw, 3rem) !important;
+}
+
+.landing-auth-hero .hero-left .mono-heading,
+.landing-auth-hero .hero-left .hero-eyebrow {
+  color: hsl(var(--tc-primary)) !important;
+  font-size: 0.6875rem !important;
+  letter-spacing: 0.14em !important;
+  font-weight: 600 !important;
+}
+
+.landing-auth-hero .hero-left .mono-heading::before {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--tc-accent)),
+    hsl(var(--tc-accent) / 0)
+  ) !important;
+}
+
+.landing-auth-hero .hero-left h1 {
+  font-family: 'Fraunces', Georgia, serif !important;
+  font-weight: 600 !important;
+  color: hsl(var(--tc-foreground)) !important;
+  letter-spacing: -0.02em !important;
+}
+
+.landing-auth-hero .hero-left .description {
+  color: hsl(var(--tc-muted-foreground)) !important;
+  line-height: 1.7 !important;
+}
+
+.landing-auth-hero .hero-left .description a {
+  color: hsl(var(--tc-primary)) !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.hero-benefits li {
+  color: hsl(var(--tc-foreground)) !important;
+  padding: 0.45rem 0 0.45rem 1.65rem !important;
+}
+
+.hero-benefits li::before {
+  color: hsl(var(--tc-accent)) !important;
+  font-weight: 700;
+}
+
+.btn-signup-ghost {
+  background: hsl(var(--tc-card)) !important;
+  border: 1px solid hsl(var(--tc-border)) !important;
+  color: hsl(var(--tc-foreground)) !important;
+  border-radius: calc(var(--tc-radius) - 2px) !important;
+  padding: 0.7rem 1.15rem !important;
+}
+
+.btn-signup-ghost:hover {
+  background: hsl(var(--tc-accent-soft)) !important;
+  border-color: hsl(var(--tc-accent) / 0.4) !important;
+}
+
+.hero-link-explore {
+  color: hsl(var(--tc-primary)) !important;
+}
+
+.hero-link-explore:hover {
+  color: hsl(var(--tc-primary-glow)) !important;
+}
+
+.landing-auth-hero .hero-right {
+  background: hsl(var(--tc-card)) !important;
+  border-left: 1px solid hsl(var(--tc-border) / 0.7) !important;
+  padding: clamp(2rem, 4.5vw, 3rem) !important;
+}
+
+.auth-container h2 {
+  font-family: 'Fraunces', Georgia, serif !important;
+  font-weight: 600 !important;
+  color: hsl(var(--tc-foreground)) !important;
+}
+
+.auth-container .subtitle {
+  color: hsl(var(--tc-muted-foreground)) !important;
+}
+
+.auth-tabs {
+  background: hsl(var(--tc-muted)) !important;
+  border-radius: calc(var(--tc-radius) - 2px) !important;
+}
+
+.auth-tab {
+  color: hsl(var(--tc-muted-foreground)) !important;
+}
+
+.auth-tab.active {
+  background: hsl(var(--tc-card)) !important;
+  color: hsl(var(--tc-primary)) !important;
+  box-shadow: 0 1px 4px hsl(180 25% 11% / 0.08) !important;
+}
+
+.form-label {
+  color: hsl(var(--tc-foreground)) !important;
+}
+
+.form-input {
+  border: 1px solid hsl(var(--tc-border)) !important;
+  background: hsl(var(--tc-background)) !important;
+  border-radius: calc(var(--tc-radius) - 4px) !important;
+  color: hsl(var(--tc-foreground)) !important;
+}
+
+.form-input:focus {
+  border-color: hsl(var(--tc-primary) / 0.5) !important;
+  box-shadow: 0 0 0 3px hsl(var(--tc-primary) / 0.12) !important;
+}
+
+.btn-primary,
+#signin-btn,
+#signup-btn {
+  background: var(--tc-gradient-accent) !important;
+  color: hsl(40 33% 99%) !important;
+  border: none !important;
+  border-radius: calc(var(--tc-radius) - 2px) !important;
+  box-shadow: 0 6px 20px hsl(var(--tc-accent) / 0.28) !important;
+}
+
+.btn-primary::before,
+#signin-btn::after {
+  display: none !important;
+}
+
+.btn-primary:hover,
+#signin-btn:hover,
+#signup-btn:hover {
+  opacity: 0.94;
+  transform: translateY(-1px);
+}
+
+.btn-google {
+  border: 1px solid hsl(var(--tc-border)) !important;
+  border-radius: calc(var(--tc-radius) - 2px) !important;
+  background: hsl(var(--tc-card)) !important;
+}
+
+.btn-google:hover {
+  background: hsl(var(--tc-muted)) !important;
+}
+
+.auth-link,
+.link-btn {
+  color: hsl(var(--tc-primary)) !important;
+}
+
+.divider {
+  color: hsl(var(--tc-muted-foreground)) !important;
+}
+
+.divider::before,
+.divider::after {
+  background: hsl(var(--tc-border)) !important;
+}
+
+/* Marketing sections below the fold */
+.section-wrapper.light {
+  background: hsl(var(--tc-background)) !important;
+}
+
+.section-wrapper.dark {
+  background: linear-gradient(
+    160deg,
+    hsl(var(--tc-primary)) 0%,
+    hsl(182 36% 16%) 100%
+  ) !important;
+  color: hsl(var(--tc-background));
+}
+
+.section-heading h2,
+.audience-card h3,
+.pillar-card h3,
+.process-card h4 {
+  font-family: 'Fraunces', Georgia, serif !important;
+  font-weight: 600 !important;
+}
+
+.badge {
+  background: hsl(var(--tc-accent-soft)) !important;
+  color: hsl(18 70% 36%) !important;
+  border: 1px solid hsl(var(--tc-accent) / 0.25) !important;
+}
+
+.audience-card,
+.pillar-card,
+.process-card,
+.metric-tile {
+  background: hsl(var(--tc-card)) !important;
+  border: 1px solid hsl(var(--tc-border) / 0.75) !important;
+  border-radius: var(--tc-radius) !important;
+  box-shadow: 0 8px 24px -14px hsl(180 25% 11% / 0.12) !important;
+}
+
+.pillar-cta,
+a.pillar-cta {
+  color: hsl(var(--tc-primary)) !important;
+  font-weight: 600 !important;
+}
+
+.landing-site-footer {
+  background: linear-gradient(
+    180deg,
+    hsl(182 42% 11%) 0%,
+    hsl(182 40% 9%) 100%
+  ) !important;
+  padding: 2.25rem 1.5rem 2.75rem !important;
+}
+
+.landing-site-footer a {
+  color: hsl(28 90% 68%) !important;
+}
+
+.landing-site-footer a:hover {
+  color: hsl(28 95% 78%) !important;
+}
+
+@media (max-width: 968px) {
+  .landing-auth-hero .hero-right {
+    border-left: none !important;
+    border-top: 1px solid hsl(var(--tc-border) / 0.7) !important;
+  }
+}
