@@ -1,9 +1,9 @@
 # Launch checklist — now (pilot first)
 
 **Purpose:** One page with **owners and dates** so “launch” is a sequence, not a vibe.  
-**Date:** 19 August 2026  
+**Date:** 19 August 2026 · **GTM update:** 16 September 2026  
 **Prod URL:** `https://iterum-culinary-app.vercel.app/`  
-**Authority:** [APP_COMPLETION_PLAN.md](./APP_COMPLETION_PLAN.md) (pilot-ready vs scale-ready) · [PILOT_ACCEPTANCE_CRITERIA_WEB.md](./PILOT_ACCEPTANCE_CRITERIA_WEB.md) · [FUNCTIONAL_READINESS_GATE.md](./FUNCTIONAL_READINESS_GATE.md)  
+**Authority:** [CEO_DIRECTIVE_SINGLE_USER_LAUNCH.md](./CEO_DIRECTIVE_SINGLE_USER_LAUNCH.md) · [APP_COMPLETION_PLAN.md](./APP_COMPLETION_PLAN.md) · [COO_SOLO_CHEF_BARTENDER_PILOT_PACK.md](./COO_SOLO_CHEF_BARTENDER_PILOT_PACK.md) · [CTO_SOLO_USER_TECH_BAR.md](./CTO_SOLO_USER_TECH_BAR.md)  
 **External one-pager:** [PILOT_ONE_PAGER.md](./PILOT_ONE_PAGER.md)  
 **Ship runbook:** [HOW_WE_SHIP.md](./HOW_WE_SHIP.md)
 
@@ -11,61 +11,61 @@
 
 ## Decision (locked for this sprint)
 
-**Launch target = first 1–3 web pilots**, not App Store / Play Store, not every HTML page, not POS/ERP.
+**Launch target = first 1–3 solo web pilots (chef or bartender)**, not App Store, not org connecting, not POS/ERP.
 
 | We sell in the pilot | We do **not** promise |
 |----------------------|------------------------|
-| Auth + workspaces (`projectId`) | `projectId` = “location” without a footnote |
-| Recipes, menus, costing | 100% costing completeness on day one |
+| Auth + **one** workspace | Multi-venue org connecting |
+| Recipes / cocktails, menus, costing | 100% costing completeness on day one |
 | Shift app: temps, checklists, Bar tab, How-to SOPs | Native store apps |
 | Vendors + price-list upload + order guides (print) | Vendor EDI / emailed POs / warehouse |
-| Bar program seed (Common Craft) + well pars | Full bottle-level ERP inventory |
-| UID teammate add | SAML SSO, automated email invites |
+| Bar program seed + well pars | Full bottle-level ERP inventory |
+| Export / archive (portable IP) | SAML SSO, automated email invites, teammate as day-one requirement |
 
-**Done for “pilot launched”:** Gates **L1–L4** below are **GO**, plus **one named kitchen** with a signed (or written) 2–4 week partner agreement.
+**Done for “pilot launched”:** **L1 + L2 + L3-solo + L5 + L6** are **GO**, plus **one named solo chef or bartender** with a written 2–4 week partner agreement. **L3 teammate / L4 A≠B** = optional hygiene (Phase 2 prep).
 
 ---
 
-## Scoreboard (19 Aug 2026)
+## Scoreboard (updated 6 Oct 2026)
 
 | Gate | Status | Owner | Due |
 |------|--------|-------|-----|
 | **L0** Code on `main` (bar + purchasing) | **GO** — `84b1cbe` | Eng | Done |
-| **L1** Vercel prod has those pages | Confirm after this deploy | Eng | 20 Aug |
-| **L2** Deploy Firebase green (E3 rules) | **Blocked** — `FIREBASE_TOKEN` | CTO | 22 Aug |
-| **L3** COO teammate 1–8 + two-workspace demo | Open hygiene | COO | 26 Aug |
-| **L4** E3 prices A ≠ B on prod | Blocked on L2 | CTO + COO | 27 Aug |
-| **L5** Named pilot + SOW | Open | CEO / COO | 2 Sep |
-| **L6** 5-min prod demo recorded | Open | COO | 5 Sep |
+| **L1** Vercel prod has those pages | **GO** — HEAD 200 on bar/stock/order/price/archive/dashboard (6 Oct 2026) | Eng | Done |
+| **L2** Deploy Firebase green | **GO** — run `37505466056` (6 Oct 2026) | CTO | Done |
+| **L3-solo** Solo chef + bartender path on prod | Open | COO + Eng | Now |
+| **L3** Teammate 1–8 + two-workspace | **Optional hygiene** | COO | Phase 2 prep |
+| **L4** E3 prices A ≠ B | **Optional hygiene** | CTO + COO | After partners |
+| **L5** Named **solo** pilot + SOW | Open | CEO / COO | This month |
+| **L6** 5-min demos recorded (**both** tracks) | Open | COO | This month |
 
 ---
 
 ## L1 — Confirm this week’s ship is live (Eng)
 
-**Due:** 20 Aug 2026
+**Due:** 20 Aug 2026 · **Closed:** 6 Oct 2026
 
 On **prod** (not localhost):
 
-- [ ] `price-list-upload.html` loads  
-- [ ] `order-guides.html` loads  
-- [ ] `bar-ops.html` loads  
-- [ ] Dashboard shows **Bar program** card  
-- [ ] Sidebar: **Bar program** + **Order guides**
-
-**Fail:** Vercel did not pick up `main` — check Actions / Vercel dashboard.
+- [x] `price-list-upload.html` loads  
+- [x] `order-guides.html` loads  
+- [x] `bar-ops.html` loads  
+- [x] `stock-setup.html` / `archive-hub.html` / `dashboard.html` load (HEAD 200)  
+- [ ] Dashboard shows **Bar program** card (human spot-check)  
+- [ ] Sidebar: **Bar program** + **Order guides** (human spot-check)
 
 ---
 
 ## L2 — Production trust (CTO) — **hard blocker**
 
-**Due:** 22 Aug 2026  
+**Due:** 22 Aug 2026 · **Closed:** 6 Oct 2026  
 **Packet:** [E3_PROD_VERIFY.md](./E3_PROD_VERIFY.md) Gate 0 · [HOW_WE_SHIP.md](./HOW_WE_SHIP.md)
 
-- [ ] `firebase login:ci` → new **`FIREBASE_TOKEN`** in GitHub Actions secrets  
-- [ ] Workflow **Deploy Firebase** **success** on `main`  
-- [ ] If no rules change since last green deploy, write that fact on this row (still confirm latest run)
+- [x] `firebase login:ci` → new **`FIREBASE_TOKEN`** in GitHub Actions secrets  
+- [x] Workflow **Deploy Firebase** **success** on `main` — [run 37505466056](https://github.com/Iterum-Foods/iterum-culinary-app/actions/runs/37505466056) (6 Oct 2026)  
+- [x] E3 / current rules path redeployed to `iterum-culinary-app2`
 
-**Why it blocks:** Shared vendors + per-workspace prices are not trustworthy until rules are live.
+**Why it mattered:** Shared vendors + cloud writes are not trustworthy until rules are live.
 
 ---
 

@@ -464,15 +464,15 @@
   white-space: nowrap;
   min-height: 2.5rem;
   padding: 0.6rem 1rem;
-  background: hsl(222 47% 11%) !important;
-  color: #ffffff !important;
-  border: 1px solid hsl(222 47% 11%) !important;
-  box-shadow: none !important;
+  background: var(--tc-gradient-accent) !important;
+  color: hsl(var(--tc-accent-foreground)) !important;
+  border: none !important;
+  box-shadow: 0 6px 18px hsl(var(--tc-accent) / 0.25) !important;
 }
 
 .tc-revamp-body .dash-header-cta:hover {
-  background: hsl(215 28% 17%) !important;
-  opacity: 1;
+  opacity: 0.94;
+  background: var(--tc-gradient-accent) !important;
 }
 
 .tc-revamp-body .dash-page-header.tc-page-hero .flex-1 {
@@ -480,21 +480,21 @@
 }
 
 .tc-revamp-body .main-content-area {
-  background: hsl(210 40% 96.5%);
-  background-image: none;
-  color: hsl(222 47% 11%);
+  background: hsl(var(--tc-background));
+  background-image: var(--tc-gradient-hero);
+  color: hsl(var(--tc-foreground));
 }
 
-/* Dashboard — stronger type contrast on cool gray canvas */
+/* Dashboard — readable type on cream canvas */
 .tc-revamp-body .main-content-area .tc-page-hero__title,
 .tc-revamp-body .main-content-area h1,
 .tc-revamp-body .main-content-area h2 {
-  color: hsl(222 47% 11%) !important;
+  color: hsl(var(--tc-foreground)) !important;
 }
 
 .tc-revamp-body .main-content-area .tc-page-hero__desc,
 .tc-revamp-body .main-content-area p.text-sm {
-  color: hsl(215 16% 35%) !important;
+  color: hsl(var(--tc-muted-foreground)) !important;
 }
 
 .tc-revamp-body .main-content-area label,

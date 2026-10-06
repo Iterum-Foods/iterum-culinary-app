@@ -273,6 +273,19 @@ class ProjectManagementSystem {
   }
 
   /**
+   * Prefer a named kitchen/bar workspace over Master Project.
+   * @returns {object|null}
+   */
+  preferSoloWorkspace() {
+    const named = this.projects.find(p => p && !this.isMasterProject(p));
+    if (named) {
+      return named;
+    }
+    const master = this.projects.find(p => p && this.isMasterProject(p));
+    return master || this.projects[0] || null;
+  }
+
+  /**
    * Create the master project (shows all user data)
    */
   createMasterProject() {
@@ -383,30 +396,30 @@ class ProjectManagementSystem {
             'not found in projects list. Available:',
             this.projects.map(p => p.id)
           );
-          // Try to find master project
-          if (this.projects.some(p => p.id === this.masterProjectId)) {
-            console.log('📋 Falling back to master project');
-            this.setCurrentProject(this.masterProjectId);
-          } else if (this.projects.length > 0) {
-            // Use first available project
-            console.log(
-              '📋 Using first available project:',
-              this.projects[0].name
-            );
-            this.setCurrentProject(this.projects[0].id);
+          const fallback = this.preferSoloWorkspace();
+          if (fallback) {
+            console.log('📋 Falling back to workspace:', fallback.name);
+            this.setCurrentProject(fallback.id);
           }
         }
       } else {
-        // No saved project - default to master or first available
-        if (this.projects.some(p => p.id === this.masterProjectId)) {
-          console.log('📋 No saved project, defaulting to master');
-          this.setCurrentProject(this.masterProjectId);
-        } else if (this.projects.length > 0) {
-          console.log(
-            '📋 No saved project, using first available:',
-            this.projects[0].name
-          );
-          this.setCurrentProject(this.projects[0].id);
+        const fallback = this.preferSoloWorkspace();
+        if (fallback) {
+          console.log('📋 No saved project, using:', fallback.name);
+          this.setCurrentProject(fallback.id);
+        }
+      }
+
+      // Solo GTM: if a named kitchen exists, do not leave the user on Master.
+      if (
+        this.currentProject &&
+        this.isMasterProject(this.currentProject) &&
+        this.projects.some(p => p && !this.isMasterProject(p))
+      ) {
+        const named = this.projects.find(p => p && !this.isMasterProject(p));
+        if (named) {
+          console.log('📋 Preferring named workspace over Master:', named.name);
+          this.setCurrentProject(named.id);
         }
       }
 
@@ -1007,13 +1020,6 @@ class ProjectManagementSystem {
   }
 
   /**
-   * Check if current project is master (always true for master-only system)
-   */
-  isMasterProject() {
-    return true; // Always true since we only use master project
-  }
-
-  /**
    * Generate unique project ID
    */
   generateProjectId() {
@@ -1173,7 +1179,7 @@ class ProjectManagementSystem {
    * Update data filtering based on current project
    */
   updateDataFiltering() {
-    if (this.isMasterProject()) {
+    if (this.isMasterProject(this.currentProject)) {
       // Show all data (no filtering)
       this.showAllData();
     } else {
@@ -1273,7 +1279,7 @@ class ProjectManagementSystem {
     const detail = {
       projectId: this.currentProject?.id ?? null,
       project: this.currentProject,
-      isMaster: this.isMasterProject(),
+      isMaster: this.isMasterProject(this.currentProject),
       userId: this.currentUserId
     };
     document.dispatchEvent(
@@ -1552,7 +1558,7 @@ class ProjectManagementSystem {
    * Show import from master modal
    */
   showImportFromMasterModal() {
-    if (this.isMasterProject()) {
+    if (this.isMasterProject(this.currentProject)) {
       console.log('⚠️ Cannot import from master while on master project');
       return;
     }
@@ -2281,7 +2287,9 @@ window.syncProjectSelectionAcrossPage = function () {
       if (window.projectManager.currentProject) {
         updatePageProjectDisplays({
           project: window.projectManager.currentProject,
-          isMaster: window.projectManager.isMasterProject()
+          isMaster: window.projectManager.isMasterProject(
+            window.projectManager.currentProject
+          )
         });
       }
 

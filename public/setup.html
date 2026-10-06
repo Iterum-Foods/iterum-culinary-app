@@ -63,7 +63,7 @@
         <li>Name your <strong>restaurant workspace</strong> below, then open <a class="text-moss-dark font-medium underline hover:text-pine" href="stock-setup.html">Stock your kitchen</a> (ingredients + counts).</li>
         <li>Build dishes in <a class="text-moss-dark font-medium underline hover:text-pine" href="dish-creator.html">Dish Creator</a> and your <a class="text-moss-dark font-medium underline hover:text-pine" href="menu-builder.html">menu</a>.</li>
       </ol>
-      <p class="mt-3 text-xs text-slate">Multi-site? Use <a class="text-moss-dark underline hover:text-pine" href="project-hub.html">Project hub</a> for workspaces and teammates.</p>
+      <p class="mt-3 text-xs text-slate">One kitchen or bar for now. Adding venues later lives in <a class="text-moss-dark underline hover:text-pine" href="project-hub.html">Project hub</a>.</p>
     </aside>
 
     <form id="setup-form" class="bg-white rounded-2xl border border-slate-200/90 shadow-lg shadow-slate-900/5 p-6 sm:p-8 space-y-8">
@@ -77,13 +77,16 @@
               <span class="text-sm text-slate">One kitchen, one cost center, one menu set.</span>
             </span>
           </label>
-          <label class="flex items-start gap-3 cursor-pointer rounded-xl border border-slate-200 p-4 has-[:checked]:border-moss has-[:checked]:bg-emerald-50/50 transition-colors">
-            <input type="radio" name="scope" value="restaurant_group" class="mt-1 text-moss focus:ring-moss">
-            <span>
-              <span class="font-medium text-ink block">Restaurant group</span>
-              <span class="text-sm text-slate">Multiple venues, shared vendors, or central oversight.</span>
-            </span>
-          </label>
+          <details class="text-sm text-slate">
+            <summary class="cursor-pointer">Running more than one venue later?</summary>
+            <label class="mt-3 flex items-start gap-3 cursor-pointer rounded-xl border border-slate-200 p-4 has-[:checked]:border-moss has-[:checked]:bg-emerald-50/50 transition-colors">
+              <input type="radio" name="scope" value="restaurant_group" class="mt-1 text-moss focus:ring-moss">
+              <span>
+                <span class="font-medium text-ink block">Restaurant group (later)</span>
+                <span class="text-sm text-slate">Multiple venues. Start with one kitchen; expand after you are using Iterum daily.</span>
+              </span>
+            </label>
+          </details>
         </div>
       </fieldset>
 

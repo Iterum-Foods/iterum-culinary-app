@@ -2,20 +2,32 @@
 
 **Purpose:** Single page for leadership to track launch readiness and foundation work.  
 **Companions:** [CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md](./CEO_BRIEF_CURRENT_STATE_AND_PRIORITIES.md) · [NEXT_STEPS_LEADERSHIP.md](./NEXT_STEPS_LEADERSHIP.md) · [LEADERSHIP_ROLE_ASSIGNMENTS.md](./LEADERSHIP_ROLE_ASSIGNMENTS.md) · [TEAM_ACTION_PLAN.md](./TEAM_ACTION_PLAN.md) · [docs/CEO_TEAM_TASK_LIST_TO_MARKET.md](./docs/CEO_TEAM_TASK_LIST_TO_MARKET.md) (delegated CEO task list) · [docs/PILOT_APP_COMPLETION_MASTER.md](./docs/PILOT_APP_COMPLETION_MASTER.md) (completion definition + backlog) · [docs/P1_EPIC_BREAKDOWN.md](./docs/P1_EPIC_BREAKDOWN.md) (E1–E5) · [docs/M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md) (M1 human gate) · [docs/APP_COMPLETION_PLAN.md](./docs/APP_COMPLETION_PLAN.md) · [docs/HOW_WE_SHIP.md](./docs/HOW_WE_SHIP.md) · [docs/SOURCE_OF_TRUTH.md](./docs/SOURCE_OF_TRUTH.md) · [docs/workflows/](./docs/workflows/) (e.g. sign-in UI redesign)  
-**Last updated:** 19 August 2026  
-**Launch sequence (owners + dates):** [docs/LAUNCH_CHECKLIST_NOW.md](./docs/LAUNCH_CHECKLIST_NOW.md) · partner one-pager: [docs/PILOT_ONE_PAGER.md](./docs/PILOT_ONE_PAGER.md)
+**Last updated:** 6 October 2026  
+**Launch sequence (owners + dates):** [docs/LAUNCH_CHECKLIST_NOW.md](./docs/LAUNCH_CHECKLIST_NOW.md) · partner one-pager: [docs/PILOT_ONE_PAGER.md](./docs/PILOT_ONE_PAGER.md)  
+**GTM lock:** [docs/CEO_DIRECTIVE_SINGLE_USER_LAUNCH.md](./docs/CEO_DIRECTIVE_SINGLE_USER_LAUNCH.md) — **solo chef/bartender first**; orgs = Phase 2.
 
 ---
 
 ## Next steps (pick up here)
 
-**Now — pilot launch gates (19 Aug 2026)** — [LAUNCH_CHECKLIST_NOW.md](./docs/LAUNCH_CHECKLIST_NOW.md)
+**Now — solo chef/bartender launch (6 Oct 2026)**
+
+- [x] **CEO:** ICP re-lock — single-user chef/bartender primary ([ICP_DECISION_RECORD.md](./docs/ICP_DECISION_RECORD.md)).
+- [x] **CTO packet:** [CTO_SOLO_USER_TECH_BAR.md](./docs/CTO_SOLO_USER_TECH_BAR.md) (S0–S8 tickets).
+- [x] **COO packet:** [COO_SOLO_CHEF_BARTENDER_PILOT_PACK.md](./docs/COO_SOLO_CHEF_BARTENDER_PILOT_PACK.md).
+- [x] **CTO:** **Deploy Firebase** green — `FIREBASE_TOKEN` refreshed; run [37505466056](https://github.com/Iterum-Foods/iterum-culinary-app/actions/runs/37505466056) (**S0** / **L2**, 6 Oct 2026).
+- [ ] **Eng:** Confirm L1 prod pages; ship Master Project / setup / export solo fixes if not on `main` yet (**S1–S2**).
+- [ ] **Eng/COO:** Solo golden path on prod chef **and** bartender (**S3** / L3-solo).
+- [ ] **COO:** Apply one-pager edits + record both 5-min demos; chase 1–2 solo founding partners.
+- [ ] **Optional hygiene (not solo GO):** Teammate 1–8 + E3 A≠B — after first partner.
+
+**Prior — pilot launch gates (19 Aug 2026)** — [LAUNCH_CHECKLIST_NOW.md](./docs/LAUNCH_CHECKLIST_NOW.md)
 
 - [x] **Eng:** Bar program + price-list upload + order guides on `main` (`84b1cbe`, 19 Aug 2026).
-- [ ] **Eng:** Confirm Vercel prod serves `/bar-ops.html`, `/price-list-upload.html`, `/order-guides.html` (L1, due 20 Aug).
-- [ ] **CTO:** **Deploy Firebase** green — still the E3 blocker; regenerate `FIREBASE_TOKEN` (L2, due 22 Aug) — [E3_PROD_VERIFY.md](./docs/E3_PROD_VERIFY.md).
-- [ ] **COO:** Teammate checklist **1–8** + two-workspace demo on prod (L3, due 26 Aug) — [M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md).
-- [ ] **CEO/COO:** Name first founding partner + send [PILOT_ONE_PAGER.md](./docs/PILOT_ONE_PAGER.md) (L5, due 2 Sep).
+- [x] **Eng:** Prod pages HTTP 200 for `/bar-ops.html`, `/price-list-upload.html`, `/order-guides.html` (L1, 6 Oct 2026).
+- [x] **CTO:** **Deploy Firebase** green (L2) — 6 Oct 2026.
+- [ ] **COO:** Teammate checklist **1–8** + two-workspace demo — **optional hygiene** under solo GTM.
+- [ ] **CEO/COO:** Name first founding partner + send [PILOT_ONE_PAGER.md](./docs/PILOT_ONE_PAGER.md) (solo track).
 
 **M1 — human GO recorded (CEO, 16 Jul 2026)** — [M1_COO_PROD_VERIFICATION.md](./docs/M1_COO_PROD_VERIFICATION.md)
 
