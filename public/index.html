@@ -12,8 +12,8 @@
     <meta property="og:url" content="https://iterum-culinary-app.vercel.app/">
     <meta name="application-name" content="Iterum Culinary">
     
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Fonts (Fraunces display + Inter body — Taste Craft) -->
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- ITERUM BRAND KIT - MUST LOAD FIRST -->
     <link rel="stylesheet" href="assets/css/iterum-brand-kit.css">
@@ -939,7 +939,7 @@
 
         /* Stats Section */
         .stats {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3f42 0%, #2a5558 100%);
             padding: 80px 20px;
             color: white;
         }
@@ -1191,42 +1191,35 @@
         <a href="https://iterumfoods.xyz/#platforms" rel="noopener">All platforms →</a>
     </div>
 
-    <!-- Hero: single card, clear auth path (see launch-nordic / brand-kit overrides scoped under .landing-auth-hero) -->
-    <section class="hero landing-auth-hero" aria-label="Sign in to Iterum">
+    <!-- Hero: brand + calm auth (Taste Craft) -->
+    <section class="hero landing-auth-hero" aria-label="Sign in to Iterum Culinary">
         <div class="hero-shell">
-            <!-- Left: value prop (no competing primary CTAs) -->
             <div class="hero-left">
-                <div class="mono-heading hero-eyebrow">Iterum Foods · Culinary OS</div>
-                <h1>Kitchen ops and recipes—without enterprise pricing.</h1>
+                <p class="hero-brand" aria-label="Product">Iterum Culinary</p>
+                <p class="mono-heading hero-eyebrow">Kitchen OS · Iterum Foods</p>
+                <h1>Your kitchen, organized—and yours to keep.</h1>
                 <p class="description">
-                    Built for small restaurants, chefs launching a menu, and cooks saving recipes for their career.
-                    Stay compliant, keep menus organized, and <strong>own your data</strong> with backups and exports you control.
-                </p>
-                <p class="description" style="font-size: 0.95rem; margin-top: 0.75rem;">
-                    Part of
-                    <a href="https://iterumfoods.xyz/" style="font-weight: 600;" rel="noopener">Iterum Foods</a>
-                    — restaurant technology built by chefs.
-                </p>
-                <p class="description" style="font-size: 0.95rem; margin-top: 0.75rem;">
-                    <a href="mobile-compliance.html" style="font-weight: 600;">Free line log</a>
-                    — HACCP-style temperature &amp; sanitizer checks on your phone (same account as the full app).
+                    Recipes, menus, and shift tools for chefs and bartenders. Stay compliant, cost the menu, and export your archive whenever you need it.
                 </p>
                 <ul class="hero-benefits" aria-label="What Iterum helps you do">
-                    <li>Compliance-sized for independents—not priced like the chains</li>
-                    <li>Recipes &amp; menus systemized per workspace, ready for launch</li>
-                    <li>Download backups—your archive moves with you</li>
+                    <li>Built for one kitchen or bar—not enterprise pricing</li>
+                    <li>Menus and recipes ready for launch day</li>
+                    <li>Backups and exports you control</li>
                 </ul>
                 <div class="hero-left-actions">
-                    <button type="button" class="btn-signup-ghost" onclick="scrollToSignUp()">Create an account</button>
-                    <a href="#pillars" class="hero-link-explore">See the three pillars →</a>
+                    <button type="button" class="btn-signup-ghost" onclick="scrollToSignUp()">Create a free account</button>
+                    <a href="#who-its-for" class="hero-link-explore">Who it’s for →</a>
                 </div>
+                <p class="hero-aside">
+                    <a href="mobile-compliance.html">Free line log</a> for temps &amp; sanitizer on your phone ·
+                    <a href="https://iterumfoods.xyz/" rel="noopener">iterumfoods.xyz</a>
+                </p>
             </div>
 
-            <!-- Right: sign in / sign up -->
             <div class="hero-right">
                 <div class="auth-container">
-                    <h2>Welcome back</h2>
-                    <p class="subtitle">No credit card required. Sign in, or open <strong>Sign Up</strong> to create a workspace.</p>
+                    <h2>Welcome</h2>
+                    <p class="subtitle">Sign in to your kitchen, or create a free account. No card required.</p>
 
                     <div id="success-message" class="success-message"></div>
                     <div id="error-message-global" class="error-message"></div>
@@ -1372,7 +1365,7 @@
 
             <div class="audience-grid">
                 <article class="audience-card" data-persona="owner">
-                    <div class="audience-icon" aria-hidden="true">🏪</div>
+                    <div class="audience-icon" aria-hidden="true"><span class="audience-mark">01</span></div>
                     <h3>Small business owners</h3>
                     <p>
                         Worried about staying compliant but can’t afford large-vendor stacks?
@@ -1380,7 +1373,7 @@
                     </p>
                 </article>
                 <article class="audience-card" data-persona="chef">
-                    <div class="audience-icon" aria-hidden="true">🍽️</div>
+                    <div class="audience-icon" aria-hidden="true"><span class="audience-mark">02</span></div>
                     <h3>Chefs &amp; restaurants launching</h3>
                     <p>
                         Get recipes, costing, and menus systemized before doors open.
@@ -1388,7 +1381,7 @@
                     </p>
                 </article>
                 <article class="audience-card" data-persona="cook">
-                    <div class="audience-icon" aria-hidden="true">👨‍🍳</div>
+                    <div class="audience-icon" aria-hidden="true"><span class="audience-mark">03</span></div>
                     <h3>Cooks building a career archive</h3>
                     <p>
                         Save every recipe in a library that grows with you.

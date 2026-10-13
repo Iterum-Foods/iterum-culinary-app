@@ -1,49 +1,72 @@
 /**
- * Dedicated sign-in page — Taste Craft (cream / teal / orange).
+ * Dedicated sign-in page — Taste Craft (warm, calm, readable).
  */
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap');
+
+@keyframes signin-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 body {
   font-family: 'Inter', system-ui, sans-serif !important;
   background:
-    radial-gradient(ellipse 70% 50% at 10% 0%, hsl(28 70% 90% / 0.65), transparent 55%),
-    radial-gradient(ellipse 55% 45% at 95% 15%, hsl(182 35% 88% / 0.55), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 8% 0%, hsl(28 65% 90% / 0.7), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 96% 12%, hsl(182 38% 88% / 0.55), transparent 50%),
     hsl(40 33% 97%) !important;
   color: hsl(180 25% 11%) !important;
 }
 
 body > .w-full.max-w-\[1100px\],
-body > div.w-full {
+body > div.w-full.max-w-\[1100px\] {
   border-color: hsl(35 22% 86%) !important;
   box-shadow:
-    0 1px 0 hsl(35 22% 86% / 0.65),
-    0 28px 64px -18px hsl(180 25% 11% / 0.16) !important;
-  border-radius: 1.15rem !important;
+    0 1px 0 hsl(35 22% 86% / 0.7),
+    0 30px 68px -20px hsl(180 25% 11% / 0.18) !important;
+  border-radius: 1.25rem !important;
+  animation: signin-fade-up 0.5s ease-out both;
 }
 
 .brand-gradient {
   background: linear-gradient(
-    155deg,
-    hsl(182 38% 18%) 0%,
-    hsl(182 32% 26%) 48%,
-    hsl(182 28% 22%) 100%
+    158deg,
+    hsl(182 40% 16%) 0%,
+    hsl(182 34% 24%) 46%,
+    hsl(182 30% 20%) 100%
   ) !important;
 }
 
 .brand-gradient::before {
   background:
-    radial-gradient(circle at 20% 15%, hsl(28 85% 55% / 0.22), transparent 42%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 45%) !important;
+    radial-gradient(circle at 18% 12%, hsl(28 85% 55% / 0.28), transparent 45%),
+    radial-gradient(circle at 85% 75%, hsl(182 40% 40% / 0.25), transparent 40%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, transparent 48%) !important;
+}
+
+.brand-gradient h2 {
+  font-family: 'Fraunces', Georgia, serif !important;
+  font-weight: 600 !important;
 }
 
 .brand-gradient .text-iterum-gold,
 .brand-gradient .text-iterum-gold.font-semibold {
-  color: hsl(28 90% 68%) !important;
+  color: hsl(28 90% 70%) !important;
+}
+
+.sidebar-item {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 0.85rem;
 }
 
 .sidebar-item:hover {
   border-left-color: hsl(28 85% 55%) !important;
-  background: rgba(255, 255, 255, 0.07) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
 }
 
 .auth-form-panel {
@@ -54,11 +77,24 @@ body > div.w-full {
   font-family: 'Fraunces', Georgia, serif !important;
   font-weight: 600 !important;
   color: hsl(180 25% 11%) !important;
+  letter-spacing: -0.02em !important;
+}
+
+.auth-form-panel input.form-input {
+  background: hsl(40 33% 98%) !important;
+  border-color: hsl(35 22% 86%) !important;
+  color: hsl(180 25% 11%) !important;
+}
+
+.auth-form-panel input.form-input::placeholder {
+  color: hsl(180 10% 48%) !important;
+  opacity: 1;
 }
 
 .input-brand:focus {
   border-color: hsl(182 38% 28%) !important;
   box-shadow: 0 0 0 3px hsl(182 38% 20% / 0.14) !important;
+  background: #fff !important;
 }
 
 .input-brand:focus-visible,
@@ -77,18 +113,20 @@ a:focus-visible {
 .auth-form-panel button[type='submit'] {
   background: linear-gradient(
     135deg,
-    hsl(28 85% 55%) 0%,
-    hsl(18 80% 50%) 100%
+    hsl(28 78% 48%) 0%,
+    hsl(18 72% 44%) 100%
   ) !important;
   color: hsl(40 33% 99%) !important;
-  box-shadow: 0 6px 18px hsl(28 85% 55% / 0.3) !important;
+  box-shadow: 0 8px 20px hsl(28 78% 48% / 0.28) !important;
   border: none !important;
+  font-weight: 700 !important;
 }
 
 #signin-btn:hover,
 #signup-btn:hover,
 .auth-form-panel button[type='submit']:hover {
-  opacity: 0.94;
+  opacity: 0.95;
+  transform: translateY(-1px);
 }
 
 .text-iterum-moss-dark {
@@ -110,8 +148,8 @@ a.text-iterum-moss-dark,
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.65rem 1.25rem;
-  background: linear-gradient(90deg, hsl(182 38% 18%), hsl(182 32% 26%));
+  padding: 0.7rem 1.35rem;
+  background: linear-gradient(90deg, hsl(182 40% 16%), hsl(182 34% 24%));
   color: hsl(40 33% 97%);
   font-size: 0.8125rem;
 }
@@ -127,5 +165,16 @@ a.text-iterum-moss-dark,
 }
 
 body.signin-with-company-bar {
-  padding-top: 2.75rem;
+  padding-top: 2.85rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body > div.w-full.max-w-\[1100px\] {
+    animation: none !important;
+  }
+
+  #signin-btn:hover,
+  #signup-btn:hover {
+    transform: none;
+  }
 }
