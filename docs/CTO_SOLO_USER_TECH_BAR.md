@@ -50,7 +50,7 @@ From [E3_PROD_VERIFY.md](./E3_PROD_VERIFY.md) Gate 0 + [HOW_WE_SHIP.md](./HOW_WE
 ## Top 5 friction bugs (solo)
 
 1. **Master Project default** — chip / selector falls back to “Master Project” even when restaurant workspaces exist (`dashboard-core.js`, `unified-project-selector.js`, owner-bot MAJOR).
-2. **Recipe library Export is a stub** — `exportRecipes()` in `recipe-library.html` logs only; real path is Archive / backup center.
+2. **Recipe library Export does not download a file** — `exportRecipes()` in `recipe-library.html` redirects to `archive-hub.html`; the download path is Archive / backup center.
 3. **Local-first recipes/menus** — cloud is backup where wired (`SOURCE_OF_TRUTH.md`); new device / clear storage feels like “missing cloud save.”
 4. **Setup still offers restaurant group** — org-shaped UX during single-user GTM (`setup.html` scope radios).
 5. **Prod rules lag** — E3 / later membership rules in git since Apr 7 may not be on prod → surprise `permission-denied` on price overrides / teammate paths.
