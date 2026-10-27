@@ -325,6 +325,17 @@ class UserDataManager {
    * Get storage key for data type
    */
   getStorageKey(dataType) {
+    if (
+      window.projectManager &&
+      typeof window.projectManager.getProjectStorageKey === 'function'
+    ) {
+      if (dataType === 'ingredients') {
+        return window.projectManager.getProjectStorageKey('ingredients');
+      }
+      if (dataType === 'recipes') {
+        return window.projectManager.getProjectStorageKey('recipe_library');
+      }
+    }
     const keyMap = {
       recipes: `recipes_${this.userId}`,
       menus: `menus_${this.userId}`,

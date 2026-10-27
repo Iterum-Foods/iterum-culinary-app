@@ -292,55 +292,51 @@ class UniversalRecipeManager {
     });
   }
 
+  projectRecipeKey(dataType) {
+    if (window.projectManager?.getProjectStorageKey) {
+      return window.projectManager.getProjectStorageKey(dataType);
+    }
+    return null;
+  }
+
+  readProjectRecipeList(dataType) {
+    const key = this.projectRecipeKey(dataType);
+    if (!key || localStorage.getItem(key) == null) {
+      return [];
+    }
+    try {
+      const parsed = JSON.parse(localStorage.getItem(key));
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      console.warn('Could not read project recipes', dataType, error);
+      return [];
+    }
+  }
+
+  writeProjectRecipeList(dataType, list) {
+    const key = this.projectRecipeKey(dataType);
+    if (!key) {
+      return false;
+    }
+    localStorage.setItem(key, JSON.stringify(Array.isArray(list) ? list : []));
+    return true;
+  }
+
   /**
    * Save to multiple storage locations for compatibility
    */
   saveToMultipleLocations(recipe) {
     try {
-      const currentUser = this.getCurrentUser();
-      const userId = currentUser?.userId || currentUser?.id || 'guest';
-
-      // 1. Save to general recipes storage
-      let allRecipes = JSON.parse(
-        localStorage.getItem(this.storageKeys.recipes) || '[]'
-      );
-      const recipeIndex = allRecipes.findIndex(r => r.id === recipe.id);
-      if (recipeIndex !== -1) {
-        allRecipes[recipeIndex] = recipe;
-      } else {
-        allRecipes.push(recipe);
-      }
-      localStorage.setItem(
-        this.storageKeys.recipes,
-        JSON.stringify(allRecipes)
-      );
-
-      // 2. Save to user-specific recipes
-      const userKey = `user_${userId}_recipes`;
-      let userRecipes = JSON.parse(localStorage.getItem(userKey) || '[]');
-      const userRecipeIndex = userRecipes.findIndex(r => r.id === recipe.id);
-      if (userRecipeIndex !== -1) {
-        userRecipes[userRecipeIndex] = recipe;
-      } else {
-        userRecipes.push(recipe);
-      }
-      localStorage.setItem(userKey, JSON.stringify(userRecipes));
-
-      // 3. Save to recipes in progress (if not published)
+      // Keep the active project's in-progress list in sync. Do not write the shared bucket.
       if (recipe.status === 'in-progress' || recipe.status === 'draft') {
-        let inProgress = JSON.parse(
-          localStorage.getItem(this.storageKeys.recipesInProgress) || '[]'
-        );
+        const inProgress = this.readProjectRecipeList('recipes_in_progress');
         const progressIndex = inProgress.findIndex(r => r.id === recipe.id);
         if (progressIndex !== -1) {
           inProgress[progressIndex] = recipe;
         } else {
           inProgress.push(recipe);
         }
-        localStorage.setItem(
-          this.storageKeys.recipesInProgress,
-          JSON.stringify(inProgress)
-        );
+        this.writeProjectRecipeList('recipes_in_progress', inProgress);
       }
 
       console.log('✅ Recipe saved to multiple storage locations');
@@ -354,8 +350,11 @@ class UniversalRecipeManager {
    */
   getRecipeLibrary() {
     try {
-      const library = localStorage.getItem(this.storageKeys.recipeLibrary);
-      return library ? JSON.parse(library) : [];
+      if (window.userDataManager?.getUserRecipes && window.projectManager) {
+        const recipes = window.userDataManager.getUserRecipes();
+        return Array.isArray(recipes) ? recipes : [];
+      }
+      return this.readProjectRecipeList('recipe_library');
     } catch (error) {
       console.error('❌ Error getting recipe library:', error);
       return [];
@@ -367,10 +366,12 @@ class UniversalRecipeManager {
    */
   saveRecipeLibrary(library) {
     try {
-      localStorage.setItem(
-        this.storageKeys.recipeLibrary,
-        JSON.stringify(library)
-      );
+      const safe = Array.isArray(library) ? library : [];
+      if (window.userDataManager?.saveUserRecipes && window.projectManager) {
+        window.userDataManager.saveUserRecipes(safe);
+      } else if (!this.writeProjectRecipeList('recipe_library', safe)) {
+        return false;
+      }
       console.log(`💾 Recipe library saved: ${library.length} recipes`);
 
       if (window.firestoreSync?.saveRecipeLibrarySnapshot) {
@@ -405,11 +406,23 @@ class UniversalRecipeManager {
         snapshot.updatedAt || snapshot.syncedAt || 0
       );
 
+      const currentId = this.getCurrentProjectId() || 'master';
+      const scoped = snapshot.recipes.filter(recipe => {
+        const pid = recipe && (recipe.projectId || recipe.project);
+        if (!pid || pid === 'master') {
+          return currentId === 'master';
+        }
+        return pid === currentId;
+      });
+      if (!scoped.length) {
+        return;
+      }
+
       if (
         !localLibrary.length ||
         (remoteUpdated && remoteUpdated > localUpdated)
       ) {
-        this.saveRecipeLibrary(snapshot.recipes);
+        this.saveRecipeLibrary(scoped);
         console.log('☁️ Recipe library hydrated from Firestore snapshot');
       }
     } catch (error) {
@@ -424,16 +437,12 @@ class UniversalRecipeManager {
    * Get all recipes (from library and all other sources)
    */
   getAllRecipes() {
-    const library = this.getRecipeLibrary();
-    const recipes = JSON.parse(
-      localStorage.getItem(this.storageKeys.recipes) || '[]'
-    );
-    const inProgress = JSON.parse(
-      localStorage.getItem(this.storageKeys.recipesInProgress) || '[]'
-    );
+    const library = this.readProjectRecipeList('recipe_library');
+    const inProgress = this.readProjectRecipeList('recipes_in_progress');
+    const ideas = this.readProjectRecipeList('recipe_ideas');
 
-    // Merge all sources, removing duplicates
-    const allRecipes = [...library, ...recipes, ...inProgress];
+    // Merge this project's lists only. Do not fall back to Master or global keys.
+    const allRecipes = [...library, ...inProgress, ...ideas];
     const uniqueRecipes = [];
     const seenIds = new Set();
 

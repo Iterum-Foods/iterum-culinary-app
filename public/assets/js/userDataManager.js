@@ -567,13 +567,22 @@ class UserDataManager {
     localStorage.setItem(`${dataType}_${userId}`, JSON.stringify(data));
   }
 
-  // Get user's ingredients
+  // Get user's ingredients for the active project (no Master fallback)
   getUserIngredients() {
+    if (window.projectManager && window.projectManager.getProjectStorageKey) {
+      return window.projectManager.readProjectList
+        ? window.projectManager.readProjectList('ingredients')
+        : [];
+    }
     return this.getUserData('ingredients') || [];
   }
 
-  // Save user's ingredients
+  // Save user's ingredients for the active project and mirror ingredients_database
   saveUserIngredients(ingredients) {
+    if (window.projectManager && window.projectManager.writeProjectList) {
+      window.projectManager.writeProjectList('ingredients', ingredients || []);
+      return;
+    }
     this.saveUserData('ingredients', ingredients);
   }
 

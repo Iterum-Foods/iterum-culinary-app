@@ -63,6 +63,9 @@
 
             <!-- Quick Actions -->
             <div style="display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap;">
+                <button type="button" data-import-from-master hidden style="display:none" onclick="window.projectManager && window.projectManager.showImportFromMasterModal()" class="btn btn-secondary">
+                    <span>Import from Master</span>
+                </button>
                 <button type="button" onclick="window.baseIngredientsLoader.showImportModal()" class="btn btn-primary">
                     <span>Import base database</span>
                 </button>
@@ -345,6 +348,17 @@
             // Load ingredients FIRST
             await loadIngredientsDatabase();
 
+            document.addEventListener('projectChanged', function () {
+                window._loadedIngredients = null;
+                const list = activeIngredientList();
+                window._loadedIngredients = list;
+                displayIngredients(list);
+                updateStats(list);
+                if (window.projectManager && window.projectManager.updateImportFromMasterButtons) {
+                    window.projectManager.updateImportFromMasterButtons();
+                }
+            });
+
             if (window.iterumIngredientCostHints) {
                 await window.iterumIngredientCostHints.refreshOverrides();
             }
@@ -365,8 +379,38 @@
             console.log('✅ Auth ready');
         }
 
+        function activeIngredientList() {
+            if (window.projectManager && window.projectManager.readProjectList) {
+                return window.projectManager.readProjectList('ingredients');
+            }
+            const stored = localStorage.getItem('ingredients_database') || localStorage.getItem('ingredients') || '[]';
+            try {
+                const parsed = JSON.parse(stored);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
         async function loadIngredientsDatabase() {
             console.log('🥬 Loading Ingredients Database...');
+            if (window.projectManager && window.projectManager.syncIngredientMirrorFromProject) {
+                window.projectManager.syncIngredientMirrorFromProject();
+            }
+
+            const pm = window.projectManager;
+            const namedProject = pm && pm.currentProject && !pm.isMasterProject(pm.currentProject);
+            const cached = activeIngredientList();
+            if (cached.length > 0) {
+                window._loadedIngredients = cached;
+                updateStats(cached);
+                return;
+            }
+            if (namedProject) {
+                window._loadedIngredients = [];
+                updateStats([]);
+                return;
+            }
             
             // Check if ingredients already exist in localStorage
             const storedIngredients = localStorage.getItem('ingredients_database') || localStorage.getItem('ingredients');
@@ -559,25 +603,9 @@
         }
 
         function loadIngredients() {
-            // Load ingredients from localStorage or global variable
-            let ingredients = null;
-            if (window._loadedIngredients && Array.isArray(window._loadedIngredients)) {
-                ingredients = window._loadedIngredients;
-                console.log(`📊 Using cached ingredients from memory: ${ingredients.length}`);
-            } else {
-                const stored = localStorage.getItem('ingredients_database') || localStorage.getItem('ingredients');
-                ingredients = stored ? JSON.parse(stored) : [];
-                
-                // Fallback to old key if database is empty
-                if (!ingredients || ingredients.length === 0) {
-                    const oldKey = localStorage.getItem('ingredients');
-                    ingredients = oldKey ? JSON.parse(oldKey) : [];
-                }
-                
-                // Store in global for future use
-                window._loadedIngredients = ingredients;
-                console.log(`📊 Loaded ${ingredients.length} ingredients from localStorage`);
-            }
+            let ingredients = activeIngredientList();
+            window._loadedIngredients = ingredients;
+            console.log(`📊 Loaded ${ingredients.length} ingredients for the active project`);
             
             if (!ingredients || !Array.isArray(ingredients)) {
                 console.warn('⚠️ Invalid ingredients data, resetting to empty array');
@@ -625,14 +653,8 @@
                 gridBtn.classList.remove('btn-primary');
             }
             
-            // Reload ingredients in the current view
-            let ingredients = null;
-            if (window._loadedIngredients && Array.isArray(window._loadedIngredients)) {
-                ingredients = window._loadedIngredients;
-            } else {
-                const stored = localStorage.getItem('ingredients_database') || localStorage.getItem('ingredients');
-                ingredients = stored ? JSON.parse(stored) : [];
-            }
+            const ingredients = activeIngredientList();
+            window._loadedIngredients = ingredients;
             displayIngredients(ingredients);
         }
 

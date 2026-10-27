@@ -196,6 +196,148 @@
     }
   };
 
+  function isMasterWorkspaceName(name) {
+    return !name || /^master project$/i.test(String(name).trim());
+  }
+
+  /** Bartender / bar lead board vs chef board. Solo workspace only. */
+  global.iterumIsBarBoard = function () {
+    var membership = global.iterumMembership;
+    var raw = membership && membership.rawRole;
+    if (raw === 'bartender' || raw === 'bar_manager') return true;
+    var role =
+      typeof global.iterumGetEffectiveRoleKey === 'function'
+        ? global.iterumGetEffectiveRoleKey()
+        : '';
+    if (role === 'bartender' || role === 'bar_manager') return true;
+    var profile = parseProfile();
+    if (
+      profile &&
+      (profile.roleKey === 'bartender' ||
+        profile.roleKey === 'bar_manager' ||
+        profile.board === 'bar')
+    ) {
+      return true;
+    }
+    try {
+      var pm = global.projectManager;
+      var project =
+        (pm && pm.currentProject) ||
+        (pm && typeof pm.getActiveProject === 'function'
+          ? pm.getActiveProject()
+          : null);
+      if (project) {
+        var tags = Array.isArray(project.tags) ? project.tags.join(' ') : '';
+        var blob = [project.type, project.venue, project.trade, project.board, tags]
+          .join(' ')
+          .toLowerCase();
+        if (/\bbar\b|bartender|cocktail/.test(blob)) return true;
+      }
+    } catch (e) {
+      /* ignore */
+    }
+    return false;
+  };
+
+  global.iterumResolveWorkspaceDisplayName = function (explicit) {
+    var candidates = [];
+    if (explicit) candidates.push(explicit);
+    try {
+      var pm = global.projectManager;
+      if (pm) {
+        if (pm.currentProject && pm.currentProject.name) {
+          candidates.push(pm.currentProject.name);
+        }
+        if (pm.currentProjectName) candidates.push(pm.currentProjectName);
+        if (typeof pm.preferSoloWorkspace === 'function') {
+          var solo = pm.preferSoloWorkspace();
+          if (solo && solo.name) candidates.push(solo.name);
+        }
+      }
+      var stored = global.localStorage.getItem('active_project_name');
+      if (stored) candidates.push(stored);
+    } catch (e) {
+      /* ignore */
+    }
+    for (var i = 0; i < candidates.length; i++) {
+      var name = String(candidates[i] || '').trim();
+      if (name && !isMasterWorkspaceName(name)) return name;
+    }
+    return global.iterumIsBarBoard() ? 'Your bar' : 'Your kitchen';
+  };
+
+  global.applyDashboardWorkspaceHero = function (explicitName) {
+    var bar = global.iterumIsBarBoard();
+    var name = global.iterumResolveWorkspaceDisplayName(explicitName);
+    var header = document.getElementById('dash-header-title');
+    if (header) header.textContent = name;
+    var sub = document.getElementById('dash-header-subtitle');
+    if (sub) sub.textContent = bar ? 'Bar board' : 'Chef board';
+    var projectChip = document.getElementById('header-project-chip');
+    if (projectChip) projectChip.textContent = 'Project: ' + name;
+    applyGoldenPathLabels(bar);
+    applyNextStepFallback(bar);
+    return name;
+  };
+
+  function applyGoldenPathLabels(bar) {
+    var rail = document.getElementById('dash-golden-path');
+    if (!rail) return;
+    var links = rail.querySelectorAll('a[data-chef-label]');
+    for (var i = 0; i < links.length; i++) {
+      var link = links[i];
+      var label = bar
+        ? link.getAttribute('data-bar-label')
+        : link.getAttribute('data-chef-label');
+      var href = bar
+        ? link.getAttribute('data-bar-href')
+        : link.getAttribute('data-chef-href');
+      var span = link.querySelector('span');
+      if (span && label) span.textContent = label;
+      if (href) link.setAttribute('href', href);
+    }
+  }
+
+  function applyNextStepFallback(bar) {
+    var copy = document.getElementById('dash-next-fallback-copy');
+    var cta = document.getElementById('dash-next-fallback-cta');
+    if (bar) {
+      if (copy) {
+        copy.textContent =
+          'Open the bar program and check the well before service.';
+      }
+      if (cta) {
+        cta.textContent = 'Open bar program';
+        cta.setAttribute('href', 'bar-ops.html');
+      }
+    } else {
+      if (copy) {
+        copy.textContent = 'Open your recipes and keep this workspace moving.';
+      }
+      if (cta) {
+        cta.textContent = 'Open recipes';
+        cta.setAttribute('href', 'recipe-library.html');
+      }
+    }
+  }
+
+  function setHeaderPrimaryCta(cta, bar) {
+    if (!cta) return;
+    var href = bar ? 'bar-ops.html' : 'recipe-library.html';
+    var label = bar ? 'Open bar program' : 'Open recipes';
+    var icon = bar ? 'fa-martini-glass-citrus' : 'fa-book-open';
+    cta.innerHTML =
+      '<i class="fa-solid ' + icon + '" aria-hidden="true"></i> ' + label;
+    if (cta.tagName === 'A') {
+      cta.setAttribute('href', href);
+      cta.onclick = null;
+    } else {
+      cta.onclick = function () {
+        global.location.href = href;
+      };
+    }
+  }
+
   /**
    * Toggle [data-dash-roles] cards. Role must appear in comma-list, or list contains "all".
    * Cards without attribute are always shown.
@@ -232,35 +374,7 @@
       }
     }
 
-    var header = document.getElementById('dash-header-title');
-    var sub = document.getElementById('dash-header-subtitle');
-    if (header) {
-      var labels = {
-        chef_leadership: {
-          t: 'Kitchen & R&D board',
-          s: 'Ideas, recipe experiments, and line-ready compliance in one calm view.'
-        },
-        operations_gm: {
-          t: 'Operations command',
-          s: 'Ship the shift: tasks first, then temps, sanitizer, and handoffs to the kitchen hub.'
-        },
-        purchasing: {
-          t: 'Purchasing & cost desk',
-          s: 'Keep vendor, ingredient, and menu math one tap away—tasks and notes stay below.'
-        },
-        consultant_rd: {
-          t: 'Consultant / R&D desk',
-          s: 'Protect deep work: shortcuts to dev tools, ideas, and a lighter compliance surface.'
-        },
-        employee_line: {
-          t: 'Team compliance',
-          s: 'Log temps, sanitizer, and shift tasks for this venue—admin sets templates and reviews.'
-        }
-      };
-      var L = labels[role] || labels.chef_leadership;
-      header.textContent = L.t;
-      if (sub) sub.textContent = L.s;
-    }
+    global.applyDashboardWorkspaceHero();
 
     var ROLE_BADGE_LABELS = {
       chef_leadership: 'Kitchen lead',
@@ -279,6 +393,11 @@
       }
     }
 
+    if (badge && global.iterumIsBarBoard()) {
+      var rawRole = global.iterumMembership && global.iterumMembership.rawRole;
+      badge.textContent = rawRole === 'bar_manager' ? 'Bar lead' : 'Bartender';
+      badge.style.display = 'inline-flex';
+    }
     var ideasCol = document.getElementById('quick-stat-ideas-col');
     var statGrid = document.getElementById('quick-stat-grid');
     if (ideasCol && statGrid) {
@@ -299,39 +418,14 @@
 
     var chip = document.getElementById('dash-scope-chip');
     if (chip) {
-      if (p && p.scope) {
-        chip.textContent =
-          p.scope === 'restaurant_group'
-            ? 'Organization: restaurant group'
-            : 'Organization: single venue';
-        chip.style.display = '';
-      } else {
-        chip.style.display = 'none';
-      }
+      chip.textContent = '';
+      chip.style.display = 'none';
     }
 
-    var cta = document.getElementById('dash-header-primary-cta');
-    if (cta) {
-      if (role === 'purchasing') {
-        cta.innerHTML =
-          '<i class="fa-solid fa-store mr-2" aria-hidden="true"></i>Open vendors';
-        cta.onclick = function () {
-          global.location.href = 'vendor-management.html';
-        };
-      } else if (role === 'operations_gm' || role === 'employee_line') {
-        cta.innerHTML =
-          '<i class="fa-solid fa-kitchen-set mr-2" aria-hidden="true"></i>Kitchen hub';
-        cta.onclick = function () {
-          global.location.href = 'kitchen-management.html';
-        };
-      } else {
-        cta.innerHTML =
-          '<i class="fa-solid fa-plus mr-2" aria-hidden="true"></i>New experiment';
-        cta.onclick = function () {
-          global.location.href = 'recipe-developer.html';
-        };
-      }
-    }
+    setHeaderPrimaryCta(
+      document.getElementById('dash-header-primary-cta'),
+      global.iterumIsBarBoard()
+    );
 
     if (typeof global.applyDashboardFeatureVisibility === 'function') {
       global.applyDashboardFeatureVisibility();

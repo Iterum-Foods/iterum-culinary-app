@@ -72,6 +72,7 @@
       var snap = await fs.getDoc(ref);
       if (!snap.exists()) return local;
       var cloud = normalizeState(snap.data());
+      if (!cloud.items.length && local.items.length) return local;
       saveLocal(pid, cloud);
       return cloud;
     } catch (e) {
@@ -83,15 +84,22 @@
     var clean = normalizeState(state);
     saveLocal(pid, clean);
     if (!db || !pid) return clean;
-    var fs = await import(
-      'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js'
-    );
-    var ref = fs.doc(db, 'projects', pid, 'snapshots', PACK_DOC);
-    await fs.setDoc(
-      ref,
-      Object.assign({}, clean, { updatedAt: fs.serverTimestamp() }),
-      { merge: true }
-    );
+    try {
+      var fs = await import(
+        'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js'
+      );
+      var ref = fs.doc(db, 'projects', pid, 'snapshots', PACK_DOC);
+      await fs.setDoc(
+        ref,
+        Object.assign({}, clean, { updatedAt: fs.serverTimestamp() }),
+        { merge: true }
+      );
+    } catch (e) {
+      var err = e instanceof Error ? e : new Error(String(e || 'Cloud save failed'));
+      err.localSaved = true;
+      err.savedState = clean;
+      throw err;
+    }
     return clean;
   }
 

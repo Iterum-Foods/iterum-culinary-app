@@ -110,16 +110,16 @@
       gap: 0.5rem;
       padding: 0.75rem 1rem;
       border-radius: var(--radius-md);
-      background-color: hsl(210 40% 98%);
-      border: 1px solid hsl(215 20% 88%);
+      background-color: hsl(var(--tc-card));
+      border: 1px solid hsl(var(--tc-border));
       transition: background-color 0.2s, border-color 0.2s;
       text-decoration: none;
-      color: hsl(222 47% 11%);
+      color: hsl(var(--tc-foreground));
     }
 
     .op-link:hover {
-      background-color: #ffffff;
-      border-color: hsl(215 16% 70%);
+      background-color: hsl(var(--tc-muted));
+      border-color: hsl(var(--tc-primary) / 0.35);
     }
 
     /* Task and Idea Styling */
@@ -145,21 +145,22 @@
     textarea, input[type="text"], input[type="date"], input[type="number"], select {
       width: 100%;
       border-radius: var(--radius-md);
-      border: 1px solid hsl(214 20% 80%);
-      background: #ffffff;
-      color: hsl(222 47% 11%);
+      border: 1px solid hsl(var(--tc-border));
+      background: hsl(var(--tc-card));
+      color: hsl(var(--tc-foreground));
       padding: 0.625rem;
       font-family: inherit;
       font-size: 0.875rem;
     }
 
     textarea::placeholder, input::placeholder {
-      color: hsl(215 16% 55%);
+      color: hsl(var(--tc-muted-foreground));
       opacity: 1;
     }
 
-    textarea:focus, input:focus, select:focus {
-      outline: none;
+    textarea:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid hsl(var(--tc-ring));
+      outline-offset: 2px;
       border-color: hsl(var(--tc-primary) / 0.55);
       box-shadow: 0 0 0 3px hsl(var(--tc-primary) / 0.12);
     }
@@ -224,11 +225,11 @@
       gap: 0.75rem;
       padding: 0.65rem 0;
       margin: -0.25rem 0 1rem;
-      border-bottom: 1px solid hsl(215 20% 88%);
+      border-bottom: 1px solid hsl(var(--tc-border));
       position: sticky;
       top: 0;
       z-index: 20;
-      background: linear-gradient(180deg, hsl(210 40% 96.5%) 88%, transparent);
+      background: linear-gradient(180deg, hsl(var(--tc-background)) 88%, transparent);
     }
     @media (min-width: 768px) {
       .dash-mobile-strip { display: none; }
@@ -246,7 +247,7 @@
       cursor: pointer;
     }
     .dash-menu-btn:focus-visible {
-      outline: 2px solid var(--brand-primary-accent);
+      outline: 3px solid hsl(var(--tc-ring));
       outline-offset: 2px;
     }
     header.dash-page-header {
@@ -268,28 +269,28 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      background: hsl(210 40% 96%);
-      color: hsl(215 16% 40%);
+      background: hsl(var(--tc-accent-soft));
+      color: hsl(var(--tc-primary));
       border: none;
     }
     .dash-list-well {
       border-radius: 0.5rem;
-      background: hsl(210 40% 98% / 0.9);
-      border: none;
+      background: hsl(var(--tc-muted) / 0.45);
+      border: 1px solid hsl(var(--tc-border) / 0.45);
       padding: 0.15rem 0.35rem;
       max-height: 15rem;
       overflow-y: auto;
     }
     .dash-list-well > * + * {
-      border-top: 1px solid hsl(215 20% 92%);
+      border-top: 1px solid hsl(var(--tc-border) / 0.55);
     }
     .dash-hint {
       font-size: 0.75rem;
       line-height: 1.45;
       padding: 0.5rem 0.65rem;
       border-radius: var(--radius-md);
-      background: hsl(210 40% 98%);
-      color: hsl(215 16% 35%);
+      background: hsl(var(--tc-muted));
+      color: hsl(var(--tc-muted-foreground));
       margin-bottom: 0.75rem;
       border: none;
     }
@@ -307,8 +308,8 @@
       text-align: center;
       padding: 0.65rem 0.35rem;
       border-radius: var(--radius-md);
-      background: hsl(210 40% 98%);
-      border: none;
+      background: hsl(var(--tc-muted) / 0.55);
+      border: 1px solid hsl(var(--tc-border) / 0.45);
     }
     .purchasing-tile {
       display: flex;
@@ -317,19 +318,19 @@
       gap: 0.75rem;
       padding: 0.85rem 1rem;
       border-radius: var(--radius-md);
-      background: hsl(210 40% 98%);
-      border: 1px solid hsl(215 20% 88%);
+      background: hsl(var(--tc-card));
+      border: 1px solid hsl(var(--tc-border));
       text-decoration: none;
-      color: hsl(222 47% 11%);
+      color: hsl(var(--tc-foreground));
       transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
     }
     .purchasing-tile:hover {
-      border-color: hsl(215 16% 70%);
-      background: #ffffff;
-      box-shadow: 0 1px 2px hsl(215 28% 17% / 0.06);
+      border-color: hsl(var(--tc-accent) / 0.35);
+      background: hsl(var(--tc-accent-soft) / 0.55);
+      box-shadow: none;
     }
     .purchasing-tile:focus-visible {
-      outline: 2px solid hsl(160 84% 39%);
+      outline: 3px solid hsl(var(--tc-ring));
       outline-offset: 2px;
     }
     .dash-stack {
@@ -338,7 +339,7 @@
       gap: 0.5rem;
     }
     #dash-header-primary-cta:focus-visible {
-      outline: 2px solid var(--brand-secondary-accent);
+      outline: 3px solid hsl(var(--tc-ring));
       outline-offset: 2px;
     }
     #task-form {
@@ -416,613 +417,573 @@
         </button>
       </div>
       
-      <!-- Header -->
-      <header class="dash-page-header tc-page-hero mb-5">
+      <!-- Header: workspace identity -->
+      <header class="dash-page-header tc-page-hero dash-identity">
         <div class="dash-header-layout">
           <div class="dash-header-copy">
-            <p class="dash-header-eyebrow">Iterum Culinary OS · Operations</p>
+            <p class="dash-header-eyebrow">Your workspace</p>
             <div class="dash-header-title-row">
-              <h1 id="dash-header-title" class="tc-page-hero__title dash-header-title">Kitchen &amp; R&amp;D board</h1>
+              <h1 id="dash-header-title" class="tc-page-hero__title dash-header-title">Your kitchen</h1>
               <span id="dash-role-badge" class="dash-role-badge" style="display:none;" title="Your workspace role"></span>
             </div>
-            <p id="dash-header-subtitle" class="tc-page-hero__desc dash-header-subtitle">Priorities, experiments, and line-ready compliance for today’s service.</p>
+            <p id="dash-header-subtitle" class="tc-page-hero__desc dash-header-subtitle">Chef board</p>
             <div class="dash-header-meta">
               <div id="dash-scope-chip" class="dash-meta-chip" style="display:none;" title="From workspace setup"></div>
-              <div id="header-project-chip" class="dash-meta-chip">Project: Master Project</div>
+              <div id="header-project-chip" class="dash-meta-chip">Project: Your kitchen</div>
               <div class="dash-date-field">
                 <label for="dashboard-date">Working date</label>
                 <input type="date" id="dashboard-date" class="dash-date-input">
               </div>
             </div>
           </div>
-          <button type="button" id="dash-header-primary-cta" class="tc-btn tc-btn-accent dash-header-cta">
-            <i class="fa-solid fa-plus" aria-hidden="true"></i>New experiment
-          </button>
+          <a id="dash-header-primary-cta" class="tc-btn tc-btn-accent dash-header-cta" href="recipe-library.html">
+            <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+            Open recipes
+          </a>
         </div>
       </header>
 
       <div id="workspace-save-indicator-root" data-workspace-save-indicator aria-label="Active workspace and cloud save status"></div>
       <div data-workspace-identity hidden></div>
 
-      <div class="tc-stat-grid mb-6" id="dash-top-stat-grid" aria-label="At a glance">
-        <article class="tc-card tc-stat-card">
-          <div class="tc-stat-card__row">
-            <div>
-              <div class="tc-stat-card__label">Open tasks</div>
-              <p class="tc-stat-card__value m-0"><span data-dash-stat="tasks" id="quick-stat-tasks">0</span></p>
-              <p class="tc-stat-card__delta m-0">Due on working date</p>
-            </div>
-            <span class="tc-stat-card__icon" aria-hidden="true"><i class="fa-solid fa-list-check"></i></span>
-          </div>
-        </article>
-        <article class="tc-card tc-stat-card" id="dash-top-stat-ideas" data-dash-roles="chef_leadership,consultant_rd" data-dash-features="recipes">
-          <div class="tc-stat-card__row">
-            <div>
-              <div class="tc-stat-card__label">Ideas queued</div>
-              <p class="tc-stat-card__value m-0"><span data-dash-stat="ideas" id="quick-stat-ideas">0</span></p>
-              <p class="tc-stat-card__delta m-0">Culinary idea pad</p>
-            </div>
-            <span class="tc-stat-card__icon" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></span>
-          </div>
-        </article>
-        <article class="tc-card tc-stat-card">
-          <div class="tc-stat-card__row">
-            <div>
-              <div class="tc-stat-card__label">Days logged</div>
-              <p class="tc-stat-card__value m-0"><span data-dash-stat="notes" id="quick-stat-notes">0</span></p>
-              <p class="tc-stat-card__delta m-0">Daily &amp; manager notes</p>
-            </div>
-            <span class="tc-stat-card__icon" aria-hidden="true"><i class="fa-solid fa-book"></i></span>
-          </div>
-        </article>
-        <article class="tc-card tc-stat-card">
-          <div class="tc-stat-card__row">
-            <div>
-              <div class="tc-stat-card__label">Shift tools</div>
-              <p class="tc-stat-card__value m-0" style="font-size: 1.35rem;">HACCP</p>
-              <p class="tc-stat-card__delta m-0"><a href="mobile-compliance.html" class="tc-link-accent">Open compliance →</a></p>
-            </div>
-            <span class="tc-stat-card__icon tc-stat-card__icon--warning" aria-hidden="true"><i class="fa-solid fa-thermometer-half"></i></span>
-          </div>
-        </article>
-      </div>
+      <div class="dash-flow">
 
-      <div class="card-style mb-5 lg:col-span-2" data-dash-roles="employee_line">
-        <div class="dash-card-head">
-          <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-            <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-clipboard-check"></i></span>
-            Primary workflow
-          </h2>
+      <section class="dash-section" aria-labelledby="dash-h-next">
+        <h2 id="dash-h-next" class="dash-section-title">Next step</h2>
+        <div class="dash-next-card" id="pantry-starter-card">
+          <p id="pantry-starter-copy" class="dash-next-job">Add what you buy and opening counts before menu costing.</p>
+          <a class="tc-btn tc-btn-accent dash-next-cta" href="stock-setup.html">Stock your kitchen</a>
         </div>
-        <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-          Log temps, sanitizer, prep, and shift notes on the device you carry on the line.
-        </p>
-        <a href="mobile-compliance.html" class="tc-btn tc-btn-accent inline-flex items-center gap-2 py-2.5 px-4 text-sm">
-          <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
-          Open shift tools
-        </a>
-      </div>
+        <div class="dash-next-card" id="dash-next-fallback" hidden>
+          <p id="dash-next-fallback-copy" class="dash-next-job">Open your recipes and keep this workspace moving.</p>
+          <a id="dash-next-fallback-cta" class="tc-btn tc-btn-accent dash-next-cta" href="recipe-library.html">Open recipes</a>
+        </div>
+      </section>
 
-      <!-- Grid Layout for Cards: 2 equal columns with better spacing -->
-      <div class="dash-board-grid">
+      <nav class="dash-path-rail" id="dash-golden-path" aria-label="Golden path">
+        <ol>
+          <li>
+            <a href="stock-setup.html" data-chef-href="stock-setup.html" data-chef-label="Stock" data-bar-href="bar-ops.html" data-bar-label="Well">
+              <i class="fa-solid fa-boxes-stacked" aria-hidden="true"></i>
+              <span>Stock</span>
+            </a>
+          </li>
+          <li>
+            <a href="recipe-library.html" data-chef-href="recipe-library.html" data-chef-label="Recipes" data-bar-href="recipe-library.html" data-bar-label="Cocktails">
+              <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+              <span>Recipes</span>
+            </a>
+          </li>
+          <li>
+            <a href="menu-builder.html" data-chef-href="menu-builder.html" data-chef-label="Menu" data-bar-href="bar-ops.html" data-bar-label="Program">
+              <i class="fa-solid fa-utensils" aria-hidden="true"></i>
+              <span>Menu</span>
+            </a>
+          </li>
+          <li>
+            <a href="mobile-compliance.html" data-chef-href="mobile-compliance.html" data-chef-label="Shift" data-bar-href="mobile-compliance.html" data-bar-label="Shift">
+              <i class="fa-solid fa-mobile-screen" aria-hidden="true"></i>
+              <span>Shift</span>
+            </a>
+          </li>
+          <li>
+            <a href="archive-hub.html" data-chef-href="archive-hub.html" data-chef-label="Archive" data-bar-href="archive-hub.html" data-bar-label="Archive">
+              <i class="fa-solid fa-box-archive" aria-hidden="true"></i>
+              <span>Archive</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
 
-        <div class="lg:col-span-2 card-style" id="workspace-positions-card">
+      <section class="dash-section" aria-labelledby="dash-h-develop">
+        <h2 id="dash-h-develop" class="dash-section-title">Develop</h2>
+        <div class="dash-develop-grid">
+          <a class="dash-develop-tile" href="stock-setup.html">
+            <i class="fa-solid fa-warehouse" aria-hidden="true"></i>
+            <span>Stock</span>
+          </a>
+          <a class="dash-develop-tile" href="recipe-library.html">
+            <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+            <span>Recipes</span>
+          </a>
+          <a class="dash-develop-tile" href="dish-creator.html">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            <span>Dish creator</span>
+          </a>
+          <a class="dash-develop-tile" href="menu-builder.html">
+            <i class="fa-solid fa-utensils" aria-hidden="true"></i>
+            <span>Menu builder</span>
+          </a>
+          <a class="dash-develop-tile" href="bar-ops.html">
+            <i class="fa-solid fa-martini-glass-citrus" aria-hidden="true"></i>
+            <span>Bar program</span>
+          </a>
+          <a class="dash-develop-tile" href="order-guides.html">
+            <i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>
+            <span>Order guides</span>
+          </a>
+          <a class="dash-develop-tile" href="vendor-management.html">
+            <i class="fa-solid fa-store" aria-hidden="true"></i>
+            <span>Vendors</span>
+          </a>
+        </div>
+
+        <div class="card-style" data-dash-roles="chef_leadership,operations_gm,consultant_rd,location_manager,account_admin" data-dash-features="menus">
+          <div id="menu-launch-checklist-dashboard"></div>
+        </div>
+
+        <details class="dash-more">
+          <summary>Bar drafts and checklists</summary>
+          <div class="dash-more-body">
+            <div class="card-style" data-dash-roles="account_admin,operations_gm,chef_leadership,location_manager" data-dash-features="bar">
+              <div class="dash-card-head">
+                <h3 class="dash-card-title">
+                  <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-martini-glass-citrus"></i></span>
+                  Bar drink drafts <span class="text-xs font-normal" style="color: var(--brand-text-muted);">(in progress)</span>
+                </h3>
+              </div>
+              <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
+                Drinks captured from the mobile app's Bar tab land here. Review, then <strong>Publish</strong> to push them into the bar pack.
+              </p>
+              <div class="flex flex-wrap gap-2 mb-3">
+                <button type="button" id="bar-drafts-refresh" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
+                  <i class="fa-solid fa-rotate mr-1" aria-hidden="true"></i>Refresh
+                </button>
+                <button type="button" id="bar-drafts-import-wusong" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" title="Import the Wusong sample cocktails as drafts" aria-label="Import Wusong sample cocktails as drafts">
+                  <i class="fa-solid fa-file-import mr-1" aria-hidden="true"></i>Import Wusong sample
+                </button>
+              </div>
+              <div id="bar-drafts-status" class="text-xs mb-2" style="color: var(--brand-text-muted);" aria-live="polite"></div>
+              <div id="bar-drafts-list" class="space-y-2">
+                <p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">Loading…</p>
+              </div>
+            </div>
+
+            <div class="card-style" data-dash-roles="account_admin,operations_gm,chef_leadership,location_manager" data-dash-features="bar">
+              <div class="dash-card-head">
+                <h3 class="dash-card-title">
+                  <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-list-check"></i></span>
+                  Bar checklists
+                </h3>
+              </div>
+              <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
+                Opening, midday, closing, and station stock lists. Edits publish to the mobile Bar tab on <strong>Save</strong>.
+              </p>
+              <div class="flex flex-wrap gap-2 mb-3">
+                <button type="button" id="bar-checklists-refresh" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
+                  <i class="fa-solid fa-rotate mr-1" aria-hidden="true"></i>Refresh
+                </button>
+                <button type="button" id="bar-checklists-import-sample" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" title="Replace the current pack with the sample" aria-label="Import sample bar checklists">
+                  <i class="fa-solid fa-file-import mr-1" aria-hidden="true"></i>Import sample
+                </button>
+                <button type="button" id="bar-checklists-save" class="dash-control-btn text-xs rounded-md shadow-sm text-white hover:opacity-90 transition-opacity" style="background: var(--brand-primary-accent);">
+                  <i class="fa-solid fa-floppy-disk mr-1" aria-hidden="true"></i>Save &amp; publish
+                </button>
+              </div>
+              <div id="bar-checklists-status" class="text-xs mb-2" style="color: var(--brand-text-muted);" aria-live="polite"></div>
+              <div class="grid gap-3 md:grid-cols-2">
+                <div>
+                  <label for="bar-checklist-ta-opening" class="text-xs font-semibold" style="color: var(--brand-text-secondary);">Opening</label>
+                  <textarea id="bar-checklist-ta-opening" rows="8" class="w-full rounded-md border px-3 py-2 mt-1 text-sm" style="border-color: var(--brand-border-light);" placeholder="One item per line"></textarea>
+                </div>
+                <div>
+                  <label for="bar-checklist-ta-midday" class="text-xs font-semibold" style="color: var(--brand-text-secondary);">Midday stock / check</label>
+                  <textarea id="bar-checklist-ta-midday" rows="8" class="w-full rounded-md border px-3 py-2 mt-1 text-sm" style="border-color: var(--brand-border-light);" placeholder="One item per line"></textarea>
+                </div>
+                <div>
+                  <label for="bar-checklist-ta-closing" class="text-xs font-semibold" style="color: var(--brand-text-secondary);">Closing</label>
+                  <textarea id="bar-checklist-ta-closing" rows="8" class="w-full rounded-md border px-3 py-2 mt-1 text-sm" style="border-color: var(--brand-border-light);" placeholder="One item per line"></textarea>
+                </div>
+                <div>
+                  <label for="bar-checklist-ta-station_stock" class="text-xs font-semibold" style="color: var(--brand-text-secondary);">Station stock list</label>
+                  <textarea id="bar-checklist-ta-station_stock" rows="8" class="w-full rounded-md border px-3 py-2 mt-1 text-sm" style="border-color: var(--brand-border-light);" placeholder="One item per line (e.g. Lime juice — par 1 quart)"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section class="dash-section" aria-labelledby="dash-h-shift">
+        <h2 id="dash-h-shift" class="dash-section-title">Shift</h2>
+        <div class="dash-shift-hero card-style">
+          <p class="dash-next-job">Temps, sanitizer, prep, and the line checklist live on Shift.</p>
+          <a class="tc-btn tc-btn-accent dash-next-cta" href="mobile-compliance.html">
+            <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
+            Open Shift
+          </a>
+        </div>
+
+        <details class="dash-more" id="dash-shift-tools">
+          <summary>Temps, sanitizer, and rounds</summary>
+          <div class="dash-more-body">
+            <div id="temperature" class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="compliance">
+              <div class="dash-hint">
+                <strong style="color: var(--brand-text-primary);">HACCP-friendly logging.</strong> Log actual readings on the line; full history sync is expanding—use this board as your daily cue.
+              </div>
+              <div class="flex justify-between items-center mb-3 gap-2">
+                <h3 class="dash-card-title">
+                  <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-temperature-low"></i></span>
+                  Temperature log
+                </h3>
+                <button type="button" onclick="tempLogManager.addUnit()" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" aria-label="Add refrigeration unit">
+                  <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i>Add unit
+                </button>
+              </div>
+              <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
+                Refrigeration units. Cold-holding target ≤ 5°C (≤ 41°F) unless your HACCP plan differs.
+              </p>
+              <ul id="refrigeration-unit-list" class="dash-list-well">
+                <li class="text-center p-4" style="color: var(--brand-text-muted);">Loading Units...</li>
+              </ul>
+            </div>
+
+            <div id="haccp" class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="compliance">
+              <div class="flex justify-between items-center mb-3 gap-2">
+                <h3 class="dash-card-title">
+                  <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-vial-circle-check"></i></span>
+                  Sanitizer checks
+                </h3>
+                <button type="button" onclick="sanitizerLogManager.addLocation()" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" aria-label="Add sanitizer check station">
+                  <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i>Add station
+                </button>
+              </div>
+              <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
+                Check stations you define. Typical test strip range 150–200 PPM—follow your chemical label and health plan.
+              </p>
+              <ul id="sanitizer-location-list" class="dash-list-well">
+                <li class="text-center p-4" style="color: var(--brand-text-muted);">Loading Locations...</li>
+              </ul>
+            </div>
+
+            <div class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="compliance,calendar">
+              <div class="flex justify-between items-center mb-3 gap-2">
+                <h3 class="dash-card-title">
+                  <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-clipboard-check"></i></span>
+                  Health inspection rounds
+                </h3>
+                <button type="button" id="btn-add-inspection-area" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" aria-label="Add health inspection area">
+                  <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i>Add area
+                </button>
+              </div>
+              <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
+                Use <strong>zones</strong> to group areas (line, BOH, FOH). Pick a <strong>program</strong>: inspection, or daily / weekly / monthly cleaning. Set <strong>alarm times</strong> for browser reminders (optional). Saving a completed round logs it for that day on <a href="calendar.html" class="underline font-medium" style="color: var(--brand-primary-accent);">Calendar</a>.
+              </p>
+              <div class="rounded-md p-3 mb-3 dash-list-well">
+                <div class="text-xs font-semibold mb-2" style="color: hsl(var(--tc-foreground));">
+                  <i class="fa-solid fa-clock-rotate-left mr-1" aria-hidden="true"></i>Today’s log (this workspace)
+                </div>
+                <div id="health-today-log-list" class="text-sm space-y-1" style="color: hsl(var(--tc-muted-foreground));">Loading…</div>
+              </div>
+              <div id="inspection-area-list" class="space-y-2">
+                <p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">Loading…</p>
+              </div>
+            </div>
+
+            <div class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="kitchen">
+              <div class="dash-card-head">
+                <h3 class="dash-card-title">
+                  <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-bullseye"></i></span>
+                  Shift focus
+                </h3>
+              </div>
+              <p class="text-sm mb-3 mt-1 leading-relaxed" style="color: var(--brand-text-muted);">Full checklists live in Kitchen management.</p>
+              <p class="font-semibold mb-2 text-sm" style="color: var(--brand-text-secondary);">Quick links</p>
+              <div class="space-y-2">
+                <a href="kitchen-management.html" class="op-link justify-between py-2.5">
+                  <span class="font-medium text-sm">
+                    <i class="fa-solid fa-door-open text-center mr-2" style="color: var(--brand-secondary-accent); width: 16px;" aria-hidden="true"></i>Opening / prep
+                  </span>
+                  <span class="text-xs px-2 py-0.5 rounded-full" style="background-color: var(--brand-bg-tertiary); color: var(--brand-text-secondary);">Kitchen hub</span>
+                </a>
+                <a href="kitchen-management.html" class="op-link justify-between py-2.5">
+                  <span class="font-medium text-sm">
+                    <i class="fa-solid fa-door-closed text-center mr-2" style="color: var(--brand-secondary-accent); width: 16px;" aria-hidden="true"></i>Closing / breakdown
+                  </span>
+                  <span class="text-xs px-2 py-0.5 rounded-full" style="background-color: hsl(var(--tc-accent)); color: hsl(var(--tc-accent-foreground));">Kitchen hub</span>
+                </a>
+                <a href="calendar.html" class="op-link justify-between py-2.5">
+                  <span class="font-medium text-sm">
+                    <i class="fa-solid fa-calendar-days text-center mr-2" style="color: var(--brand-secondary-accent); width: 16px;" aria-hidden="true"></i>Calendar
+                  </span>
+                  <i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i>
+                </a>
+              </div>
+            </div>
+
+            <div class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="compliance">
+              <div id="checklist-dashboard-card"></div>
+            </div>
+
+            <div class="card-style" data-dash-roles="account_admin,operations_gm,chef_leadership,location_manager" data-dash-features="compliance">
+              <div class="dash-card-head">
+                <h3 class="dash-card-title">
+                  <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span>
+                  How-to guides (SOPs)
+                </h3>
+              </div>
+              <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
+                Standard procedures for opening, kitchen, bar, and safety. Publish to the mobile Shift
+                <strong>How-to</strong> tab.
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <a href="sop-hub.html" class="dash-control-btn text-xs rounded-md shadow-sm text-white hover:opacity-90 transition-opacity" style="background: var(--brand-primary-accent); text-decoration: none;">
+                  <i class="fa-solid fa-pen-to-square mr-1" aria-hidden="true"></i>Open SOP Hub
+                </a>
+                <a href="mobile-compliance.html" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary); text-decoration: none;">
+                  <i class="fa-solid fa-mobile-screen mr-1" aria-hidden="true"></i>Shift app
+                </a>
+              </div>
+            </div>
+
+            <div class="card-style" data-dash-roles="chef_leadership,operations_gm,purchasing" data-dash-features="compliance,ingredients,vendors">
+              <div class="dash-card-head">
+                <h3 class="dash-card-title">
+                  <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-triangle-exclamation"></i></span>
+                  Operations exceptions
+                </h3>
+              </div>
+              <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
+                Auto-detected risks: missing specs, stale prices, and failed opening checks.
+              </p>
+              <div id="ops-exception-panel"></div>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section class="dash-section" aria-labelledby="dash-h-scratch">
+        <h2 id="dash-h-scratch" class="dash-section-title">Scratch</h2>
+
+        <div class="tc-stat-grid" id="dash-top-stat-grid" aria-label="At a glance">
+          <article class="tc-card tc-stat-card">
+            <div class="tc-stat-card__row">
+              <div>
+                <div class="tc-stat-card__label">Open tasks</div>
+                <p class="tc-stat-card__value m-0"><span data-dash-stat="tasks" id="quick-stat-tasks">0</span></p>
+                <p class="tc-stat-card__delta m-0">Due on working date</p>
+              </div>
+              <span class="tc-stat-card__icon" aria-hidden="true"><i class="fa-solid fa-list-check"></i></span>
+            </div>
+          </article>
+          <article class="tc-card tc-stat-card" id="dash-top-stat-ideas" data-dash-roles="chef_leadership,consultant_rd" data-dash-features="recipes">
+            <div class="tc-stat-card__row">
+              <div>
+                <div class="tc-stat-card__label">Ideas queued</div>
+                <p class="tc-stat-card__value m-0"><span data-dash-stat="ideas" id="quick-stat-ideas">0</span></p>
+                <p class="tc-stat-card__delta m-0">Culinary idea pad</p>
+              </div>
+              <span class="tc-stat-card__icon" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></span>
+            </div>
+          </article>
+          <article class="tc-card tc-stat-card">
+            <div class="tc-stat-card__row">
+              <div>
+                <div class="tc-stat-card__label">Days logged</div>
+                <p class="tc-stat-card__value m-0"><span data-dash-stat="notes" id="quick-stat-notes">0</span></p>
+                <p class="tc-stat-card__delta m-0">Daily notes</p>
+              </div>
+              <span class="tc-stat-card__icon" aria-hidden="true"><i class="fa-solid fa-book"></i></span>
+            </div>
+          </article>
+        </div>
+
+        <div class="card-style">
           <div class="dash-card-head">
-            <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-              <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-id-badge"></i></span>
-              Your positions
-            </h2>
+            <h3 class="dash-card-title">
+              <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-list-check"></i></span>
+              Daily tasks
+            </h3>
           </div>
           <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-            Default role from workspace setup, plus how you work on each team project. <strong>Team access</strong> is assigned by an admin; your per-project position is saved for you and does not override permissions.
+            Capture the must-do items for today and check them off as you go.
           </p>
-          <div id="workspace-positions-root"></div>
-        </div>
-
-        <!-- COLUMN 1: R&D, IDEAS, AND PERFORMANCE (Left Column) -->
-        <div class="space-y-5">
-          
-          <!-- Card 1.1: Idea Pad (Recipe Ideas - Existing Feature) -->
-          <div class="card-style" data-dash-roles="chef_leadership,consultant_rd" data-dash-features="recipes">
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></span>
-                Culinary Idea Pad
-              </h2>
-            </div>
-            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Sketch out concepts for new dishes or menu themes.
-            </p>
-            
-            <!-- Idea Form -->
-            <form id="idea-form" aria-label="Capture culinary idea">
-              <label class="sr-only" for="idea-title">Idea title</label>
-              <input type="text" id="idea-title" placeholder="Idea title" class="w-full text-sm" aria-label="Idea title">
-              <label class="sr-only" for="idea-notes">Idea notes</label>
-              <textarea id="idea-notes" class="w-full h-28 resize-none text-sm" placeholder="Concept: Deconstructed Beet Wellington. Components: Smoked beet puree, puff pastry shard, foie gras mousse, reduced port wine jus. Theme: Late Autumn Menu." aria-label="Idea notes"></textarea>
-              <div class="idea-actions">
-                <button type="submit" class="btn-primary flex-1">
-                  <i class="fa-solid fa-floppy-disk mr-2"></i>Save Idea
-                </button>
-                <button type="button" id="clear-ideas" class="btn-secondary">
-                  Clear All
-                </button>
-              </div>
-            </form>
-            
-            <!-- Idea List -->
-            <div id="idea-list" class="max-h-64 overflow-y-auto dash-list-well mt-4"></div>
-            <div id="idea-status" class="text-xs mt-2" style="color: var(--brand-text-muted);">No ideas yet</div>
-          </div>
-
-          <!-- Card 1.2: R&D Success Rate (Doughnut Chart) -->
-          <div class="card-style" data-dash-roles="chef_leadership,consultant_rd" data-dash-features="recipes">
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold m-0" style="color: var(--brand-text-primary);">R&amp;D pipeline</h2>
-            </div>
-            <p class="text-sm mb-2 leading-relaxed" style="color: var(--brand-text-muted);">
-              Snapshot of experiments by status (replace with live recipe data when connected).
-            </p>
-            <p class="text-xs mb-3" style="color: var(--brand-text-muted); opacity: 0.9;">Sample breakdown for orientation—not live production KPIs.</p>
-            <div class="chart-container">
-              <canvas id="successRateChart"></canvas>
-            </div>
-          </div>
-
-          <!-- Day 0: ingredients & stock -->
-          <div class="card-style" id="pantry-starter-card" data-dash-roles="chef_leadership,operations_gm,purchasing,consultant_rd" data-dash-features="ingredients,inventory" hidden>
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-carrot"></i></span>
-                Stock your kitchen
-              </h2>
-            </div>
-            <p class="text-sm mb-4 leading-relaxed" style="color: var(--brand-text-muted);">
-              Add what you buy and opening counts before menu costing — about five minutes.
-            </p>
-            <div class="dash-stack">
-              <a href="stock-setup.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-list-check mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Guided setup (ingredients + counts)</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
-              <a href="ingredients.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-book mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Full ingredient library</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
-              <a href="inventory.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-warehouse mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Inventory counts</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
-            </div>
-          </div>
-
-          <!-- Menu launch checklist (E1 guided cycle) -->
-          <div class="card-style" data-dash-roles="chef_leadership,operations_gm,consultant_rd,location_manager,account_admin" data-dash-features="menus">
-            <div id="menu-launch-checklist-dashboard"></div>
-          </div>
-
-          <!-- Consultant: deep-work links -->
-          <div class="card-style" data-dash-roles="consultant_rd" data-dash-features="recipes,menus">
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-compass"></i></span>
-                R&amp;D shortcuts
-              </h2>
-            </div>
-            <p class="text-sm mb-4 leading-relaxed" style="color: var(--brand-text-muted);">Open tools for documentation and experimentation.</p>
-            <div class="dash-stack">
-              <a href="dish-creator.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-plus mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Dish Creator</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
-              <a href="recipe-library.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-book-open mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Recipe index</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
-              <a href="menu-builder.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-utensils mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Menu builder</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
-            </div>
-          </div>
-
-          <!-- Purchasing shortcuts (role: purchasing only) -->
-          <div class="card-style" data-dash-roles="purchasing" data-dash-features="vendors,ingredients">
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-cart-shopping"></i></span>
-                Purchasing &amp; costing
-              </h2>
-            </div>
-            <p class="text-sm mb-4 leading-relaxed" style="color: var(--brand-text-muted);">
-              Cost and supply workflows in fewer taps. Inventory counts live on the Inventory page.
-            </p>
-            <div class="dash-stack">
-              <a href="vendor-management.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-store mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Vendors &amp; pricing</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
-              <a href="ingredients.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-carrot mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Ingredients library</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
-              <a href="spec-library.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-file-lines mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Spec library</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
-              <a href="inventory.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-boxes-stacked mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Inventory</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
-              <a href="menu-builder.html" class="purchasing-tile"><span class="font-medium text-sm"><i class="fa-solid fa-utensils mr-2" style="color: var(--brand-primary-accent);" aria-hidden="true"></i>Menu builder &amp; margins</span><i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i></a>
-            </div>
-          </div>
-
-          <!-- Card 1.3: Daily Tasks (Existing Feature) -->
-          <div class="card-style">
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-list-check"></i></span>
-                Daily tasks
-              </h2>
-            </div>
-            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Capture the must-do items for today and check them off as you go.
-            </p>
-            
-            <!-- Task Form -->
-            <form id="task-form" aria-label="Daily tasks">
-              <label class="sr-only" for="task-input">New task</label>
-              <input type="text" id="task-input" placeholder="Add a task and press Enter" class="text-sm" aria-label="New task">
-              <button type="submit" class="btn-primary text-sm px-3">Add</button>
-            </form>
-            
-            <!-- Task List -->
-            <ul id="task-list" class="max-h-56 overflow-y-auto dash-list-well"></ul>
-            <div id="task-status" class="text-xs mt-2" style="color: var(--brand-text-muted);">Nothing queued</div>
-            
-            <!-- Task Actions -->
-            <div class="flex gap-2 mt-3">
-              <button id="clear-completed" class="btn-ghost dash-control-btn flex-1 text-xs">Clear Completed</button>
-              <button id="reset-tasks" class="btn-ghost dash-control-btn flex-1 text-xs">Reset List</button>
-            </div>
+          <form id="task-form" aria-label="Daily tasks">
+            <label class="sr-only" for="task-input">New task</label>
+            <input type="text" id="task-input" placeholder="Add a task and press Enter" class="text-sm" aria-label="New task">
+            <button type="submit" class="btn-primary text-sm px-3">Add</button>
+          </form>
+          <ul id="task-list" class="max-h-56 overflow-y-auto dash-list-well"></ul>
+          <div id="task-status" class="text-xs mt-2" style="color: var(--brand-text-muted);">Nothing queued</div>
+          <div class="flex gap-2 mt-3">
+            <button id="clear-completed" class="btn-ghost dash-control-btn flex-1 text-xs">Clear Completed</button>
+            <button id="reset-tasks" class="btn-ghost dash-control-btn flex-1 text-xs">Reset List</button>
           </div>
         </div>
 
-        <!-- COLUMN 2: DAILY OPERATIONS, LOGGING, AND EXECUTION (Right Column) -->
-        <div class="space-y-5">
-          
-          <!-- Card 2.1: Dynamic Temperature Log -->
-          <div id="temperature" class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="compliance">
-            <div class="dash-hint">
-              <strong style="color: var(--brand-text-primary);">HACCP-friendly logging.</strong> Log actual readings on the line; full history sync is expanding—use this board as your daily cue.
-            </div>
-            <div class="flex justify-between items-center mb-3 gap-2">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-temperature-low"></i></span>
-                Temperature log
-              </h2>
-              <button type="button" onclick="tempLogManager.addUnit()" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" aria-label="Add refrigeration unit">
-                <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i>Add unit
+        <div class="card-style" data-dash-roles="chef_leadership,consultant_rd" data-dash-features="recipes">
+          <div class="dash-card-head">
+            <h3 class="dash-card-title">
+              <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-lightbulb"></i></span>
+              Culinary idea pad
+            </h3>
+          </div>
+          <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
+            Sketch out concepts for new dishes or menu themes.
+          </p>
+          <form id="idea-form" aria-label="Capture culinary idea">
+            <label class="sr-only" for="idea-title">Idea title</label>
+            <input type="text" id="idea-title" placeholder="Idea title" class="w-full text-sm" aria-label="Idea title">
+            <label class="sr-only" for="idea-notes">Idea notes</label>
+            <textarea id="idea-notes" class="w-full h-28 resize-none text-sm" placeholder="Concept, components, and the menu it belongs on." aria-label="Idea notes"></textarea>
+            <div class="idea-actions">
+              <button type="submit" class="btn-primary flex-1">
+                <i class="fa-solid fa-floppy-disk mr-2" aria-hidden="true"></i>Save Idea
+              </button>
+              <button type="button" id="clear-ideas" class="btn-secondary">
+                Clear All
               </button>
             </div>
-            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Refrigeration units. Cold-holding target ≤ 5°C (≤ 41°F) unless your HACCP plan differs.
-            </p>
-            <ul id="refrigeration-unit-list" class="dash-list-well">
-              <li class="text-center p-4" style="color: var(--brand-text-muted);">Loading Units...</li>
-            </ul>
-          </div>
-          
-          <!-- Card 2.2: Dynamic Sanitizer Check Log -->
-          <div id="haccp" class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="compliance">
-            <div class="flex justify-between items-center mb-3 gap-2">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-vial-circle-check"></i></span>
-                Sanitizer checks
-              </h2>
-              <button type="button" onclick="sanitizerLogManager.addLocation()" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" aria-label="Add sanitizer check station">
-                <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i>Add station
-              </button>
-            </div>
-            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Check stations you define. Typical test strip range 150–200 PPM—follow your chemical label and health plan.
-            </p>
-            <ul id="sanitizer-location-list" class="dash-list-well">
-              <li class="text-center p-4" style="color: var(--brand-text-muted);">Loading Locations...</li>
-            </ul>
-          </div>
+          </form>
+          <div id="idea-list" class="max-h-64 overflow-y-auto dash-list-well mt-4"></div>
+          <div id="idea-status" class="text-xs mt-2" style="color: var(--brand-text-muted);">No ideas yet</div>
+        </div>
 
-          <!-- Health inspection rounds (areas, schedules, checklist → saved to calendar) -->
-          <div class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="compliance,calendar">
-            <div class="flex justify-between items-center mb-3 gap-2">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-clipboard-check"></i></span>
-                Health inspection rounds
-              </h2>
-              <button type="button" id="btn-add-inspection-area" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity shrink-0" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" aria-label="Add health inspection area">
-                <i class="fa-solid fa-plus mr-1" aria-hidden="true"></i>Add area
-              </button>
-            </div>
-            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Use <strong>zones</strong> to group areas (line, BOH, FOH). Pick a <strong>program</strong>: inspection, or daily / weekly / monthly cleaning. Set <strong>alarm times</strong> for browser reminders (optional). Saving a completed round logs it for that day on <a href="calendar.html" class="underline font-medium" style="color: var(--brand-primary-accent);">Calendar</a>.
-            </p>
-            <div class="rounded-md p-3 mb-3" style="background: hsl(210 40% 98%);">
-              <div class="text-xs font-semibold mb-2" style="color: hsl(215 25% 27%);">
-                <i class="fa-solid fa-clock-rotate-left mr-1" aria-hidden="true"></i>Today’s log (this project)
-              </div>
-              <div id="health-today-log-list" class="text-sm space-y-1" style="color: hsl(215 16% 40%);">Loading…</div>
-            </div>
-            <div id="inspection-area-list" class="space-y-2">
-              <p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">Loading…</p>
-            </div>
+        <div class="card-style">
+          <div class="dash-card-head">
+            <h3 class="dash-card-title">
+              <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-note-sticky"></i></span>
+              Shift notes
+            </h3>
           </div>
-
-          <div id="health-area-modal" class="fixed inset-0 z-[10050] hidden flex items-center justify-center p-4" style="background: rgba(15,23,42,0.55);" aria-modal="true" role="dialog">
-            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto" style="border: 1px solid var(--brand-border-light);">
-              <div class="p-4 border-b flex justify-between items-center" style="border-color: var(--brand-border-light);">
-                <h3 id="health-area-modal-title" class="text-lg font-bold m-0" style="color: var(--brand-text-primary);">Add area / program</h3>
-                <button type="button" id="health-area-modal-close" class="text-2xl leading-none px-2" style="color: var(--brand-text-muted);" aria-label="Close">&times;</button>
-              </div>
-              <div class="p-4 space-y-3 text-sm">
-                <div>
-                  <label class="block font-semibold mb-1" for="health-f-zone">Zone</label>
-                  <input id="health-f-zone" type="text" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);" placeholder="e.g. Back of house, Line, FOH">
-                </div>
-                <div>
-                  <label class="block font-semibold mb-1" for="health-f-name">Area name</label>
-                  <input id="health-f-name" type="text" required class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);" placeholder="e.g. Dry storage, Restrooms">
-                </div>
-                <div>
-                  <label class="block font-semibold mb-1" for="health-f-program">Program</label>
-                  <select id="health-f-program" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);">
-                    <option value="inspection">Health inspection round</option>
-                    <option value="cleaning_daily">Daily cleaning</option>
-                    <option value="cleaning_weekly">Weekly cleaning</option>
-                    <option value="cleaning_monthly">Monthly cleaning</option>
-                  </select>
-                  <p id="health-f-program-hint" class="text-xs mt-1" style="color: var(--brand-text-muted);">Checklist below starts from a template—edit freely.</p>
-                </div>
-                <div id="health-f-weekly-wrap" class="hidden">
-                  <label class="block font-semibold mb-1" for="health-f-weekday">Day of week (weekly)</label>
-                  <select id="health-f-weekday" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);">
-                    <option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option>
-                    <option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option>
-                  </select>
-                </div>
-                <div id="health-f-monthly-wrap" class="hidden">
-                  <label class="block font-semibold mb-1" for="health-f-monthday">Day of month (1–31)</label>
-                  <input id="health-f-monthday" type="number" min="1" max="31" value="1" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);">
-                </div>
-                <div>
-                  <label class="block font-semibold mb-1" for="health-f-checklist">Checklist items (one per line)</label>
-                  <textarea id="health-f-checklist" rows="6" class="w-full rounded-md border px-3 py-2 font-mono text-xs" style="border-color: var(--brand-border-light);"></textarea>
-                </div>
-                <div>
-                  <label class="block font-semibold mb-1" for="health-f-times">Reminder times (24h, comma-separated)</label>
-                  <input id="health-f-times" type="text" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);" placeholder="09:00, 15:00, 21:00">
-                </div>
-                <div>
-                  <label class="block font-semibold mb-1" for="health-f-assign">Assigned to (optional)</label>
-                  <input id="health-f-assign" type="text" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);" placeholder="Name or role">
-                </div>
-                <label class="flex items-center gap-2 cursor-pointer" for="health-f-alarm">
-                  <input type="checkbox" id="health-f-alarm" checked>
-                  <span>Browser reminders at the times above (when this tab has been opened and you allow notifications)</span>
-                </label>
-              </div>
-              <div class="p-4 border-t flex justify-end gap-2" style="border-color: var(--brand-border-light);">
-                <button type="button" id="health-area-cancel" class="px-4 py-2 rounded-md text-sm font-medium border" style="border-color: var(--brand-border-light);">Cancel</button>
-                <button type="button" id="health-area-save" class="px-4 py-2 rounded-md text-sm font-bold text-white" style="background: var(--brand-primary-accent);">Save</button>
+          <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
+            Daily notes for this working date. Manager handoff stays with leads.
+          </p>
+          <div class="mb-4">
+            <label for="notes-daily-content" class="block text-xs font-semibold mb-1" style="color: var(--brand-text-secondary);">Daily notes</label>
+            <textarea id="notes-daily-content" class="w-full h-28 resize-none mb-2 text-sm" placeholder="Service wins, 86 list, prep reminders."></textarea>
+            <div id="notes-team-shift-wrap" class="mb-3">
+              <label class="block text-xs font-semibold mb-1" style="color: var(--brand-text-secondary);">From Shift</label>
+              <p class="text-xs mb-1" style="color: var(--brand-text-muted);">Shift and stock notes for this workspace and the working date above.</p>
+              <div id="notes-team-shift-feed" class="text-sm dash-list-well p-2 max-h-52 overflow-y-auto" style="min-height: 2.5rem;">
+                <p class="text-xs" style="color: var(--brand-text-muted);">Loading…</p>
               </div>
             </div>
           </div>
-          
-          <!-- Card 2.3: Today's Operations Focus & Checklists -->
-          <div class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="kitchen">
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-bullseye"></i></span>
-                Shift focus
-              </h2>
+          <div id="notes-manager-section" class="mb-4" hidden aria-hidden="true">
+            <label for="notes-manager-content" class="block text-xs font-semibold mb-1" style="color: var(--brand-text-secondary);">Manager notes (nightly handoff)</label>
+            <p class="text-xs mb-1" style="color: var(--brand-text-muted);">Sensitive handoff — not shown to line-only roles.</p>
+            <textarea id="notes-manager-content" class="w-full h-24 resize-none mb-2 text-sm" placeholder="EOD recap, scheduling, vendor issues — leads and managers only."></textarea>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" id="save-notes" class="btn-primary flex-1 min-w-[8rem] text-sm py-2">Save notes</button>
+            <button type="button" id="clear-notes-daily" class="btn-ghost text-sm py-2 px-3">Clear daily</button>
+            <button type="button" id="clear-notes-manager" class="btn-ghost text-sm py-2 px-3" hidden>Clear handoff</button>
+          </div>
+          <div id="notes-status" class="text-xs mt-2" style="color: var(--brand-text-muted);">No saved notes yet</div>
+        </div>
+
+        <div class="card-style" data-dash-roles="chef_leadership,consultant_rd" data-dash-features="recipes">
+          <div class="dash-card-head">
+            <h3 class="dash-card-title">R&amp;D pipeline</h3>
+          </div>
+          <p class="text-sm mb-2 leading-relaxed" style="color: var(--brand-text-muted);">
+            Snapshot of experiments by status (sample until live recipe data is connected).
+          </p>
+          <p class="text-xs mb-3" style="color: var(--brand-text-muted);">Sample breakdown for orientation—not live production KPIs.</p>
+          <div class="chart-container">
+            <canvas id="successRateChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card-style">
+          <div class="dash-card-head">
+            <h3 class="dash-card-title">At a glance</h3>
+          </div>
+          <p class="text-xs mb-3" style="color: var(--brand-text-muted);">Local to this browser until cloud summaries land.</p>
+          <div id="quick-stat-grid" class="dash-stat-grid cols-3">
+            <div class="dash-stat-tile">
+              <div class="text-xl font-bold" style="color: var(--brand-primary-accent);"><span data-dash-stat="tasks">0</span></div>
+              <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Open tasks</div>
             </div>
-            <p class="text-sm mb-3 mt-1 leading-relaxed" style="color: var(--brand-text-muted);">Full checklists live in Kitchen management.</p>
-            <p class="font-semibold mb-2 text-sm" style="color: var(--brand-text-secondary);">Quick links</p>
-            <div class="space-y-2">
-              <a href="kitchen-management.html" class="op-link justify-between py-2.5">
-                <span class="font-medium text-sm">
-                  <i class="fa-solid fa-door-open text-center mr-2" style="color: var(--brand-secondary-accent); width: 16px;" aria-hidden="true"></i>Opening / prep
-                </span>
-                <span class="text-xs px-2 py-0.5 rounded-full" style="background-color: var(--brand-bg-tertiary); color: var(--brand-text-secondary);">Kitchen hub</span>
-              </a>
-              <a href="kitchen-management.html" class="op-link justify-between py-2.5">
-                <span class="font-medium text-sm">
-                  <i class="fa-solid fa-door-closed text-center mr-2" style="color: var(--brand-secondary-accent); width: 16px;" aria-hidden="true"></i>Closing / breakdown
-                </span>
-                <span class="text-xs px-2 py-0.5 rounded-full text-white" style="background-color: var(--brand-primary-accent);">Kitchen hub</span>
-              </a>
-              <a href="calendar.html" class="op-link justify-between py-2.5">
-                <span class="font-medium text-sm">
-                  <i class="fa-solid fa-calendar-days text-center mr-2" style="color: var(--brand-secondary-accent); width: 16px;" aria-hidden="true"></i>Calendar
-                </span>
-                <i class="fa-solid fa-chevron-right text-xs opacity-50" aria-hidden="true"></i>
-              </a>
+            <div id="quick-stat-ideas-col" class="dash-stat-tile">
+              <div class="text-xl font-bold" style="color: var(--brand-secondary-accent);"><span data-dash-stat="ideas">0</span></div>
+              <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Ideas queued</div>
+            </div>
+            <div class="dash-stat-tile">
+              <div class="text-xl font-bold" style="color: var(--brand-primary-accent);"><span data-dash-stat="notes">0</span></div>
+              <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Days logged</div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div class="card-style" data-dash-roles="chef_leadership,operations_gm,employee_line" data-dash-features="compliance">
-            <div id="checklist-dashboard-card"></div>
+      <section class="dash-section dash-archive" aria-labelledby="dash-h-archive">
+        <h2 id="dash-h-archive" class="dash-section-title">Archive</h2>
+        <p class="dash-next-job">Export this workspace whenever you need a copy you own.</p>
+        <div class="dash-archive-actions">
+          <a class="tc-btn tc-btn-accent dash-next-cta" href="archive-hub.html">Open Archive</a>
+          <a class="tc-btn dash-archive-secondary" href="data-backup-center.html">Backup center</a>
+        </div>
+      </section>
+
+      </div>
+
+      <div id="health-area-modal" class="fixed inset-0 z-[10050] hidden flex items-center justify-center p-4" style="background: hsl(var(--tc-foreground) / 0.55);" aria-modal="true" role="dialog" aria-labelledby="health-area-modal-title">
+        <div class="rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto" style="background: hsl(var(--tc-card)); border: 1px solid var(--brand-border-light);">
+          <div class="p-4 border-b flex justify-between items-center" style="border-color: var(--brand-border-light);">
+            <h3 id="health-area-modal-title" class="text-lg font-bold m-0" style="color: var(--brand-text-primary);">Add area / program</h3>
+            <button type="button" id="health-area-modal-close" class="text-2xl leading-none px-2" style="color: var(--brand-text-muted);" aria-label="Close">&times;</button>
           </div>
-
-          <div class="card-style" data-dash-roles="account_admin,operations_gm,chef_leadership,location_manager" data-dash-features="compliance">
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span>
-                How-to guides (SOPs)
-              </h2>
+          <div class="p-4 space-y-3 text-sm">
+            <div>
+              <label class="block font-semibold mb-1" for="health-f-zone">Zone</label>
+              <input id="health-f-zone" type="text" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);" placeholder="e.g. Back of house, Line, FOH">
             </div>
-            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Standard procedures for opening, kitchen, bar, FOH, and safety. Publish to the mobile Shift
-              <strong>How-to</strong> tab for line staff.
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <a href="sop-hub.html" class="dash-control-btn text-xs rounded-md shadow-sm text-white hover:opacity-90 transition-opacity" style="background: var(--brand-primary-accent); text-decoration: none;">
-                <i class="fa-solid fa-pen-to-square mr-1" aria-hidden="true"></i>Open SOP Hub
-              </a>
-              <a href="mobile-compliance.html" target="_blank" rel="noopener" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary); text-decoration: none;">
-                <i class="fa-solid fa-mobile-screen mr-1" aria-hidden="true"></i>Shift app
-              </a>
+            <div>
+              <label class="block font-semibold mb-1" for="health-f-name">Area name</label>
+              <input id="health-f-name" type="text" required class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);" placeholder="e.g. Dry storage, Restrooms">
             </div>
+            <div>
+              <label class="block font-semibold mb-1" for="health-f-program">Program</label>
+              <select id="health-f-program" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);">
+                <option value="inspection">Health inspection round</option>
+                <option value="cleaning_daily">Daily cleaning</option>
+                <option value="cleaning_weekly">Weekly cleaning</option>
+                <option value="cleaning_monthly">Monthly cleaning</option>
+              </select>
+              <p id="health-f-program-hint" class="text-xs mt-1" style="color: var(--brand-text-muted);">Checklist below starts from a template—edit freely.</p>
+            </div>
+            <div id="health-f-weekly-wrap" class="hidden">
+              <label class="block font-semibold mb-1" for="health-f-weekday">Day of week (weekly)</label>
+              <select id="health-f-weekday" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);">
+                <option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option>
+                <option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option>
+              </select>
+            </div>
+            <div id="health-f-monthly-wrap" class="hidden">
+              <label class="block font-semibold mb-1" for="health-f-monthday">Day of month (1–31)</label>
+              <input id="health-f-monthday" type="number" min="1" max="31" value="1" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);">
+            </div>
+            <div>
+              <label class="block font-semibold mb-1" for="health-f-checklist">Checklist items (one per line)</label>
+              <textarea id="health-f-checklist" rows="6" class="w-full rounded-md border px-3 py-2 font-mono text-xs" style="border-color: var(--brand-border-light);"></textarea>
+            </div>
+            <div>
+              <label class="block font-semibold mb-1" for="health-f-times">Reminder times (24h, comma-separated)</label>
+              <input id="health-f-times" type="text" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);" placeholder="09:00, 15:00, 21:00">
+            </div>
+            <div>
+              <label class="block font-semibold mb-1" for="health-f-assign">Assigned to (optional)</label>
+              <input id="health-f-assign" type="text" class="w-full rounded-md border px-3 py-2" style="border-color: var(--brand-border-light);" placeholder="Name or role">
+            </div>
+            <label class="flex items-center gap-2 cursor-pointer" for="health-f-alarm">
+              <input type="checkbox" id="health-f-alarm" checked>
+              <span>Browser reminders at the times above (when this tab has been opened and you allow notifications)</span>
+            </label>
           </div>
-
-          <div class="card-style" data-dash-roles="account_admin,operations_gm,chef_leadership,location_manager,bar_manager" data-dash-features="compliance">
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-whiskey-glass"></i></span>
-                Bar program
-              </h2>
-            </div>
-            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Service standards, cocktail specs, well inventory, and below-par ordering. Import the Common Craft pack or upload a vendor PDF.
-            </p>
-            <div class="flex flex-wrap gap-2">
-              <a href="bar-ops.html" class="dash-control-btn text-xs rounded-md shadow-sm text-white hover:opacity-90 transition-opacity" style="background: var(--brand-primary-accent); text-decoration: none;">
-                <i class="fa-solid fa-martini-glass-citrus mr-1" aria-hidden="true"></i>Open bar program
-              </a>
-              <a href="price-list-upload.html" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary); text-decoration: none;">
-                Upload price list
-              </a>
-              <a href="order-guides.html" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary); text-decoration: none;">
-                Order guides
-              </a>
-            </div>
+          <div class="p-4 border-t flex justify-end gap-2" style="border-color: var(--brand-border-light);">
+            <button type="button" id="health-area-cancel" class="px-4 py-2 rounded-md text-sm font-medium border" style="border-color: var(--brand-border-light);">Cancel</button>
+            <button type="button" id="health-area-save" class="px-4 py-2 rounded-md text-sm font-bold text-white" style="background: var(--brand-primary-accent);">Save</button>
           </div>
-
-          <div class="card-style" data-dash-roles="account_admin,operations_gm,chef_leadership,location_manager" data-dash-features="bar">
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-martini-glass-citrus"></i></span>
-                Bar drink drafts <span class="text-xs font-normal" style="color: var(--brand-text-muted);">(in progress)</span>
-              </h2>
-            </div>
-            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Drinks captured from the mobile app's Bar tab land here. Review, then <strong>Publish</strong> to push them into the bar pack line staff sees.
-            </p>
-            <div class="flex flex-wrap gap-2 mb-3">
-              <button type="button" id="bar-drafts-refresh" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
-                <i class="fa-solid fa-rotate mr-1" aria-hidden="true"></i>Refresh
-              </button>
-              <button type="button" id="bar-drafts-import-wusong" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" title="Import the Wusong sample cocktails as drafts" aria-label="Import Wusong sample cocktails as drafts">
-                <i class="fa-solid fa-file-import mr-1" aria-hidden="true"></i>Import Wusong sample
-              </button>
-            </div>
-            <div id="bar-drafts-status" class="text-xs mb-2" style="color: var(--brand-text-muted);" aria-live="polite"></div>
-            <div id="bar-drafts-list" class="space-y-2">
-              <p class="text-sm text-center py-3" style="color: var(--brand-text-muted);">Loading…</p>
-            </div>
-          </div>
-
-          <div class="card-style" data-dash-roles="account_admin,operations_gm,chef_leadership,location_manager" data-dash-features="bar">
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-list-check"></i></span>
-                Bar checklists
-              </h2>
-            </div>
-            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Opening, midday, closing, and station stock lists for bartenders. Edits publish to the mobile Bar tab on <strong>Save</strong>.
-            </p>
-            <div class="flex flex-wrap gap-2 mb-3">
-              <button type="button" id="bar-checklists-refresh" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);">
-                <i class="fa-solid fa-rotate mr-1" aria-hidden="true"></i>Refresh
-              </button>
-              <button type="button" id="bar-checklists-import-sample" class="dash-control-btn text-xs rounded-md shadow-sm border hover:opacity-90 transition-opacity" style="border-color: var(--brand-border-light); background-color: var(--brand-bg-primary); color: var(--brand-text-primary);" title="Replace the current pack with the sample" aria-label="Import sample bar checklists">
-                <i class="fa-solid fa-file-import mr-1" aria-hidden="true"></i>Import sample
-              </button>
-              <button type="button" id="bar-checklists-save" class="dash-control-btn text-xs rounded-md shadow-sm text-white hover:opacity-90 transition-opacity" style="background: var(--brand-primary-accent);">
-                <i class="fa-solid fa-floppy-disk mr-1" aria-hidden="true"></i>Save &amp; publish
-              </button>
-            </div>
-            <div id="bar-checklists-status" class="text-xs mb-2" style="color: var(--brand-text-muted);" aria-live="polite"></div>
-            <div class="grid gap-3 md:grid-cols-2">
-              <div>
-                <label for="bar-checklist-ta-opening" class="text-xs font-semibold" style="color: var(--brand-text-secondary);">Opening</label>
-                <textarea id="bar-checklist-ta-opening" rows="8" class="w-full rounded-md border px-3 py-2 mt-1 text-sm" style="border-color: var(--brand-border-light);" placeholder="One item per line"></textarea>
-              </div>
-              <div>
-                <label for="bar-checklist-ta-midday" class="text-xs font-semibold" style="color: var(--brand-text-secondary);">Midday stock / check</label>
-                <textarea id="bar-checklist-ta-midday" rows="8" class="w-full rounded-md border px-3 py-2 mt-1 text-sm" style="border-color: var(--brand-border-light);" placeholder="One item per line"></textarea>
-              </div>
-              <div>
-                <label for="bar-checklist-ta-closing" class="text-xs font-semibold" style="color: var(--brand-text-secondary);">Closing</label>
-                <textarea id="bar-checklist-ta-closing" rows="8" class="w-full rounded-md border px-3 py-2 mt-1 text-sm" style="border-color: var(--brand-border-light);" placeholder="One item per line"></textarea>
-              </div>
-              <div>
-                <label for="bar-checklist-ta-station_stock" class="text-xs font-semibold" style="color: var(--brand-text-secondary);">Station stock list</label>
-                <textarea id="bar-checklist-ta-station_stock" rows="8" class="w-full rounded-md border px-3 py-2 mt-1 text-sm" style="border-color: var(--brand-border-light);" placeholder="One item per line (e.g. Lime juice — par 1 quart)"></textarea>
-              </div>
-            </div>
-          </div>
-
-          <div class="card-style" data-dash-roles="chef_leadership,operations_gm,purchasing" data-dash-features="compliance,ingredients,vendors">
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-triangle-exclamation"></i></span>
-                Operations exceptions
-              </h2>
-            </div>
-            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Auto-detected risks: missing specs, stale prices, and failed opening checks.
-            </p>
-            <div id="ops-exception-panel"></div>
-          </div>
-
-          <div class="card-style">
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-clipboard-list"></i></span>
-                Team prep lists
-              </h2>
-            </div>
-            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Latest prep and stock lists from your team for this project. Managers can leave notes on each list.
-            </p>
-            <div id="manager-prep-board-status" class="text-xs mb-2" style="color: var(--brand-text-muted);">Loading team lists…</div>
-            <div id="manager-prep-board-feed" class="text-sm rounded-md p-2 max-h-[28rem] overflow-y-auto" style="background: hsl(210 40% 98%); min-height: 4rem;">
-              <p class="text-xs" style="color: var(--brand-text-muted);">Loading…</p>
-            </div>
-          </div>
-
-          <!-- Card 2.4: Notes (Existing Feature) -->
-          <div class="card-style">
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold flex items-center gap-2 m-0" style="color: var(--brand-text-primary);">
-                <span class="dash-card-icon" aria-hidden="true"><i class="fa-solid fa-note-sticky"></i></span>
-                Shift notes
-              </h2>
-            </div>
-            <p class="text-sm mb-3 leading-relaxed" style="color: var(--brand-text-muted);">
-              Daily notes are visible to everyone on the team. Manager handoff is for leads only (nightly / EOD).
-            </p>
-            <div class="mb-4">
-              <label for="notes-daily-content" class="block text-xs font-semibold mb-1" style="color: var(--brand-text-secondary);">Daily restaurant notes</label>
-              <p class="text-xs mb-1" style="color: var(--brand-text-muted);">Open channel — line, FOH, anyone on shift.</p>
-              <textarea id="notes-daily-content" class="w-full h-28 resize-none mb-2 text-sm" placeholder="Service wins, 86 list, prep reminders, anything the whole team should see."></textarea>
-              <div id="notes-team-shift-wrap" class="mb-3">
-                <label class="block text-xs font-semibold mb-1" style="color: var(--brand-text-secondary);">From the team (shift app)</label>
-                <p class="text-xs mb-1" style="color: var(--brand-text-muted);">Shift and stock notes for this project and the working date above — updates live.</p>
-                <div id="notes-team-shift-feed" class="text-sm rounded-md p-2 max-h-52 overflow-y-auto" style="background: hsl(210 40% 98%); min-height: 2.5rem;">
-                  <p class="text-xs" style="color: var(--brand-text-muted);">Loading…</p>
-                </div>
-              </div>
-            </div>
-            <div id="notes-manager-section" class="mb-4" hidden aria-hidden="true">
-              <label for="notes-manager-content" class="block text-xs font-semibold mb-1" style="color: var(--brand-text-secondary);">Manager notes (nightly handoff)</label>
-              <p class="text-xs mb-1" style="color: var(--brand-text-muted);">Sensitive handoff — not shown to line-only roles.</p>
-              <textarea id="notes-manager-content" class="w-full h-24 resize-none mb-2 text-sm" placeholder="EOD recap, scheduling, HR, vendor issues — leads and managers only."></textarea>
-            </div>
-            <div class="flex flex-wrap gap-2">
-              <button type="button" id="save-notes" class="btn-primary flex-1 min-w-[8rem] text-sm py-2">Save notes</button>
-              <button type="button" id="clear-notes-daily" class="btn-ghost text-sm py-2 px-3">Clear daily</button>
-              <button type="button" id="clear-notes-manager" class="btn-ghost text-sm py-2 px-3" hidden>Clear handoff</button>
-            </div>
-            <div id="notes-status" class="text-xs mt-2" style="color: var(--brand-text-muted);">No saved notes yet</div>
-          </div>
-
-          <!-- Card 2.5: Quick Stats -->
-          <div class="card-style">
-            <div class="dash-card-head">
-              <h2 class="text-base sm:text-lg font-semibold m-0" style="color: var(--brand-text-primary);">At a glance</h2>
-            </div>
-            <p class="text-xs mb-3" style="color: var(--brand-text-muted);">Local to this browser until cloud summaries land everywhere.</p>
-            <div id="quick-stat-grid" class="dash-stat-grid cols-3">
-              <div class="dash-stat-tile">
-                <div class="text-xl font-bold" style="color: var(--brand-primary-accent);"><span data-dash-stat="tasks">0</span></div>
-                <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Open tasks</div>
-              </div>
-              <div id="quick-stat-ideas-col" class="dash-stat-tile">
-                <div class="text-xl font-bold" style="color: var(--brand-secondary-accent);" ><span data-dash-stat="ideas">0</span></div>
-                <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Ideas queued</div>
-              </div>
-              <div class="dash-stat-tile">
-                <div class="text-xl font-bold" style="color: var(--brand-primary-accent);" ><span data-dash-stat="notes">0</span></div>
-                <div class="text-xs mt-1" style="color: var(--brand-text-muted);">Days logged</div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
+
+      <div id="workspace-positions-card" hidden>
+        <div id="workspace-positions-root"></div>
+      </div>
+      <div id="manager-prep-board-status" hidden>Loading team lists…</div>
+      <div id="manager-prep-board-feed" hidden></div>
     </div>
   </section>
 
@@ -1893,6 +1854,7 @@
         const rAndDData = {
           successRate: { approved: 55, inProgress: 30, archived: 15 }
         };
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         new Chart(ctx.getContext('2d'), {
           type: 'doughnut',
           data: {
@@ -1900,17 +1862,18 @@
             datasets: [{
               data: [rAndDData.successRate.approved, rAndDData.successRate.inProgress, rAndDData.successRate.archived],
               backgroundColor: [
-                'var(--brand-primary-accent)',
-                'var(--brand-secondary-accent)',
-                'var(--brand-text-muted)'
+                'hsl(28 85% 55%)',
+                'hsl(182 38% 20%)',
+                'hsl(180 12% 38%)'
               ],
-              hoverOffset: 15,
+              hoverOffset: reduceMotion ? 0 : 4,
               borderWidth: 0
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: reduceMotion ? false : { duration: 400 },
             cutout: '75%',
             plugins: {
               legend: {
@@ -2003,11 +1966,14 @@
 
       // Load project info
       function updateProjectChips(projectName) {
-        const name = projectName || 'Master Project';
-        const navChip = document.getElementById('nav-project-chip');
+        if (typeof window.applyDashboardWorkspaceHero === 'function') {
+          window.applyDashboardWorkspaceHero(projectName);
+          return;
+        }
+        const name = projectName || 'Your kitchen';
         const headerChip = document.getElementById('header-project-chip');
-        
-        if (navChip) navChip.textContent = `Project: ${name}`;
+        const title = document.getElementById('dash-header-title');
+        if (title && name && name !== 'Master Project') title.textContent = name;
         if (headerChip) headerChip.textContent = `Project: ${name}`;
       }
 

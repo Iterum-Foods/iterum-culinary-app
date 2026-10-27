@@ -29,7 +29,30 @@ class IngredientsManagerEnhanced {
   /**
    * Separate built-in ingredients from user-added products
    */
+  projectIngredientList() {
+    if (window.projectManager?.readProjectList) {
+      return window.projectManager.readProjectList('ingredients');
+    }
+    return null;
+  }
+
+  persistProjectIngredients(all) {
+    const safe = Array.isArray(all) ? all : [];
+    if (window.projectManager?.writeProjectList) {
+      window.projectManager.writeProjectList('ingredients', safe);
+      return;
+    }
+    localStorage.setItem(this.legacyKey, JSON.stringify(safe));
+    localStorage.setItem('ingredients', JSON.stringify(safe));
+  }
+
   async separateIngredients() {
+    if (window.projectManager?.readProjectList) {
+      const projectList = window.projectManager.readProjectList('ingredients');
+      console.log(`📦 Active project ingredients: ${projectList.length}`);
+      return;
+    }
+
     // Load all ingredients from legacy storage
     const allIngredients = JSON.parse(
       localStorage.getItem(this.legacyKey) ||
@@ -75,6 +98,10 @@ class IngredientsManagerEnhanced {
    * Get built-in ingredients
    */
   getBuiltInIngredients() {
+    const projectList = this.projectIngredientList();
+    if (projectList) {
+      return projectList.filter(ing => this.isBuiltIn(ing));
+    }
     const builtIn = JSON.parse(localStorage.getItem(this.builtInKey) || '[]');
 
     // If no built-in found, try to load from base database
@@ -90,6 +117,10 @@ class IngredientsManagerEnhanced {
    * Get custom/user-added ingredients
    */
   getCustomIngredients() {
+    const projectList = this.projectIngredientList();
+    if (projectList) {
+      return projectList.filter(ing => !this.isBuiltIn(ing));
+    }
     return JSON.parse(localStorage.getItem(this.customKey) || '[]');
   }
 
@@ -97,6 +128,10 @@ class IngredientsManagerEnhanced {
    * Get all ingredients (built-in + custom)
    */
   getAllIngredients() {
+    const projectList = this.projectIngredientList();
+    if (projectList) {
+      return projectList.slice();
+    }
     const builtIn = this.getBuiltInIngredients();
     const custom = this.getCustomIngredients();
     return [...builtIn, ...custom];
@@ -117,7 +152,6 @@ class IngredientsManagerEnhanced {
     ingredient.isCustom = true;
     ingredient.dateAdded = ingredient.dateAdded || new Date().toISOString();
 
-    // Get existing custom ingredients
     const custom = this.getCustomIngredients();
 
     // Check for duplicates
@@ -128,18 +162,15 @@ class IngredientsManagerEnhanced {
     );
 
     if (existing) {
-      // Update existing
       Object.assign(existing, ingredient);
     } else {
-      // Add new
       custom.push(ingredient);
     }
 
-    // Save custom ingredients
-    localStorage.setItem(this.customKey, JSON.stringify(custom));
-
-    // Also update legacy key for compatibility
-    this.updateLegacyStorage();
+    const builtIn = this.getBuiltInIngredients().filter(
+      ing => !custom.some(item => item.id === ing.id)
+    );
+    this.persistProjectIngredients([...builtIn, ...custom]);
 
     console.log(`✅ Added custom ingredient: ${ingredient.name}`);
     return ingredient;
@@ -149,26 +180,23 @@ class IngredientsManagerEnhanced {
    * Update custom ingredient
    */
   updateCustomIngredient(ingredientId, updates) {
-    const custom = this.getCustomIngredients();
-    const index = custom.findIndex(ing => ing.id === ingredientId);
+    const all = this.getAllIngredients();
+    const index = all.findIndex(ing => ing.id === ingredientId);
 
     if (index === -1) {
       console.warn(`⚠️ Custom ingredient not found: ${ingredientId}`);
       return false;
     }
 
-    // Update ingredient
-    custom[index] = {
-      ...custom[index],
+    all[index] = {
+      ...all[index],
       ...updates,
       lastModified: new Date().toISOString()
     };
 
-    // Save
-    localStorage.setItem(this.customKey, JSON.stringify(custom));
-    this.updateLegacyStorage();
+    this.persistProjectIngredients(all);
 
-    console.log(`✅ Updated custom ingredient: ${custom[index].name}`);
+    console.log(`✅ Updated custom ingredient: ${all[index].name}`);
     return true;
   }
 
@@ -176,16 +204,15 @@ class IngredientsManagerEnhanced {
    * Delete custom ingredient
    */
   deleteCustomIngredient(ingredientId) {
-    const custom = this.getCustomIngredients();
-    const filtered = custom.filter(ing => ing.id !== ingredientId);
+    const all = this.getAllIngredients();
+    const filtered = all.filter(ing => ing.id !== ingredientId);
 
-    if (filtered.length === custom.length) {
+    if (filtered.length === all.length) {
       console.warn(`⚠️ Custom ingredient not found: ${ingredientId}`);
       return false;
     }
 
-    localStorage.setItem(this.customKey, JSON.stringify(filtered));
-    this.updateLegacyStorage();
+    this.persistProjectIngredients(filtered);
 
     console.log(`✅ Deleted custom ingredient: ${ingredientId}`);
     return true;
@@ -195,12 +222,7 @@ class IngredientsManagerEnhanced {
    * Update legacy storage (for backward compatibility)
    */
   updateLegacyStorage() {
-    const builtIn = this.getBuiltInIngredients();
-    const custom = this.getCustomIngredients();
-    const all = [...builtIn, ...custom];
-
-    localStorage.setItem(this.legacyKey, JSON.stringify(all));
-    localStorage.setItem('ingredients', JSON.stringify(all)); // Also update old key
+    this.persistProjectIngredients(this.getAllIngredients());
   }
 
   /**
@@ -243,5 +265,11 @@ if (document.readyState === 'loading') {
 } else {
   window.ingredientsManager.init();
 }
+
+document.addEventListener('projectChanged', () => {
+  if (window.ingredientsManager) {
+    window.ingredientsManager.initialized = true;
+  }
+});
 
 console.log('📦 Enhanced Ingredients Manager loaded');

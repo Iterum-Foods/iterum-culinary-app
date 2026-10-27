@@ -5,6 +5,7 @@
   'use strict';
 
   var state = { inventory: null, tab: 'program' };
+  var handlersBound = false;
 
   function $(id) {
     return document.getElementById(id);
@@ -149,17 +150,114 @@
     });
   }
 
+  function newBarItemId() {
+    if (window.iterumOps && typeof window.iterumOps.newId === 'function') {
+      return window.iterumOps.newId('barinv');
+    }
+    return 'barinv_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+  }
+
+  function nextNewBarItemName(items) {
+    var taken = {};
+    (items || []).forEach(function (it) {
+      taken[String(it.name || '').trim().toLowerCase()] = true;
+    });
+    var base = 'New bar item';
+    if (!taken[base.toLowerCase()]) return base;
+    var n = 2;
+    while (taken[(base + ' ' + n).toLowerCase()]) n += 1;
+    return base + ' ' + n;
+  }
+
+  function rowsFromTable() {
+    return collectInventory().filter(function (row) {
+      return String(row.name || '').trim();
+    }).map(function (row) {
+      if (!row.id) row.id = newBarItemId();
+      return row;
+    });
+  }
+
+  function syncIngredients(items) {
+    var bridge = window.iterumIngredientInventory;
+    if (!bridge || typeof bridge.addIngredient !== 'function') return;
+    (items || []).forEach(function (item) {
+      var name = String(item && item.name || '').trim();
+      if (!name) return;
+      bridge.addIngredient({
+        name: name,
+        category: item.category || 'Spirit',
+        unit: item.unit || 'btl',
+        cost: item.unitCost || 0,
+        supplier: item.vendor || ''
+      });
+    });
+  }
+
   async function saveInventory() {
-    state.inventory = {
-      items: window.iterumBarInventory.mergeItems([], collectInventory())
-    };
-    await window.iterumBarInventory.saveState(
-      window.iterumOps.getDb(),
-      pid(),
-      state.inventory
-    );
+    state.inventory = { items: rowsFromTable() };
+    try {
+      state.inventory = await window.iterumBarInventory.saveState(
+        window.iterumOps.getDb(),
+        pid(),
+        state.inventory
+      );
+    } catch (e) {
+      if (e && e.savedState) state.inventory = e.savedState;
+      renderInventory();
+      if (e && e.localSaved) {
+        try {
+          syncIngredients(state.inventory && state.inventory.items);
+        } catch (syncErr) {
+          /* inventory is already on this device */
+        }
+        setStatus(
+          'Saved on this device. Cloud sync failed: ' +
+            (e.message || 'unknown error'),
+          true
+        );
+        return false;
+      }
+      setStatus(
+        'Could not save bar inventory: ' +
+          (e && e.message ? e.message : 'unknown error'),
+        true
+      );
+      return false;
+    }
     renderInventory();
+    try {
+      syncIngredients(state.inventory && state.inventory.items);
+    } catch (syncErr) {
+      setStatus(
+        'Bar inventory saved. Ingredient library update failed: ' +
+          (syncErr && syncErr.message ? syncErr.message : 'unknown error'),
+        true
+      );
+      return false;
+    }
     setStatus('Bar inventory saved.');
+    return true;
+  }
+
+  function addInventoryRow() {
+    var items = rowsFromTable();
+    items.push({
+      id: newBarItemId(),
+      name: nextNewBarItemName(items),
+      category: 'Spirit',
+      location: 'Well',
+      par: 1,
+      onHand: 0,
+      vendor: '',
+      unitCost: null,
+      packSize: '',
+      unit: 'btl',
+      sku: '',
+      notes: ''
+    });
+    state.inventory = { items: items };
+    renderInventory();
   }
 
   async function importProgram() {
@@ -259,7 +357,8 @@
   }
 
   async function sendBelowParToOrderGuide() {
-    await saveInventory();
+    var saved = await saveInventory();
+    if (!saved) return;
     var low = window.iterumBarInventory.belowPar(state.inventory);
     if (!low.length) {
       setStatus('Nothing is below par.');
@@ -322,14 +421,17 @@
     window.location.href = 'order-guides.html';
   }
 
-  async function init() {
-    renderStandards();
-    renderDrinks();
+  async function reloadInventory() {
     state.inventory = await window.iterumBarInventory.loadState(
       window.iterumOps.getDb(),
       pid()
     );
     renderInventory();
+  }
+
+  function bindHandlers() {
+    if (handlersBound) return;
+    handlersBound = true;
     document.querySelectorAll('.bp-tab').forEach(function (btn) {
       btn.addEventListener('click', function () {
         showTab(btn.getAttribute('data-tab'));
@@ -337,24 +439,19 @@
     });
     $('bo-import')?.addEventListener('click', importProgram);
     $('bo-save-inv')?.addEventListener('click', saveInventory);
-    $('bo-add-inv')?.addEventListener('click', function () {
-      state.inventory.items = window.iterumBarInventory.mergeItems(
-        collectInventory(),
-        [
-          {
-            name: 'New bar item',
-            category: 'Spirit',
-            location: 'Well',
-            par: 1,
-            onHand: 0
-          }
-        ]
-      );
-      renderInventory();
-    });
+    $('bo-add-inv')?.addEventListener('click', addInventoryRow);
     $('bo-order-low')?.addEventListener('click', sendBelowParToOrderGuide);
+    document.addEventListener('projectChanged', function () {
+      reloadInventory();
+    });
+  }
+
+  async function init() {
+    renderStandards();
+    renderDrinks();
+    await reloadInventory();
+    bindHandlers();
     showTab('program');
-    document.addEventListener('projectChanged', init);
   }
 
   if (document.readyState === 'loading') {

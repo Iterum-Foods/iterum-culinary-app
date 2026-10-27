@@ -233,8 +233,13 @@
       }
     },
     updateProjectChip(name) {
+      if (typeof window.applyDashboardWorkspaceHero === 'function') {
+        window.applyDashboardWorkspaceHero(name);
+        return;
+      }
       if (this.projectChip) {
-        this.projectChip.textContent = `Project: ${name || 'Master Project'}`;
+        var label = name && name !== 'Master Project' ? name : 'Your kitchen';
+        this.projectChip.textContent = `Project: ${label}`;
       }
     },
     ensureDate() {

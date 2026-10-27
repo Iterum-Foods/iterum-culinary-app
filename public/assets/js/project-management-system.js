@@ -160,6 +160,10 @@ class ProjectManagementSystem {
         }
       }
 
+      // Copy legacy Master recipes/ingredients before any project switch clears the mirror.
+      this.installIngredientWriteEcho();
+      this.migrateMasterScopedDataOnce();
+
       // Load projects from storage (also ensures master via ensureMasterProject)
       this.loadProjects();
 
@@ -172,6 +176,8 @@ class ProjectManagementSystem {
       if (!this.currentProject) {
         this.setCurrentProject(this.masterProjectId);
       }
+
+      this.syncIngredientMirrorFromProject();
 
       // Update UI
       this.updateProjectUI();
@@ -991,10 +997,13 @@ class ProjectManagementSystem {
       return false;
     }
     const ids = new Set(this.getEffectiveProjectIds());
-    if (ids.has(this.masterProjectId)) {
-      return true;
-    }
     const pid = recipe.projectId || recipe.project;
+    if (ids.has(this.masterProjectId)) {
+      if (!pid || pid === this.masterProjectId) {
+        return true;
+      }
+      return ids.has(pid);
+    }
     if (!pid) {
       return true;
     }
@@ -1002,12 +1011,233 @@ class ProjectManagementSystem {
   }
 
   /**
-   * Generate storage key for data (simplified for master project)
-   * All data is stored in master project storage
+   * Recipe and ingredient lists are stored per project.
+   * Equipment, menus, and every other type stay on the master key.
+   */
+  isProjectScopedDataType(dataType) {
+    return (
+      dataType === 'recipe_library' ||
+      dataType === 'recipes_in_progress' ||
+      dataType === 'recipe_ideas' ||
+      dataType === 'ingredients'
+    );
+  }
+
+  /**
+   * Storage key for the active project.
+   * Scoped types use iterum_${projectId}_${dataType}. Master uses iterum_master_${dataType}.
+   * A missing named-project key is empty — callers must not fall back to master.
    */
   getProjectStorageKey(dataType) {
-    // Always use master project storage
+    if (!this.isProjectScopedDataType(dataType)) {
+      return `iterum_master_${dataType}`;
+    }
+    const project = this.currentProject;
+    if (!project || this.isMasterProject(project)) {
+      return `iterum_master_${dataType}`;
+    }
+    return `iterum_${project.id}_${dataType}`;
+  }
+
+  getMasterStorageKey(dataType) {
     return `iterum_master_${dataType}`;
+  }
+
+  readJsonArray(key) {
+    if (!key || localStorage.getItem(key) == null) {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(localStorage.getItem(key));
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      console.warn('Could not parse storage list', key, error);
+      return [];
+    }
+  }
+
+  readProjectList(dataType) {
+    const stored = this.readJsonArray(this.getProjectStorageKey(dataType));
+    return stored || [];
+  }
+
+  writeProjectList(dataType, list) {
+    const safe = Array.isArray(list) ? list : [];
+    localStorage.setItem(
+      this.getProjectStorageKey(dataType),
+      JSON.stringify(safe)
+    );
+    if (dataType === 'ingredients') {
+      this.mirrorIngredientList(safe);
+    }
+  }
+
+  /**
+   * Copy legacy user recipes and ingredients into Master once.
+   * Named projects are left empty.
+   */
+  migrateMasterScopedDataOnce() {
+    this.syncUserIdFromEnvironment();
+    const userId = this.currentUserId || 'guest';
+
+    const recipesKey = this.getMasterStorageKey('recipes_in_progress');
+    if (localStorage.getItem(recipesKey) == null) {
+      const legacy = localStorage.getItem(
+        `user_${userId}_recipes_in_progress.json`
+      );
+      if (legacy != null) {
+        const parsed = this.readJsonArray(
+          `user_${userId}_recipes_in_progress.json`
+        );
+        if (parsed) {
+          localStorage.setItem(recipesKey, JSON.stringify(parsed));
+          console.log(
+            '📦 Migrated in-progress recipes into Master:',
+            parsed.length
+          );
+        }
+      }
+    }
+
+    const ingredientsKey = this.getMasterStorageKey('ingredients');
+    if (localStorage.getItem(ingredientsKey) == null) {
+      const source = this.readLegacyUserIngredients(userId);
+      if (source) {
+        localStorage.setItem(ingredientsKey, JSON.stringify(source));
+        console.log(
+          '📦 Migrated ingredients into Master:',
+          source.length
+        );
+      }
+    }
+  }
+
+  readLegacyUserIngredients(userId) {
+    const keys = [
+      `ingredients_${userId}`,
+      `user_${userId}_ingredients.json`,
+      'ingredients_database',
+      'ingredients'
+    ];
+    for (let i = 0; i < keys.length; i++) {
+      if (localStorage.getItem(keys[i]) == null) {
+        continue;
+      }
+      const parsed = this.readJsonArray(keys[i]);
+      if (parsed) {
+        return parsed;
+      }
+    }
+    return null;
+  }
+
+  mirrorIngredientList(list) {
+    const safe = Array.isArray(list) ? list : [];
+    const json = JSON.stringify(safe);
+    const custom = safe.filter(
+      ing => !(ing && ing.id && /^ing_\d+$/.test(String(ing.id)))
+    );
+    this._suppressIngredientEcho = true;
+    try {
+      localStorage.setItem('ingredients_database', json);
+      localStorage.setItem('ingredients', json);
+      localStorage.setItem('custom_ingredients', JSON.stringify(custom));
+    } finally {
+      this._suppressIngredientEcho = false;
+    }
+  }
+
+  /**
+   * Keep ingredients_database aligned with the active project list.
+   * Missing project key mirrors an empty list and does not copy Master.
+   */
+  syncIngredientMirrorFromProject() {
+    const key = this.getProjectStorageKey('ingredients');
+    const stored = this.readJsonArray(key);
+    this.mirrorIngredientList(stored || []);
+  }
+
+  installIngredientWriteEcho() {
+    if (window.__iterumIngredientEchoInstalled) {
+      return;
+    }
+    window.__iterumIngredientEchoInstalled = true;
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key, value) {
+      original.call(this, key, value);
+      if (this !== window.localStorage || key !== 'ingredients_database') {
+        return;
+      }
+      const pm = window.projectManager;
+      if (!pm || pm._suppressIngredientEcho) {
+        return;
+      }
+      let parsed;
+      try {
+        parsed = JSON.parse(value);
+      } catch (error) {
+        return;
+      }
+      if (!Array.isArray(parsed)) {
+        return;
+      }
+      const projectKey = pm.getProjectStorageKey('ingredients');
+      pm._suppressIngredientEcho = true;
+      try {
+        original.call(this, projectKey, JSON.stringify(parsed));
+        original.call(this, 'ingredients', JSON.stringify(parsed));
+        const custom = parsed.filter(
+          ing => !(ing && ing.id && /^ing_\d+$/.test(String(ing.id)))
+        );
+        original.call(this, 'custom_ingredients', JSON.stringify(custom));
+      } finally {
+        pm._suppressIngredientEcho = false;
+      }
+    };
+  }
+
+  updateImportFromMasterButtons() {
+    const show =
+      !!this.currentProject && !this.isMasterProject(this.currentProject);
+    document.querySelectorAll('[data-import-from-master]').forEach(el => {
+      el.hidden = !show;
+      el.style.display = show ? '' : 'none';
+    });
+  }
+
+  getMasterRecipeCatalog() {
+    const byId = new Map();
+    ['recipe_library', 'recipes_in_progress', 'recipe_ideas'].forEach(type => {
+      const list = this.readJsonArray(this.getMasterStorageKey(type)) || [];
+      list.forEach(item => {
+        if (!item || item.id == null) {
+          return;
+        }
+        const id = String(item.id);
+        if (!byId.has(id)) {
+          byId.set(id, item);
+        }
+      });
+    });
+    return Array.from(byId.values());
+  }
+
+  newCopiedId(prefix) {
+    return (
+      prefix +
+      '_' +
+      Date.now() +
+      '_' +
+      Math.random().toString(36).slice(2, 9)
+    );
+  }
+
+  escapeImportLabel(value) {
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 
   /**
@@ -1051,6 +1281,8 @@ class ProjectManagementSystem {
    * Update project UI elements
    */
   updateProjectUI() {
+    this.updateImportFromMasterButtons();
+
     // Update project selector dropdowns
     this.updateProjectSelectors();
 
@@ -1274,6 +1506,9 @@ class ProjectManagementSystem {
    * Dispatch project change event
    */
   dispatchProjectChangeEvent() {
+    this.syncIngredientMirrorFromProject();
+    this.updateImportFromMasterButtons();
+
     // Use document + bubbles so listeners on document (dashboard chips, nav) and
     // window (firestore-sync, state-persistence, etc.) all receive the same change.
     const detail = {
@@ -1606,19 +1841,17 @@ class ProjectManagementSystem {
                             <div class="border rounded-lg p-4">
                                 <div class="flex items-center justify-between mb-3">
                                     <h4 class="font-medium text-gray-900">🥕 Ingredients</h4>
-                                    <button onclick="window.projectManager.toggleImportSection('ingredients')" class="text-sm text-blue-600 hover:text-blue-700">
+                                    <button type="button" onclick="window.projectManager.toggleImportSection('ingredients')" class="text-sm text-blue-600 hover:text-blue-700">
                                         Show/Hide
                                     </button>
                                 </div>
                                 <div id="import-ingredients" class="space-y-2" style="display: none;">
-                                    <p class="text-sm text-gray-600">Select ingredients to import:</p>
-                                    <div class="max-h-32 overflow-y-auto space-y-2">
-                                        <div class="flex items-center space-x-2">
-                                            <input type="checkbox" id="ingredient-all" class="rounded">
-                                            <label for="ingredient-all" class="text-sm">Select All Ingredients</label>
-                                        </div>
-                                        <!-- Ingredient list will be populated here -->
+                                    <p class="text-sm text-gray-600">Select ingredients to copy from Master:</p>
+                                    <div class="flex items-center space-x-2">
+                                        <input type="checkbox" id="ingredient-all" class="rounded" onchange="window.projectManager.toggleImportSelectAll('ingredients', this.checked)">
+                                        <label for="ingredient-all" class="text-sm">Select All Ingredients</label>
                                     </div>
+                                    <div id="import-ingredients-list" class="max-h-32 overflow-y-auto space-y-2"></div>
                                 </div>
                             </div>
                             
@@ -1626,56 +1859,24 @@ class ProjectManagementSystem {
                             <div class="border rounded-lg p-4">
                                 <div class="flex items-center justify-between mb-3">
                                     <h4 class="font-medium text-gray-900">📖 Recipes</h4>
-                                    <button onclick="window.projectManager.toggleImportSection('recipes')" class="text-sm text-blue-600 hover:text-blue-700">
+                                    <button type="button" onclick="window.projectManager.toggleImportSection('recipes')" class="text-sm text-blue-600 hover:text-blue-700">
                                         Show/Hide
                                     </button>
                                 </div>
                                 <div id="import-recipes" class="space-y-2" style="display: none;">
-                                    <p class="text-sm text-gray-600">Select recipes to import:</p>
-                                    <div class="max-h-32 overflow-y-auto space-y-2">
-                                        <div class="flex items-center space-x-2">
-                                            <input type="checkbox" id="recipe-all" class="rounded">
-                                            <label for="recipe-all" class="text-sm">Select All Recipes</label>
-                                        </div>
-                                        <!-- Recipe list will be populated here -->
+                                    <p class="text-sm text-gray-600">Select recipes to copy from Master:</p>
+                                    <div class="flex items-center space-x-2">
+                                        <input type="checkbox" id="recipe-all" class="rounded" onchange="window.projectManager.toggleImportSelectAll('recipes', this.checked)">
+                                        <label for="recipe-all" class="text-sm">Select All Recipes</label>
                                     </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Menus -->
-                            <div class="border rounded-lg p-4">
-                                <div class="flex items-center justify-between mb-3">
-                                    <h4 class="font-medium text-gray-900">🍽️ Menus</h4>
-                                    <button onclick="window.projectManager.toggleImportSection('menus')" class="text-sm text-blue-600 hover:text-blue-700">
-                                        Show/Hide
-                                    </button>
-                                </div>
-                                <div id="import-menus" class="space-y-2" style="display: none;">
-                                    <p class="text-sm text-gray-600">Select menus to import:</p>
-                                    <div class="max-h-32 overflow-y-auto space-y-2">
-                                        <div class="flex items-center space-x-2">
-                                            <input type="checkbox" id="menu-all" class="rounded">
-                                            <label for="menu-all" class="text-sm">Select All Menus</label>
-                                        </div>
-                                        <!-- Menu list will be populated here -->
-                                    </div>
+                                    <div id="import-recipes-list" class="max-h-32 overflow-y-auto space-y-2"></div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Import Mode -->
                         <div class="border-t pt-4">
-                            <h3 class="font-medium text-gray-900 mb-3">Import Mode</h3>
-                            <div class="space-y-2">
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" id="import-mode-copy" name="import-mode" value="copy" checked class="rounded">
-                                    <label for="import-mode-copy" class="text-sm">Copy (Create independent copies)</label>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    <input type="radio" id="import-mode-link" name="import-mode" value="link" class="rounded">
-                                    <label for="import-mode-link" class="text-sm">Link (Reference master data)</label>
-                                </div>
-                            </div>
+                            <h3 class="font-medium text-gray-900 mb-1">Import mode</h3>
+                            <p class="text-sm text-gray-600">Copies are independent. Master lists stay unchanged, and editing a copy does not change Master.</p>
                         </div>
                     </div>
                     
@@ -1710,21 +1911,143 @@ class ProjectManagementSystem {
    * Toggle import section visibility
    */
   toggleImportSection(section) {
+    if (section === 'menus') {
+      return;
+    }
     const element = document.getElementById(`import-${section}`);
-    if (element) {
-      element.style.display =
-        element.style.display === 'none' ? 'block' : 'none';
+    if (!element) {
+      return;
+    }
+    const opening = element.style.display === 'none';
+    element.style.display = opening ? 'block' : 'none';
+    if (opening) {
+      this.populateImportSection(section);
     }
   }
 
+  toggleImportSelectAll(section, checked) {
+    document
+      .querySelectorAll(`#import-${section}-list input[type="checkbox"]`)
+      .forEach(box => {
+        box.checked = !!checked;
+      });
+  }
+
+  populateImportSection(section) {
+    const listEl = document.getElementById(`import-${section}-list`);
+    if (!listEl) {
+      return;
+    }
+    const items =
+      section === 'ingredients'
+        ? this.readJsonArray(this.getMasterStorageKey('ingredients')) || []
+        : this.getMasterRecipeCatalog();
+    if (!items.length) {
+      listEl.innerHTML =
+        '<p class="text-sm text-gray-500">Nothing in Master to import.</p>';
+      return;
+    }
+    listEl.innerHTML = items
+      .map(item => {
+        const id = this.escapeImportLabel(item.id);
+        const label = this.escapeImportLabel(
+          item.name || item.title || 'Untitled'
+        );
+        return `<label class="flex items-center space-x-2 text-sm text-gray-800"><input type="checkbox" class="rounded" value="${id}"> <span>${label}</span></label>`;
+      })
+      .join('');
+  }
+
   /**
-   * Execute import from master
+   * Copy checked Master ingredients and recipes into the current named project.
+   * New ids keep later edits from changing Master.
    */
   executeImport() {
-    console.log('🔍 Executing import from master...');
-    // TODO: Implement actual import logic
+    if (this.isMasterProject(this.currentProject)) {
+      console.log('⚠️ Cannot import from master while on master project');
+      this.closeProjectModal();
+      return;
+    }
+
+    const selectedIngredients = Array.from(
+      document.querySelectorAll(
+        '#import-ingredients-list input[type="checkbox"]:checked'
+      )
+    ).map(box => box.value);
+    const selectedRecipes = Array.from(
+      document.querySelectorAll(
+        '#import-recipes-list input[type="checkbox"]:checked'
+      )
+    ).map(box => box.value);
+
+    if (!selectedIngredients.length && !selectedRecipes.length) {
+      alert('Select at least one ingredient or recipe to import.');
+      return;
+    }
+
+    const projectId = this.currentProject.id;
+    const masterIngredients =
+      this.readJsonArray(this.getMasterStorageKey('ingredients')) || [];
+    const masterRecipes = this.getMasterRecipeCatalog();
+
+    if (selectedIngredients.length) {
+      const current = this.readProjectList('ingredients');
+      selectedIngredients.forEach(id => {
+        const source = masterIngredients.find(item => String(item.id) === id);
+        if (!source) {
+          return;
+        }
+        const copy = JSON.parse(JSON.stringify(source));
+        copy.id = this.newCopiedId('ing');
+        copy.importedFromId = source.id;
+        copy.importedFromProject = this.masterProjectId;
+        copy.projectId = projectId;
+        current.push(copy);
+      });
+      this.writeProjectList('ingredients', current);
+    }
+
+    if (selectedRecipes.length) {
+      const library = this.readProjectList('recipe_library');
+      const inProgress = this.readProjectList('recipes_in_progress');
+      selectedRecipes.forEach(id => {
+        const source = masterRecipes.find(item => String(item.id) === id);
+        if (!source) {
+          return;
+        }
+        const copy = JSON.parse(JSON.stringify(source));
+        copy.id = this.newCopiedId('recipe');
+        copy.importedFromId = source.id;
+        copy.importedFromProject = this.masterProjectId;
+        copy.projectId = projectId;
+        copy.project = projectId;
+        copy.name = copy.name || copy.title;
+        copy.title = copy.title || copy.name;
+        library.push(copy);
+        inProgress.push(copy);
+      });
+      this.writeProjectList('recipe_library', library);
+      this.writeProjectList('recipes_in_progress', inProgress);
+    }
+
+    if (typeof window.loadRecipeIdeasFromFiles === 'function') {
+      window.loadRecipeIdeasFromFiles();
+    }
+    if (typeof window.loadIngredientsDatabase === 'function') {
+      window.loadIngredientsDatabase();
+    }
+    if (typeof window.loadIngredients === 'function') {
+      window.loadIngredients();
+    }
+    if (typeof window.loadRecipes === 'function') {
+      window.loadRecipes();
+    }
+    if (window.ingredientLibrary?.loadFromLocalStorage) {
+      window.ingredientLibrary.loadFromLocalStorage();
+    }
+
     alert(
-      'Import functionality will be implemented in the next phase. This will allow you to import ingredients, recipes, and menus from your master project.'
+      `Imported ${selectedIngredients.length} ingredient(s) and ${selectedRecipes.length} recipe(s) into ${this.currentProject.name}. Master was not changed.`
     );
     this.closeProjectModal();
   }
@@ -1834,10 +2157,13 @@ class ProjectManagementSystem {
       this.currentUserId = uid;
       console.log('🔄 User changed to:', user.name, 'ID:', uid);
 
+      this.migrateMasterScopedDataOnce();
+
       // Reload projects for new user
       this.loadProjects();
       this.loadCurrentProject();
       this.loadRestaurantLocationScope();
+      this.syncIngredientMirrorFromProject();
       this.updateProjectUI();
     }
   }
@@ -2377,6 +2703,18 @@ function updatePageProjectDisplays(projectDetail) {
 
 // Create global instance
 window.projectManager = new ProjectManagementSystem();
+
+function refreshImportFromMasterButtons() {
+  if (window.projectManager?.updateImportFromMasterButtons) {
+    window.projectManager.updateImportFromMasterButtons();
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', refreshImportFromMasterButtons);
+} else {
+  refreshImportFromMasterButtons();
+}
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

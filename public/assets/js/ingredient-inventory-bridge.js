@@ -14,6 +14,12 @@
 
   function readLegacyIngredients() {
     try {
+      if (
+        global.projectManager &&
+        typeof global.projectManager.readProjectList === 'function'
+      ) {
+        return global.projectManager.readProjectList('ingredients');
+      }
       var raw =
         global.localStorage.getItem('ingredients_database') ||
         global.localStorage.getItem('ingredients') ||
@@ -27,8 +33,16 @@
 
   function writeLegacyIngredients(list) {
     try {
-      global.localStorage.setItem('ingredients_database', JSON.stringify(list));
-      global.localStorage.setItem('ingredients', JSON.stringify(list));
+      var safe = Array.isArray(list) ? list : [];
+      if (
+        global.projectManager &&
+        typeof global.projectManager.writeProjectList === 'function'
+      ) {
+        global.projectManager.writeProjectList('ingredients', safe);
+        return;
+      }
+      global.localStorage.setItem('ingredients_database', JSON.stringify(safe));
+      global.localStorage.setItem('ingredients', JSON.stringify(safe));
     } catch (e) {
       console.warn('Could not save ingredients', e);
     }

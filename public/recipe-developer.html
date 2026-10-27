@@ -655,6 +655,7 @@
                     <div class="tc-rd-toolbar__actions">
                         <span class="tc-rd-save-hint" id="tc-rd-save-hint" aria-live="polite">Auto-save every 30s</span>
                         <span id="recipe-status" class="tc-status-pill tc-status-pill--draft">New recipe</span>
+                        <button type="button" class="btn btn-secondary btn-sm tc-btn tc-btn-outline" data-import-from-master hidden style="display:none" onclick="window.projectManager && window.projectManager.showImportFromMasterModal()">Import from Master</button>
                         <button type="button" class="btn btn-secondary btn-sm tc-btn tc-btn-outline" onclick="saveRecipe()">Save</button>
                         <button type="button" class="btn btn-primary btn-sm tc-btn tc-btn-accent" onclick="saveAndContinue()">Save &amp; continue</button>
                     </div>
@@ -1008,19 +1009,22 @@
             console.log('📦 Loading ingredients database...');
             
             try {
-                // Load from localStorage (ingredients_database or ingredients)
-                const ingredientsDb = localStorage.getItem('ingredients_database');
-                const ingredients = localStorage.getItem('ingredients');
-                
-                if (ingredientsDb) {
-                    availableIngredients = JSON.parse(ingredientsDb);
-                    console.log(`✅ Loaded ${availableIngredients.length} ingredients from database`);
-                } else if (ingredients) {
-                    availableIngredients = JSON.parse(ingredients);
-                    console.log(`✅ Loaded ${availableIngredients.length} ingredients from storage`);
+                if (window.projectManager && window.projectManager.readProjectList) {
+                    availableIngredients = window.projectManager.readProjectList('ingredients');
+                    console.log(`✅ Loaded ${availableIngredients.length} ingredients for the active project`);
                 } else {
-                    console.warn('⚠️ No ingredients found, using default list');
-                    availableIngredients = getDefaultIngredients();
+                    const ingredientsDb = localStorage.getItem('ingredients_database');
+                    const ingredients = localStorage.getItem('ingredients');
+                    if (ingredientsDb) {
+                        availableIngredients = JSON.parse(ingredientsDb);
+                    } else if (ingredients) {
+                        availableIngredients = JSON.parse(ingredients);
+                    } else {
+                        availableIngredients = getDefaultIngredients();
+                    }
+                }
+                if (!Array.isArray(availableIngredients)) {
+                    availableIngredients = [];
                 }
                 
                 // Populate all ingredient dropdowns
@@ -1202,6 +1206,14 @@
 
         // Check and auto-load ingredients if empty
         function checkAndAutoLoadIngredients() {
+            const pm = window.projectManager;
+            if (pm && pm.currentProject && !pm.isMasterProject(pm.currentProject)) {
+                const raw = localStorage.getItem(pm.getProjectStorageKey('ingredients'));
+                if (raw == null || raw === '[]') {
+                    console.log('📦 Named project has no ingredients yet; skipping base import');
+                    return;
+                }
+            }
             const ingredientsDb = localStorage.getItem('ingredients_database');
             const ingredients = localStorage.getItem('ingredients');
             
@@ -1280,10 +1292,10 @@
             document.addEventListener('projectChanged', function(event) {
                 console.log('📋 Project changed on recipe developer page, reloading ideas...');
                 if (event.detail && event.detail.project) {
-                    // Reload ideas for the new project
                     setTimeout(() => {
                         loadRecipeIdeasFromFiles();
-                    }, 500);
+                        loadIngredientsDatabase();
+                    }, 100);
                 }
             });
             
@@ -1385,51 +1397,53 @@
             console.log('✅ User file storage initialized for:', currentUser.name);
         }
         
+        function readActiveProjectList(dataType) {
+            if (!window.projectManager || !window.projectManager.getProjectStorageKey) {
+                return [];
+            }
+            try {
+                const key = window.projectManager.getProjectStorageKey(dataType);
+                const raw = localStorage.getItem(key);
+                if (raw == null) return [];
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                console.warn('⚠️ Could not read project list', dataType, error);
+                return [];
+            }
+        }
+
+        function writeActiveProjectList(dataType, list) {
+            if (window.projectManager && window.projectManager.writeProjectList) {
+                window.projectManager.writeProjectList(dataType, list);
+                return true;
+            }
+            if (!window.projectManager || !window.projectManager.getProjectStorageKey) {
+                return false;
+            }
+            localStorage.setItem(
+                window.projectManager.getProjectStorageKey(dataType),
+                JSON.stringify(list)
+            );
+            return true;
+        }
+
         function loadRecipeIdeasFromFiles() {
             const ideasList = document.getElementById('ideas-list');
             if (!ideasList) return;
 
-            console.log('📂 Loading recipe ideas from project-aware storage...');
+            console.log('📂 Loading recipe ideas from the active project...');
+            const recipeIdeas = readActiveProjectList('recipe_ideas');
+            const inProgressRecipes = readActiveProjectList('recipes_in_progress');
             
-            // Try to load from project-aware storage first
-            let recipeIdeas = [];
-            let inProgressRecipes = [];
-            
-            try {
-                // Try to load from project-aware storage
-                if (window.projectManager && window.projectManager.getCurrentProject()) {
-                    // Load recipe ideas from project-specific storage
-                    const ideasProjectKey = window.projectManager.getProjectStorageKey('recipe_ideas');
-                    const storedIdeas = localStorage.getItem(ideasProjectKey);
-                    if (storedIdeas) {
-                        recipeIdeas = JSON.parse(storedIdeas);
-                        console.log('📥 Loaded', recipeIdeas.length, 'recipe ideas from project:', ideasProjectKey);
-                    }
-                    
-                    // Load in-progress recipes from project-specific storage
-                    const recipesProjectKey = window.projectManager.getProjectStorageKey('recipes_in_progress');
-                    const storedRecipes = localStorage.getItem(recipesProjectKey);
-                    if (storedRecipes) {
-                        inProgressRecipes = JSON.parse(storedRecipes);
-                        console.log('📥 Loaded', inProgressRecipes.length, 'in-progress recipes from project:', recipesProjectKey);
-                    }
-                } else {
-                    // Fallback to global storage
-                    recipeIdeas = JSON.parse(localStorage.getItem('recipe_ideas') || '[]');
-                    inProgressRecipes = JSON.parse(localStorage.getItem('recipes_in_progress') || '[]');
-                    console.log('📥 Loaded from global storage:', recipeIdeas.length, 'ideas,', inProgressRecipes.length, 'recipes');
-                }
-                
-            } catch (error) {
-                console.warn('⚠️ Could not load from project storage, falling back to localStorage:', error);
-                
-                // Fallback to localStorage for existing data
-                recipeIdeas = JSON.parse(localStorage.getItem('recipe_ideas') || '[]');
-                inProgressRecipes = JSON.parse(localStorage.getItem('recipes_in_progress') || '[]');
-            }
-            
-            // Combine ideas and in-progress recipes
-            const allItems = [...recipeIdeas, ...inProgressRecipes];
+            const seenIds = new Set();
+            const allItems = [...recipeIdeas, ...inProgressRecipes].filter(item => {
+                if (!item || item.id == null) return false;
+                const id = String(item.id);
+                if (seenIds.has(id)) return false;
+                seenIds.add(id);
+                return true;
+            });
             
             if (allItems.length === 0) {
                 ideasList.innerHTML = `
@@ -2655,6 +2669,8 @@
                 lastUpdated: new Date().toISOString(),
                 userId: currentUser?.id || 'guest',
                 userName: currentUser?.name || 'Guest User',
+                projectId: window.projectManager?.currentProject?.id || 'master',
+                project: window.projectManager?.currentProject?.id || 'master',
                 // Additional metadata
                 notes: document.getElementById('sketch-notes')?.value || '',
                 sketchData: {
@@ -2698,16 +2714,16 @@
                 existingRecipes.push(recipeData);
             }
             
-            // Save to user file only (avoid clear-text recipe writes in localStorage)
             let saveSuccess = false;
             
             try {
-                saveSuccess = saveUserFile('recipes_in_progress.json', existingRecipes);
+                saveSuccess = writeActiveProjectList('recipes_in_progress', existingRecipes);
             } catch (error) {
-                console.error('❌ Error saving recipe to user file:', error);
+                console.error('❌ Error saving recipe to the active project:', error);
             }
             
             if (saveSuccess) {
+                upsertRecipeIntoProjectLibrary(recipeData);
                 // Update current recipe
                 currentRecipeId = recipeData.id;
                 currentRecipeData = recipeData;
@@ -2811,17 +2827,37 @@
             }
         }
         
-        // Load in-progress recipes from user file
-        function loadInProgressRecipesFromFile() {
-            try {
-                const recipesData = loadUserFile('recipes_in_progress.json');
-                if (recipesData) {
-                    return JSON.parse(recipesData);
+        function upsertRecipeIntoProjectLibrary(recipeData) {
+            const entry = {
+                ...recipeData,
+                name: recipeData.name || recipeData.title,
+                title: recipeData.title || recipeData.name
+            };
+            let library = [];
+            if (window.userDataManager && window.userDataManager.getUserRecipes && window.userDataManager.saveUserRecipes) {
+                library = window.userDataManager.getUserRecipes() || [];
+                const index = library.findIndex(recipe => recipe && recipe.id === entry.id);
+                if (index >= 0) {
+                    library[index] = { ...library[index], ...entry };
+                } else {
+                    library.push(entry);
                 }
-            } catch (error) {
-                console.warn('⚠️ Could not load from user file, using empty array');
+                window.userDataManager.saveUserRecipes(library);
+                return;
             }
-            return [];
+            library = readActiveProjectList('recipe_library');
+            const index = library.findIndex(recipe => recipe && recipe.id === entry.id);
+            if (index >= 0) {
+                library[index] = { ...library[index], ...entry };
+            } else {
+                library.push(entry);
+            }
+            writeActiveProjectList('recipe_library', library);
+        }
+
+        // Load in-progress recipes from the active project key
+        function loadInProgressRecipesFromFile() {
+            return readActiveProjectList('recipes_in_progress');
         }
 
         function collectIngredients() {
@@ -3279,13 +3315,11 @@
             // Add to available ingredients
             availableIngredients.push(newIngredient);
             
-            // Save to localStorage - use BOTH keys for compatibility
             try {
-                // Save to ingredients_database (primary)
-                localStorage.setItem('ingredients_database', JSON.stringify(availableIngredients));
-                
-                // Also save to 'ingredients' for compatibility with ingredients page
-                localStorage.setItem('ingredients', JSON.stringify(availableIngredients));
+                if (!writeActiveProjectList('ingredients', availableIngredients)) {
+                    localStorage.setItem('ingredients_database', JSON.stringify(availableIngredients));
+                    localStorage.setItem('ingredients', JSON.stringify(availableIngredients));
+                }
                 
                 console.log('✅ Saved new ingredient:', name, newIngredient);
                 console.log('📊 Total ingredients in database:', availableIngredients.length);
@@ -3690,7 +3724,7 @@
                     if (!existingRecipes.find(r => r.id === stub.id)) {
                         existingRecipes.push(stub);
                     }
-                    saveUserFile('recipes_in_progress.json', existingRecipes);
+                    writeActiveProjectList('recipes_in_progress', existingRecipes);
                 } catch (error) {
                     console.warn('⚠️ Unable to persist prep stub via user file:', error);
                 }

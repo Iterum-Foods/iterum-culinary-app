@@ -232,16 +232,21 @@ class IngredientLibrary {
   }
 
   loadFromLocalStorage() {
-    // Use user-specific file storage first, fallback to localStorage
-    if (window.userDataManager && window.userDataManager.isUserLoggedIn()) {
+    if (window.projectManager && window.projectManager.readProjectList) {
+      this.ingredients = window.projectManager.readProjectList('ingredients');
+      console.log(
+        `🥬 Loaded ${this.ingredients.length} ingredients for the active project`
+      );
+    } else if (window.userDataManager && window.userDataManager.isUserLoggedIn()) {
       const userId = window.userDataManager.getCurrentUserId();
       const filename = `user_${userId}_ingredients.json`;
-      this.ingredients = window.userDataManager.loadUserFile(filename) || [];
+      this.ingredients = window.userDataManager.loadUserFile
+        ? window.userDataManager.loadUserFile(filename) || []
+        : [];
       console.log(
         `🥬 Loaded ${this.ingredients.length} ingredients from user file`
       );
     } else {
-      // Fallback to global storage for backward compatibility
       this.ingredients = JSON.parse(
         localStorage.getItem('iterum_ingredients') || '[]'
       );
@@ -924,24 +929,27 @@ class IngredientLibrary {
   }
 
   saveToLocalStorage() {
-    // Use user-specific file storage first, fallback to localStorage
-    if (window.userDataManager && window.userDataManager.isUserLoggedIn()) {
-      const userId = window.userDataManager.getCurrentUserId();
-      const filename = `user_${userId}_ingredients.json`;
-      window.userDataManager.saveUserFile(filename, this.ingredients);
+    if (window.projectManager && window.projectManager.writeProjectList) {
+      window.projectManager.writeProjectList('ingredients', this.ingredients);
       console.log(
-        `💾 Saved ${this.ingredients.length} ingredients to user file`
+        `💾 Saved ${this.ingredients.length} ingredients to the active project`
       );
-    } else {
-      // Fallback to global storage for backward compatibility
-      localStorage.setItem(
-        'iterum_ingredients',
-        JSON.stringify(this.ingredients)
-      );
-      console.log(
-        `💾 Saved ${this.ingredients.length} ingredients to localStorage`
-      );
+      return;
     }
+    if (window.userDataManager && window.userDataManager.saveUserIngredients) {
+      window.userDataManager.saveUserIngredients(this.ingredients);
+      console.log(
+        `💾 Saved ${this.ingredients.length} ingredients via user data manager`
+      );
+      return;
+    }
+    localStorage.setItem(
+      'iterum_ingredients',
+      JSON.stringify(this.ingredients)
+    );
+    console.log(
+      `💾 Saved ${this.ingredients.length} ingredients to localStorage`
+    );
   }
 
   loadDefaultIngredientDatabase() {
@@ -2752,6 +2760,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Create global instance
 window.ingredientLibrary = new IngredientLibrary();
+
+document.addEventListener('projectChanged', () => {
+  if (window.ingredientLibrary && window.ingredientLibrary.loadFromLocalStorage) {
+    window.ingredientLibrary.loadFromLocalStorage();
+  }
+});
 
 // Helper to get current user ID (simplified for master project)
 function getCurrentUserId() {
